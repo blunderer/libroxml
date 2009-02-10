@@ -1,10 +1,11 @@
 
-SRC=roxml.c
 INC=roxml.h
+SRC_LIB=roxml.c
 SRC_TST=xshell.c
+SRC_BIN=roxml-parser.c
 OBJ_TST=$(SRC_TST:.c=.o)
-OBJ_BIN=$(SRC:.c=-bin.o)
-OBJ_LIB=$(SRC:.c=-lib.o)
+OBJ_BIN=$(SRC_BIN:.c=.o)
+OBJ_LIB=$(SRC_LIB:.c=.o)
 
 LDFLAGS=
 CFLAGS=-I. -g -Wall -Wextra
@@ -19,7 +20,7 @@ $(TARGET_TST): $(OBJ_TST)
 	$(CC) $(LDFLAGS) -L. -lroxml $^ -o $@
 
 $(TARGET_BIN): $(OBJ_BIN)
-	$(CC) $(LDFLAGS) $^ -o $@
+	$(CC) $(LDFLAGS) -L. -lroxml $^ -o $@
 
 $(TARGET_LIB): $(OBJ_LIB)
 	$(CC) -shared $(LDFLAGS) $^ -o $@
