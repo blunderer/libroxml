@@ -12,9 +12,37 @@ int main(int argc, char ** argv)
 	node_t *cur;
 	
 	if(argc < 2)	{
+		fprintf(stderr,"usage %s [buffer] <filename>\n",argv[0]);
+		fprintf(stderr,"keyword buffer ask to use the buffer parsing instead of file parsing\n");
 		return -1;
 	}
-	root = roxml_load_doc(argv[1]);
+
+	if(argc > 2)	{
+		if(strcmp(argv[1], "buffer")==0)	{
+			FILE *f;
+			char * my_buffer;
+			f = fopen(argv[2], "r");
+			if(f)	{
+				int size, ret;
+				fseek(f, 0, SEEK_END);
+				size = ftell(f);
+				fseek(f, 0, SEEK_SET);
+				my_buffer = (char*)malloc(sizeof(char)*(size+1));
+				memset(my_buffer, 0, sizeof(char)*(size+1));
+				ret = fread(my_buffer, 1, sizeof(char)*(size), f);
+				root = roxml_load_buf(my_buffer);
+				fclose(f);
+			} else {
+				fprintf(stderr,"no such file %s\n",argv[2]);
+				exit(-1);
+			}
+		} else {
+			fprintf(stderr,"unknown arg %s\n",argv[1]);
+			exit(-1);
+		}
+	} else	{
+		root = roxml_load_doc(argv[1]);
+	}
 	cur = root;
 	
 	running = 1;
@@ -240,7 +268,7 @@ int main(int argc, char ** argv)
 		}
 	}
 
-	roxml_close_doc(root);
+	roxml_close(root);
 	return 0;
 }
 

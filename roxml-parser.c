@@ -8,6 +8,7 @@ int main(int argc, char ** argv)
 	node_t *cur;
 	
 	if(argc < 2)	{
+		fprintf(stderr,"usage %s <filename> <node1> <node2> <node3> ... <nodeN>\n",argv[0]);
 		return -1;
 	}
 	root = roxml_load_doc(argv[1]);
@@ -37,7 +38,7 @@ int main(int argc, char ** argv)
 		}
 	}
 
-	roxml_close_doc(root);
+	roxml_close(root);
 	return 0;
 }
 
