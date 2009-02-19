@@ -49,12 +49,13 @@ mrproper: clean
 	rm -fr docs
 
 install: $(TARGET) doxy
-	mkdir -p $(DESTDIR)/usr/lib/ $(DESTDIR)/usr/bin/ $(DESTDIR)/usr/include $(DESTDIR)/usr/lib/pkgconfig
+	mkdir -p $(DESTDIR)/usr/lib/ $(DESTDIR)/usr/bin/ $(DESTDIR)/usr/include $(DESTDIR)/usr/lib/pkgconfig $(DESTDIR)/usr/share/doc/libroxml/
 	cp -a $(TARGET_LIB) $(DESTDIR)/usr/lib/
 	cp -a $(TARGET_TST) $(DESTDIR)/usr/bin/
 	cp -a $(TARGET_BIN) $(DESTDIR)/usr/bin/
 	cp -a $(INC) $(DESTDIR)/usr/include
 	cp -a libroxml.pc $(DESTDIR)/usr/lib/pkgconfig
+	cp -a docs/html $(DESTDIR)/usr/share/doc/libroxml/
 
 uninstall:
 	rm -f $(DESTDIR)/usr/lib/pkgconfig/libroxml.pc
@@ -62,6 +63,7 @@ uninstall:
 	rm -f $(DESTDIR)/usr/bin/$(TARGET_TST)
 	rm -f $(DESTDIR)/usr/bin/$(TARGET_BIN)
 	rm -f $(DESTDIR)/usr/include/$(INC)
+	rm -fr $(DESTDIR)/usr/share/doc/libroxml
 
 .PHONY: clean mrproper uninstall
 

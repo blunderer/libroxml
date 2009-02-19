@@ -1,0 +1,23 @@
+Source: libroxml
+Priority: extra
+Maintainer: blunderer <blunderer@blunderer.org>
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.7.3
+Section: libs
+Homepage: http://code.google.com/p/libroxml/
+
+Package: libroxml-dev
+Section: libdevel
+Architecture: any
+Depends: libroxml (= ${binary:Version})
+Description: development file for libroxml
+
+Package: libroxml
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: a light and powerfull xml parsing library
+ libroxml is a very light, low fingerprint, fast, and powerfull
+ library designed for parsing XML files. This is perfectly suitable 
+ for little embeded systems but you also use it widely in various
+ application for xml configuration file reading for example.
