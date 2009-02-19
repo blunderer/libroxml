@@ -1,8 +1,7 @@
-/** \file roxml.h
- *  \brief header for libroxml.so
+/** \file roxml-internal.h
+ *  \brief internal header for libroxml.so
  *         
- * This is the header file used to develop some
- * softwares using the libroxml.so library.
+ * This is the header file used by roxml.c
  * \author blunderer <blunderer@blunderer.org>
  * \date 23 Dec 2008
  *
