@@ -57,8 +57,10 @@ install: $(TARGET) doxy
 	cp -a libroxml.pc $(DESTDIR)/usr/lib/pkgconfig
 
 uninstall:
+	rm -f $(DESTDIR)/usr/lib/pkgconfig/libroxml.pc
 	rm -f $(DESTDIR)/usr/lib/$(TARGET_LIB)
 	rm -f $(DESTDIR)/usr/bin/$(TARGET_TST)
+	rm -f $(DESTDIR)/usr/bin/$(TARGET_BIN)
 	rm -f $(DESTDIR)/usr/include/$(INC)
 
 .PHONY: clean mrproper uninstall
