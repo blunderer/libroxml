@@ -49,9 +49,12 @@ mrproper: clean
 	rm -fr docs
 
 install: $(TARGET) doxy
+	mkdir -p $(DESTDIR)/usr/lib/ $(DESTDIR)/usr/bin/ $(DESTDIR)/usr/include $(DESTDIR)/usr/lib/pkgconfig
 	cp -a $(TARGET_LIB) $(DESTDIR)/usr/lib/
 	cp -a $(TARGET_TST) $(DESTDIR)/usr/bin/
+	cp -a $(TARGET_BIN) $(DESTDIR)/usr/bin/
 	cp -a $(INC) $(DESTDIR)/usr/include
+	cp -a libroxml.pc $(DESTDIR)/usr/lib/pkgconfig
 
 uninstall:
 	rm -f $(DESTDIR)/usr/lib/$(TARGET_LIB)
