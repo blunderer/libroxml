@@ -5,24 +5,27 @@
  * \author blunderer <blunderer@blunderer.org>
  * \date 23 Dec 2008
  *
+ * Copyright (C) 2009 blunderer
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 #ifndef ROXML_C
 #define ROXML_C
 
 #include "roxml.h"
-
-#ifdef BUILD_AS_BIN
-int main(int argc, char ** argv)
-{
-	if(argc == 1)	{
-		return 0;
-	}
-	node_t *my = roxml_load_doc(argv[1]);
-	roxml_close(my);
-	return 0;
-}
-#endif /* BUILD_AS_BIN */
 
 node_t * roxml_parent_node(node_t *parent, node_t *n)
 {
@@ -191,7 +194,7 @@ int roxml_get_content(node_t *n, char *content)
 		len = n->end - start - 1;
 		if(len > 0)	{
 			if(content)	{
-				fread(content, len, sizeof(char), n->fil);
+				ROXML_FREAD(content, len, sizeof(char), n);
 				content[len] = '\0';
 			}
 		} else	{
@@ -368,45 +371,14 @@ node_t * roxml_load(node_t *current_node, FILE *file, char *buffer)
 				if(state == STATE_NODE_NAME)	{
 					state = STATE_NODE_CONTENT;
 					current_node = roxml_parent_node(current_node, candidat_node);
-#ifdef BUILD_AS_BIN
-					fprintf(stderr,"new node '%s'\n",roxml_get_name(current_node));
-#endif /* BUILD_AS_BIN */
 				} else if(state == STATE_NODE_ATTR)	{
-#ifdef BUILD_AS_BIN
-					int nb, i;
-#endif /* BUILD_AS_BIN */
 					state = STATE_NODE_CONTENT;
 					current_node = roxml_parent_node(current_node, candidat_node);
-#ifdef BUILD_AS_BIN
-					nb = roxml_get_nb_attr(current_node);
-					fprintf(stderr,"new node with attr '%s'\n",roxml_get_name(current_node));
-					fprintf(stderr,"%d args\n",nb);
-					for(i = 0; i < nb; i++)	{
-						fprintf(stderr,"%d arg : %s = %s\n",i,
-							roxml_get_attr_nth(current_node, i),
-							roxml_get_attr_val_nth(current_node, i));
-					}
-#endif /* BUILD_AS_BIN */
 				} else if(state == STATE_NODE_SINGLE)	{
 					current_node = roxml_parent_node(current_node, candidat_node);
-#ifdef BUILD_AS_BIN
-					fprintf(stderr,"new single node '%s'\n",roxml_get_name(current_node));
-#endif /* BUILD_AS_BIN */
 					current_node = current_node->fat;
 				} else if(state == STATE_NODE_END)	{
-#ifdef BUILD_AS_BIN
-					int len;
-					char content[1024] = "";
-#endif /* BUILD_AS_BIN */
 					roxml_close_node(current_node, candidat_node);
-#ifdef BUILD_AS_BIN
-					len = roxml_get_content(current_node, NULL);
-					if(len < 1024)	{
-						roxml_get_content(current_node, content);
-					}
-					fprintf(stderr,"close %s\n",roxml_get_name(current_node));
-					fprintf(stderr,"content %d %s\n",len, content);
-#endif /* BUILD_AS_BIN */
 					current_node = current_node->fat;
 				}
 			} else if(c == '/')	{
@@ -424,9 +396,75 @@ node_t * roxml_load(node_t *current_node, FILE *file, char *buffer)
 			}
 		}
 	}
+	while(current_node->fat)	{ current_node = current_node->fat; }
 	return current_node;
 }
 
+node_t ** roxml_exec_path(node_t *n, char * path, int *nb_ans)
+{
+	int index = 0;
+	int nb_ans_internal = 0;
+	node_t *starting_node = n;
+	node_t **resulting_nodes = NULL;
+	char * path_to_find;
+	if(path[0] == '/')	{
+		path_to_find = strdup(path+1);
+		while(starting_node->fat)	{
+			starting_node = starting_node->fat;
+		}
+	} else	{
+		path_to_find = strdup(path);
+	}
+
+	/* two pass algorithm : first: how many node match */
+	roxml_resolv_path(starting_node, path_to_find, &nb_ans_internal, NULL);
+	if(nb_ans) { *nb_ans = nb_ans_internal; }
+	if(nb_ans_internal == 0)	{
+		return NULL;
+	}
+
+	/* two pass algorithm : then: copy them */
+	index = 0;
+	resulting_nodes = (node_t**)malloc(sizeof(node_t*)*nb_ans_internal);
+	roxml_resolv_path(starting_node, path_to_find, &index, &resulting_nodes);
+
+	return resulting_nodes;
+}
+
+void roxml_resolv_path(node_t *n, char * path, int *idx, node_t ***res)
+{
+	int i;
+	int nb_son = 0;
+	if(strlen(path) == 0)	{ return; }
+	if(n == NULL)	{ return; }
+
+	if(strncmp(path, "..", strlen("..")) == 0)	{
+		char * new_path = path+strlen("..");
+		if((strlen(new_path) > 0) && (strcmp(new_path,"/") != 0))	{
+			roxml_resolv_path(n->fat, new_path+1, idx, res);
+		} else	{
+			if(res)	{ (*res)[*idx] = n->fat; }
+			(*idx)++;
+		}
+	}
+
+	nb_son = roxml_get_son_nb(n);
+	for(i = 0; i < nb_son; i++)	{
+		node_t *cur = roxml_get_son_nth(n, i);
+		char *name = roxml_get_name(cur);
+
+		if(strncmp(name, path, strlen(name)) == 0)	{
+			char * new_path = path+strlen(name);
+			if((strlen(new_path) > 0) && (strcmp(new_path,"/") != 0))	{
+				roxml_resolv_path(cur, new_path+1, idx, res);
+			} else	{
+				if(res)	{ (*res)[*idx] = cur; }
+				(*idx)++;
+			}
+		}
+		free(name);
+	}
+}
 
 #endif /* ROXML_C */
 

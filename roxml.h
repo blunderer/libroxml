@@ -6,6 +6,21 @@
  * \author blunderer <blunderer@blunderer.org>
  * \date 23 Dec 2008
  *
+ * Copyright (C) 2009 blunderer
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 /** \mainpage libroxml homepage
@@ -164,6 +179,20 @@ char*	ROXML_API roxml_get_attr_nth		(node_t *n, int nb);
  * see roxml_parse_node
  */
 char*	ROXML_API roxml_get_attr_val_nth	(node_t *n, int nb);
+
+/** \brief exec path function
+ *
+ * \fn roxml_exec_path(node_t *n, char * path);
+ * This function return a node corresponding to a given path.
+ * path syntax is : 
+ * if path begin with  a "/" it is an absolute path relative to root
+ * else it is a path relative to given node
+ * param n is one node of the tree path can be relative to this or absolute
+ * param path the path to resolv
+ * param nb_ans the number of results
+ * return the node table or NULL 
+ */
+node_t ** ROXML_API roxml_exec_path(node_t *n, char * path, int *nb_ans);
 
 #endif /* ROXML_H */
 

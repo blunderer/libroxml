@@ -6,27 +6,19 @@
  * \author blunderer <blunderer@blunderer.org>
  * \date 23 Dec 2008
  *
- */
-
-/** \mainpage libroxml homepage
- *
- * \section intro_sec Introduction
- * This library is minimum, easy-to-use, C implementation for xml file parsing
- * It includes a mini shell to navigate thru a xml file as a demo.
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  * 
- * \section why_sec Why libroxml?
- * Because XML parsing is always hard to reinvent, and because very often xml lib are 
- * too big to fit with very little application
- *
- * \section what_sec What can do libroxml?
- * It allow you to easily:
- * - load / unload document
- * - navigate thru an xml tree
- * - read attributes and attributes' values for nodes
- * - get content of nodes
- *
- * \section how_sec How does it work?
- * \ref roxml.h
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 #ifndef ROXML_INT_H
@@ -208,6 +200,13 @@ typedef struct node {
  */
 #define ROXML_FEOF(n)	((n->type > 0)?feof(n->fil):((*(n->idx))>=(strlen(n->buf)-1)))
 
+/**
+ * \def ROXML_FREAD(b, len, size, n)
+ * 
+ * get chunck of stream
+ */
+#define ROXML_FREAD(b, len, size, n)	{if(n->type > 0){fread(b, len, size, n->fil);} else { memcpy(b, n->buf+*(n->idx), (size)*(len)); }}
+
 /** \brief internal function
  *
  * \fn void ROXML_INT roxml_free_node(node_t *n);
@@ -286,6 +285,18 @@ void 	ROXML_INT roxml_close_node		(node_t *n, node_t *close);
  * see roxml_close
  */
 node_t*	ROXML_INT roxml_load			(node_t *current_node, FILE *file, char *buffer);
+
+/** \brief recursiv resolv path function
+ *
+ * \fn roxml_resolv_path(node_t *n, char * path, int *idx, node_t **res);
+ * this function resolv a chunk of path and call itself recursively
+ * param current_node, the current node 
+ * param path the path to resolv
+ * param idx the actual number of results
+ * param res the place where to store resulting nodes
+ * see roxml_close
+ */
+void ROXML_INT roxml_resolv_path(node_t *n, char * path, int *idx, node_t ***res);
 
 #endif /* ROXML_INT_H */
 
