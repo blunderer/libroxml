@@ -1,4 +1,4 @@
-%define name blunderer
+%define name libroxml
 %define version 1.3
 %define release 1
 
@@ -6,7 +6,7 @@ Summary: a light and powerfull xml parsing library
 Name: %{name}
 Version: %{version}
 Release: %{release}
-Source: http://code.google.com/p/libroxml/source/checkout
+Source: http://libroxml.googlecode.com/files/libroxml-1.3.tar.gz
 Vendor: blunderer
 URL:  http://code.google.com/p/libroxml/
 License: LGPL
@@ -29,7 +29,7 @@ The %{name}-devel package contains the header files and static libraries for
 building applications which use %{name}.
 
 %prep
-%setup -n %{name}-%{version}.tar.gz
+%setup -n %{name}-%{version}
 
 %build
 make
@@ -47,14 +47,16 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%doc AUTHORS debian/changelog COPYING INSTALL NEWS README TODO
-%{_prefix}/lib/lib*.so.*
+%doc debian/changelog debian/README
+%{_prefix}/lib/lib*.so
+%{_prefix}/lib/lib*.a
 
 %files devel
 %defattr(-,root,root)
-%doc AUTHORS debian/changelog COPYING INSTALL NEWS README TODO
+%doc debian/changelog debian/README
 %{_prefix}/bin/*
 %{_prefix}/lib/lib*.so
 %{_prefix}/include/*
 %{_prefix}/lib/pkgconfig/*
+%{_prefix}/share/doc/libroxml/html/*
 
