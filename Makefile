@@ -2,70 +2,110 @@
 ifeq ($O,)
 O = .
 endif
+# V (Verbosity) is 0 (quiet) or 1 (verbose)
+ifeq ($V,0)
+override V =
+endif
 
-INC=roxml.h
-SRC_LIB=roxml.c
-SRC_TST=xshell.c
-SRC_BIN=roxml-parser.c
-OBJ_TST=$(SRC_TST:%.c=$O/%.o)
-OBJ_BIN=$(SRC_BIN:%.c=$O/%.o)
-OBJ_LIB=$(SRC_LIB:%.c=$O/%.o)
+# files
+INC = roxml.h
+SRC_LIB = roxml.c
+SRC_BIN = roxml-parser.c
+SRC_TST = xshell.c
+DEPS = $(patsubst %.c, $O/%.d, $(SRC_LIB) $(SRC_BIN) $(SRC_TST))
+OBJS = $(OBJ_LIB) $(OBJ_TST) $(OBJ_BIN)
+OBJ_LIB = $(SRC_LIB:%.c=$O/%.o)
+OBJ_BIN = $(SRC_BIN:%.c=$O/%.o)
+OBJ_TST = $(SRC_TST:%.c=$O/%.o)
+TARGETS = $(TARGET_SLIB) $(TARGET_LIB) $(TARGET_BIN) $(TARGET_TST)
+TARGET_SLIB = $O/libroxml.a
+TARGET_LIB = $O/libroxml.so
+TARGET_BIN = $O/roxml
+TARGET_TST = $O/xshell
 
+# options
 override CPPFLAGS +=
 override CFLAGS += -Wall -Wextra -Werror
 override LDFLAGS +=
 
-TARGET_SLIB=$O/libroxml.a
-TARGET_LIB=$O/libroxml.so
-TARGET_BIN=$O/roxml
-TARGET_TST=$O/xshell
+# first rule (default)
+all:
 
-all: $(TARGET_SLIB) $(TARGET_LIB) $(TARGET_BIN) $(TARGET_TST)
+# dependencies
+ifeq ($(or \
+	$(findstring doxy, $(MAKECMDGOALS)), \
+	$(findstring clean, $(MAKECMDGOALS)), \
+	$(findstring mrproper, $(MAKECMDGOALS)), \
+	$(findstring uninstall, $(MAKECMDGOALS)) \
+),)
+-include $(DEPS)
+endif
 
-$(TARGET_TST): $(OBJ_TST) | $(if $(filter -static, $(LDFLAGS)), $(TARGET_SLIB), $(TARGET_LIB))
-	$(CC) $(LDFLAGS) $^ -o $@ -L$O -lroxml
+# rules verbosity
+define ECHO_DO
+@ $(if $V, echo $2, $(if $(strip $1), echo $1))
+@ $2
+endef
 
-$(TARGET_BIN): $(OBJ_BIN) | $(if $(filter -static, $(LDFLAGS)), $(TARGET_SLIB), $(TARGET_LIB))
-	$(CC) $(LDFLAGS) $^ -o $@ -L$O -lroxml
-
-$(TARGET_SLIB): $(OBJ_LIB)
-	$(AR) rc $@ $^
-
-$(TARGET_LIB): $(OBJ_LIB)
-	$(CC) -shared $(LDFLAGS) $^ -o $@
-
-$O/%.o: $(notdir %.c) | $O
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) $< -o $@
+# rules
 
 $O:
-	mkdir -p $O
+	$(call ECHO_DO, '  MKDIR   $@', \
+	mkdir -p $O )
 
+$O/%.d: $(notdir %.c) | $O
+	$(call ECHO_DO, '  DEP     $(notdir $@)', \
+	$(CC) -MM -MT '$@ $O/$*.o' $(CPPFLAGS) $< -MF $@ || rm -f $@ )
+
+$O/%.o: $(notdir %.c)
+	$(call ECHO_DO, '  CC      $(notdir $@)', \
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $< -o $@ )
+
+$(TARGET_SLIB): $(OBJ_LIB)
+	$(call ECHO_DO, '  AR      $(notdir $@)', \
+	$(AR) rc $@ $^ )
+
+$(TARGET_LIB): $(OBJ_LIB)
+	$(call ECHO_DO, '  LD      $(notdir $@)', \
+	$(CC) -shared $(LDFLAGS) $^ -o $@ )
+
+$(TARGET_BIN): $(OBJ_BIN)
+$(TARGET_TST): $(OBJ_TST)
+$(TARGET_BIN) $(TARGET_TST): | $(if $(filter -static, $(LDFLAGS)), $(TARGET_SLIB), $(TARGET_LIB))
+	$(call ECHO_DO, '  LD      $(notdir $@)', \
+	$(CC) $(LDFLAGS) $^ -L$O -lroxml -o $@ )
+
+.PHONY: all
+all: $(TARGET_SLIB) $(if $(filter -static, $(LDFLAGS)), , $(TARGET_LIB)) $(TARGET_BIN) $(TARGET_TST)
+
+.PHONY: doxy
 doxy: doxy.cfg
-	doxygen doxy.cfg
+	$(call ECHO_DO, '  DOXYGEN', \
+	doxygen $< )
 
+.PHONY: clean
 clean:
-	- rm -f $(TARGET_BIN)
-	- rm -f $(TARGET_SLIB)
-	- rm -f $(TARGET_LIB)
-	- rm -f $(TARGET_TST)
-	- rm -f $(OBJ_LIB)
-	- rm -f $(OBJ_BIN)
-	- rm -f $(OBJ_TST)
+	$(call ECHO_DO, '  RM      deps objs libs bins', \
+	- rm -f $(DEPS) $(OBJS) $(TARGETS) )
 
+.PHONY: mrproper
 mrproper: clean
-	- rm -fr docs
-	- fakeroot make -f debian/rules clean
+	$(call ECHO_DO, '  RM      docs', \
+	- rm -fr docs )
+	$(call ECHO_DO, '  CLEAN   debian', \
+	- fakeroot $(MAKE) -f $(abspath debian/rules) clean )
 
-install: $(TARGET) doxy
-	mkdir -p $(DESTDIR)/usr/lib/ $(DESTDIR)/usr/bin/ $(DESTDIR)/usr/include $(DESTDIR)/usr/lib/pkgconfig $(DESTDIR)/usr/share/doc/libroxml/
-	cp -a $(TARGET_SLIB) $(DESTDIR)/usr/lib/
-	cp -a $(TARGET_LIB) $(DESTDIR)/usr/lib/
-	cp -a $(TARGET_TST) $(DESTDIR)/usr/bin/
-	cp -a $(TARGET_BIN) $(DESTDIR)/usr/bin/
-	cp -a $(INC) $(DESTDIR)/usr/include
-	cp -a libroxml.pc $(DESTDIR)/usr/lib/pkgconfig
-	cp -a docs/html $(DESTDIR)/usr/share/doc/libroxml/
+.PHONY: install
+install: $(TARGETS) doxy
+	install -D $(TARGET_SLIB) $(DESTDIR)/usr/lib
+	install -D $(TARGET_LIB) $(DESTDIR)/usr/lib
+	install -D $(TARGET_TST) $(DESTDIR)/usr/bin
+	install -D $(TARGET_BIN) $(DESTDIR)/usr/bin
+	install -D $(INC) $(DESTDIR)/usr/include
+	install -D libroxml.pc $(DESTDIR)/usr/lib/pkgconfig
+	install -D docs/html $(DESTDIR)/usr/share/doc/libroxml
 
+.PHONY: uninstall
 uninstall:
 	- rm -f $(DESTDIR)/usr/lib/pkgconfig/libroxml.pc
 	- rm -f $(DESTDIR)/usr/lib/$(TARGET_SLIB)
@@ -74,6 +114,3 @@ uninstall:
 	- rm -f $(DESTDIR)/usr/bin/$(TARGET_BIN)
 	- rm -f $(DESTDIR)/usr/include/$(INC)
 	- rm -fr $(DESTDIR)/usr/share/doc/libroxml
-
-.PHONY: clean mrproper uninstall
-
