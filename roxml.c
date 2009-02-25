@@ -323,6 +323,9 @@ node_t * roxml_load_doc(char *filename)
 {
 	node_t *current_node = NULL;
 	FILE* file = fopen(filename, "r");
+	if(file == NULL)	{
+		return NULL;
+	}
 	current_node = roxml_new_node(0, file, NULL, NULL);
 	current_node = roxml_parent_node(NULL, current_node);
 	return roxml_load(current_node,  file, NULL);

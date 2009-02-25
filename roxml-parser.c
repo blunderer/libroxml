@@ -32,8 +32,6 @@ void print_usage (const char *progname) {
 
 int main(int argc, char ** argv)
 {
-	struct stat buf;
-	int status;
 	int option ;
 	int quiet = 0 ;
 	int j ,max;
@@ -56,14 +54,12 @@ int main(int argc, char ** argv)
 		return -1;
 	}
 
-	status = stat(argv[optind], &buf);
-
-	if(status == -1)	{
+	root = roxml_load_doc(argv[optind]);
+	cur = root;
+	if(root == NULL)	{
 		fprintf(stdout,"no such file '%s'\n", argv[optind]);
 	}
 
-	root = roxml_load_doc(argv[optind]);
-	cur = root;
 
 	ans= roxml_exec_path(cur, argv[optind + 1],  &max);
 
