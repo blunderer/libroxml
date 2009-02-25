@@ -22,22 +22,50 @@
  */
 
 #include "roxml.h"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+
+void print_usage (const char *progname) {
+	fprintf (stderr, "usage: %s [-q] <filename> [/]<node1>/<node2>/<node3>/.../<nodeN>\n", progname) ;
+}
 
 int main(int argc, char ** argv)
 {
+	struct stat buf;
+	int status;
+	int option ;
+	int quiet = 0 ;
 	int j ,max;
 	node_t *root;
 	node_t *cur;
 	node_t **ans;
-	
-	if(argc < 2)	{
-		fprintf(stderr,"usage %s <filename> [/]<node1>/<node2>/<node3>/.../<nodeN>\n",argv[0]);
+
+	while ((option = getopt (argc, argv, "q")) >= 0) {
+		switch (option) {
+			case 'q' :
+				quiet = 1 ;
+				break ;
+			default :
+				print_usage (argv[0]) ;
+				return EXIT_FAILURE ;
+		}
+	}
+	if (argc < optind + 2) {
+		print_usage (argv[0]) ;
 		return -1;
 	}
-	root = roxml_load_doc(argv[1]);
+
+	status = stat(argv[optind], &buf);
+
+	if(status == -1)	{
+		fprintf(stdout,"no such file '%s'\n", argv[optind]);
+	}
+
+	root = roxml_load_doc(argv[optind]);
 	cur = root;
-	
-	ans= roxml_exec_path(cur, argv[2],  &max);
+
+	ans= roxml_exec_path(cur, argv[optind + 1],  &max);
 
 	for(j = 0; j < max; j++)
 	{
@@ -46,7 +74,9 @@ int main(int argc, char ** argv)
 		size = roxml_get_content(ans[j], c);
 		c = (char*)malloc(sizeof(char)*(size+1));
 		roxml_get_content(ans[j], c);
-		fprintf(stderr,"ans[%d]: %s\n",j, c);
+		if (! quiet)
+			fprintf(stdout,"ans[%d]: ", j);
+		fprintf(stdout,"%s\n", c);
 		free(c);
 	}
 
