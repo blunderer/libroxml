@@ -63,6 +63,10 @@ int main(int argc, char ** argv)
 		}
 	} else	{
 		root = roxml_load_doc(argv[1]);
+		if(root == NULL)	{
+			fprintf(stderr,"no such file or directory\n");
+			exit(-1);
+		}
 	}
 	cur = root;
 	

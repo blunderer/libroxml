@@ -49,6 +49,8 @@ int main(int argc, char ** argv)
 				return EXIT_FAILURE ;
 				break ;
 			default :
+				print_usage (argv[0]) ;
+				return EXIT_FAILURE ;
 				break;
 		}
 	}
