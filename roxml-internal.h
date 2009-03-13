@@ -193,6 +193,13 @@ typedef struct node {
 #define ROXML_FTELL(n)	((n->type > 0)?ftell(n->fil):*((int*)n->idx))
 
 /**
+ * \def ROXML_FSEEK(n, pos)
+ * 
+ * set stream position
+ */
+#define ROXML_FSEEK(n, pos)	{if(n->type > 0){ fseek((n)->fil, pos, SEEK_SET); } else { *((int*)(n)->idx)=(pos); } }
+
+/**
  * \def ROXML_FEOF(n)
  * 
  * get end of stream

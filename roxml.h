@@ -129,8 +129,21 @@ char*	ROXML_API roxml_get_name		(node_t *n);
 
 /** \brief content getter function
  *
+ * \fn int ROXML_API roxml_get_raw_content(node_t *n, char * content);
+ * This function fill a pointer with the content of a node including sons as text;
+ * if the pointer is NULL then the len is returned (without last \0). libroxml assume that
+ * pointer is large enought to write the whole content string
+ * param n is one node of the tree
+ * param content is a pointer where content will be copied
+ * return the len of content
+ * see 
+ */
+int	ROXML_API roxml_get_raw_content		(node_t *n, char * content);
+
+/** \brief content getter function
+ *
  * \fn int ROXML_API roxml_get_content(node_t *n, char * content);
- * This function fill a pointer with the content of a node
+ * This function fill a pointer with only the text content of a node 
  * if the pointer is NULL then the len is returned (without last \0). libroxml assume that
  * pointer is large enought to write the whole content string
  * param n is one node of the tree

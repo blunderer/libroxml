@@ -44,12 +44,15 @@ int main(int argc, char ** argv)
 			case 'q' :
 				quiet = 1 ;
 				break ;
-			default :
+			case 'h' :
 				print_usage (argv[0]) ;
 				return EXIT_FAILURE ;
+				break ;
+			default :
+				break;
 		}
 	}
-	if (argc < optind + 2) {
+	if(argc < optind + 2) {
 		print_usage (argv[0]) ;
 		return -1;
 	}

@@ -179,6 +179,58 @@ void roxml_parse_node(node_t *n, char *name, char * arg, char * value, int * num
 
 int roxml_get_content(node_t *n, char *content)
 {
+	int num;
+	int nbs;
+	int len = 0, total = 0;
+	char *content_ptr = content;
+	long long int start = 0, end = 0;	
+
+	nbs = roxml_get_son_nb(n);
+
+	PUSH(n)
+
+	for(num = 0; num < nbs+1; num++)	{
+		char c = 0;
+		node_t *son = roxml_get_son_nth(n, num);
+		if(son)	{
+			end = son->pos;
+		} else	{
+			end = n->end;
+		}
+
+		while((!ROXML_FEOF(n))&&(c != '>'))      {
+			c = ROXML_FGETC(n);
+		}
+		if(c == '>')	{
+			start = ROXML_FTELL(n);
+			len = end - start - 1;
+			if(len > 0)	{
+				if(content_ptr)	{
+					ROXML_FREAD(content_ptr, len, sizeof(char), n);
+					content_ptr[len] = '\0';
+					content_ptr += len;
+				}
+				total += len;
+			} else	{
+				len = 0;
+				if(content_ptr)	{
+					content_ptr[0] = '\0';
+				}
+			}
+		} else {
+			return -1;
+		}
+		if(son)	{
+			ROXML_FSEEK(son, son->end);
+		}
+	}
+
+	POP(n)
+	return total;
+}
+
+int roxml_get_raw_content(node_t *n, char *content)
+{
 	char c = 0;
 	int len = 0;
 	long long int start = 0;	
@@ -306,6 +358,7 @@ node_t *roxml_get_son_nth(node_t *n, int nb)
 		count++;
 		ptr = ptr->bra;
 	}
+	if(nb > count)	{ return NULL; }
 	return ptr;
 }
 
