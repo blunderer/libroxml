@@ -51,13 +51,13 @@ endef
 
 $O:
 	$(call ECHO_DO, '  MKDIR   $@', \
-	mkdir -p $O )
+	mkdir -p $@ )
 
-$O/%.d: $(notdir %.c) | $O
+$O/%.d: %.c | $O
 	$(call ECHO_DO, '  DEP     $(notdir $@)', \
-	$(CC) -MM -MT '$@ $O/$*.o' $(CPPFLAGS) $< -MF $@ || rm -f $@ )
+	$(CC) -MM -MT '$@ $(basename $@).o' $(CPPFLAGS) $< -MF $@ || rm -f $@ )
 
-$O/%.o: $(notdir %.c)
+$O/%.o: %.c
 	$(call ECHO_DO, '  CC      $(notdir $@)', \
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $< -o $@ )
 
