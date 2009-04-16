@@ -105,7 +105,9 @@ install: $(TARGETS) doxy
 	install -D $(INC) $(DESTDIR)/usr/include
 	install -D $(INC2) $(DESTDIR)/usr/include
 	install -D libroxml.pc $(DESTDIR)/usr/lib/pkgconfig
-	install -D docs/html/ $(DESTDIR)/usr/share/doc/libroxml
+	install -d $(DESTDIR)/usr/share/doc/libroxml/html
+	install -D LGPL.txt $(DESTDIR)/usr/share/doc/libroxml/
+	install -D docs/html/* $(DESTDIR)/usr/share/doc/libroxml
 
 .PHONY: uninstall
 uninstall:

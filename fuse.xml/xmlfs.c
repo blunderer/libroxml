@@ -1,3 +1,30 @@
+/** \file xmlfs.c
+ *  \brief source for mount.fuse.xml
+ *         
+ * This is the source file for fuse xml file system
+ * \author blunderer <blunderer@blunderer.org>
+ * \date 15 Apr 2009
+ *
+ * Copyright (C) 2009 blunderer
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ * 
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+ */
+
+#ifndef XMLFS_C
+#define XMLFS_C
+
 #define FUSE_USE_VERSION 26
  
 #include <fuse.h>
@@ -336,4 +363,6 @@ int main(int argc, char *argv[])
 
 	return fuse_main(args.argc, args.argv, &xmlfs_oper, mount_src);
 }
+
+#endif /* XMLFS_C */
 

@@ -130,8 +130,9 @@ char*	ROXML_API roxml_get_name		(node_t *n);
 /** \brief content getter function
  *
  * \fn int ROXML_API roxml_get_raw_content(node_t *n, char * content);
+ *
  * This function fill a pointer with the content of a node including sons as text;
- * if the pointer is NULL then the len is returned (without last \0). libroxml assume that
+ * if the pointer is NULL then the len is returned (without the end of string caracter). libroxml assume that
  * pointer is large enought to write the whole content string
  * param n is one node of the tree
  * param content is a pointer where content will be copied
@@ -143,8 +144,9 @@ int	ROXML_API roxml_get_raw_content		(node_t *n, char * content);
 /** \brief content getter function
  *
  * \fn int ROXML_API roxml_get_content(node_t *n, char * content);
+ *
  * This function fill a pointer with only the text content of a node 
- * if the pointer is NULL then the len is returned (without last \0). libroxml assume that
+ * if the pointer is NULL then the len is returned (without end of string caracter). libroxml assume that
  * pointer is large enought to write the whole content string
  * param n is one node of the tree
  * param content is a pointer where content will be copied
@@ -195,11 +197,12 @@ char*	ROXML_API roxml_get_attr_val_nth	(node_t *n, int nb);
 
 /** \brief exec path function
  *
- * \fn roxml_exec_path(node_t *n, char * path);
+ * \fn roxml_exec_path(node_t *n, char * path, int *nb_ans);
  * This function return a node corresponding to a given path.
  * path syntax is : 
  * if path begin with  a "/" it is an absolute path relative to root
  * else it is a path relative to given node
+ * handled XPath are : "/", "..", "@<attr name>", "<node name>[table idx]"
  * param n is one node of the tree path can be relative to this or absolute
  * param path the path to resolv
  * param nb_ans the number of results

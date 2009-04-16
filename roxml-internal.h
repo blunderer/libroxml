@@ -23,6 +23,11 @@
 #ifndef ROXML_INT_H
 #define ROXML_INT_H
 
+/**
+ * \def ROXML_INT
+ *
+ * internal function: not part of the API
+ */
 #define ROXML_INT
 
 #include <stdio.h>
@@ -231,7 +236,7 @@ void	ROXML_INT roxml_free_node		(node_t *n);
 
 /** \brief internal function
  *
- * \fn node_t* ROXML_INT roxml_new_node(int pos, FILE *file);
+ * \fn node_t* ROXML_INT roxml_new_node(int pos, FILE *file, char * buf, unsigned int * idx);
  * This function allocate a new node 
  * param pos is the beginning offset of the node in the file
  * param file is the pointer to the opened document
@@ -263,7 +268,7 @@ node_t*	ROXML_INT roxml_parent_node		(node_t *parent, node_t *n);
 
 /** \brief internal function
  *
- * \fn void ROXML_INT roxml_parse_node(node_t *n, char *name, char * arg, char * value, int * num, int max);
+ * \fn void ROXML_INT roxml_del_tree(node_t *n);
  * This function delete a tree recursively
  * param n is one node of the tree
  * return void
@@ -297,7 +302,7 @@ void 	ROXML_INT roxml_close_node		(node_t *n, node_t *close);
 
 /** \brief generic load function
  *
- * \fn node_t* ROXML_API roxml_load(node_t *current_node);
+ * \fn node_t* ROXML_API roxml_load(node_t *current_node, FILE *file, char *buffer);
  * This function load a document and all the corresponding nodes
  * file and buffer params are exclusive. You usualy want to load
  * either a file OR a buffer
@@ -311,7 +316,7 @@ node_t*	ROXML_INT roxml_load			(node_t *current_node, FILE *file, char *buffer);
 
 /** \brief recursiv resolv path function
  *
- * \fn roxml_resolv_path(node_t *n, char * path, int *idx, node_t **res);
+ * \fn void ROXML_INT roxml_resolv_path(node_t *n, char * path, int *idx, node_t ***res);
  * this function resolv a chunk of path and call itself recursively
  * param current_node, the current node 
  * param path the path to resolv
@@ -319,17 +324,17 @@ node_t*	ROXML_INT roxml_load			(node_t *current_node, FILE *file, char *buffer);
  * param res the place where to store resulting nodes
  * see roxml_close
  */
-void ROXML_INT roxml_resolv_path(node_t *n, char * path, int *idx, node_t ***res);
+void ROXML_INT roxml_resolv_path		(node_t *n, char * path, int *idx, node_t ***res);
 
 /** \brief recursiv resolv path function
  *
- * \fn roxml_xpath_conditionnal(node_t *n, int idx, char *condition);
+ * \fn int ROXML_INT roxml_xpath_conditionnal(node_t *n, char *condition);
  * this function resolv an xpath condition
  * param n, the current node 
  * param condition the condition in brackets
  * see roxml_resolv_path
  */
-int ROXML_INT roxml_xpath_conditionnal(node_t *n, char *condition);
+int ROXML_INT roxml_xpath_conditionnal		(node_t *n, char *condition);
 
 #endif /* ROXML_INT_H */
 
