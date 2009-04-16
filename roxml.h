@@ -157,7 +157,7 @@ int	ROXML_API roxml_get_content		(node_t *n, char * content);
 
 /** \brief number of attribute getter function
  *
- * \fn int ROXML_API roxml_get_nb_attr(node_t *n);
+ * \fn int ROXML_API roxml_get_attr_nb(node_t *n);
  * 
  * param n is one node of the tree
  * return the number of attributes in node
@@ -165,7 +165,7 @@ int	ROXML_API roxml_get_content		(node_t *n, char * content);
  * see roxml_get_attr_nth
  * see roxml_parse_node
  */
-int	ROXML_API roxml_get_nb_attr		(node_t *n);
+int	ROXML_API roxml_get_attr_nb		(node_t *n);
 
 /** \brief attribute getter function
  *

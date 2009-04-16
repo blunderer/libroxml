@@ -274,7 +274,7 @@ char * roxml_get_name(node_t *n)
 	return name;
 }
 
-int ROXML_API roxml_get_nb_attr(node_t *n)
+int ROXML_API roxml_get_attr_nb(node_t *n)
 {
 	int count;
 	roxml_parse_node(n, NULL, NULL, NULL, &count, -1);
@@ -528,7 +528,7 @@ void roxml_resolv_path(node_t *n, char * path, int *idx, node_t ***res)
 	/* read only attribute */
 	if(strncmp(path, "@", strlen("@")) == 0)	{
 		int i;
-		int nb_attr = roxml_get_nb_attr(n);
+		int nb_attr = roxml_get_attr_nb(n);
 		char * new_path = path+strlen("@");
 		for(i = 0; i < nb_attr; i++)	{
 			char *name = roxml_get_attr_nth(n, i);
@@ -638,7 +638,7 @@ int roxml_xpath_conditionnal(node_t *n, char *condition)
 	while((*cond == ' ')||(*cond == '\t'))	{ cond++; }
 	if(cond[0] == '@')	{
 		/* condition on attribut */
-		int nb_attr = roxml_get_nb_attr(n);
+		int nb_attr = roxml_get_attr_nb(n);
 		if(nb_attr == 0)	{
 			return 0;
 		}

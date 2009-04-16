@@ -124,7 +124,7 @@ static int xmlfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, of
 			}
 			free(name);
 		}
-		nb = roxml_get_nb_attr(n);
+		nb = roxml_get_attr_nb(n);
 		DEBUG("%d files", nb)
 		for(i = 0; i < nb; i++)	{
 			char fname[512] = "@";
