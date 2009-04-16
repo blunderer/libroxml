@@ -13,6 +13,7 @@
 
 #define MAX_ENTRIES	512
 #define LOG_FILE	"/var/log/xmlfs.log"
+#define NODE_CONTENT	"content.data"
 
 node_t ** opened_files = NULL;
 FILE *debug_f = NULL;
@@ -23,34 +24,35 @@ static int xmlfs_getattr(const char *path, struct stat *stbuf)
 {
 	int nb;
 	int fsize = 1;
+	int content = 0;
 	node_t *n = NULL;
 	node_t *root = fuse_get_context()->private_data;
-	DEBUG("trying '%s'",path);
-	node_t **ans = roxml_exec_path(root, (char*)path, &nb);
+	char newpath[512];
+	char *ptr;
 
+	strcpy(newpath, path);
+	if(ptr = strstr(newpath, NODE_CONTENT))	{
+		*ptr = 0;
+		content = 1;
+	}
+
+	DEBUG("trying '%s'",newpath);
+	node_t **ans = roxml_exec_path(root, newpath, &nb);
 
 	if(ans) {
 		n = ans[0];
-		DEBUG("stat dir")
+		if((roxml_is_arg(n))||(content))	{
+			fsize = roxml_get_content(n, NULL);
+			stbuf->st_mode = S_IFREG;
+			DEBUG("file stat : %d",fsize)
+		} else {
+			fsize = 1;
+			stbuf->st_mode = S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
+		}
+		
 
 		stbuf->st_ino = n->pos;
-		stbuf->st_mode = S_IXUSR | S_IXGRP | S_IXOTH | S_IRUSR | S_IRGRP | S_IROTH | S_IFDIR;
-		stbuf->st_nlink = 0;
-		stbuf->st_uid = 0;
-		stbuf->st_gid = 0;
-		stbuf->st_rdev = 0;
-		stbuf->st_size = fsize;
-		stbuf->st_blksize = 1;
-		stbuf->st_blocks = fsize;
-		stbuf->st_atime = 0;
-		stbuf->st_mtime = 0;
-		stbuf->st_ctime = 0;
-
-		return 0;
-	} else {
-		DEBUG("stat file")
-		stbuf->st_ino = 0;
-		stbuf->st_mode = S_IRUSR | S_IRGRP | S_IROTH | S_IFREG;
+		stbuf->st_mode |= S_IRUSR | S_IRGRP | S_IROTH;
 		stbuf->st_nlink = 0;
 		stbuf->st_uid = 0;
 		stbuf->st_gid = 0;
@@ -82,22 +84,30 @@ static int xmlfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, of
 		nb = roxml_get_son_nb(n);
 		DEBUG("%d dirs", nb)
 		for(i = 0; i < nb; i++)	{
+			int idx;
+			char fname[512] = "";
 			node_t *tmp = roxml_get_son_nth(n, i);
 			char *name = roxml_get_name(tmp);
-			filler(buf, name, NULL, 0);
+			idx = roxml_get_node_index(tmp);
+			if(idx != -1)	{
+				sprintf(fname,"%s[%d]",name,idx);
+				filler(buf, fname, NULL, 0);
+			} else	{
+				filler(buf, name, NULL, 0);
+			}
 			free(name);
 		}
 		nb = roxml_get_nb_attr(n);
 		DEBUG("%d files", nb)
 		for(i = 0; i < nb; i++)	{
-			char fname[512] = ".";
+			char fname[512] = "@";
 			char *name = roxml_get_attr_nth(n, i);
 			strcat(fname, name);
 			filler(buf, fname, NULL, 0);
 			free(name);
 		}
 		if(roxml_get_content(n, NULL) > 0)	{
-			filler(buf, "node.content", NULL, 0);
+			filler(buf, NODE_CONTENT, NULL, 0);
 		}
 
 		return 0;
@@ -115,7 +125,14 @@ static int xmlfs_open(const char *path, struct fuse_file_info *fi)
 	int i = 0;
 	int nb;
 	node_t *root = fuse_get_context()->private_data;
-	node_t **ans = roxml_exec_path(root, (char*)path, &nb);
+	char newpath[512];
+	char *ptr;
+
+	strcpy(newpath, path);
+	if(ptr = strstr(newpath, NODE_CONTENT))	{
+		*ptr = 0;
+	}
+	node_t **ans = roxml_exec_path(root, (char*)newpath, &nb);
 
 	if(ans)	{
 		node_t *n = ans[0];
