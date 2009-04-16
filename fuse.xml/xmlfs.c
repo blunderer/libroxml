@@ -90,9 +90,14 @@ static int xmlfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, of
 		nb = roxml_get_nb_attr(n);
 		DEBUG("%d files", nb)
 		for(i = 0; i < nb; i++)	{
+			char fname[512] = ".";
 			char *name = roxml_get_attr_nth(n, i);
-			filler(buf, name, NULL, 0);
+			strcat(fname, name);
+			filler(buf, fname, NULL, 0);
 			free(name);
+		}
+		if(roxml_get_content(n, NULL) > 0)	{
+			filler(buf, "node.content", NULL, 0);
 		}
 
 		return 0;
@@ -272,6 +277,8 @@ static int xmlfs_opt_proc(void *data, const char *arg, int key, struct fuse_args
 				debug_f = fopen(LOG_FILE,"w");
 				fprintf(stderr,"debug mode started\n");
 				return 0;
+			} else if(strcmp(arg, "-oallow-other") == 0) {
+				return 0;
 			}
 			break;
 		case FUSE_OPT_KEY_NONOPT:
@@ -298,6 +305,7 @@ int main(int argc, char *argv[])
 	if(fuse_opt_parse(&args, mount_src, NULL, xmlfs_opt_proc) == -1) {
 		return -1;
 	}
+	fuse_opt_add_arg(&args, "-oallow_other");
 
 	if(strlen(mount_src) == 0)	{
 		return -1;

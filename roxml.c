@@ -464,19 +464,27 @@ node_t ** roxml_exec_path(node_t *n, char * path, int *nb_ans)
 	node_t **resulting_nodes = NULL;
 	char * path_to_find;
 	if(path[0] == '/')	{
+		char *name = NULL;
 		path_to_find = strdup(path+1);
 		while(starting_node->fat)	{
 			starting_node = starting_node->fat;
 		}
+		name = roxml_get_name(roxml_get_son_nth(starting_node, 0));
+		if(strcmp(name, "?xml") == 0)	{
+			starting_node = roxml_get_son_nth(starting_node, 0);
+		}
+		free(name);
+		name = roxml_get_name(starting_node);
+		free(name);
 	} else	{
 		path_to_find = strdup(path);
 	}
 
 	/* two pass algorithm : first: how many node match */
-	if(strcmp(path, "/") != 0)	{
-		roxml_resolv_path(starting_node, path_to_find, &nb_ans_internal, NULL);
-	} else	{
+	if(strcmp(path, "/") == 0)	{
 		nb_ans_internal = 1;
+	} else	{
+		roxml_resolv_path(starting_node, path_to_find, &nb_ans_internal, NULL);
 	}
 
 	if(nb_ans) { *nb_ans = nb_ans_internal; }
@@ -487,10 +495,10 @@ node_t ** roxml_exec_path(node_t *n, char * path, int *nb_ans)
 	/* two pass algorithm : then: copy them */
 	index = 0;
 	resulting_nodes = (node_t**)malloc(sizeof(node_t*)*nb_ans_internal);
-	if(strcmp(path, "/") != 0)	{
-		roxml_resolv_path(starting_node, path_to_find, &index, &resulting_nodes);
-	} else	{
+	if(strcmp(path, "/") == 0)	{
 		resulting_nodes[0] = starting_node;
+	} else	{
+		roxml_resolv_path(starting_node, path_to_find, &index, &resulting_nodes);
 	}
 
 	return resulting_nodes;
