@@ -316,6 +316,9 @@ void roxml_close(node_t *n)
 		fclose(root->fil);
 	} else if(root->type == FILE_BUFF)	{
 		free(root->idx);
+	} else if(root->type == FILE_ARG)	{
+		free(root->buf);
+		free(root->idx);
 	}
 	free(root);
 }
@@ -511,6 +514,7 @@ void roxml_resolv_path(node_t *n, char * path, int *idx, node_t ***res)
 	if(strlen(path) == 0)	{ return; }
 	if(n == NULL)	{ return; }
 
+	/* relative path special nodes */
 	if(strncmp(path, "..", strlen("..")) == 0)	{
 		char * new_path = path+strlen("..");
 		if((strlen(new_path) > 0) && (strcmp(new_path,"/") != 0))	{
@@ -521,6 +525,27 @@ void roxml_resolv_path(node_t *n, char * path, int *idx, node_t ***res)
 		}
 	}
 
+	/* read only attribute */
+	if(strncmp(path, "@", strlen("@")) == 0)	{
+		int i;
+		int nb_attr = roxml_get_nb_attr(n);
+		char * new_path = path+strlen("@");
+		for(i = 0; i < nb_attr; i++)	{
+			char *name = roxml_get_attr_nth(n, i);
+			if(strcmp(new_path, name) == 0)	{
+				if(res)	{ 
+					char *value = roxml_get_attr_val_nth(n, i);
+					node_t *arg = roxml_new_arg_node(name, value);
+					(*res)[*idx] = arg; 
+					free(value);
+				}
+				(*idx)++;
+			}
+			free(name);
+		}
+	}
+	
+
 	nb_son = roxml_get_son_nb(n);
 	for(i = 0; i < nb_son; i++)	{
 		node_t *cur = roxml_get_son_nth(n, i);
@@ -528,14 +553,105 @@ void roxml_resolv_path(node_t *n, char * path, int *idx, node_t ***res)
 
 		if(strncmp(name, path, strlen(name)) == 0)	{
 			char * new_path = path+strlen(name);
-			if((strlen(new_path) > 0) && (strcmp(new_path,"/") != 0))	{
-				roxml_resolv_path(cur, new_path+1, idx, res);
+			if(new_path[0] == '[')	{
+				/* conditionnal xpath */
+				if(roxml_xpath_conditionnal(cur, new_path))	{
+					new_path = strstr(new_path, "]");
+					if(new_path)	{
+						new_path++;
+						if((strlen(new_path) > 0) && (strcmp(new_path,"/") != 0))	{
+							roxml_resolv_path(cur, new_path+1, idx, res);
+						} else	{
+							if(res)	{ (*res)[*idx] = cur; }
+							(*idx)++;
+						}
+					}
+				}
 			} else	{
-				if(res)	{ (*res)[*idx] = cur; }
-				(*idx)++;
+				if((strlen(new_path) > 0) && (strcmp(new_path,"/") != 0))	{
+					roxml_resolv_path(cur, new_path+1, idx, res);
+				} else	{
+					if(res)	{ (*res)[*idx] = cur; }
+					(*idx)++;
+				}
 			}
 		}
 		free(name);
+	}
+}
+
+node_t* roxml_new_arg_node(char * name, char * value)
+{
+	int size, close;
+	node_t *node;
+	
+	size = 2*strlen(name) + strlen(value) + 6;
+	close = strlen(name) + strlen(value) + 3;
+	node = (node_t*)malloc(sizeof(node_t));
+	node->buf = (char*)malloc(size*sizeof(char));
+	node->idx = (unsigned int*)malloc(sizeof(unsigned int));
+	sprintf(node->buf,"<%s>%s</%s>",name,value,name);
+	node->type = FILE_ARG;
+	node->son = NULL;
+	node->bra = NULL;
+	node->fat = NULL;
+	node->fil = NULL;
+	*node->idx = 0;
+	node->pos = 0;
+	node->end = close;
+	node->prv = 0;
+
+	return node;
+}
+
+int roxml_is_arg(node_t *n)
+{
+	if(n->type == FILE_ARG)	{
+		return 1;
+	}
+	return 0;
+}
+
+int roxml_get_node_index(node_t *n)
+{
+	int i = 0, idx = 0;
+	int nb_bra = 0, nb_same_bra = 0;
+	char * realn = roxml_get_name(n);
+
+	nb_bra = roxml_get_son_nb(n->fat);
+	for(i = 0; i < nb_bra; i++)	{
+		node_t *tmp = roxml_get_son_nth(n->fat, i);
+		char * name = roxml_get_name(tmp);
+		if(tmp == n)	{ idx = nb_same_bra; }
+		if(strcmp(name, realn) == 0)	{ nb_same_bra++; }
+		free(name);
+	}
+	free(realn);		
+
+	if(nb_same_bra > 1)	{ return idx; }
+	return -1;
+}
+
+int roxml_xpath_conditionnal(node_t *n, char *condition)
+{
+	char *cond = condition+1;
+	while((*cond == ' ')||(*cond == '\t'))	{ cond++; }
+	if(cond[0] == '@')	{
+		/* condition on attribut */
+		int nb_attr = roxml_get_nb_attr(n);
+		if(nb_attr == 0)	{
+			return 0;
+		}
+		return 0;
+	} else if((cond[0] >= 0x30)&&(cond[0] <= 0x39))	{
+		/* condition on table id */
+		int ask = atoi(cond);
+		int idx = roxml_get_node_index(n);
+		if(ask == idx)	{ return 1; }
+		return 0;
+	} else	{
+		/* other not yet handled */
+		return 0;
 	}
 }
 

@@ -53,6 +53,13 @@ typedef struct node {
 
 
 /**
+ * \def FILE_ARG
+ * 
+ * constant for argument node
+ */
+#define FILE_ARG	-2
+
+/**
  * \def FILE_BUFF
  * 
  * constant for buffer document
@@ -230,9 +237,19 @@ void	ROXML_INT roxml_free_node		(node_t *n);
  * param file is the pointer to the opened document
  * param buffer is the pointer to the buffer
  * param idx is the position pointer inside the buffer
- * return void
+ * return the new node
  */
 node_t* ROXML_INT roxml_new_node		(int pos, FILE *file, char * buf, unsigned int * idx);
+
+/** \brief internal function
+ *
+ * \fn node_t* ROXML_INT roxml_new_arg_node(char * name, char * value);
+ * This function allocate a new node for argument storage
+ * param name is the argument name
+ * param value is the argument value
+ * return the new node
+ */
+node_t* ROXML_INT roxml_new_arg_node		(char * name, char * value);
 
 /** \brief internal function
  *
@@ -303,6 +320,16 @@ node_t*	ROXML_INT roxml_load			(node_t *current_node, FILE *file, char *buffer);
  * see roxml_close
  */
 void ROXML_INT roxml_resolv_path(node_t *n, char * path, int *idx, node_t ***res);
+
+/** \brief recursiv resolv path function
+ *
+ * \fn roxml_xpath_conditionnal(node_t *n, int idx, char *condition);
+ * this function resolv an xpath condition
+ * param n, the current node 
+ * param condition the condition in brackets
+ * see roxml_resolv_path
+ */
+int ROXML_INT roxml_xpath_conditionnal(node_t *n, char *condition);
 
 #endif /* ROXML_INT_H */
 

@@ -207,5 +207,23 @@ char*	ROXML_API roxml_get_attr_val_nth	(node_t *n, int nb);
  */
 node_t ** ROXML_API roxml_exec_path(node_t *n, char * path, int *nb_ans);
 
+/** \brief node type function
+ *
+ * \fn roxml_is_arg(node_t *n);
+ * This function tells if a node is a arg or real node.
+ * param n is the node to test
+ * return 1 if node is arg else return 0
+ */
+int ROXML_API roxml_is_arg(node_t *n);
+
+/** \brief node get index function
+ *
+ * \fn roxml_get_node_index(node_t *n);
+ * This function tells the index of a node between all its homonyns.
+ * param n is the node to test
+ * return the idx or -1 if only one node
+ */
+int ROXML_API roxml_get_node_index(node_t *n);
+
 #endif /* ROXML_H */
 
