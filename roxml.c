@@ -473,7 +473,12 @@ node_t ** roxml_exec_path(node_t *n, char * path, int *nb_ans)
 	}
 
 	/* two pass algorithm : first: how many node match */
-	roxml_resolv_path(starting_node, path_to_find, &nb_ans_internal, NULL);
+	if(strcmp(path, "/") != 0)	{
+		roxml_resolv_path(starting_node, path_to_find, &nb_ans_internal, NULL);
+	} else	{
+		nb_ans_internal = 1;
+	}
+
 	if(nb_ans) { *nb_ans = nb_ans_internal; }
 	if(nb_ans_internal == 0)	{
 		return NULL;
@@ -482,7 +487,11 @@ node_t ** roxml_exec_path(node_t *n, char * path, int *nb_ans)
 	/* two pass algorithm : then: copy them */
 	index = 0;
 	resulting_nodes = (node_t**)malloc(sizeof(node_t*)*nb_ans_internal);
-	roxml_resolv_path(starting_node, path_to_find, &index, &resulting_nodes);
+	if(strcmp(path, "/") != 0)	{
+		roxml_resolv_path(starting_node, path_to_find, &index, &resulting_nodes);
+	} else	{
+		resulting_nodes[0] = starting_node;
+	}
 
 	return resulting_nodes;
 }

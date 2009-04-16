@@ -9,6 +9,7 @@ endif
 
 # files
 INC = roxml.h
+INC2 = roxml-internal.h
 SRC_LIB = roxml.c
 SRC_BIN = roxml-parser.c
 SRC_TST = xshell.c
@@ -102,8 +103,9 @@ install: $(TARGETS) doxy
 	install -D $(TARGET_TST) $(DESTDIR)/usr/bin
 	install -D $(TARGET_BIN) $(DESTDIR)/usr/bin
 	install -D $(INC) $(DESTDIR)/usr/include
+	install -D $(INC2) $(DESTDIR)/usr/include
 	install -D libroxml.pc $(DESTDIR)/usr/lib/pkgconfig
-	install -D docs/html $(DESTDIR)/usr/share/doc/libroxml
+	install -D docs/html/ $(DESTDIR)/usr/share/doc/libroxml
 
 .PHONY: uninstall
 uninstall:
@@ -113,4 +115,5 @@ uninstall:
 	- rm -f $(DESTDIR)/usr/bin/$(TARGET_TST)
 	- rm -f $(DESTDIR)/usr/bin/$(TARGET_BIN)
 	- rm -f $(DESTDIR)/usr/include/$(INC)
+	- rm -f $(DESTDIR)/usr/include/$(INC2)
 	- rm -fr $(DESTDIR)/usr/share/doc/libroxml
