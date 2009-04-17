@@ -2,7 +2,7 @@
 SRC=xmlfs.c
 OBJ=$(SRC:.c=.o)
 TARGET=mount.fuse.xml
-CFLAGS=-D_FILE_OFFSET_BITS=64
+CFLAGS=-g -D_FILE_OFFSET_BITS=64
 LDFLAGS=-L.. -lroxml -lfuse
 
 $(TARGET): $(OBJ)
