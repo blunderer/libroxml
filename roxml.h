@@ -224,9 +224,10 @@ int ROXML_API roxml_is_arg(node_t *n);
  * \fn roxml_get_node_index(node_t *n);
  * This function tells the index of a node between all its homonyns.
  * param n is the node to test
+ * param last is the index of last homonym
  * return the idx or -1 if only one node
  */
-int ROXML_API roxml_get_node_index(node_t *n);
+int ROXML_API roxml_get_node_index(node_t *n, int * last);
 
 #endif /* ROXML_H */
 

@@ -612,7 +612,7 @@ int roxml_is_arg(node_t *n)
 	return 0;
 }
 
-int roxml_get_node_index(node_t *n)
+int roxml_get_node_index(node_t *n, int * last)
 {
 	int i = 0, idx = 0;
 	int nb_bra = 0, nb_same_bra = 0;
@@ -627,6 +627,8 @@ int roxml_get_node_index(node_t *n)
 		free(name);
 	}
 	free(realn);		
+
+	if(last) { *last = nb_same_bra-1; }
 
 	if(nb_same_bra > 1)	{ return idx; }
 	return -1;
@@ -646,13 +648,18 @@ int roxml_xpath_conditionnal(node_t *n, char *condition)
 			if(strncmp(name, cond+1, strlen(name)) == 0)	{
 				char *value = roxml_get_attr_val_nth(n, i);
 				char *request = strstr(cond+1, "=");
-				if(request)	{
+				char *end = strstr(cond+1, "]");
+				if((request) && (request<end))	{
 					request++;
 					if(strncmp(value, request, strlen(value)) == 0)	{
 						free(name);
 						free(value);
 						return 1;
 					}
+				} else {
+					free(value);
+					free(name);
+					return 1;
 				}
 				free(value);
 			}
@@ -662,13 +669,31 @@ int roxml_xpath_conditionnal(node_t *n, char *condition)
 	} else if((cond[0] >= 0x30)&&(cond[0] <= 0x39))	{
 		/* condition on table id */
 		int ask = atoi(cond);
-		int idx = roxml_get_node_index(n);
+		int idx = roxml_get_node_index(n, NULL);
 		if(ask == idx)	{ return 1; }
 		return 0;
-	} else	{
+	} else if(strncmp(cond, "last()", strlen("last()")) == 0)	{
+		char *ptr = cond+strlen("last()");
+		int last = 0;
+		int offset = atoi(ptr);
+		int idx = roxml_get_node_index(n, &last);
+		if(idx == last+offset) { return 1; }
+		return 0;
+	} else if(strncmp(cond, "first()", strlen("first()")) == 0)	{
+		char *ptr = cond+strlen("first()");
+		int idx = roxml_get_node_index(n, NULL);
+		int offset = atoi(ptr);
+		if(idx == offset) { return 1; }
+		return 0;
+	} else if(strncmp(cond, "position()", strlen("position()")) == 0)	{
+		/* select operator between: < > = != <= >= */
+		
+		return 0;
+	} else if(strncmp(cond, "position()", strlen("position()")) == 0)	{
 		/* other not yet handled */
 		return 0;
 	}
+	return 0;
 }
 
 #endif /* ROXML_C */
