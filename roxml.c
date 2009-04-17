@@ -687,8 +687,8 @@ int roxml_xpath_conditionnal(node_t *n, char *condition)
 		return 0;
 	} else if(strncmp(cond, "position()", strlen("position()")) == 0)	{
 		/* select operator between: < > = != <= >= */
-		char *ptr = cond+strlen("position()");
-		int idx = roxml_get_node_index(n, NULL);
+		/* char *ptr = cond+strlen("position()"); */
+		/* int idx = roxml_get_node_index(n, NULL); */
 		
 		return 0;
 	} else if(strncmp(cond, "position()", strlen("position()")) == 0)	{
