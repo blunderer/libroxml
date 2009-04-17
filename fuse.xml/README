@@ -16,6 +16,7 @@ How to use mount.fuse.xml
 
 # 4th step: mount it
 - sudo mount -t fuse.xml <xml file> <mount point>
+- if you want debug info you can add --debug option to mount. logs will be written to /var/log/xmlfs.log
 
 # 5th step: navigate
 - you can now navigate into <mount point> as if you were in a ext3 fs
