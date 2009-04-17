@@ -638,9 +638,25 @@ int roxml_xpath_conditionnal(node_t *n, char *condition)
 	while((*cond == ' ')||(*cond == '\t'))	{ cond++; }
 	if(cond[0] == '@')	{
 		/* condition on attribut */
+		int i;
 		int nb_attr = roxml_get_attr_nb(n);
-		if(nb_attr == 0)	{
-			return 0;
+		if(nb_attr == 0) { return 0; }
+		for(i = 0; i < nb_attr; i++)	{
+			char *name = roxml_get_attr_nth(n, i);
+			if(strncmp(name, cond+1, strlen(name)) == 0)	{
+				char *value = roxml_get_attr_val_nth(n, i);
+				char *request = strstr(cond+1, "=");
+				if(request)	{
+					request++;
+					if(strncmp(value, request, strlen(value)) == 0)	{
+						free(name);
+						free(value);
+						return 1;
+					}
+				}
+				free(value);
+			}
+			free(name);
 		}
 		return 0;
 	} else if((cond[0] >= 0x30)&&(cond[0] <= 0x39))	{
