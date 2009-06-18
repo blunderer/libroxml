@@ -86,9 +86,9 @@ typedef struct node node_t;
  * This function load a document and all the corresponding nodes
  * \param buffer the XML buffer to load
  * \return the root node or NULL
- * see roxml_close
- * see roxml_load_doc
- * see roxml_load
+ * \see roxml_close
+ * \see roxml_load_doc
+ * \see roxml_load
  */
 node_t*	ROXML_API roxml_load_buf		(char *buffer);
 
@@ -98,9 +98,9 @@ node_t*	ROXML_API roxml_load_buf		(char *buffer);
  * This function load a document and all the corresponding nodes
  * \param filename the XML document to load
  * \return the root node or NULL
- * see roxml_close
- * see roxml_load_buf
- * see roxml_load
+ * \see roxml_close
+ * \see roxml_load_buf
+ * \see roxml_load
  */
 node_t*	ROXML_API roxml_load_doc		(char *filename);
 
@@ -110,7 +110,7 @@ node_t*	ROXML_API roxml_load_doc		(char *filename);
  * This function clear a document and all the corresponding nodes
  * \param n is one node of the tree
  * \return void
- * see roxml_load_doc
+ * \see roxml_load_doc
  */
 void 	ROXML_API roxml_close		(node_t *n);
 
@@ -130,7 +130,7 @@ node_t*	ROXML_API roxml_get_parent		(node_t *n);
  * \param n is one node of the tree
  * \param nb is the id of the son to get
  * \return the nth son
- * see roxml_get_son_nb
+ * \see roxml_get_son_nb
  */
 node_t*	ROXML_API roxml_get_son_nth		(node_t *n, int nb);
 
@@ -140,7 +140,7 @@ node_t*	ROXML_API roxml_get_son_nth		(node_t *n, int nb);
  * This function return the number of sons for a given node
  * \param n is one node of the tree
  * \return  the number of sons
- * see roxml_get_son_nth
+ * \see roxml_get_son_nth
  */
 int 	ROXML_API roxml_get_son_nb		(node_t *n);
 
@@ -151,7 +151,7 @@ int 	ROXML_API roxml_get_son_nb		(node_t *n);
  * User should roxml_release the returned buffer when no longer needed.
  * \param n is one node of the tree
  * \return the name of the node
- * see roxml_parse_node
+ * \nsee roxml_parse_node
  */
 char*	ROXML_API roxml_get_name		(node_t *n);
 
@@ -185,9 +185,9 @@ char *	ROXML_API roxml_get_content		(node_t *n);
  * 
  * \param n is one node of the tree
  * \return the number of attributes in node
- * see roxml_get_attr_val_nth
- * see roxml_get_attr_nth
- * see roxml_parse_node
+ * \see roxml_get_attr_val_nth
+ * \see roxml_get_attr_nth
+ * \see roxml_parse_node
  */
 int	ROXML_API roxml_get_attr_nb		(node_t *n);
 
@@ -199,9 +199,9 @@ int	ROXML_API roxml_get_attr_nb		(node_t *n);
  * \param n is one node of the tree
  * \param nb the id of attribute to read
  * \return the attribute
- * see roxml_get_nb_attr
- * see roxml_get_attr_val_nth
- * see roxml_parse_node
+ * \see roxml_get_nb_attr
+ * \see roxml_get_attr_val_nth
+ * \see roxml_parse_node
  */
 char*	ROXML_API roxml_get_attr_nth		(node_t *n, int nb);
 
@@ -213,9 +213,9 @@ char*	ROXML_API roxml_get_attr_nth		(node_t *n, int nb);
  * \param n is one node of the tree
  * \param nb the id of attribute value to read
  * \return the attribute value
- * see roxml_get_attr_nth
- * see roxml_get_nb_attr
- * see roxml_parse_node
+ * \see roxml_get_attr_nth
+ * \see roxml_get_nb_attr
+ * \see roxml_parse_node
  */
 char*	ROXML_API roxml_get_attr_val_nth	(node_t *n, int nb);
 
@@ -246,7 +246,7 @@ int ROXML_API roxml_is_arg(node_t *n);
 
 /** \brief node get index function
  *
- * \fn roxml_get_node_index(node_t *n);
+ * \fn roxml_get_node_index(node_t *n, int * last);
  * This function tells the index of a node between all its homonyns.
  * \param n is the node to test
  * \param last is the index of last homonym
@@ -258,9 +258,13 @@ int ROXML_API roxml_get_node_index(node_t *n, int * last);
  *
  * \fn roxml_release(void * data);
  * This function release the memory pointed by pointer
- * or all previously allocated memory if data is NULL;
- * Be carefull because the second case is not threadsafe 
- * \param data the pointer to delete or NULL
+ * just like free would. Freeing a NULL pointer won't do
+ * anything. roxml_release also allow you to remove all 
+ * previously allocated datas by using RELEASE_ALL as argument.
+ * You can also safely use RELEASE_LAST argument that will release the 
+ * previously allocated var within the current thread (making this
+ * function thread safe).
+ * \param data the pointer to delete or NULL or RELEASE_ALL or RELEASE_LAST
  * \return void
  */
 void ROXML_API roxml_release(void * data);
