@@ -49,6 +49,7 @@ FILE *debug_f = NULL;
  
 static int xmlfs_getattr(const char *path, struct stat *stbuf)
 {
+	DEBUG("here")
 	int nb;
 	int fsize = 1;
 	int content = 0;
@@ -67,9 +68,12 @@ static int xmlfs_getattr(const char *path, struct stat *stbuf)
 	node_t **ans = roxml_exec_path(root, newpath, &nb);
 
 	if(ans) {
+		DEBUG("got ans")
 		n = ans[0];
 		if((roxml_is_arg(n))||(content))	{
-			fsize = roxml_get_content(n, NULL);
+			char * txt = roxml_get_content(n);
+			fsize = strlen(txt);
+			roxml_release(txt);
 			stbuf->st_mode = S_IFREG;
 			DEBUG("file stat : %d",fsize)
 		} else {
@@ -77,8 +81,7 @@ static int xmlfs_getattr(const char *path, struct stat *stbuf)
 			stbuf->st_mode = S_IFDIR | S_IXUSR | S_IXGRP | S_IXOTH;
 		}
 		
-
-		stbuf->st_ino = n->pos;
+		stbuf->st_ino = 0;
 		stbuf->st_mode |= S_IRUSR | S_IRGRP | S_IROTH;
 		stbuf->st_nlink = 0;
 		stbuf->st_uid = 0;
@@ -91,6 +94,9 @@ static int xmlfs_getattr(const char *path, struct stat *stbuf)
 		stbuf->st_mtime = 0;
 		stbuf->st_ctime = 0;
 
+		DEBUG("will release")
+		roxml_release(ans);
+		DEBUG("released")
 		return 0;
 	}
 	return -ENOENT;
@@ -98,6 +104,7 @@ static int xmlfs_getattr(const char *path, struct stat *stbuf)
  
 static int xmlfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi)
 {
+	DEBUG("here")
 	int i;
 	int nb;
 	node_t *n = NULL;
@@ -106,7 +113,7 @@ static int xmlfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, of
 
 	if(ans)	{
 		n = ans[0];
-		free(ans);
+		roxml_release(ans);
 
 		nb = roxml_get_son_nb(n);
 		DEBUG("%d dirs", nb)
@@ -122,7 +129,7 @@ static int xmlfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, of
 			} else	{
 				filler(buf, name, NULL, 0);
 			}
-			free(name);
+			roxml_release(name);
 		}
 		nb = roxml_get_attr_nb(n);
 		DEBUG("%d files", nb)
@@ -131,10 +138,11 @@ static int xmlfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, of
 			char *name = roxml_get_attr_nth(n, i);
 			strcat(fname, name);
 			filler(buf, fname, NULL, 0);
-			free(name);
+			roxml_release(name);
 		}
-		if(roxml_get_content(n, NULL) > 0)	{
+		if(roxml_get_content(n))	{
 			filler(buf, NODE_CONTENT, NULL, 0);
+			roxml_release(RELEASE_LAST);
 		}
 
 		return 0;
@@ -144,11 +152,13 @@ static int xmlfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, of
  
 static int xmlfs_create(const char *path, mode_t mode, struct fuse_file_info *fi)
 {
+	DEBUG("here")
 	return -ENOENT;
 }
  
 static int xmlfs_open(const char *path, struct fuse_file_info *fi)
 {
+	DEBUG("here")
 	int i = 0;
 	int nb;
 	node_t *root = fuse_get_context()->private_data;
@@ -163,7 +173,7 @@ static int xmlfs_open(const char *path, struct fuse_file_info *fi)
 
 	if(ans)	{
 		node_t *n = ans[0];
-		free(ans);
+		roxml_release(ans);
 		while((i < MAX_ENTRIES)&&(opened_files[i]))	{ i++; } 
 		if(i < MAX_ENTRIES)	{
 			fi->fh = i;
@@ -178,6 +188,7 @@ static int xmlfs_open(const char *path, struct fuse_file_info *fi)
 
 static int xmlfs_read(const char *path, char *buf, size_t size, off_t offset, struct fuse_file_info *fi)
 {
+	DEBUG("here")
 	int bsize;
 	int bytes;
 	node_t *n;
@@ -188,9 +199,8 @@ static int xmlfs_read(const char *path, char *buf, size_t size, off_t offset, st
 
 	if (!n) { return -ENOENT; }
 
-	bsize = roxml_get_content(n, NULL);
-	content = (char*)malloc(bsize*sizeof(char*));
-	bsize = roxml_get_content(n, content);
+	content = roxml_get_content(n);
+	bsize = strlen(content);
 
 	if((size + offset) >= bsize)	{
 		bytes = bsize - offset;
@@ -199,23 +209,26 @@ static int xmlfs_read(const char *path, char *buf, size_t size, off_t offset, st
 	}
 	memcpy(buf, content+offset, bytes); 
 
-	free(content);
+	roxml_release(content);
 
 	return bytes;
 }
 
 static int xmlfs_write(const char *path, const char *buf, size_t size, off_t offset, struct fuse_file_info *fi)
 {
+	DEBUG("here")
 	return -ENOENT;
 }
 
 static int xmlfs_fsync(const char *path, int datasync, struct fuse_file_info *fi)
 {
+	DEBUG("here")
 	return -ENOENT;
 }
 
 static int xmlfs_release(const char *path, struct fuse_file_info *fi)
 {
+	DEBUG("here")
 	if(fi->fh < 0) { return -ENOENT; }
 	if(fi->fh > MAX_ENTRIES) { return -ENOENT; }
 
@@ -226,17 +239,20 @@ static int xmlfs_release(const char *path, struct fuse_file_info *fi)
 
 void xmlfs_cleanup(void *data)
 {
+	DEBUG("here")
 	DEBUG("freeing file table")
 	free(opened_files);
 }
 
 int xmlfs_flush(const char *path, struct fuse_file_info *fi)
 {
+	DEBUG("here")
 	return -ENOENT;
 }
 
 int xmlfs_statfs(const char *path, struct statvfs *stats)
 {
+	DEBUG("here")
 	stats->f_bsize = 0;
 	stats->f_frsize = 0;
 	stats->f_blocks = 0;
@@ -250,31 +266,37 @@ int xmlfs_statfs(const char *path, struct statvfs *stats)
 
 int xmlfs_truncate(const char *path, off_t size)
 {
+	DEBUG("here")
 	return -ENOENT;
 }
 
 int xmlfs_ftruncate(const char *path, off_t size, struct fuse_file_info *fi)
 {
+	DEBUG("here")
 	return -ENOENT;
 }
 
 int xmlfs_unlink(const char *path)
 {
+	DEBUG("here")
 	return -ENOENT;
 }
 
 int xmlfs_rename(const char *from, const char *to)
 {
+	DEBUG("here")
 	return -ENOENT;
 }
 
 int xmlfs_mkdir(const char *dir, mode_t ignored)
 {
+	DEBUG("here")
 	return -ENOENT;
 }
 
 void *xmlfs_init(struct fuse_conn_info *conn)
 {
+	DEBUG("here")
 	node_t *n = NULL;
 	char *src = NULL;
 	struct fuse_context *ctx = fuse_get_context();
@@ -312,6 +334,7 @@ static struct fuse_operations xmlfs_oper = {
 
 static int xmlfs_opt_proc(void *data, const char *arg, int key, struct fuse_args *outargs)
 {
+	DEBUG("here")
 	char *data_arg = (char*)data;
 	static int num = 0;
 
@@ -338,6 +361,7 @@ static int xmlfs_opt_proc(void *data, const char *arg, int key, struct fuse_args
 
 int main(int argc, char *argv[])
 {
+	DEBUG("here")
 	int i, j;
 	char mount_src[512] = "";
 	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);

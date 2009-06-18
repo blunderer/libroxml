@@ -97,7 +97,7 @@ int main(int argc, char ** argv)
 				} else	{
 					fprintf(stdout,"%s\t",name);
 				}
-				free(name);
+				roxml_release(name);
 				if(i % 5 == 4)	{
 					fprintf(stdout,"\n\t");
 				}
@@ -159,7 +159,6 @@ int main(int argc, char ** argv)
 				fprintf(stdout,"No such node\n");
 			}
 		} else if(strncmp(command, "cat", 3) == 0)	{
-			int len;
 			char* content;
 			char* arg;
 			int found = 0;
@@ -174,11 +173,9 @@ int main(int argc, char ** argv)
 					if(roxml_get_son_nb(roxml_get_son_nth(cur, i)) > 0)	{
 						fprintf(stdout,"This is not a child node\n");
 					} else	{
-						len = roxml_get_content(roxml_get_son_nth(cur, i), NULL);
-						content = (char*)malloc(sizeof(char)*(len+1));
-						roxml_get_content(roxml_get_son_nth(cur, i), content);
+						content = roxml_get_content(roxml_get_son_nth(cur, i));
 						fprintf(stdout,"%s\n",content);
-						free(content);
+						roxml_release(content);
 					}
 				}
 			}
@@ -186,7 +183,6 @@ int main(int argc, char ** argv)
 				fprintf(stdout,"No such node\n");
 			}
 		} else if(strncmp(command, "ncat", 4) == 0)	{
-			int len;
 			char* content;
 			char* arg;
 			int argn;
@@ -208,11 +204,9 @@ int main(int argc, char ** argv)
 						if(roxml_get_son_nb(roxml_get_son_nth(cur, i)) > 0)	{
 							fprintf(stdout,"This is not a child node\n");
 						} else	{
-							len = roxml_get_content(roxml_get_son_nth(cur, i), NULL);
-							content = (char*)malloc(sizeof(char)*(len+1));
-							roxml_get_content(roxml_get_son_nth(cur, i), content);
+							content = roxml_get_content(roxml_get_son_nth(cur, i));
 							fprintf(stdout,"%s\n",content);
-							free(content);
+							roxml_release(content);
 						}
 					}
 				}

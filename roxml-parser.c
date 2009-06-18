@@ -66,22 +66,24 @@ int main(int argc, char ** argv)
 	}
 
 
-	ans= roxml_exec_path(cur, argv[optind + 1],  &max);
+	ans = roxml_exec_path(cur, argv[optind + 1],  &max);
 
 	for(j = 0; j < max; j++)
 	{
-		int size;
 		char *c = NULL;
-		size = roxml_get_content(ans[j], c);
-		c = (char*)malloc(sizeof(char)*(size+1));
-		roxml_get_content(ans[j], c);
-		if (! quiet)
+		c = roxml_get_content(ans[j]);
+		if (! quiet)	{
 			fprintf(stdout,"ans[%d]: ", j);
+		}
 		fprintf(stdout,"%s\n", c);
-		free(c);
 	}
+	roxml_release(RELEASE_LAST);
+	roxml_release(RELEASE_LAST);
+	roxml_release(RELEASE_ALL);
+	roxml_release(RELEASE_ALL);
+	roxml_release(RELEASE_LAST);
+	roxml_release(RELEASE_LAST);
 
-	free(ans);
 	roxml_close(root);
 	return 0;
 }
