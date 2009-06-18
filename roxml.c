@@ -25,7 +25,9 @@
 #ifndef ROXML_C
 #define ROXML_C
 
-#include "roxml.h"
+#include "roxml-internal.h"
+
+static memory_cell_t head_cell = {PTR_NONE, 0, NULL, 0, NULL, NULL};
 
 node_t * roxml_parent_node(node_t *parent, node_t *n)
 {
@@ -177,12 +179,13 @@ void roxml_parse_node(node_t *n, char *name, char * arg, char * value, int * num
 	POP(n)
 }
 
-int roxml_get_content(node_t *n, char *content)
+char * roxml_get_content(node_t *n)
 {
 	int num;
 	int nbs;
+	char * content = NULL;
 	int len = 0, total = 0;
-	char *content_ptr = content;
+	char *content_ptr = NULL;
 	long long int start = 0, end = 0;	
 
 	nbs = roxml_get_son_nb(n);
@@ -205,20 +208,52 @@ int roxml_get_content(node_t *n, char *content)
 			start = ROXML_FTELL(n);
 			len = end - start - 1;
 			if(len > 0)	{
-				if(content_ptr)	{
-					ROXML_FREAD(content_ptr, len, sizeof(char), n);
-					content_ptr[len] = '\0';
-					content_ptr += len;
-				}
 				total += len;
 			} else	{
 				len = 0;
-				if(content_ptr)	{
-					content_ptr[0] = '\0';
-				}
 			}
 		} else {
-			return -1;
+			return NULL;
+		}
+		if(son)	{
+			ROXML_FSEEK(son, son->end);
+		}
+	}
+	
+	POP(n)
+	content = roxml_malloc(sizeof(char), total+1, PTR_CHAR);
+	if(content == NULL) { return NULL; }
+	memset(content, 0, sizeof(char) * (total+1));
+	content_ptr = content;
+	len = 0;
+	total = 0;
+	start = 0;
+	end = 0;	
+	PUSH(n)
+
+	for(num = 0; num < nbs+1; num++)	{
+		char c = 0;
+		node_t *son = roxml_get_son_nth(n, num);
+		if(son)	{
+			end = son->pos;
+		} else	{
+			end = n->end;
+		}
+
+		while((!ROXML_FEOF(n))&&(c != '>'))      {
+			c = ROXML_FGETC(n);
+		}
+		if(c == '>')	{
+			start = ROXML_FTELL(n);
+			len = end - start - 1;
+			if(len > 0)	{
+				ROXML_FREAD(content_ptr, len, sizeof(char), n);
+				content_ptr += len;
+			} else	{
+				len = 0;
+			}
+		} else {
+			return NULL;
 		}
 		if(son)	{
 			ROXML_FSEEK(son, son->end);
@@ -226,13 +261,14 @@ int roxml_get_content(node_t *n, char *content)
 	}
 
 	POP(n)
-	return total;
+	return content;
 }
 
-int roxml_get_raw_content(node_t *n, char *content)
+char * roxml_get_raw_content(node_t *n)
 {
 	char c = 0;
 	int len = 0;
+	char * content = NULL;
 	long long int start = 0;	
 
 	PUSH(n)
@@ -244,26 +280,39 @@ int roxml_get_raw_content(node_t *n, char *content)
 	if(c == '>')	{
 		start = ROXML_FTELL(n);
 		len = n->end - start - 1;
-		if(len > 0)	{
-			if(content)	{
-				ROXML_FREAD(content, len, sizeof(char), n);
-				content[len] = '\0';
-			}
-		} else	{
+		if(len < 0)	{
 			len = 0;
-			if(content)	{
-				content[0] = '\0';
-			}
 		}
 	}
 
 	POP(n)
-	return len;
+	c = 0;
+	len = 0;
+	start = 0;	
+	content = roxml_malloc(sizeof(char), len+1, PTR_CHAR);
+	if(content == NULL) { return NULL; }
+	memset(content, 0, sizeof(char) * (len+1));
+	PUSH(n)
+
+	while((!ROXML_FEOF(n))&&(c != '>'))      {
+		c = ROXML_FGETC(n);
+	}
+
+	if(c == '>')	{
+		start = ROXML_FTELL(n);
+		len = n->end - start - 1;
+		if(len > 0)	{
+			ROXML_FREAD(content, len, sizeof(char), n);
+		}
+	}
+
+	POP(n)
+	return content;
 }
 
 char * roxml_get_name(node_t *n)
 {
-	char * name = (char*)malloc(sizeof(char)*512);
+	char * name = (char*)roxml_malloc(sizeof(char), 512, PTR_CHAR);
 	memset(name, 0, sizeof(char)*512);
 
 	if(n->fat == NULL)	{
@@ -283,7 +332,7 @@ int ROXML_API roxml_get_attr_nb(node_t *n)
 
 char *roxml_get_attr_val_nth(node_t *n, int nb)
 {
-	char * val = (char*)malloc(sizeof(char)*512);
+	char * val = (char*)roxml_malloc(sizeof(char), 512, PTR_CHAR);
 	memset(val, 0, sizeof(char)*512);
 	
 	roxml_parse_node(n, NULL, NULL, val, NULL, nb);
@@ -293,7 +342,7 @@ char *roxml_get_attr_val_nth(node_t *n, int nb)
 
 char *roxml_get_attr_nth(node_t *n, int nb)
 {
-	char * arg = (char*)malloc(sizeof(char)*512);
+	char * arg = (char*)roxml_malloc(sizeof(char), 512, PTR_CHAR);
 	memset(arg, 0, sizeof(char)*512);
 	
 	roxml_parse_node(n, NULL, arg, NULL, NULL, nb);
@@ -321,6 +370,7 @@ void roxml_close(node_t *n)
 		free(root->idx);
 	}
 	free(root);
+	roxml_release(RELEASE_ALL);
 }
 
 void roxml_del_tree(node_t *n)
@@ -476,9 +526,9 @@ node_t ** roxml_exec_path(node_t *n, char * path, int *nb_ans)
 		if(strcmp(name, "?xml") == 0)	{
 			starting_node = roxml_get_son_nth(starting_node, 0);
 		}
-		free(name);
+		roxml_release(name);
 		name = roxml_get_name(starting_node);
-		free(name);
+		roxml_release(name);
 	} else	{
 		path_to_find = strdup(path);
 	}
@@ -497,7 +547,7 @@ node_t ** roxml_exec_path(node_t *n, char * path, int *nb_ans)
 
 	/* two pass algorithm : then: copy them */
 	index = 0;
-	resulting_nodes = (node_t**)malloc(sizeof(node_t*)*nb_ans_internal);
+	resulting_nodes = (node_t**)roxml_malloc(sizeof(node_t*), nb_ans_internal, PTR_NODE_RESULT);
 	if(strcmp(path, "/") == 0)	{
 		resulting_nodes[0] = starting_node;
 	} else	{
@@ -537,11 +587,11 @@ void roxml_resolv_path(node_t *n, char * path, int *idx, node_t ***res)
 					char *value = roxml_get_attr_val_nth(n, i);
 					node_t *arg = roxml_new_arg_node(name, value);
 					(*res)[*idx] = arg; 
-					free(value);
+					roxml_release(value);
 				}
 				(*idx)++;
 			}
-			free(name);
+			roxml_release(name);
 		}
 	}
 	
@@ -576,7 +626,7 @@ void roxml_resolv_path(node_t *n, char * path, int *idx, node_t ***res)
 				}
 			}
 		}
-		free(name);
+		roxml_release(name);
 	}
 }
 
@@ -587,9 +637,9 @@ node_t* roxml_new_arg_node(char * name, char * value)
 	
 	size = 2*strlen(name) + strlen(value) + 6;
 	close = strlen(name) + strlen(value) + 3;
-	node = (node_t*)malloc(sizeof(node_t));
-	node->buf = (char*)malloc(size*sizeof(char));
-	node->idx = (unsigned int*)malloc(sizeof(unsigned int));
+	node = (node_t*)roxml_malloc(sizeof(node_t), 1, PTR_NODE);
+	node->buf = (char*)roxml_malloc(sizeof(char), size, PTR_CHAR);
+	node->idx = (unsigned int*)roxml_malloc(sizeof(unsigned int), 1, PTR_INT);
 	sprintf(node->buf,"<%s>%s</%s>",name,value,name);
 	node->type = FILE_ARG;
 	node->son = NULL;
@@ -624,9 +674,9 @@ int roxml_get_node_index(node_t *n, int * last)
 		char * name = roxml_get_name(tmp);
 		if(tmp == n)	{ idx = nb_same_bra; }
 		if(strcmp(name, realn) == 0)	{ nb_same_bra++; }
-		free(name);
+		roxml_release(name);
 	}
-	free(realn);		
+	roxml_release(realn);		
 
 	if(last) { *last = nb_same_bra-1; }
 
@@ -652,18 +702,18 @@ int roxml_xpath_conditionnal(node_t *n, char *condition)
 				if((request) && (request<end))	{
 					request++;
 					if(strncmp(value, request, strlen(value)) == 0)	{
-						free(name);
-						free(value);
+						roxml_release(name);
+						roxml_release(value);
 						return 1;
 					}
 				} else {
-					free(value);
-					free(name);
+					roxml_release(value);
+					roxml_release(name);
 					return 1;
 				}
-				free(value);
+				roxml_release(value);
 			}
-			free(name);
+			roxml_release(name);
 		}
 		return 0;
 	} else if((cond[0] >= 0x30)&&(cond[0] <= 0x39))	{
@@ -687,9 +737,28 @@ int roxml_xpath_conditionnal(node_t *n, char *condition)
 		return 0;
 	} else if(strncmp(cond, "position()", strlen("position()")) == 0)	{
 		/* select operator between: < > = != <= >= */
-		/* char *ptr = cond+strlen("position()"); */
-		/* int idx = roxml_get_node_index(n, NULL); */
-		
+		char *op = NULL;
+		char *ptr = cond+strlen("position()");
+		int idx = roxml_get_node_index(n, NULL);
+		if((op = strstr(ptr, "!=")))	{
+			int val = atoi(op+strlen("!="));
+			if(idx != val)	{ return 1; }
+		} else if((op = strstr(ptr, ">=")))	{
+			int val = atoi(op+strlen(">="));
+			if(idx >= val)	{ return 1; }
+		} else if((op = strstr(ptr, "<=")))	{
+			int val = atoi(op+strlen("<="));
+			if(idx <= val)	{ return 1; }
+		} else if((op = strstr(ptr, "=")))	{
+			int val = atoi(op+strlen("="));
+			if(idx == val)	{ return 1; }
+		} else if((op = strstr(ptr, "<")))	{
+			int val = atoi(op+strlen("<"));
+			if(idx < val)	{ return 1; }
+		} else if((op = strstr(ptr, ">")))	{
+			int val = atoi(op+strlen(">"));
+			if(idx > val)	{ return 1; }
+		}
 		return 0;
 	} else if(strncmp(cond, "position()", strlen("position()")) == 0)	{
 		/* other not yet handled */
@@ -697,6 +766,89 @@ int roxml_xpath_conditionnal(node_t *n, char *condition)
 	}
 	return 0;
 }
+
+void * roxml_malloc(int size, int num, int type)
+{
+	memory_cell_t *cell = &head_cell;
+	while(cell->next != NULL) { cell = cell->next; }
+	cell->next = (memory_cell_t*)malloc(sizeof(memory_cell_t));
+	if(!cell->next) { return NULL; }
+	cell->next->next = NULL;
+	cell->next->prev = cell;
+	cell = cell->next;
+	cell->type = type;
+	cell->id = pthread_self();
+	cell->occ = size;
+	cell->ptr = malloc(size*num);
+	head_cell.prev = cell;
+	return cell->ptr;
+}
+
+void roxml_release(void * data)
+{
+	memory_cell_t *ptr = &head_cell;
+	memory_cell_t *to_delete = NULL;
+
+	if(data == RELEASE_LAST)	{
+		while((ptr->prev != NULL)&&(ptr->prev->id != pthread_self())) { ptr = ptr->prev; } 
+		if(ptr->prev == NULL)	{ return; }
+
+		to_delete = ptr->prev;
+		if(to_delete->next) { 
+			to_delete->prev->next = to_delete->next;
+			to_delete->next->prev = to_delete->prev;
+		} else {
+			if(to_delete->prev != &head_cell)	{
+				head_cell.prev = to_delete->prev;
+			} else {
+				head_cell.prev = NULL;
+			}
+			to_delete->prev->next = NULL;
+		}
+
+		if(PTR_IS_STAR(to_delete))	{
+			int i = 0;
+			for(i = 0; i < to_delete->occ; i++) { free(((void**)(to_delete->ptr))[i]); }
+		}
+		if(to_delete->type != PTR_NONE)	{
+			free(to_delete->ptr);
+			to_delete->type = PTR_NONE;
+			free(to_delete);
+		}
+	} else if(data == RELEASE_ALL) {
+		while(ptr->next != NULL) { 
+			to_delete = ptr->next;
+			if(to_delete->next) { to_delete->next->prev = ptr; }
+			ptr->next = to_delete->next;
+			if(PTR_IS_STAR(to_delete))	{
+				int i = 0;
+				for(i = 0; i < to_delete->occ; i++) { free(((void**)(to_delete->ptr))[i]); }
+			}
+			free(to_delete->ptr);
+			to_delete->type = PTR_NONE;
+			free(to_delete);
+			ptr = ptr->next;
+		}
+	} else	{
+		while((ptr->next != NULL)&&(ptr->next->ptr != data)) { ptr = ptr->next; }
+		if(ptr->next == NULL)	{ 
+			free(data);
+			return;
+		}
+
+		to_delete = ptr->next;
+		if(to_delete->next) { to_delete->next->prev = ptr; }
+		ptr->next = to_delete->next;
+		if(PTR_IS_STAR(to_delete))	{
+			int i = 0;
+			for(i = 0; i < to_delete->occ; i++) { free(((void**)(to_delete->ptr))[i]); }
+		}
+		free(to_delete->ptr);
+		to_delete->type = PTR_NONE;
+		free(to_delete);
+	}
+}
+
 
 #endif /* ROXML_C */
 

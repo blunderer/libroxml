@@ -23,6 +23,7 @@
 #ifndef ROXML_INT_H
 #define ROXML_INT_H
 
+
 /**
  * \def ROXML_INT
  *
@@ -33,7 +34,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 
+/** \struct memory_cell_t
+ *
+ * \brief memory cell structure
+ * 
+ * This is the structure for a memory cell. It contains the
+ * pointer info and type. It also contains the caller id so that
+ * it can free without reference to a specific pointer
+ */
+typedef struct memory_cell {
+	int type;			/*!< pointer type from PTR_NODE, PTR_CHAR... */
+	int occ;			/*!< number of element */
+	void *ptr;			/*!< pointer */
+	pthread_t id;			/*!< thread id of allocator */
+	struct memory_cell *next;	/*!< next memory cell */
+	struct memory_cell *prev;	/*!< prev memory cell */
+} memory_cell_t;
 
 /** \struct node_t
  *
@@ -56,6 +74,78 @@ typedef struct node {
 	struct node *fat;		/*!< ref to father */
 } node_t;
 
+#define ROXML_PRIVATE
+#include "roxml.h"
+
+/**
+ * \def PTR_NONE
+ * 
+ * constant for void pointers
+ */
+#define PTR_NONE	-1
+
+/**
+ * \def PTR_VOID
+ * 
+ * constant for void pointers
+ */
+#define PTR_VOID	0
+
+/**
+ * \def PTR_CHAR
+ * 
+ * constant for char pointers
+ */
+#define PTR_CHAR	2
+
+/**
+ * \def PTR_CHAR_STAR
+ * 
+ * constant for char table pointers
+ */
+#define PTR_CHAR_START	3
+
+/**
+ * \def PTR_NODE
+ * 
+ * constant for node pointers
+ */
+#define PTR_NODE	4
+
+/**
+ * \def PTR_NODE_STAR
+ * 
+ * constant for node table pointers
+ */
+#define PTR_NODE_STAR	5
+
+/**
+ * \def PTR_INT
+ * 
+ * constant for int pointer
+ */
+#define PTR_INT	6
+
+/**
+ * \def PTR_INT_STAR
+ * 
+ * constant for int table pointers
+ */
+#define PTR_INT_STAR	7
+
+/**
+ * \def PTR_RESULT
+ * 
+ * constant for node table pointers where node are node to delete
+ */
+#define PTR_NODE_RESULT	8
+
+/**
+ * \def PTR_IS_STAR(a)
+ * 
+ * macro returning if a memory_cell is a star cell
+ */
+#define PTR_IS_STAR(a)	((a)->type % 2)
 
 /**
  * \def FILE_ARG
@@ -229,8 +319,8 @@ typedef struct node {
  *
  * \fn void ROXML_INT roxml_free_node(node_t *n);
  * This function delete a node 
- * param n is one node of the tree
- * return void
+ * \param n is one node of the tree
+ * \return void
  */
 void	ROXML_INT roxml_free_node		(node_t *n);
 
@@ -238,11 +328,11 @@ void	ROXML_INT roxml_free_node		(node_t *n);
  *
  * \fn node_t* ROXML_INT roxml_new_node(int pos, FILE *file, char * buf, unsigned int * idx);
  * This function allocate a new node 
- * param pos is the beginning offset of the node in the file
- * param file is the pointer to the opened document
- * param buffer is the pointer to the buffer
- * param idx is the position pointer inside the buffer
- * return the new node
+ * \param pos is the beginning offset of the node in the file
+ * \param file is the pointer to the opened document
+ * \param buffer is the pointer to the buffer
+ * \param idx is the position pointer inside the buffer
+ * \return the new node
  */
 node_t* ROXML_INT roxml_new_node		(int pos, FILE *file, char * buf, unsigned int * idx);
 
@@ -250,9 +340,9 @@ node_t* ROXML_INT roxml_new_node		(int pos, FILE *file, char * buf, unsigned int
  *
  * \fn node_t* ROXML_INT roxml_new_arg_node(char * name, char * value);
  * This function allocate a new node for argument storage
- * param name is the argument name
- * param value is the argument value
- * return the new node
+ * \param name is the argument name
+ * \param value is the argument value
+ * \return the new node
  */
 node_t* ROXML_INT roxml_new_arg_node		(char * name, char * value);
 
@@ -260,9 +350,9 @@ node_t* ROXML_INT roxml_new_arg_node		(char * name, char * value);
  *
  * \fn node_t* ROXML_INT roxml_parent_node(node_t *parent, node_t *n);
  * This function give a node to its father and the father to the node
- * param parent is the father node
- * param n is one orphan node of the tree
- * return the parented node
+ * \param parent is the father node
+ * \param n is one orphan node of the tree
+ * \return the parented node
  */
 node_t*	ROXML_INT roxml_parent_node		(node_t *parent, node_t *n);
 
@@ -270,8 +360,8 @@ node_t*	ROXML_INT roxml_parent_node		(node_t *parent, node_t *n);
  *
  * \fn void ROXML_INT roxml_del_tree(node_t *n);
  * This function delete a tree recursively
- * param n is one node of the tree
- * return void
+ * \param n is one node of the tree
+ * \return void
  * see roxml_close
  */
 void 	ROXML_INT roxml_del_tree		(node_t *n);
@@ -280,13 +370,13 @@ void 	ROXML_INT roxml_del_tree		(node_t *n);
  *
  * \fn void ROXML_INT roxml_parse_node(node_t *n, char *name, char * arg, char * value, int * num, int max);
  * This function read a node in the file and return all datas required
- * param n is one node of the tree
- * param name a pointer where name of node will be stored or NULL
- * param arg a pointer where nth arg of node will be stored or NULL
- * param value a pointer where nth value of node will be stored or NULL
- * param num a pointer where the number of attributes will be stored
- * param max the id of attribute or value we want to read
- * return void
+ * \param n is one node of the tree
+ * \param name a pointer where name of node will be stored or NULL
+ * \param arg a pointer where nth arg of node will be stored or NULL
+ * \param value a pointer where nth value of node will be stored or NULL
+ * \param num a pointer where the number of attributes will be stored
+ * \param max the id of attribute or value we want to read
+ * \return void
  */
 void 	ROXML_INT roxml_parse_node		(node_t *n, char *name, char * arg, char * value, int * num, int max);
 
@@ -294,9 +384,9 @@ void 	ROXML_INT roxml_parse_node		(node_t *n, char *name, char * arg, char * val
  *
  * \fn void ROXML_INT roxml_close_node(node_t *n, node_t *close);
  * This function close the node (add the end offset) and parent the node
- * param n is the node to close
- * param close is the node that close node n
- * return void
+ * \param n is the node to close
+ * \param close is the node that close node n
+ * \return void
  */
 void 	ROXML_INT roxml_close_node		(node_t *n, node_t *close);
 
@@ -304,12 +394,12 @@ void 	ROXML_INT roxml_close_node		(node_t *n, node_t *close);
  *
  * \fn node_t* ROXML_API roxml_load(node_t *current_node, FILE *file, char *buffer);
  * This function load a document and all the corresponding nodes
- * file and buffer params are exclusive. You usualy want to load
+ * file and buffer \params are exclusive. You usualy want to load
  * either a file OR a buffer
- * param current_node, the XML root
- * param file file descriptor of document
- * param buffer address of buffer that contains xml
- * return the root node or NULL
+ * \param current_node, the XML root
+ * \param file file descriptor of document
+ * \param buffer address of buffer that contains xml
+ * \return the root node or NULL
  * see roxml_close
  */
 node_t*	ROXML_INT roxml_load			(node_t *current_node, FILE *file, char *buffer);
@@ -318,10 +408,10 @@ node_t*	ROXML_INT roxml_load			(node_t *current_node, FILE *file, char *buffer);
  *
  * \fn void ROXML_INT roxml_resolv_path(node_t *n, char * path, int *idx, node_t ***res);
  * this function resolv a chunk of path and call itself recursively
- * param current_node, the current node 
- * param path the path to resolv
- * param idx the actual number of results
- * param res the place where to store resulting nodes
+ * \param current_node, the current node 
+ * \param path the path to resolv
+ * \param idx the actual number of results
+ * \param res the place where to store resulting nodes
  * see roxml_close
  */
 void ROXML_INT roxml_resolv_path		(node_t *n, char * path, int *idx, node_t ***res);
@@ -330,11 +420,22 @@ void ROXML_INT roxml_resolv_path		(node_t *n, char * path, int *idx, node_t ***r
  *
  * \fn int ROXML_INT roxml_xpath_conditionnal(node_t *n, char *condition);
  * this function resolv an xpath condition
- * param n, the current node 
- * param condition the condition in brackets
+ * \param n, the current node 
+ * \param condition the condition in brackets
  * see roxml_resolv_path
  */
 int ROXML_INT roxml_xpath_conditionnal		(node_t *n, char *condition);
+
+/** \brief alloc memory function function
+ *
+ * \fn roxml_malloc(int size, int num, int type)
+ * this function allocate some memory that will be reachable at
+ * any time by libroxml memory manager
+ * \param size the size of memory to allocate for each elem
+ * \param num the number of element
+ * \param type the kind of pointer
+ */
+void * ROXML_INT roxml_malloc(int size, int num, int type);
 
 #endif /* ROXML_INT_H */
 

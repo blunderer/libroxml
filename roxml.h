@@ -28,7 +28,7 @@
  * \section intro_sec Introduction
  * This library is minimum, easy-to-use, C implementation for xml file parsing
  * It includes a mini shell to navigate thru a xml file as a demo.
- * 
+ *
  * \section why_sec Why libroxml?
  * Because XML parsing is always hard to reinvent, and because very often xml lib are 
  * too big to fit with very little application
@@ -47,17 +47,45 @@
 #ifndef ROXML_H
 #define ROXML_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <pthread.h>
+
 #define ROXML_API
 
-#include "roxml-internal.h"
+#ifndef ROXML_PRIVATE
+/** \struct node_t
+ *
+ * \brief node_t structure
+ * 
+ * This is the structure for a node. This struct is very
+ * little as it only contains offset for node in file and
+ * tree links
+ */
+typedef struct node node_t;
+#endif
 
+/**
+ * \def RELEASE_ALL
+ * 
+ * release all allocated memory
+ */
+#define RELEASE_ALL	(void*)-1
+
+/**
+ * \def RELEASE_LAST
+ * 
+ * release last allocated memory
+ */
+#define RELEASE_LAST	(void*)-2
 
 /** \brief load function for buffers
  *
  * \fn node_t* ROXML_API roxml_load_buf(char *buffer);
  * This function load a document and all the corresponding nodes
- * param buffer the XML buffer to load
- * return the root node or NULL
+ * \param buffer the XML buffer to load
+ * \return the root node or NULL
  * see roxml_close
  * see roxml_load_doc
  * see roxml_load
@@ -68,8 +96,8 @@ node_t*	ROXML_API roxml_load_buf		(char *buffer);
  *
  * \fn node_t* ROXML_API roxml_load_doc(char *filename);
  * This function load a document and all the corresponding nodes
- * param filename the XML document to load
- * return the root node or NULL
+ * \param filename the XML document to load
+ * \return the root node or NULL
  * see roxml_close
  * see roxml_load_buf
  * see roxml_load
@@ -80,8 +108,8 @@ node_t*	ROXML_API roxml_load_doc		(char *filename);
  *
  * \fn void ROXML_API roxml_close(node_t *n);
  * This function clear a document and all the corresponding nodes
- * param n is one node of the tree
- * return void
+ * \param n is one node of the tree
+ * \return void
  * see roxml_load_doc
  */
 void 	ROXML_API roxml_close		(node_t *n);
@@ -90,8 +118,8 @@ void 	ROXML_API roxml_close		(node_t *n);
  *
  * \fn node_t* ROXML_API roxml_get_parent(node_t *n);
  * This function returns the parent of a given node
- * param n is one node of the tree
- * return the node parent
+ * \param n is one node of the tree
+ * \return the node parent
  */
 node_t*	ROXML_API roxml_get_parent		(node_t *n);
 
@@ -99,9 +127,9 @@ node_t*	ROXML_API roxml_get_parent		(node_t *n);
  *
  * \fn node_t* ROXML_API roxml_get_son_nth(node_t *n, int nb);
  * This function returns a given son of a node
- * param n is one node of the tree
- * param nb is the id of the son to get
- * return the nth son
+ * \param n is one node of the tree
+ * \param nb is the id of the son to get
+ * \return the nth son
  * see roxml_get_son_nb
  */
 node_t*	ROXML_API roxml_get_son_nth		(node_t *n, int nb);
@@ -110,8 +138,8 @@ node_t*	ROXML_API roxml_get_son_nth		(node_t *n, int nb);
  *
  * \fn int ROXML_API roxml_get_son_nb(node_t *n);
  * This function return the number of sons for a given node
- * param n is one node of the tree
- * return  the number of sons
+ * \param n is one node of the tree
+ * \return  the number of sons
  * see roxml_get_son_nth
  */
 int 	ROXML_API roxml_get_son_nb		(node_t *n);
@@ -120,47 +148,43 @@ int 	ROXML_API roxml_get_son_nb		(node_t *n);
  *
  * \fn char* ROXML_API roxml_get_name(node_t *n);
  * This function return the name of the node
- * User should free the returned buffer when no longer needed.
- * param n is one node of the tree
- * return the name of the node
+ * User should roxml_release the returned buffer when no longer needed.
+ * \param n is one node of the tree
+ * \return the name of the node
  * see roxml_parse_node
  */
 char*	ROXML_API roxml_get_name		(node_t *n);
 
 /** \brief content getter function
  *
- * \fn int ROXML_API roxml_get_raw_content(node_t *n, char * content);
+ * \fn char * ROXML_API roxml_get_raw_content(node_t *n);
  *
- * This function fill a pointer with the content of a node including sons as text;
- * if the pointer is NULL then the len is returned (without the end of string caracter). libroxml assume that
- * pointer is large enought to write the whole content string
- * param n is one node of the tree
- * param content is a pointer where content will be copied
- * return the len of content
- * see 
+ * This function returns a pointer with raw content of a node (son are included as text).;
+ * if the returned pointer is NULL then the node was empty.
+ * returned string should be roxml_release when not used anymore
+ * \param n is one node of the tree
+ * \return the content
  */
-int	ROXML_API roxml_get_raw_content		(node_t *n, char * content);
+char *	ROXML_API roxml_get_raw_content		(node_t *n);
 
 /** \brief content getter function
  *
- * \fn int ROXML_API roxml_get_content(node_t *n, char * content);
+ * \fn char * ROXML_API roxml_get_content(node_t *n);
  *
- * This function fill a pointer with only the text content of a node 
- * if the pointer is NULL then the len is returned (without end of string caracter). libroxml assume that
- * pointer is large enought to write the whole content string
- * param n is one node of the tree
- * param content is a pointer where content will be copied
- * return the len of content
- * see 
+ * This function returns a pointer with text content of a node (son are NOT included as text).;
+ * if the returned pointer is NULL then the node was empty.
+ * returned string should be roxml_release when not used anymore
+ * \param n is one node of the tree
+ * \return the content
  */
-int	ROXML_API roxml_get_content		(node_t *n, char * content);
+char *	ROXML_API roxml_get_content		(node_t *n);
 
 /** \brief number of attribute getter function
  *
  * \fn int ROXML_API roxml_get_attr_nb(node_t *n);
  * 
- * param n is one node of the tree
- * return the number of attributes in node
+ * \param n is one node of the tree
+ * \return the number of attributes in node
  * see roxml_get_attr_val_nth
  * see roxml_get_attr_nth
  * see roxml_parse_node
@@ -171,10 +195,10 @@ int	ROXML_API roxml_get_attr_nb		(node_t *n);
  *
  * \fn char* ROXML_API roxml_get_attr_nth(node_t *n, int nb);
  * This function get the nth attribute of a node.
- * User should free the returned buffer when no longer needed.
- * param n is one node of the tree
- * param nb the id of attribute to read
- * return the attribute
+ * User should roxml_release the returned buffer when no longer needed.
+ * \param n is one node of the tree
+ * \param nb the id of attribute to read
+ * \return the attribute
  * see roxml_get_nb_attr
  * see roxml_get_attr_val_nth
  * see roxml_parse_node
@@ -185,10 +209,10 @@ char*	ROXML_API roxml_get_attr_nth		(node_t *n, int nb);
  *
  * \fn char* ROXML_API roxml_get_attr_val_nth(node_t *n, int nb);
  * This function get the nth attribute value of a node.
- * User should free the returned buffer when no longer needed.
- * param n is one node of the tree
- * param nb the id of attribute value to read
- * return the attribute value
+ * User should roxml_release the returned buffer when no longer needed.
+ * \param n is one node of the tree
+ * \param nb the id of attribute value to read
+ * \return the attribute value
  * see roxml_get_attr_nth
  * see roxml_get_nb_attr
  * see roxml_parse_node
@@ -202,11 +226,12 @@ char*	ROXML_API roxml_get_attr_val_nth	(node_t *n, int nb);
  * path syntax is : 
  * if path begin with  a "/" it is an absolute path relative to root
  * else it is a path relative to given node
- * handled XPath are : "/", "..", "@<attr name>", "<node name>[table idx]"
- * param n is one node of the tree path can be relative to this or absolute
- * param path the path to resolv
- * param nb_ans the number of results
- * return the node table or NULL 
+ * handled XPath are : "/", "..", "@<attr name>", "<node name>[table idx]..."
+ * resulting node table should be roxml_release when not used anymore
+ * \param n is one node of the tree path can be relative to this or absolute
+ * \param path the path to resolv
+ * \param nb_ans the number of results
+ * \return the node table or NULL 
  */
 node_t ** ROXML_API roxml_exec_path(node_t *n, char * path, int *nb_ans);
 
@@ -214,8 +239,8 @@ node_t ** ROXML_API roxml_exec_path(node_t *n, char * path, int *nb_ans);
  *
  * \fn roxml_is_arg(node_t *n);
  * This function tells if a node is a arg or real node.
- * param n is the node to test
- * return 1 if node is arg else return 0
+ * \param n is the node to test
+ * \return 1 if node is arg else return 0
  */
 int ROXML_API roxml_is_arg(node_t *n);
 
@@ -223,11 +248,22 @@ int ROXML_API roxml_is_arg(node_t *n);
  *
  * \fn roxml_get_node_index(node_t *n);
  * This function tells the index of a node between all its homonyns.
- * param n is the node to test
- * param last is the index of last homonym
- * return the idx or -1 if only one node
+ * \param n is the node to test
+ * \param last is the index of last homonym
+ * \return the idx or -1 if only one node
  */
 int ROXML_API roxml_get_node_index(node_t *n, int * last);
+
+/** \brief memory cleanning function
+ *
+ * \fn roxml_release(void * data);
+ * This function release the memory pointed by pointer
+ * or all previously allocated memory if data is NULL;
+ * Be carefull because the second case is not threadsafe 
+ * \param data the pointer to delete or NULL
+ * \return void
+ */
+void ROXML_API roxml_release(void * data);
 
 #endif /* ROXML_H */
 
