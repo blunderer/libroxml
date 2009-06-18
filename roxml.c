@@ -625,6 +625,8 @@ void roxml_resolv_path(node_t *n, char * path, int *idx, node_t ***res)
 					(*idx)++;
 				}
 			}
+		} else {
+			roxml_resolv_path(cur, path, idx, res);
 		}
 		roxml_release(name);
 	}
@@ -816,7 +818,7 @@ void roxml_release(void * data)
 			free(to_delete);
 		}
 	} else if(data == RELEASE_ALL) {
-		while(ptr->next != NULL) { 
+		while((ptr != NULL) && (ptr->next != NULL)) { 
 			to_delete = ptr->next;
 			if(to_delete->next) { to_delete->next->prev = ptr; }
 			ptr->next = to_delete->next;
