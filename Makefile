@@ -27,7 +27,7 @@ TARGET_TST = $O/xshell
 # options
 override CPPFLAGS +=
 override CFLAGS += -Wall -Wextra -Werror
-override LDFLAGS +=
+override LDFLAGS += -lpthread
 
 # first rule (default)
 all:
@@ -82,7 +82,7 @@ all: $(TARGET_SLIB) $(if $(filter -static, $(LDFLAGS)), , $(TARGET_LIB)) $(TARGE
 .PHONY: doxy
 doxy: doxy.cfg
 	$(call ECHO_DO, '  DOXYGEN', \
-	doxygen $< )
+	doxygen $< &> /dev/null)
 
 .PHONY: clean
 clean:
