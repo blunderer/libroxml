@@ -269,5 +269,7 @@ int ROXML_API roxml_get_node_index(node_t *n, int * last);
  */
 void ROXML_API roxml_release(void * data);
 
+void roxml_commit_changes(node_t *n);
+
 #endif /* ROXML_H */
 

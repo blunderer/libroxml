@@ -516,7 +516,7 @@ node_t ** roxml_exec_path(node_t *n, char * path, int *nb_ans)
 	node_t *starting_node = n;
 	node_t **resulting_nodes = NULL;
 	char * path_to_find;
-	if(path[0] == '/')	{
+	if((path[0] == '/')&&(path[1] != '/'))	{
 		char *name = NULL;
 		path_to_find = strdup(path+1);
 		while(starting_node->fat)	{
@@ -625,8 +625,9 @@ void roxml_resolv_path(node_t *n, char * path, int *idx, node_t ***res)
 					(*idx)++;
 				}
 			}
-		} else {
-			roxml_resolv_path(cur, path, idx, res);
+		} else /*if((path[0] == '/') && (path[1] == '/'))*/	{
+			printf("%s\n",path+0);
+			roxml_resolv_path(cur, path+0, idx, res);
 		}
 		roxml_release(name);
 	}
@@ -839,7 +840,15 @@ void roxml_release(void * data)
 		}
 
 		to_delete = ptr->next;
-		if(to_delete->next) { to_delete->next->prev = ptr; }
+		if(to_delete->next) {
+			to_delete->next->prev = ptr; 
+		} else {
+			if(ptr == &head_cell)	{
+				head_cell.prev = NULL;
+			} else {
+				head_cell.prev = to_delete->prev;
+			}
+		}
 		ptr->next = to_delete->next;
 		if(PTR_IS_STAR(to_delete))	{
 			int i = 0;
@@ -848,6 +857,32 @@ void roxml_release(void * data)
 		free(to_delete->ptr);
 		to_delete->type = PTR_NONE;
 		free(to_delete);
+	}
+}
+
+void roxml_write_node(node_t * n, FILE *f)
+{
+	char *name = roxml_get_name(n);
+	int nb = roxml_get_son_nb(n);
+	if(nb > 0)	{
+		int i = 0;
+		fprintf(f, "<%s>", name);
+		for(i = 0; i < nb; i++)	{
+			roxml_write_node(roxml_get_son_nth(n, i), f);
+		}
+		fprintf(f, "</%s>", name);
+	} else {
+		fprintf(f, "<%s/>", name);
+	}
+	roxml_release(name);
+}
+
+void roxml_commit_changes(node_t *n)
+{
+	FILE *fout = fopen("/tmp/out.xml", "w");
+	if(fout)	{
+		roxml_write_node(n, fout);
+		fclose(fout);	
 	}
 }
 

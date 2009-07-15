@@ -9,7 +9,6 @@ endif
 
 # files
 INC = roxml.h
-INC2 = roxml-internal.h
 SRC_LIB = roxml.c
 SRC_BIN = roxml-parser.c
 SRC_TST = xshell.c
@@ -26,7 +25,7 @@ TARGET_TST = $O/xshell
 
 # options
 override CPPFLAGS +=
-override CFLAGS += -Wall -Wextra -Werror
+override CFLAGS += -g -Wall -Wextra -Werror
 override LDFLAGS += -lpthread
 
 # first rule (default)
@@ -103,7 +102,6 @@ install: $(TARGETS) doxy
 	install -D $(TARGET_TST) $(DESTDIR)/usr/bin
 	install -D $(TARGET_BIN) $(DESTDIR)/usr/bin
 	install -D $(INC) $(DESTDIR)/usr/include
-	install -D $(INC2) $(DESTDIR)/usr/include
 	install -D libroxml.pc $(DESTDIR)/usr/lib/pkgconfig
 	install -d $(DESTDIR)/usr/share/doc/libroxml/html
 	install -D LGPL.txt $(DESTDIR)/usr/share/doc/libroxml/
@@ -117,5 +115,4 @@ uninstall:
 	- rm -f $(DESTDIR)/usr/bin/$(TARGET_TST)
 	- rm -f $(DESTDIR)/usr/bin/$(TARGET_BIN)
 	- rm -f $(DESTDIR)/usr/include/$(INC)
-	- rm -f $(DESTDIR)/usr/include/$(INC2)
 	- rm -fr $(DESTDIR)/usr/share/doc/libroxml

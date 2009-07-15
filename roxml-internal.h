@@ -152,7 +152,14 @@ typedef struct node {
  * 
  * constant for argument node
  */
-#define FILE_ARG	-2
+#define FILE_ARG	-3
+
+/**
+ * \def FILE_PENDING
+ * 
+ * constant for argument node
+ */
+#define FILE_PENDING	-2
 
 /**
  * \def FILE_BUFF
