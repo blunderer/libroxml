@@ -66,7 +66,7 @@ int main(int argc, char ** argv)
 	}
 
 
-	ans = roxml_exec_path(cur, argv[optind + 1],  &max);
+	ans = roxml_xpath(cur, argv[optind + 1],  &max);
 
 	for(j = 0; j < max; j++)
 	{

@@ -87,12 +87,12 @@ int main(int argc, char ** argv)
 			fprintf(stdout,"\n");
 			running = 0;
 		} else if(strncmp(command, "ls", 2) == 0)	{
-			int i, nb = roxml_get_son_nb(cur);
+			int i, nb = roxml_get_chld_nb(cur);
 			fprintf(stdout,"%d elem in %s:\n\t", nb, roxml_get_name(cur));
 			for(i = 0; i < nb; i++)	{
-				node_t *n = roxml_get_son_nth(cur, i);
+				node_t *n = roxml_get_chld(cur, NULL, i);
 				char *name = roxml_get_name(n);
-				if(roxml_get_son_nb(roxml_get_son_nth(cur, i)) > 0)	{
+				if(roxml_get_chld_nb(roxml_get_chld(cur, NULL, i)) > 0)	{
 					fprintf(stdout,"%s/\t",name);
 				} else	{
 					fprintf(stdout,"%s\t",name);
@@ -114,12 +114,12 @@ int main(int argc, char ** argv)
 				found = 1;
 				cur = roxml_get_parent(cur);
 			} else	{
-				int i, nb = roxml_get_son_nb(cur);
+				int i, nb = roxml_get_chld_nb(cur);
 				for(i = 0; i < nb && !found; i++)	{
-					if(strcmp(roxml_get_name(roxml_get_son_nth(cur, i)), arg)==0)	{
+					if(strcmp(roxml_get_name(roxml_get_chld(cur, NULL, i)), arg)==0)	{
 						found = 1;
-						if(roxml_get_son_nb(roxml_get_son_nth(cur, i)) > 0)	{
-							cur = roxml_get_son_nth(cur, i);
+						if(roxml_get_chld_nb(roxml_get_chld(cur, NULL, i)) > 0)	{
+							cur = roxml_get_chld(cur, NULL, i);
 						} else	{
 							fprintf(stdout,"This is a child node\n");
 						}
@@ -141,14 +141,14 @@ int main(int argc, char ** argv)
 			LTRIM(n)
 			arg = n;
 			RTRIM(n)
-			int i, nb = roxml_get_son_nb(cur);
+			int i, nb = roxml_get_chld_nb(cur);
 			for(i = 0; i < nb && !found; i++)	{
-				if(strcmp(roxml_get_name(roxml_get_son_nth(cur, i)), arg)==0)	{
+				if(strcmp(roxml_get_name(roxml_get_chld(cur, NULL, i)), arg)==0)	{
 					argn--;
 					if(argn == 0)	{
 						found = 1;
-						if(roxml_get_son_nb(roxml_get_son_nth(cur, i)) > 0)	{
-							cur = roxml_get_son_nth(cur, i);
+						if(roxml_get_chld_nb(roxml_get_chld(cur, NULL, i)) > 0)	{
+							cur = roxml_get_chld(cur, NULL, i);
 						} else	{
 							fprintf(stdout,"This is a child node\n");
 						}
@@ -166,14 +166,14 @@ int main(int argc, char ** argv)
 			LTRIM(n)
 			arg = n;
 			RTRIM(n)
-			int i, nb = roxml_get_son_nb(cur);
+			int i, nb = roxml_get_chld_nb(cur);
 			for(i = 0; i < nb && !found; i++)	{
-				if(strcmp(roxml_get_name(roxml_get_son_nth(cur, i)), arg)==0)	{
+				if(strcmp(roxml_get_name(roxml_get_chld(cur, NULL, i)), arg)==0)	{
 					found = 1;
-					if(roxml_get_son_nb(roxml_get_son_nth(cur, i)) > 0)	{
+					if(roxml_get_chld_nb(roxml_get_chld(cur, NULL, i)) > 0)	{
 						fprintf(stdout,"This is not a child node\n");
 					} else	{
-						content = roxml_get_content(roxml_get_son_nth(cur, i));
+						content = roxml_get_content(roxml_get_chld(cur, NULL, i));
 						fprintf(stdout,"%s\n",content);
 						roxml_release(content);
 					}
@@ -195,16 +195,16 @@ int main(int argc, char ** argv)
 			LTRIM(n)
 			arg = n;
 			RTRIM(n)
-			int i, nb = roxml_get_son_nb(cur);
+			int i, nb = roxml_get_chld_nb(cur);
 			for(i = 0; i < nb && !found; i++)	{
-				if(strcmp(roxml_get_name(roxml_get_son_nth(cur, i)), arg)==0)	{
+				if(strcmp(roxml_get_name(roxml_get_chld(cur, NULL, i)), arg)==0)	{
 					argn--;
 					if(argn == 0)	{
 						found = 1;
-						if(roxml_get_son_nb(roxml_get_son_nth(cur, i)) > 0)	{
+						if(roxml_get_chld_nb(roxml_get_chld(cur, NULL, i)) > 0)	{
 							fprintf(stdout,"This is not a child node\n");
 						} else	{
-							content = roxml_get_content(roxml_get_son_nth(cur, i));
+							content = roxml_get_content(roxml_get_chld(cur, NULL, i));
 							fprintf(stdout,"%s\n",content);
 							roxml_release(content);
 						}
@@ -222,21 +222,21 @@ int main(int argc, char ** argv)
 			LTRIM(n)
 			arg = n;
 			RTRIM(n)
-			nb = roxml_get_son_nb(cur);
+			nb = roxml_get_chld_nb(cur);
 			for(i = 0; i < nb && !found; i++)	{
-				if(strcmp(roxml_get_name(roxml_get_son_nth(cur, i)), arg)==0)	{
+				if(strcmp(roxml_get_name(roxml_get_chld(cur, NULL, i)), arg)==0)	{
 					found = 1;
-					if(roxml_get_son_nb(roxml_get_son_nth(cur, i)) > 0)	{
-						fprintf(stdout,"%s is a node with %d arguments:\n", roxml_get_name(roxml_get_son_nth(cur, i)),
-							roxml_get_attr_nb(roxml_get_son_nth(cur, i)));
+					if(roxml_get_chld_nb(roxml_get_chld(cur, NULL, i)) > 0)	{
+						fprintf(stdout,"%s is a node with %d arguments:\n", roxml_get_name(roxml_get_chld(cur, NULL, i)),
+							roxml_get_attr_nb(roxml_get_chld(cur, NULL, i)));
 					} else	{
-						fprintf(stdout,"%s is a child node with %d arguments:\n",roxml_get_name(roxml_get_son_nth(cur, i)),
-							roxml_get_attr_nb(roxml_get_son_nth(cur, i)));
+						fprintf(stdout,"%s is a child node with %d arguments:\n",roxml_get_name(roxml_get_chld(cur, NULL, i)),
+							roxml_get_attr_nb(roxml_get_chld(cur, NULL, i)));
 					}
-					nb = roxml_get_attr_nb(roxml_get_son_nth(cur, i));
+					nb = roxml_get_attr_nb(roxml_get_chld(cur, NULL, i));
 					for(j = 0; j < nb; j++) {
-						fprintf(stdout,"\t%s=%s\n", roxml_get_attr_nth(roxml_get_son_nth(cur, i), j),
-								roxml_get_attr_val_nth(roxml_get_son_nth(cur, i), j));
+						fprintf(stdout,"\t%s=%s\n", roxml_get_name(roxml_get_attr(roxml_get_chld(cur, NULL, i), NULL, j)),
+								roxml_get_content(roxml_get_attr(roxml_get_chld(cur, NULL, i), NULL, j)));
 					}
 				}
 			}
@@ -256,23 +256,23 @@ int main(int argc, char ** argv)
 			LTRIM(n)
 			arg = n;
 			RTRIM(n)
-			nb = roxml_get_son_nb(cur);
+			nb = roxml_get_chld_nb(cur);
 			for(i = 0; i < nb && !found; i++)	{
-				if(strcmp(roxml_get_name(roxml_get_son_nth(cur, i)), arg)==0)	{
+				if(strcmp(roxml_get_name(roxml_get_chld(cur, NULL, i)), arg)==0)	{
 					argn--;
 					if(argn == 0)	{
 						found = 1;
-						if(roxml_get_son_nb(roxml_get_son_nth(cur, i)) > 0)	{
-							fprintf(stdout,"%s is a node with %d arguments:\n", roxml_get_name(roxml_get_son_nth(cur, i)),
-								roxml_get_attr_nb(roxml_get_son_nth(cur, i)));
+						if(roxml_get_chld_nb(roxml_get_chld(cur, NULL, i)) > 0)	{
+							fprintf(stdout,"%s is a node with %d arguments:\n", roxml_get_name(roxml_get_chld(cur, NULL, i)),
+								roxml_get_attr_nb(roxml_get_chld(cur, NULL, i)));
 						} else	{
-							fprintf(stdout,"%s is a child node with %d arguments:\n",roxml_get_name(roxml_get_son_nth(cur, i)),
-								roxml_get_attr_nb(roxml_get_son_nth(cur, i)));
+							fprintf(stdout,"%s is a child node with %d arguments:\n",roxml_get_name(roxml_get_chld(cur, NULL, i)),
+								roxml_get_attr_nb(roxml_get_chld(cur, NULL, i)));
 						}
-						nb = roxml_get_attr_nb(roxml_get_son_nth(cur, i));
+						nb = roxml_get_attr_nb(roxml_get_chld(cur, NULL, i));
 						for(j = 0; j < nb; j++) {
-							fprintf(stdout,"\t%s=%s\n", roxml_get_attr_nth(roxml_get_son_nth(cur, i), j),
-									roxml_get_attr_val_nth(roxml_get_son_nth(cur, i), j));
+							fprintf(stdout,"\t%s=%s\n", roxml_get_name(roxml_get_attr(roxml_get_chld(cur, NULL, i), NULL, j)),
+									roxml_get_content(roxml_get_attr(roxml_get_chld(cur, NULL, i), NULL, j)));
 						}
 					}
 				}

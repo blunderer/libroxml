@@ -123,55 +123,48 @@ void 	ROXML_API roxml_close		(node_t *n);
  */
 node_t*	ROXML_API roxml_get_parent		(node_t *n);
 
-/** \brief son getter function
+/** \brief chld getter function
  *
- * \fn node_t* ROXML_API roxml_get_son_nth(node_t *n, int nb);
- * This function returns a given son of a node
+ * \fn node_t* ROXML_API roxml_get_chld(node_t *n, char * name, int nb);
+ * This function returns a given chld of a node
  * \param n is one node of the tree
- * \param nb is the id of the son to get
- * \return the nth son
- * \see roxml_get_son_nb
+ * \param name is the name of the child to get
+ * \param nb is the id of the chld to get
+ * \return the chld corresponding to name or id (if both are set, name is used)
+ * \see roxml_get_chld_nb
  */
-node_t*	ROXML_API roxml_get_son_nth		(node_t *n, int nb);
+node_t*	ROXML_API roxml_get_chld		(node_t *n, char * name, int nb);
 
-/** \brief sons number getter function
+/** \brief chlds number getter function
  *
- * \fn int ROXML_API roxml_get_son_nb(node_t *n);
- * This function return the number of sons for a given node
+ * \fn int ROXML_API roxml_get_chld_nb(node_t *n);
+ * This function return the number of chlds for a given node
  * \param n is one node of the tree
- * \return  the number of sons
- * \see roxml_get_son_nth
+ * \return  the number of chlds
+ * \see roxml_get_chld_nth
  */
-int 	ROXML_API roxml_get_son_nb		(node_t *n);
+int 	ROXML_API roxml_get_chld_nb		(node_t *n);
 
 /** \brief name getter function
  *
- * \fn char* ROXML_API roxml_get_name(node_t *n);
- * This function return the name of the node
- * User should roxml_release the returned buffer when no longer needed.
+ * \fn char* ROXML_API roxml_get_name(node_t *n, char * name, int size);
+ * This function return the name of the node or fill the current buffer with it if not NULL.
+ * if name is NULL, the function will allocated a buffer that user should 
+ * roxml_release when no longer needed.
+ * Be carreful as if your buffer is too short for the returned string, it will be truncated
  * \param n is one node of the tree
- * \return the name of the node
+ * \param name a buffer pointer or NULL if has to be auto allocated
+ * \param size the size of buffer pointed by name if not NULL
+ * \return the name of the node (return our buffer pointer if it wasn't NULL)
  * \nsee roxml_parse_node
  */
-char*	ROXML_API roxml_get_name		(node_t *n);
-
-/** \brief content getter function
- *
- * \fn char * ROXML_API roxml_get_raw_content(node_t *n);
- *
- * This function returns a pointer with raw content of a node (son are included as text).;
- * if the returned pointer is NULL then the node was empty.
- * returned string should be roxml_release when not used anymore
- * \param n is one node of the tree
- * \return the content
- */
-char *	ROXML_API roxml_get_raw_content		(node_t *n);
+char*	ROXML_API roxml_get_name		(node_t *n, char * name, int size);
 
 /** \brief content getter function
  *
  * \fn char * ROXML_API roxml_get_content(node_t *n);
  *
- * This function returns a pointer with text content of a node (son are NOT included as text).;
+ * This function returns a pointer with text content of a node (chld are NOT included as text).;
  * if the returned pointer is NULL then the node was empty.
  * returned string should be roxml_release when not used anymore
  * \param n is one node of the tree
@@ -193,35 +186,22 @@ int	ROXML_API roxml_get_attr_nb		(node_t *n);
 
 /** \brief attribute getter function
  *
- * \fn char* ROXML_API roxml_get_attr_nth(node_t *n, int nb);
+ * \fn char* ROXML_API roxml_get_attr(node_t *n, char * name, int nb);
  * This function get the nth attribute of a node.
  * User should roxml_release the returned buffer when no longer needed.
  * \param n is one node of the tree
  * \param nb the id of attribute to read
- * \return the attribute
+ * \param name is the name of the child to get
+ * \return the attribute corresponding to name or id (if both are set, name is used)
  * \see roxml_get_nb_attr
  * \see roxml_get_attr_val_nth
  * \see roxml_parse_node
  */
-char*	ROXML_API roxml_get_attr_nth		(node_t *n, int nb);
-
-/** \brief attribute value getter function
- *
- * \fn char* ROXML_API roxml_get_attr_val_nth(node_t *n, int nb);
- * This function get the nth attribute value of a node.
- * User should roxml_release the returned buffer when no longer needed.
- * \param n is one node of the tree
- * \param nb the id of attribute value to read
- * \return the attribute value
- * \see roxml_get_attr_nth
- * \see roxml_get_nb_attr
- * \see roxml_parse_node
- */
-char*	ROXML_API roxml_get_attr_val_nth	(node_t *n, int nb);
+node_t*	ROXML_API roxml_get_attr		(node_t *n, char * name, int nb);
 
 /** \brief exec path function
  *
- * \fn roxml_exec_path(node_t *n, char * path, int *nb_ans);
+ * \fn roxml_xpath(node_t *n, char * path, int *nb_ans);
  * This function return a node corresponding to a given path.
  * path syntax is : 
  * if path begin with  a "/" it is an absolute path relative to root
@@ -233,16 +213,16 @@ char*	ROXML_API roxml_get_attr_val_nth	(node_t *n, int nb);
  * \param nb_ans the number of results
  * \return the node table or NULL 
  */
-node_t ** ROXML_API roxml_exec_path(node_t *n, char * path, int *nb_ans);
+node_t ** ROXML_API roxml_xpath(node_t *n, char * path, int *nb_ans);
 
 /** \brief node type function
  *
- * \fn roxml_is_arg(node_t *n);
+ * \fn roxml_get_node_type(node_t *n);
  * This function tells if a node is a arg or real node.
  * \param n is the node to test
- * \return 1 if node is arg else return 0
+ * \return the node type
  */
-int ROXML_API roxml_is_arg(node_t *n);
+int ROXML_API roxml_get_node_type(node_t *n);
 
 /** \brief node get index function
  *
@@ -258,18 +238,41 @@ int ROXML_API roxml_get_node_index(node_t *n, int * last);
  *
  * \fn roxml_release(void * data);
  * This function release the memory pointed by pointer
- * just like free would. Freeing a NULL pointer won't do
+ * just like free would but for memory allocated with roxml_malloc. 
+ * Freeing a NULL pointer won't do
  * anything. roxml_release also allow you to remove all 
  * previously allocated datas by using RELEASE_ALL as argument.
  * You can also safely use RELEASE_LAST argument that will release the 
  * previously allocated var within the current thread (making this
  * function thread safe).
+ * if using roxml_release on a variable non roxml_mallocated, nothing will happen
  * \param data the pointer to delete or NULL or RELEASE_ALL or RELEASE_LAST
  * \return void
  */
 void ROXML_API roxml_release(void * data);
 
+/** \brief node type getter function
+ *
+ * \fn roxml_get_type(node_t *n);
+ * this function return the node type : ROXML_ARG ROXML_VAL
+ * \param n the node to return type for
+ * \return the node type
+ */
+int roxml_get_type(node_t *n);
+
+
+/////////// TODO LIBRWXML
 void roxml_commit_changes(node_t *n);
+
+/** \brief internal function
+ *
+ * \fn node_t* ROXML_INT roxml_parent_node(node_t *parent, node_t *n);
+ * This function give a node to its parent and the parent to the node
+ * \param parent is the parent node
+ * \param n is one orphan node of the tree
+ * \return the parented node
+ */
+node_t * ROXML_API roxml_parent_node(node_t *parent, node_t *n);
 
 #endif /* ROXML_H */
 

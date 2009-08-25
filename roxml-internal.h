@@ -62,16 +62,17 @@ typedef struct memory_cell {
  * tree links
  */
 typedef struct node {
-	int type;			/*!< document or buffer */
+	int type;			/*!< document or buffer / attribute or value */
 	char *buf;			/*!< buffer address */
 	unsigned int *idx;		/*!< index in buffer address */
 	FILE *fil;			/*!< loaded document */
 	unsigned long long pos;		/*!< offset of opening node in file */
 	unsigned long long end;		/*!< offset of closing node in file */
 	unsigned long long prv;		/*!< internal offset used to keep file position */
-	struct node *bra;		/*!< ref to brother */
-	struct node *son;		/*!< ref to son */
-	struct node *fat;		/*!< ref to father */
+	struct node *sibl;		/*!< ref to brother */
+	struct node *chld;		/*!< ref to chld */
+	struct node *prnt;		/*!< ref to parent */
+	struct node *attr;		/*!< ref to attributes */
 } node_t;
 
 #define ROXML_PRIVATE
@@ -148,32 +149,32 @@ typedef struct node {
 #define PTR_IS_STAR(a)	((a)->type % 2)
 
 /**
- * \def FILE_ARG
+ * \def ROXML_FILE
  * 
  * constant for argument node
  */
-#define FILE_ARG	-3
+#define ROXML_FILE	0x01
 
 /**
- * \def FILE_PENDING
- * 
- * constant for argument node
- */
-#define FILE_PENDING	-2
-
-/**
- * \def FILE_BUFF
+ * \def ROXML_BUFF
  * 
  * constant for buffer document
  */
-#define FILE_BUFF	-1
+#define ROXML_BUFF	0x02
 
 /**
- * \def FILE_FILE
+ * \def ROXML_ARG
  * 
  * constant for file document
  */
-#define FILE_FILE	1
+#define ROXML_ARG	0x04
+
+/**
+ * \def ROXML_VAL
+ * 
+ * constant for file document
+ */
+#define ROXML_VAL	0x08
 
 /**
  * \def STATE_NODE_NONE
@@ -274,53 +275,76 @@ typedef struct node {
 #define MODE_COMMENT_DQUOTE	2
 
 /**
+ * \def STATE_INSIDE_BEG
+ * 
+ * inside node state begining (attribute declaration)
+ */
+#define STATE_INSIDE_BEG	0
+
+/**
+ * \def STATE_INSIDE_ARG
+ * 
+ * inside node state arg name
+ */
+#define STATE_INSIDE_ARG	1
+
+/**
+ * \def STATE_INSIDE_VAL
+ * 
+ * inside node state arg value
+ */
+#define STATE_INSIDE_VAL	2
+
+/**
  * \def PUSH(n)
  * 
  * save current document position and recall to node
  */
-#define PUSH(n)	{if(n->type > 0){n->prv = ftell(n->fil); fseek(n->fil, n->pos, SEEK_SET);} else { n->prv = *(n->idx); *(n->idx) = n->pos;}}
+#define PUSH(n)	{if((n->type & ROXML_FILE) == ROXML_FILE){n->prv = ftell(n->fil); fseek(n->fil, n->pos, SEEK_SET);} else { n->prv = *(n->idx); *(n->idx) = n->pos;}}
 
 /**
  * \def POP(n)
  * 
  * restore old document position
  */
-#define POP(n)	{if(n->type > 0){fseek(n->fil, n->prv, SEEK_SET);} else { *(n->idx) = n->prv; }}
+#define POP(n)	{if((n->type & ROXML_FILE) == ROXML_FILE){fseek(n->fil, n->prv, SEEK_SET);} else { *(n->idx) = n->prv; }}
 
 /**
  * \def ROXML_FGETC(n)
  * 
  * get next char
  */
-#define ROXML_FGETC(n)	((n->type > 0)?fgetc(n->fil):n->buf[(*(n->idx))++])
+#define ROXML_FGETC(n)	(((n->type & ROXML_FILE) == ROXML_FILE)?fgetc(n->fil):n->buf[(*(n->idx))++])
 
 /**
  * \def ROXML_FTELL(n)
  * 
  * get stream position
  */
-#define ROXML_FTELL(n)	((n->type > 0)?ftell(n->fil):*((int*)n->idx))
+#define ROXML_FTELL(n)	(((n->type & ROXML_FILE) == ROXML_FILE)?ftell(n->fil):*((int*)n->idx))
 
 /**
  * \def ROXML_FSEEK(n, pos)
  * 
  * set stream position
  */
-#define ROXML_FSEEK(n, pos)	{if(n->type > 0){ fseek((n)->fil, pos, SEEK_SET); } else { *((int*)(n)->idx)=(pos); } }
+#define ROXML_FSEEK(n, pos)	{if((n->type & ROXML_FILE) == ROXML_FILE){ fseek((n)->fil, pos, SEEK_SET); } else { *((int*)(n)->idx)=(pos); } }
 
 /**
  * \def ROXML_FEOF(n)
  * 
  * get end of stream
  */
-#define ROXML_FEOF(n)	((n->type > 0)?feof(n->fil):((*(n->idx))>=(strlen(n->buf)-1)))
+#define ROXML_FEOF(n)	(((n->type & ROXML_FILE) == ROXML_FILE)?feof(n->fil):((*(n->idx))>=(strlen(n->buf)-1)))
 
 /**
  * \def ROXML_FREAD(b, len, size, n)
  * 
  * get chunck of stream
  */
-#define ROXML_FREAD(b, len, size, n)	{if(n->type > 0){fread(b, len, size, n->fil);} else { memcpy(b, n->buf+*(n->idx), (size)*(len)); }}
+#define ROXML_FREAD(b, len, size, n)	{if((n->type & ROXML_FILE) == ROXML_FILE){fread(b, len, size, n->fil);} else { memcpy(b, n->buf+*(n->idx), (size)*(len)); }}
+
+extern memory_cell_t head_cell;
 
 /** \brief internal function
  *
@@ -333,35 +357,16 @@ void	ROXML_INT roxml_free_node		(node_t *n);
 
 /** \brief internal function
  *
- * \fn node_t* ROXML_INT roxml_new_node(int pos, FILE *file, char * buf, unsigned int * idx);
+ * \fn node_t* ROXML_INT roxml_create_node(int pos, FILE *file, char * buf, unsigned int * idx);
  * This function allocate a new node 
  * \param pos is the beginning offset of the node in the file
  * \param file is the pointer to the opened document
  * \param buffer is the pointer to the buffer
  * \param idx is the position pointer inside the buffer
+ * \param type is the type of node between arg and val
  * \return the new node
  */
-node_t* ROXML_INT roxml_new_node		(int pos, FILE *file, char * buf, unsigned int * idx);
-
-/** \brief internal function
- *
- * \fn node_t* ROXML_INT roxml_new_arg_node(char * name, char * value);
- * This function allocate a new node for argument storage
- * \param name is the argument name
- * \param value is the argument value
- * \return the new node
- */
-node_t* ROXML_INT roxml_new_arg_node		(char * name, char * value);
-
-/** \brief internal function
- *
- * \fn node_t* ROXML_INT roxml_parent_node(node_t *parent, node_t *n);
- * This function give a node to its father and the father to the node
- * \param parent is the father node
- * \param n is one orphan node of the tree
- * \return the parented node
- */
-node_t*	ROXML_INT roxml_parent_node		(node_t *parent, node_t *n);
+node_t* ROXML_INT roxml_create_node		(int pos, FILE *file, char * buf, unsigned int * idx, int type);
 
 /** \brief internal function
  *

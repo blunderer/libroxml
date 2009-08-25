@@ -12,6 +12,7 @@ INC = roxml.h
 SRC_LIB = roxml.c
 SRC_BIN = roxml-parser.c
 SRC_TST = xshell.c
+SRC_TST = 
 DEPS = $(patsubst %.c, $O/%.d, $(SRC_LIB) $(SRC_BIN) $(SRC_TST))
 OBJS = $(OBJ_LIB) $(OBJ_TST) $(OBJ_BIN)
 OBJ_LIB = $(SRC_LIB:%.c=$O/%.o)
