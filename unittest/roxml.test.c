@@ -33,7 +33,7 @@ int test_tree_on_doc(void)
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl);	//node4
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl);	//node5
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld);	//node6
-	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->chld);
+	ASSERT_NULL(root->chld->chld->sibl->sibl->chld);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->sibl);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->chld);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->chld);
@@ -166,7 +166,7 @@ int test_tree_on_buf(void)
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl);	//node4
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl);	//node5
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld);	//node6
-	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->chld);
+	ASSERT_NULL(root->chld->chld->sibl->sibl->chld);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->sibl);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->chld);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->chld);
@@ -284,7 +284,7 @@ int test_tree_on_human_doc(void)
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl);	//node4
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl);	//node5
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld);	//node6
-	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->chld);
+	ASSERT_NULL(root->chld->chld->sibl->sibl->chld);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->sibl);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->chld);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->chld);
@@ -414,7 +414,7 @@ int test_tree_on_human_buf(void)
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl);	//node4
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl);	//node5
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld);	//node6
-	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->chld);
+	ASSERT_NULL(root->chld->chld->sibl->sibl->chld);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->sibl);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->chld);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->chld);
@@ -549,80 +549,124 @@ int test_malloc_release(void)
 	RETURN /* close context macro */
 }
 
-int test_free_node(void)
-{
-	INIT
-	EMPTY
-	RETURN
-}
-
 int test_create_node(void)
 {
 	INIT
-	EMPTY
-	RETURN
-}
 
-int test_del_tree(void)
-{
-	INIT
-	EMPTY
-	RETURN
-}
+	FILE * doc = (FILE *)0x42;
+	unsigned int * idx = (unsigned int *)0x43;
+	char * buf = (char *)0x44;
 
-int test_parse_node(void)
-{
-	INIT
-	EMPTY
-	RETURN
-}
+	node_t * node = roxml_create_node(1, doc, buf, idx, ROXML_FILE | ROXML_VAL);
+	node_t * cnode = roxml_create_node(1, doc, NULL, NULL, ROXML_FILE | ROXML_VAL);
+	node_t * anode = roxml_create_node(1, doc, NULL, NULL, ROXML_FILE | ROXML_ARG);
+	node_t * close = roxml_create_node(10, doc, NULL, NULL, ROXML_FILE | ROXML_VAL);
+	roxml_close_node(node, close);
+	ASSERT_EQUAL(node->type, ROXML_FILE | ROXML_VAL)
+	ASSERT_EQUAL(node->buf, buf)
+	ASSERT_EQUAL(node->idx, idx)
+	ASSERT_EQUAL(node->fil, doc)
+	ASSERT_EQUAL(node->pos, 1)
+	ASSERT_EQUAL(node->end, 10)
+	ASSERT_EQUAL(node->prv, 0)
+	ASSERT_NULL(node->prnt)
+	ASSERT_NULL(node->sibl)
+	ASSERT_NULL(node->chld)
+	ASSERT_NULL(node->attr)
 
-int test_close_node(void)
-{
-	INIT
-	EMPTY
-	RETURN
-}
+	roxml_parent_node(cnode, node);
+	roxml_parent_node(node, anode);
+	ASSERT_EQUAL(node->prnt, cnode)
+	ASSERT_EQUAL(anode->prnt, node)
+	ASSERT_EQUAL(cnode->chld, node)
+	ASSERT_EQUAL(node->attr, anode)
 
-int test_resolv_path(void)
-{
-	INIT
-	EMPTY
-	RETURN
-}
+	roxml_parent_node(cnode, node);
+	roxml_parent_node(node, anode);
+	ASSERT_EQUAL(node->sibl, node)
+	ASSERT_EQUAL(anode->sibl, anode)
 
-int test_xpath_conditionnal(void)
-{
-	INIT
-	EMPTY
-	RETURN
-}
+	roxml_free_node(node);
+	roxml_free_node(cnode);
+	roxml_free_node(anode);
 
-int test_close(void)
-{
-	INIT
-	EMPTY
-	RETURN
-}
-
-int test_get_parent(void)
-{
-	INIT
-	EMPTY
 	RETURN
 }
 
 int test_get_chld(void)
 {
 	INIT
-	EMPTY
+	node_t *root = roxml_load_doc("roxml.test.xml");
+
+	ASSERT_STRING_EQUAL(roxml_get_name(root, NULL, 0), "root")
+
+	node_t * node0 = roxml_get_chld(root, NULL, 0);
+	ASSERT_STRING_EQUAL(roxml_get_name(node0, NULL, 0), "node0")
+	node_t * node1 = roxml_get_chld(node0, NULL, 0);
+	ASSERT_STRING_EQUAL(roxml_get_name(node1, NULL, 0), "node1")
+	node_t * node2 = roxml_get_chld(node0, NULL, 1);
+	ASSERT_STRING_EQUAL(roxml_get_name(node2, NULL, 0), "node2")
+	node_t * node3 = roxml_get_chld(node2, NULL, 0);
+	ASSERT_STRING_EQUAL(roxml_get_name(node3, NULL, 0), "node3")
+	node_t * node4 = roxml_get_chld(node2, NULL, 1);
+	ASSERT_STRING_EQUAL(roxml_get_name(node4, NULL, 0), "node4")
+	node_t * node5 = roxml_get_chld(node2, NULL, 2);
+	ASSERT_STRING_EQUAL(roxml_get_name(node5, NULL, 0), "node5")
+	node_t * node6 = roxml_get_chld(node5, NULL, 0);
+	ASSERT_STRING_EQUAL(roxml_get_name(node6, NULL, 0), "node6")
+	node_t * node7 = roxml_get_chld(node0, NULL, 2);
+	ASSERT_STRING_EQUAL(roxml_get_name(node7, NULL, 0), "node7")
+
+	node0 = roxml_get_chld(root, "node0", 0);
+	ASSERT_STRING_EQUAL(roxml_get_name(node0, NULL, 0), "node0")
+	node1 = roxml_get_chld(node0,"node1", 0);
+	ASSERT_STRING_EQUAL(roxml_get_name(node1, NULL, 0), "node1")
+	node2 = roxml_get_chld(node0, "node2", 0);
+	ASSERT_STRING_EQUAL(roxml_get_name(node2, NULL, 0), "node2")
+	node3 = roxml_get_chld(node2, "node3", 0);
+	ASSERT_STRING_EQUAL(roxml_get_name(node3, NULL, 0), "node3")
+	node4 = roxml_get_chld(node2, "node4", 0);
+	ASSERT_STRING_EQUAL(roxml_get_name(node4, NULL, 0), "node4")
+	node5 = roxml_get_chld(node2, "node5", 0);
+	ASSERT_STRING_EQUAL(roxml_get_name(node5, NULL, 0), "node5")
+	node6 = roxml_get_chld(node5, "node6", 0);
+	ASSERT_STRING_EQUAL(roxml_get_name(node6, NULL, 0), "node6")
+	node7 = roxml_get_chld(node0, "node7", 0);
+	ASSERT_STRING_EQUAL(roxml_get_name(node7, NULL, 0), "node7")
+
+	roxml_release(RELEASE_ALL);
+	roxml_close(root);
+
 	RETURN
 }
 
 int test_get_chld_nb(void)
 {
 	INIT
-	EMPTY
+
+	node_t *root = roxml_load_doc("roxml.test.xml");
+
+	int nb = roxml_get_chld_nb(root);	// root
+	ASSERT_EQUAL(nb, 1);
+	nb = roxml_get_chld_nb(root->chld);	// node0
+	ASSERT_EQUAL(nb, 3);
+	nb = roxml_get_chld_nb(root->chld->chld);	// node1
+	ASSERT_EQUAL(nb, 0);
+	nb = roxml_get_chld_nb(root->chld->chld->sibl);	// node2
+	ASSERT_EQUAL(nb, 3);
+	nb = roxml_get_chld_nb(root->chld->chld->sibl->sibl);	// node7
+	ASSERT_EQUAL(nb, 0);
+	nb = roxml_get_chld_nb(root->chld->chld->sibl->chld); // node3
+	ASSERT_EQUAL(nb, 0);
+	nb = roxml_get_chld_nb(root->chld->chld->sibl->chld->sibl);	// node4
+	ASSERT_EQUAL(nb, 0);
+	nb = roxml_get_chld_nb(root->chld->chld->sibl->chld->sibl->sibl);	// node5
+	ASSERT_EQUAL(nb, 1);
+	nb = roxml_get_chld_nb(root->chld->chld->sibl->chld->sibl->sibl->chld);	// node6
+	ASSERT_EQUAL(nb, 0);
+
+	roxml_close(root);
+
 	RETURN
 }
 
@@ -668,14 +712,6 @@ int test_get_node_index(void)
 	RETURN
 }
 
-int test_parent_node(void)
-{
-	INIT
-	EMPTY
-	RETURN
-}
-
-
 int main(int argc, char ** argv)	{
 	INIT /* init context macro */
 
@@ -692,15 +728,7 @@ int main(int argc, char ** argv)	{
 	TEST_FUNC(test_tree_on_human_buf) 
 	TEST_FUNC(test_names_on_human_buf) 
 	TEST_FUNC(test_malloc_release) 
-	TEST_FUNC(test_free_node)
 	TEST_FUNC(test_create_node)
-	TEST_FUNC(test_del_tree)
-	TEST_FUNC(test_parse_node)
-	TEST_FUNC(test_close_node)
-	TEST_FUNC(test_resolv_path)
-	TEST_FUNC(test_xpath_conditionnal)
-	TEST_FUNC(test_close)
-	TEST_FUNC(test_get_parent)
 	TEST_FUNC(test_get_chld)
 	TEST_FUNC(test_get_chld_nb)
 	TEST_FUNC(test_get_content)
@@ -709,7 +737,6 @@ int main(int argc, char ** argv)	{
 	TEST_FUNC(test_xpath)
 	TEST_FUNC(test_get_node_type)
 	TEST_FUNC(test_get_node_index)
-	TEST_FUNC(test_parent_node)
 
 	EXEC_UNITTEST /* exec tests depending on command line option see available options with --help */
 

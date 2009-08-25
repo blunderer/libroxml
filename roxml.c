@@ -401,6 +401,7 @@ void roxml_del_tree(node_t *n)
 int roxml_get_chld_nb(node_t *n)
 {
 	node_t *ptr = n;
+	if(ptr == NULL)	{ return -1; }
 	int nb = 0;
 	if(ptr->chld)	{
 		ptr = ptr->chld;
@@ -491,19 +492,17 @@ node_t * roxml_load(node_t *current_node, FILE *file, char *buffer)
 	while(!ROXML_FEOF(current_node))	{
 		char c = ROXML_FGETC(current_node);
 
-		if(state != STATE_NODE_CONTENT)	{
-			if(c == '"')	{
-				if(mode == MODE_COMMENT_NONE)	{
-					mode = MODE_COMMENT_DQUOTE;
-				} else if(mode == MODE_COMMENT_DQUOTE)	{
-					mode = MODE_COMMENT_NONE;
-				}
-			} else if(c == '\'')	{
-				if(mode == MODE_COMMENT_NONE)	{
-					mode = MODE_COMMENT_QUOTE;
-				} else if(mode == MODE_COMMENT_QUOTE)	{
-					mode = MODE_COMMENT_NONE;
-				}
+		if(c == '"')	{
+			if(mode == MODE_COMMENT_NONE)	{
+				mode = MODE_COMMENT_DQUOTE;
+			} else if(mode == MODE_COMMENT_DQUOTE)	{
+				mode = MODE_COMMENT_NONE;
+			}
+		} else if(c == '\'')	{
+			if(mode == MODE_COMMENT_NONE)	{
+				mode = MODE_COMMENT_QUOTE;
+			} else if(mode == MODE_COMMENT_QUOTE)	{
+				mode = MODE_COMMENT_NONE;
 			}
 		}
 		
