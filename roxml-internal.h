@@ -283,11 +283,11 @@ typedef struct node {
 #define MODE_COMMENT_DQUOTE	2
 
 /**
- * \def STATE_INSIDE_BEG
+ * \def STATE_INSIDE_ARG_BEG
  * 
  * inside node state begining (attribute declaration)
  */
-#define STATE_INSIDE_BEG	0
+#define STATE_INSIDE_ARG_BEG	0
 
 /**
  * \def STATE_INSIDE_ARG
@@ -297,11 +297,25 @@ typedef struct node {
 #define STATE_INSIDE_ARG	1
 
 /**
+ * \def STATE_INSIDE_VAL_BEG
+ * 
+ * inside node state arg value
+ */
+#define STATE_INSIDE_VAL_BEG	2
+
+/**
  * \def STATE_INSIDE_VAL
  * 
  * inside node state arg value
  */
-#define STATE_INSIDE_VAL	2
+#define STATE_INSIDE_VAL	3
+
+/**
+ * \def ROXML_WHITE(n)
+ * 
+ * save current document position and recall to node
+ */
+#define ROXML_WHITE(n) ((n==' ')||(n=='\t')||(n=='\n')||(n=='\r'))
 
 /**
  * \def PUSH(n)
