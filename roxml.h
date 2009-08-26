@@ -162,7 +162,7 @@ char*	ROXML_API roxml_get_name		(node_t *n, char * name, int size);
 
 /** \brief content getter function
  *
- * \fn char * ROXML_API roxml_get_content(node_t *n);
+ * \fn char * ROXML_API roxml_get_content(node_t *n, char * name, int size);
  *
  * This function returns a pointer with text content of a node (chld are NOT included as text).;
  * if the returned pointer is NULL then the node was empty.
@@ -170,7 +170,7 @@ char*	ROXML_API roxml_get_name		(node_t *n, char * name, int size);
  * \param n is one node of the tree
  * \return the content
  */
-char *	ROXML_API roxml_get_content		(node_t *n);
+char *	ROXML_API roxml_get_content		(node_t *n, char * name, int size);
 
 /** \brief number of attribute getter function
  *

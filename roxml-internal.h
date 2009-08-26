@@ -66,13 +66,14 @@ typedef struct node {
 	char *buf;			/*!< buffer address */
 	unsigned int *idx;		/*!< index in buffer address */
 	FILE *fil;			/*!< loaded document */
-	unsigned long long pos;		/*!< offset of opening node in file */
-	unsigned long long end;		/*!< offset of closing node in file */
+	unsigned long long pos;		/*!< offset of begining of opening node in file */
+	unsigned long long end;		/*!< offset of begining of closing node in file */
 	unsigned long long prv;		/*!< internal offset used to keep file position */
 	struct node *sibl;		/*!< ref to brother */
 	struct node *chld;		/*!< ref to chld */
 	struct node *prnt;		/*!< ref to parent */
 	struct node *attr;		/*!< ref to attributes */
+	struct node *text;		/*!< ref to content */
 } node_t;
 
 #define ROXML_PRIVATE
@@ -175,6 +176,13 @@ typedef struct node {
  * constant for file document
  */
 #define ROXML_VAL	0x08
+
+/**
+ * \def ROXML_TXT
+ * 
+ * constant for file document
+ */
+#define ROXML_TXT	0x10
 
 /**
  * \def STATE_NODE_NONE
