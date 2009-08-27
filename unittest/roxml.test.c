@@ -561,6 +561,8 @@ int test_malloc_release(void)
 	ASSERT_NULL(head_cell.next);
 	roxml_release(RELEASE_ALL);
 	ASSERT_NULL(head_cell.next);
+	roxml_release(RELEASE_LAST);
+	ASSERT_NULL(head_cell.next);
 
 	RETURN /* close context macro */
 }
@@ -827,7 +829,8 @@ int test_get_node_type(void)
 	ASSERT_NOT_EQUAL(type & ROXML_VAL, ROXML_VAL)
 	ASSERT_EQUAL(type & ROXML_ARG, ROXML_ARG)
 
-	roxml_release(RELEASE_ALL);	
+	roxml_free_node(cnode);
+	roxml_free_node(anode);
 
 	RETURN
 }

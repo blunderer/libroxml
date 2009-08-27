@@ -71,7 +71,7 @@ int main(int argc, char ** argv)
 	for(j = 0; j < max; j++)
 	{
 		char *c = NULL;
-		c = roxml_get_content(ans[j]);
+		c = roxml_get_content(ans[j], NULL, 0);
 		if (! quiet)	{
 			fprintf(stdout,"ans[%d]: ", j);
 		}

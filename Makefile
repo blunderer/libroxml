@@ -11,19 +11,14 @@ endif
 INC = roxml.h
 SRC_LIB = roxml.c
 SRC_BIN = roxml-parser.c
-SRC_TST = xshell.c
-SRC_TST = 
-DEPS = $(patsubst %.c, $O/%.d, $(SRC_LIB) $(SRC_BIN) $(SRC_TST))
-OBJS = $(OBJ_LIB) $(OBJ_TST) $(OBJ_BIN)
+DEPS = $(patsubst %.c, $O/%.d, $(SRC_LIB) $(SRC_BIN))
+OBJS = $(OBJ_LIB) $(OBJ_BIN)
 OBJ_LIB = $(SRC_LIB:%.c=$O/%.o)
 OBJ_BIN = $(SRC_BIN:%.c=$O/%.o)
-OBJ_TST = $(SRC_TST:%.c=$O/%.o)
-TARGETS = $(TARGET_SLIB) $(TARGET_LIB) $(TARGET_BIN) $(TARGET_TST)
+TARGETS = $(TARGET_SLIB) $(TARGET_LIB) $(TARGET_BIN)
 TARGET_SLIB = $O/libroxml.a
 TARGET_LIB = $O/libroxml.so
 TARGET_BIN = $O/roxml
-TARGET_TST = $O/xshell
-
 # options
 override CPPFLAGS +=
 override CFLAGS += -g -Wall -Wextra -Werror
@@ -71,13 +66,12 @@ $(TARGET_LIB): $(OBJ_LIB)
 	$(CC) -shared $(LDFLAGS) $^ -o $@ )
 
 $(TARGET_BIN): $(OBJ_BIN)
-$(TARGET_TST): $(OBJ_TST)
-$(TARGET_BIN) $(TARGET_TST): | $(if $(filter -static, $(LDFLAGS)), $(TARGET_SLIB), $(TARGET_LIB))
+$(TARGET_BIN): | $(if $(filter -static, $(LDFLAGS)), $(TARGET_SLIB), $(TARGET_LIB))
 	$(call ECHO_DO, '  LD      $(notdir $@)', \
 	$(CC) $(LDFLAGS) $^ -L$O -lroxml -o $@ )
 
 .PHONY: all
-all: $(TARGET_SLIB) $(if $(filter -static, $(LDFLAGS)), , $(TARGET_LIB)) $(TARGET_BIN) $(TARGET_TST)
+all: $(TARGET_SLIB) $(if $(filter -static, $(LDFLAGS)), , $(TARGET_LIB)) $(TARGET_BIN)
 
 .PHONY: doxy
 doxy: doxy.cfg
@@ -100,7 +94,6 @@ mrproper: clean
 install: $(TARGETS) doxy
 	install -D $(TARGET_SLIB) $(DESTDIR)/usr/lib
 	install -D $(TARGET_LIB) $(DESTDIR)/usr/lib
-	install -D $(TARGET_TST) $(DESTDIR)/usr/bin
 	install -D $(TARGET_BIN) $(DESTDIR)/usr/bin
 	install -D $(INC) $(DESTDIR)/usr/include
 	install -D libroxml.pc $(DESTDIR)/usr/lib/pkgconfig
@@ -113,7 +106,6 @@ uninstall:
 	- rm -f $(DESTDIR)/usr/lib/pkgconfig/libroxml.pc
 	- rm -f $(DESTDIR)/usr/lib/$(TARGET_SLIB)
 	- rm -f $(DESTDIR)/usr/lib/$(TARGET_LIB)
-	- rm -f $(DESTDIR)/usr/bin/$(TARGET_TST)
 	- rm -f $(DESTDIR)/usr/bin/$(TARGET_BIN)
 	- rm -f $(DESTDIR)/usr/include/$(INC)
 	- rm -fr $(DESTDIR)/usr/share/doc/libroxml

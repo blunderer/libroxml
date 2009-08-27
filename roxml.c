@@ -78,6 +78,7 @@ node_t * roxml_create_node(int pos, FILE *file, char * buf, unsigned int * idx, 
 	n->fil = file;
 	n->pos = pos;
 	n->end = pos;
+	n->prv = 0;
 	n->sibl = NULL;
 	n->chld = NULL;
 	n->text = NULL;
@@ -246,7 +247,7 @@ char * roxml_get_content(node_t *n, char * name, int size)
 		memset(content, 0, sizeof(char) * (total+1));
 		ROXML_FREAD(content, total, 1, n)
 
-		POP(n)
+		POP(n->text)
 	}
 	if(name)	{
 		strncpy(name, content, size);
@@ -704,7 +705,6 @@ void roxml_resolv_path(node_t *n, char * path, int *idx, node_t ***res)
 				}
 			}
 		} else /*if((path[0] == '/') && (path[1] == '/'))*/	{
-			printf("%s\n",path+0);
 			roxml_resolv_path(cur, path+0, idx, res);
 		}
 		roxml_release(name);
@@ -872,6 +872,7 @@ void roxml_release(void * data)
 		if(ptr->prev == NULL)	{ return; }
 
 		to_delete = ptr->prev;
+
 		if(to_delete->next) { 
 			to_delete->prev->next = to_delete->next;
 			to_delete->next->prev = to_delete->prev;
@@ -894,9 +895,10 @@ void roxml_release(void * data)
 			free(to_delete);
 		}
 	} else if(data == RELEASE_ALL) {
+		head_cell.prev = NULL;
 		while((head_cell.next != NULL)) { 
 			to_delete = head_cell.next;
-			if(to_delete->next) { to_delete->next->prev = ptr; }
+			if(to_delete->next) { to_delete->next->prev = &head_cell; }
 			head_cell.next = to_delete->next;
 
 			if(PTR_IS_STAR(to_delete))	{
@@ -933,6 +935,8 @@ void roxml_release(void * data)
 		to_delete->type = PTR_NONE;
 		free(to_delete);
 	}
+	if(head_cell.next == &head_cell) { head_cell.next = NULL; }
+	if(head_cell.prev == &head_cell) { head_cell.prev = NULL; }
 }
 
 void roxml_write_node(node_t * n, FILE *f)
