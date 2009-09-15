@@ -84,12 +84,15 @@ typedef struct node {
 #define ROXML_L_SELF	"self::"
 #define ROXML_L_PARENT	"parent::"
 #define ROXML_L_ATTR	"attribute::"
-#define ROXML_S_CHILD	"/"
-#define ROXML_S_DESC	"//"
-#define ROXML_S_SELF	"/."
-#define ROXML_S_PARENT	"/.."
-#define ROXML_S_ATTR	"/@"
+#define ROXML_S_CHILD
+#define ROXML_S_DESC	""
+#define ROXML_S_SELF	"."
+#define ROXML_S_PARENT	".."
+#define ROXML_S_ATTR	"@"
 
+#define ROXML_DIRECT		0
+#define ROXML_DESC_ONLY		1
+#define ROXML_SELF_AND_DESC	2
 
 /**
  * \def PTR_NONE
@@ -150,7 +153,7 @@ typedef struct node {
 /**
  * \def PTR_RESULT
  * 
- * constant for node table pointers where node are node to delete
+ * constant for node table pointers where node are not to delete
  */
 #define PTR_NODE_RESULT	8
 
