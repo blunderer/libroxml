@@ -680,9 +680,11 @@ void roxml_check_node(char *xp, int again, node_t *context, node_t ***ans, int *
 	// tests axes
 	if((strncmp(ROXML_L_SELF, xp, strlen(ROXML_L_SELF))==0)||(strncmp(ROXML_S_SELF, xp, strlen(ROXML_S_SELF))==0)) {
 		// ROXML_L_SELF & ROXML_S_SELF
+		roxml_validate_axes(context, "*", ans, nb, max, again);
 		roxml_check_node(xp+strlen(xp)+1, again-1, context, ans, nb, max, ignore);
 	} else if((strncmp(ROXML_L_PARENT, xp, strlen(ROXML_L_PARENT))==0)||(strncmp(ROXML_S_SELF, xp, strlen(ROXML_S_SELF))==0)) {
 		// ROXML_L_PARENT & ROXML_S_SELF
+		roxml_validate_axes(context->prnt, "*", ans, nb, max, again);
 		roxml_check_node(xp+strlen(xp)+1, again-1, context->prnt, ans, nb, max, ignore);
 	} else if(strncmp(ROXML_L_DESC, xp, strlen(ROXML_L_DESC))==0) {
 		// ROXML_L_DESC
