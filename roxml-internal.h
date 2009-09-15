@@ -79,16 +79,25 @@ typedef struct node {
 #define ROXML_PRIVATE
 #include "roxml.h"
 
-#define ROXML_L_CHILD	"child::"
-#define ROXML_L_DESC	"descendant-or-self::"
-#define ROXML_L_SELF	"self::"
-#define ROXML_L_PARENT	"parent::"
-#define ROXML_L_ATTR	"attribute::"
+#define ROXML_L_CHILD		"child::"
+#define ROXML_L_DESC_O_SELF	"descendant-or-self::"
+#define ROXML_L_SELF		"self::"
+#define ROXML_L_PARENT		"parent::"
+#define ROXML_L_ATTR		"attribute::"
+#define ROXML_L_DESC		"descendant::"
+#define ROXML_L_ANC		"ancestor::"
+#define ROXML_L_NEXT_SIBL	"following-sibling::"
+#define ROXML_L_PREC_SIBL	"preceding-sibling::"
+#define ROXML_L_NEXT		"following::"
+#define ROXML_L_PREC		"preceding::"
+#define ROXML_L_NS		"namespace::"
+#define ROXML_L_ANC_O_SELF	"ancestor-or-self::"
+
 #define ROXML_S_CHILD
-#define ROXML_S_DESC	""
-#define ROXML_S_SELF	"."
-#define ROXML_S_PARENT	".."
-#define ROXML_S_ATTR	"@"
+#define ROXML_S_DESC_O_SELF	""
+#define ROXML_S_SELF		"."
+#define ROXML_S_PARENT		".."
+#define ROXML_S_ATTR		"@"
 
 #define ROXML_DIRECT		0
 #define ROXML_DESC_ONLY		1
