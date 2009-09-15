@@ -634,17 +634,17 @@ int roxml_parse_xpath(char *path)
 	return nbaxes;
 }
 
-int roxml_validate_predicat(node_t *candidat, char *predicat, node_t ***ans, int *nb, int *max, int xleave)
+int roxml_validate_axes(node_t *candidat, char *axes, node_t ***ans, int *nb, int *max, int xleave)
 {
 	int valid = 0;
 	char intern_buff[512];
 
 	char * name  = roxml_get_name(candidat, intern_buff, 512);
 
-	if(strncmp(name, predicat, strlen(name)) == 0)	{
+	if(strncmp(name, axes, strlen(name)) == 0)	{
 		valid = 1;
 	}
-	if(strncmp("*", predicat, strlen("*")) == 0)  {
+	if(strncmp("*", axes, strlen("*")) == 0)  {
 		valid = 1;
 	}
 
@@ -694,7 +694,7 @@ void roxml_check_node(char *xp, int again, node_t *context, node_t ***ans, int *
 		// ROXML_L_ATTR
 		node_t *attribute = context->attr;
 		while(attribute)  {
-			if(roxml_validate_predicat(attribute, xp+strlen(ROXML_L_ATTR), ans, nb, max, again))	{
+			if(roxml_validate_axes(attribute, xp+strlen(ROXML_L_ATTR), ans, nb, max, again))	{
 				roxml_check_node(xp+strlen(xp)+1, again-1, context, ans, nb, max, ignore);
 			}
 			attribute = attribute->sibl;
@@ -703,7 +703,7 @@ void roxml_check_node(char *xp, int again, node_t *context, node_t ***ans, int *
 		// ROXML_S_ATTR
 		node_t *attribute = context->attr;
 		while(attribute)  {
-			if(roxml_validate_predicat(attribute, xp+strlen(ROXML_S_ATTR), ans, nb, max, again))	{
+			if(roxml_validate_axes(attribute, xp+strlen(ROXML_S_ATTR), ans, nb, max, again))	{
 				roxml_check_node(xp+strlen(xp)+1, again-1, context, ans, nb, max, ignore);
 			}
 			attribute = attribute->sibl;
@@ -712,7 +712,7 @@ void roxml_check_node(char *xp, int again, node_t *context, node_t ***ans, int *
 		// ROXML_L_CHILD
 		node_t *current = context->chld;
 		while(current)	{
-			if(roxml_validate_predicat(current, xp+strlen(ROXML_L_CHILD), ans, nb, max, again))	{
+			if(roxml_validate_axes(current, xp+strlen(ROXML_L_CHILD), ans, nb, max, again))	{
 				roxml_check_node(xp+strlen(xp)+1, again-1, current, ans, nb, max, ROXML_DIRECT);
 			}
 			current = current->sibl;
@@ -721,7 +721,7 @@ void roxml_check_node(char *xp, int again, node_t *context, node_t ***ans, int *
 		// ROXML_S_CHILD
 		node_t *current = context->chld;
 		while(current)	{
-			if(roxml_validate_predicat(current, xp, ans, nb, max, again))	{
+			if(roxml_validate_axes(current, xp, ans, nb, max, again))	{
 				roxml_check_node(xp+strlen(xp)+1, again-1, current, ans, nb, max, ROXML_DIRECT);
 			}
 			current = current->sibl;
@@ -736,7 +736,7 @@ void roxml_check_node(char *xp, int again, node_t *context, node_t ***ans, int *
 			current = current->sibl;
 		}
 		if(ignore == ROXML_SELF_AND_DESC)	{
-			roxml_validate_predicat(context, xp, ans, nb, max, again);
+			roxml_validate_axes(context, xp, ans, nb, max, again);
 		}
 	}
 
