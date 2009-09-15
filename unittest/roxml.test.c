@@ -805,10 +805,56 @@ int test_get_attr(void)
 	RETURN
 }
 
+int test_xparse(void)
+{
+	INIT
+
+	int nbans;
+	node_t *root = roxml_load_doc("roxml.test.xml");
+	node_t **node_set = roxml_xpath(root, "//node0/node2/node3", &nbans);
+	node_set = roxml_xpath(root, "node0/node2/node3", &nbans);
+	node_set = roxml_xpath(root, "/node0//node2/../node3/toto('titi')/bibi[first()]/@name/toto[tutu=\"/coco\"]", &nbans);
+	node_set = roxml_xpath(root, "/node0//node2/../node3/toto('titi')/bibi[first()]/@name/toto[tutu=\'/coco\']", &nbans);
+
+	RETURN
+}
+
 int test_xpath(void)
 {
 	INIT
-	EMPTY
+
+	int nbans;
+	node_t *root = roxml_load_doc("roxml.test.xml");
+	node_t **node_set = roxml_xpath(root, "/node0/node2/node3", &nbans);
+
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node3")
+
+	node_set = roxml_xpath(root, "/node0/node2/@name", &nbans);
+
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "name")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0), "name2")
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[1], NULL, 0), "value")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[1], NULL, 0), "value2")
+
+	node_set = roxml_xpath(root, "node6", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node6")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0), "text5")
+
+	roxml_close(root);
+
+	roxml_release(RELEASE_ALL);
+
+	root = roxml_load_doc("roxml.test.xml.multiple");
+	ASSERT_NOT_NULL(root)
+	node_set = roxml_xpath(root, "node", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node6")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0), "text5")
+
+
 	RETURN
 }
 
@@ -887,6 +933,7 @@ int main(int argc, char ** argv)	{
 	TEST_FUNC(test_get_content)
 	TEST_FUNC(test_get_attr_nb)
 	TEST_FUNC(test_get_attr)
+	TEST_FUNC(test_xparse)
 	TEST_FUNC(test_xpath)
 	TEST_FUNC(test_get_node_type)
 	TEST_FUNC(test_get_node_index)

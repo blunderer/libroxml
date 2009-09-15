@@ -79,6 +79,18 @@ typedef struct node {
 #define ROXML_PRIVATE
 #include "roxml.h"
 
+#define ROXML_L_CHILD	"child::"
+#define ROXML_L_DESC	"descendant-or-self::"
+#define ROXML_L_SELF	"self::"
+#define ROXML_L_PARENT	"parent::"
+#define ROXML_L_ATTR	"attribute::"
+#define ROXML_S_CHILD	"/"
+#define ROXML_S_DESC	"//"
+#define ROXML_S_SELF	"/."
+#define ROXML_S_PARENT	"/.."
+#define ROXML_S_ATTR	"/@"
+
+
 /**
  * \def PTR_NONE
  * 
