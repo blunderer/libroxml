@@ -710,6 +710,22 @@ void roxml_check_node(char *xp, int again, node_t *context, node_t ***ans, int *
 			}
 			attribute = attribute->sibl;
 		}
+	} else if(strcmp(ROXML_L_DESC, xp, strlen(ROXML_L_DESC))=0) {
+		// ROXML_L_DESC
+	} else if(strcmp(ROXML_L_ANC, xp, strlen(ROXML_L_ANC))=0) {
+		// ROXML_L_ANC
+	} else if(strcmp(ROXML_L_NEXT_SIBL, xp, strlen(ROXML_L_NEXT_SIBL))=0) {
+		// ROXML_L_NEXT_SIBL
+	} else if(strcmp(ROXML_L_PREC_SIBL, xp, strlen(ROXML_L_PREC_SIBL))=0) {
+		// ROXML_L_PREC_SIBL
+	} else if(strcmp(ROXML_L_NEXT, xp, strlen(ROXML_L_NEXT))=0) {
+		// ROXML_L_NEXT
+	} else if(strcmp(ROXML_L_PREC, xp, strlen(ROXML_L_PREC))=0) {
+		// ROXML_L_PREC
+	} else if(strcmp(ROXML_L_NS, xp, strlen(ROXML_L_NS))=0) {
+		// ROXML_L_NS
+	} else if(strcmp(ROXML_L_ANC_O_SELF, xp, strlen(ROXML_L_ANC_O_SELF))=0) {
+		// ROXML_L_ANC_O_SELF
 	} else if(strncmp(ROXML_L_CHILD, xp, strlen(ROXML_L_CHILD))==0) {
 		// ROXML_L_CHILD
 		node_t *current = context->chld;
