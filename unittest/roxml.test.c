@@ -619,9 +619,8 @@ int test_create_node(void)
 	node_t * close = roxml_create_node(10, doc, NULL, NULL, ROXML_FILE | ROXML_VAL);
 	roxml_close_node(node, close);
 	ASSERT_EQUAL(node->type, ROXML_FILE | ROXML_VAL)
-	ASSERT_EQUAL(node->buf, buf)
+	ASSERT_EQUAL(node->src.buf, buf)
 	ASSERT_EQUAL(node->idx, idx)
-	ASSERT_EQUAL(node->fil, doc)
 	ASSERT_EQUAL(node->pos, 1)
 	ASSERT_EQUAL(node->end, 10)
 	ASSERT_EQUAL(node->prv, 0)

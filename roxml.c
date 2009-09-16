@@ -168,8 +168,11 @@ node_t * roxml_create_node(int pos, FILE *file, char * buf, unsigned int * idx, 
 	node_t *n = (node_t*)malloc(sizeof(node_t));
 	n->type = type;
 	n->idx = idx;
-	n->buf = buf;
-	n->fil = file;
+	if(buf)	{
+		n->src.buf = buf;
+	} else if(file)	{
+		n->src.fil = file;
+	}
 	n->pos = pos;
 	n->end = pos;
 	n->prv = 0;
@@ -464,7 +467,7 @@ void roxml_close(node_t *n)
 	roxml_del_tree(root->sibl);
 	roxml_del_tree(root->attr);
 	if((root->type & ROXML_FILE) == ROXML_FILE)	{
-		fclose(root->fil);
+		fclose(root->src.fil);
 	} else if((root->type & ROXML_BUFF) == ROXML_BUFF)	{
 		free(root->idx);
 	}
@@ -550,14 +553,14 @@ node_t* roxml_new_node(int type, char * name, char * value)
 	size = 2*strlen(name) + strlen(value) + 6;
 	close = strlen(name) + strlen(value) + 3;
 	node = (node_t*)roxml_malloc(sizeof(node_t), 1, PTR_NODE);
-	node->buf = (char*)roxml_malloc(sizeof(char), size, PTR_CHAR);
+	node->src.buf = (char*)roxml_malloc(sizeof(char), size, PTR_CHAR);
 	node->idx = (unsigned int*)roxml_malloc(sizeof(unsigned int), 1, PTR_INT);
-	sprintf(node->buf,"<%s>%s</%s>",name,value,name);
+	sprintf(node->src.buf,"<%s>%s</%s>",name,value,name);
 	node->type = ROXML_BUFF & type;
 	node->chld = NULL;
 	node->sibl = NULL;
 	node->prnt = NULL;
-	node->fil = NULL;
+	node->src.fil = NULL;
 	node->next = NULL;
 	node->prev = NULL;
 	*node->idx = 0;

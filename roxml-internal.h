@@ -63,12 +63,14 @@ typedef struct memory_cell {
  */
 typedef struct node {
 	int type;			/*!< document or buffer / attribute or value */
-	char *buf;			/*!< buffer address */
 	unsigned int *idx;		/*!< index in buffer address */
-	FILE *fil;			/*!< loaded document */
-	unsigned long long pos;		/*!< offset of begining of opening node in file */
-	unsigned long long end;		/*!< offset of begining of closing node in file */
-	unsigned long long prv;		/*!< internal offset used to keep file position */
+	union {
+		char *buf;		/*!< buffer address */
+		FILE *fil;		/*!< loaded document */
+	} src;
+	unsigned long pos;		/*!< offset of begining of opening node in file */
+	unsigned long end;		/*!< offset of begining of closing node in file */
+	unsigned long prv;		/*!< internal offset used to keep file position */
 	struct node *sibl;		/*!< ref to brother */
 	struct node *chld;		/*!< ref to chld */
 	struct node *prnt;		/*!< ref to parent */
@@ -356,49 +358,49 @@ typedef struct node {
  * 
  * save current document position and recall to node
  */
-#define PUSH(n)	{if((n->type & ROXML_FILE) == ROXML_FILE){n->prv = ftell(n->fil); fseek(n->fil, n->pos, SEEK_SET);} else { n->prv = *(n->idx); *(n->idx) = n->pos;}}
+#define PUSH(n)	{if((n->type & ROXML_FILE) == ROXML_FILE){n->prv = ftell(n->src.fil); fseek(n->src.fil, n->pos, SEEK_SET);} else { n->prv = *(n->idx); *(n->idx) = n->pos;}}
 
 /**
  * \def POP(n)
  * 
  * restore old document position
  */
-#define POP(n)	{if((n->type & ROXML_FILE) == ROXML_FILE){fseek(n->fil, n->prv, SEEK_SET);} else { *(n->idx) = n->prv; }}
+#define POP(n)	{if((n->type & ROXML_FILE) == ROXML_FILE){fseek(n->src.fil, n->prv, SEEK_SET);} else { *(n->idx) = n->prv; }}
 
 /**
  * \def ROXML_FGETC(n)
  * 
  * get next char
  */
-#define ROXML_FGETC(n)	(((n->type & ROXML_FILE) == ROXML_FILE)?fgetc(n->fil):n->buf[(*(n->idx))++])
+#define ROXML_FGETC(n)	(((n->type & ROXML_FILE) == ROXML_FILE)?fgetc(n->src.fil):n->src.buf[(*(n->idx))++])
 
 /**
  * \def ROXML_FTELL(n)
  * 
  * get stream position
  */
-#define ROXML_FTELL(n)	(((n->type & ROXML_FILE) == ROXML_FILE)?ftell(n->fil):*((int*)n->idx))
+#define ROXML_FTELL(n)	(((n->type & ROXML_FILE) == ROXML_FILE)?ftell(n->src.fil):*((int*)n->idx))
 
 /**
  * \def ROXML_FSEEK(n, pos)
  * 
  * set stream position
  */
-#define ROXML_FSEEK(n, pos)	{if((n->type & ROXML_FILE) == ROXML_FILE){ fseek((n)->fil, pos, SEEK_SET); } else { *((int*)(n)->idx)=(pos); } }
+#define ROXML_FSEEK(n, pos)	{if((n->type & ROXML_FILE) == ROXML_FILE){ fseek((n)->src.fil, pos, SEEK_SET); } else { *((int*)(n)->idx)=(pos); } }
 
 /**
  * \def ROXML_FEOF(n)
  * 
  * get end of stream
  */
-#define ROXML_FEOF(n)	(((n->type & ROXML_FILE) == ROXML_FILE)?feof(n->fil):((*(n->idx))>=(strlen(n->buf)-1)))
+#define ROXML_FEOF(n)	(((n->type & ROXML_FILE) == ROXML_FILE)?feof(n->src.fil):((*(n->idx))>=(strlen(n->src.buf)-1)))
 
 /**
  * \def ROXML_FREAD(b, len, size, n)
  * 
  * get chunck of stream
  */
-#define ROXML_FREAD(b, len, size, n)	{if((n->type & ROXML_FILE) == ROXML_FILE){fread(b, len, size, n->fil);} else { memcpy(b, n->buf+*(n->idx), (size)*(len)); }}
+#define ROXML_FREAD(b, len, size, n)	{if((n->type & ROXML_FILE) == ROXML_FILE){fread(b, len, size, n->src.fil);} else { memcpy(b, n->src.buf+*(n->idx), (size)*(len)); }}
 
 extern memory_cell_t head_cell;
 
