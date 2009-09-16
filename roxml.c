@@ -175,7 +175,6 @@ node_t * roxml_create_node(int pos, FILE *file, char * buf, unsigned int * idx, 
 	}
 	n->pos = pos;
 	n->end = pos;
-	n->prv = 0;
 	n->sibl = NULL;
 	n->chld = NULL;
 	n->text = NULL;
@@ -207,6 +206,7 @@ void roxml_parse_node(node_t *n, char *name, char * arg, char * value, int * num
 	int mode = MODE_COMMENT_NONE;
 	int state = STATE_NODE_NAME;
 
+	ROXML_USE_NODE
 	PUSH(n)
 
 	while((!ROXML_FEOF(n))&&(c != '>')&&((max >= 0)?(count < max+1):(1)))      {
@@ -309,6 +309,8 @@ char * roxml_get_content(node_t *n, char * name, int size)
 	node_t * ptr;
 	int total = 0;
 	char * content = NULL;
+	
+	ROXML_USE_NODE
 
 	if(n == NULL)	{
 		if(name)	{
@@ -362,6 +364,8 @@ char * roxml_get_name(node_t *n, char * name, int size)
 	int count = 0;
 	char tmp_name[INTERNAL_BUF_SIZE];
 	memset(tmp_name, 0, INTERNAL_BUF_SIZE*sizeof(char));
+
+	ROXML_USE_NODE
 
 	if(n == NULL)	{
 		if(name)	{
@@ -566,7 +570,6 @@ node_t* roxml_new_node(int type, char * name, char * value)
 	*node->idx = 0;
 	node->pos = 0;
 	node->end = close;
-	node->prv = 0;
 
 	return node;
 }

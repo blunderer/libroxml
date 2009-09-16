@@ -103,7 +103,7 @@ int main(int argc, char ** argv)
 	printf("\tread last node:\t\t\t %d.%06d sec\n", (int)dt_name2.tv_sec, (int)dt_name2.tv_usec);
 	printf("\trelease result:\t\t\t %d.%06d sec\n", (int)dt_release.tv_sec, (int)dt_release.tv_usec);
 	printf("\tclose_doc:\t\t\t %d.%06d sec\n", (int)dt_close.tv_sec, (int)dt_close.tv_usec);
-	printf("\tram tree:\t\t\t %d bytes\n",sizeof(node_t)*nb);
+	printf("\tram tree:\t\t\t %lu bytes\n",sizeof(node_t)*nb);
 	printf("\tram total:\t\t\t %d bytes\n",ram);
 	printf("\tram ratio:\t\t\t %f\n",(float)(sizeof(node_t)*nb)/(float)len);
 

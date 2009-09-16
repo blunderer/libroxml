@@ -70,7 +70,6 @@ typedef struct node {
 	} src;
 	unsigned long pos;		/*!< offset of begining of opening node in file */
 	unsigned long end;		/*!< offset of begining of closing node in file */
-	unsigned long prv;		/*!< internal offset used to keep file position */
 	struct node *sibl;		/*!< ref to brother */
 	struct node *chld;		/*!< ref to chld */
 	struct node *prnt;		/*!< ref to parent */
@@ -354,18 +353,25 @@ typedef struct node {
 #define ROXML_WHITE(n) ((n==' ')||(n=='\t')||(n=='\n')||(n=='\r'))
 
 /**
+ * \def ROXML_USE_NODE(n)
+ * 
+ * declare current document position storage
+ */
+#define ROXML_USE_NODE	unsigned int _prv = 0;
+
+/**
  * \def PUSH(n)
  * 
  * save current document position and recall to node
  */
-#define PUSH(n)	{if((n->type & ROXML_FILE) == ROXML_FILE){n->prv = ftell(n->src.fil); fseek(n->src.fil, n->pos, SEEK_SET);} else { n->prv = *(n->idx); *(n->idx) = n->pos;}}
+#define PUSH(n)	{if((n->type & ROXML_FILE) == ROXML_FILE){_prv = ftell(n->src.fil); fseek(n->src.fil, n->pos, SEEK_SET);} else { _prv = *(n->idx); *(n->idx) = n->pos;}}
 
 /**
  * \def POP(n)
  * 
  * restore old document position
  */
-#define POP(n)	{if((n->type & ROXML_FILE) == ROXML_FILE){fseek(n->src.fil, n->prv, SEEK_SET);} else { *(n->idx) = n->prv; }}
+#define POP(n)	{if((n->type & ROXML_FILE) == ROXML_FILE){fseek(n->src.fil, _prv, SEEK_SET);} else { *(n->idx) = _prv; }}
 
 /**
  * \def ROXML_FGETC(n)
