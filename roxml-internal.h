@@ -74,6 +74,8 @@ typedef struct node {
 	struct node *prnt;		/*!< ref to parent */
 	struct node *attr;		/*!< ref to attributes */
 	struct node *text;		/*!< ref to content */
+	struct node *next;		/*!< ref to next node in doc */
+	struct node *prev;		/*!< ref to previous node in doc */
 } node_t;
 
 #define ROXML_PRIVATE
@@ -87,9 +89,9 @@ typedef struct node {
 #define ROXML_L_DESC		"descendant::"
 #define ROXML_L_ANC		"ancestor::"
 #define ROXML_L_NEXT_SIBL	"following-sibling::"
-#define ROXML_L_PREC_SIBL	"preceding-sibling::"
+#define ROXML_L_PREV_SIBL	"preceding-sibling::"
 #define ROXML_L_NEXT		"following::"
-#define ROXML_L_PREC		"preceding::"
+#define ROXML_L_PREV		"preceding::"
 #define ROXML_L_NS		"namespace::"
 #define ROXML_L_ANC_O_SELF	"ancestor-or-self::"
 
@@ -102,6 +104,14 @@ typedef struct node {
 #define ROXML_DIRECT		0
 #define ROXML_DESC_ONLY		1
 #define ROXML_SELF_AND_DESC	2
+
+
+/**
+ * \def INTERNAL_BUF_SIZE
+ * 
+ * constant for internal buffer size
+ */
+#define INTERNAL_BUF_SIZE	512
 
 /**
  * \def PTR_NONE
