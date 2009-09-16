@@ -1,0 +1,59 @@
+#
+# How to launch tests
+#
+You just need to launch:
+	$> ./roxml.unitC
+and you'll see the results for all tests cases. 
+You can use the "--help" option to ./roxml.unitC if you need more info.
+
+#
+# How to calculate performances
+#
+you can generate example XML files using xmlgen.Linux available at http://www.xml-benchmark.org
+syntax: 
+	$> ./xmlgen.Linux -o test.xml -f 0 
+will output a file named test.xml about 27Kbytes
+
+	$> ./xmlgen.Linux -o test.xml -f 0.01 
+will output a file named test.xml about 1200Kbytes
+
+	$> ./xmlgen.Linux -o test.xml -f 0.1    
+will output a file named test.xml about 12Mbytes
+
+#
+# Performances results
+# 
+
+stats for 'test-27K.xml':
+	load_doc (26713 bytes):		 0.006046 sec
+	xpath processed 384 nodes:	 0.001324 sec
+	read first node:		 0.000011 sec
+	read last node:			 0.000007 sec
+	release result:			 0.000002 sec
+	close_doc:			 0.000221 sec
+	ram tree:			 26112 bytes
+	ram total:			 577536 bytes
+	ram ratio:			 0.977502
+
+stats for 'test-1200K.xml':
+	load_doc (1161615 bytes):	 2.1294696 sec
+	xpath processed 11096 nodes:	 0.272365 sec
+	read first node:		 0.000004 sec
+	read last node:			 0.000003 sec
+	release result:			 0.000008 sec
+	close_doc:			 0.002513 sec
+	ram tree:			 754528 bytes
+	ram total:			 3125248 bytes
+	ram ratio:			 0.649551
+
+stats for 'test-12M.xml':
+        load_doc (11669705 bytes):       625.464024 sec
+	xpath processed 132431 nodes:    40.1274706 sec
+	read first node:                 0.000004 sec
+	read last node:                  0.000003 sec
+	release result:                  0.000028 sec
+	close_doc:			 0.032173 sec
+	ram tree:			 9005308 bytes
+	ram total:			 31969280 bytes
+	ram ratio:			 0.771683
+
