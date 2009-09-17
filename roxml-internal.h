@@ -82,6 +82,9 @@ typedef struct node {
 #define ROXML_PRIVATE
 #include "roxml.h"
 
+
+#define ROXML_BULK_READ		4096
+
 #define ROXML_L_CHILD		"child::"
 #define ROXML_L_DESC_O_SELF	"descendant-or-self::"
 #define ROXML_L_SELF		"self::"
@@ -513,5 +516,11 @@ int ROXML_INT roxml_xpath_conditionnal		(node_t *n, char *condition);
  */
 void * ROXML_INT roxml_malloc(int size, int num, int type);
 
+
+#ifdef __DEBUG
+extern unsigned int _nb_node;
+extern unsigned int _nb_attr;
+extern unsigned int _nb_text;
+#endif
 #endif /* ROXML_INT_H */
 

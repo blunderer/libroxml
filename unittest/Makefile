@@ -7,9 +7,9 @@ OBJ2 = $(SRC2:.c=.o)
 CC = gcc
 RM = rm -f
 
-CFLAGS = -g -DUNITTEST -DREENTRANT -DLINUX -Wall -Wextra
+CFLAGS = -g -DUNITTEST -DREENTRANT -DLINUX -Wall -Wextra -D__DEBUG
 TARGET1 = roxml.unitC
-TARGET2 = roxml.perfs
+TARGET2 = roxml.perf
 
 all: $(TARGET1) $(TARGET2)
 
@@ -17,7 +17,7 @@ $(TARGET1): $(OBJ1)
 	$(CC) -o $@ $^
 
 $(TARGET2): $(OBJ2)
-	$(CC) -o $@ $^
+	$(CC) -pg -o $@ $^
 
 %.o: %.c
 	$(CC) -c -o $@ $< $(CFLAGS)

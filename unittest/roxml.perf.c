@@ -16,13 +16,15 @@ int main(int argc, char ** argv)
 	struct timeval dt_name2;
 	struct timeval dt_release;
 	struct timeval tv1, tv2;
+	char input[128] = "test-1200K.xml";
 
 	if(argc < 2)	{
-		printf("no input file\n");
-		return 1;
+		printf("no input file use '%s'\n", input);
+	} else	{
+		strncpy(input, argv[1], 128);
 	}
 
-	FILE * f = fopen(argv[1], "r");
+	FILE * f = fopen(input, "r");
 	if(f)	{
 		fseek(f, 0, SEEK_END);
 		len = ftell(f);
@@ -33,7 +35,7 @@ int main(int argc, char ** argv)
 	}
 
 	gettimeofday(&tv1, NULL);
-	node_t *root = roxml_load_doc(argv[1]);
+	node_t *root = roxml_load_doc(input);
 	gettimeofday(&tv2, NULL);
 	dt_load.tv_sec = (tv2.tv_sec - tv1.tv_sec);
 	dt_load.tv_usec = (tv2.tv_usec - tv1.tv_usec);
@@ -63,16 +65,16 @@ int main(int argc, char ** argv)
 	dt_xpath.tv_usec = (tv2.tv_usec - tv1.tv_usec);
 
 	gettimeofday(&tv1, NULL);
-	name = roxml_get_name(set[0], NULL, 0);
+//	name = roxml_get_name(set[0], NULL, 0);
 	gettimeofday(&tv2, NULL);
-	roxml_release(name);
+//	roxml_release(name);
 	dt_name1.tv_sec = (tv2.tv_sec - tv1.tv_sec);
 	dt_name1.tv_usec = (tv2.tv_usec - tv1.tv_usec);
 
 	gettimeofday(&tv1, NULL);
-	name = roxml_get_name(set[nb-1], NULL, 0);
-	roxml_release(name);
+//	name = roxml_get_name(set[nb-1], NULL, 0);
 	gettimeofday(&tv2, NULL);
+//	roxml_release(name);
 	dt_name2.tv_sec = (tv2.tv_sec - tv1.tv_sec);
 	dt_name2.tv_usec = (tv2.tv_usec - tv1.tv_usec);
 
@@ -95,17 +97,19 @@ int main(int argc, char ** argv)
 	if(dt_release.tv_usec < 0) { dt_release.tv_sec++; dt_release.tv_usec = 1000000-dt_release.tv_usec; }
 	if(dt_close.tv_usec < 0) { dt_close.tv_sec++; dt_close.tv_usec = 1000000-dt_close.tv_usec; }
 
-
-	printf("stats for '%s':\n", argv[1]);
+	printf("stats for '%s':\n", input);
 	printf("\tload_doc (%d bytes):\t\t %d.%06d sec\n", len, (int)dt_load.tv_sec, (int)dt_load.tv_usec);
 	printf("\txpath processed %d nodes:\t %d.%06d sec\n", nb, (int)dt_xpath.tv_sec, (int)dt_xpath.tv_usec);
 	printf("\tread first node:\t\t %d.%06d sec\n", (int)dt_name1.tv_sec, (int)dt_name1.tv_usec);
 	printf("\tread last node:\t\t\t %d.%06d sec\n", (int)dt_name2.tv_sec, (int)dt_name2.tv_usec);
 	printf("\trelease result:\t\t\t %d.%06d sec\n", (int)dt_release.tv_sec, (int)dt_release.tv_usec);
 	printf("\tclose_doc:\t\t\t %d.%06d sec\n", (int)dt_close.tv_sec, (int)dt_close.tv_usec);
-	printf("\tram tree:\t\t\t %lu bytes\n",sizeof(node_t)*nb);
+	printf("\ttotal node:\t\t\t %u\n",_nb_node);
+	printf("\ttotal attr:\t\t\t %u\n",_nb_attr);
+	printf("\ttotal text:\t\t\t %u\n",_nb_text);
+	printf("\tram tree:\t\t\t %u bytes\n",sizeof(node_t)*(_nb_node+_nb_attr+_nb_text));
 	printf("\tram total:\t\t\t %d bytes\n",ram);
-	printf("\tram ratio:\t\t\t %f\n",(float)(sizeof(node_t)*nb)/(float)len);
+	printf("\tram ratio:\t\t\t %f\n",(float)(sizeof(node_t)*(_nb_node+_nb_attr+_nb_text))/(float)len);
 
 	return 0;
 }
