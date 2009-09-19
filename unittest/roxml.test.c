@@ -73,6 +73,44 @@ int test_tree_on_doc(void)
 	// node7
 	ASSERT_NULL(root->chld->chld->sibl->sibl->attr)
 
+	// node0
+	ASSERT_NOT_NULL(root->chld->text)
+	ASSERT_NOT_NULL(root->chld->text->sibl)
+	ASSERT_NOT_NULL(root->chld->text->sibl->sibl)
+	ASSERT_NOT_NULL(root->chld->text->sibl->sibl->sibl)
+	ASSERT_NULL(root->chld->text->sibl->sibl->sibl->sibl)
+
+	// node1
+	ASSERT_NOT_NULL(root->chld->chld->text)
+	ASSERT_NULL(root->chld->chld->text->sibl)
+
+	// node2
+	ASSERT_NOT_NULL(root->chld->chld->sibl->text)
+	ASSERT_NOT_NULL(root->chld->chld->sibl->text->sibl)
+	ASSERT_NOT_NULL(root->chld->chld->sibl->text->sibl->sibl)
+	ASSERT_NOT_NULL(root->chld->chld->sibl->text->sibl->sibl->sibl)
+	ASSERT_NULL(root->chld->chld->sibl->text->sibl->sibl->sibl->sibl)
+
+	// node3
+	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->text)
+	ASSERT_NULL(root->chld->chld->sibl->chld->text->sibl)
+
+	// node4
+	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->text)
+
+	// node5
+	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->text)
+	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->text->sibl)
+	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->text->sibl->sibl)
+
+	// node6
+	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->text)
+	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->text->sibl)
+
+	// node7
+	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->text)
+	ASSERT_NULL(root->chld->chld->sibl->sibl->text->sibl)
+
 	roxml_close(root);
 
 	RETURN /* close context macro */

@@ -82,8 +82,8 @@ typedef struct node {
 #define ROXML_PRIVATE
 #include "roxml.h"
 
-
 #define ROXML_BULK_READ		4096
+#define ROXML_BULK_CTX		8
 
 #define ROXML_L_CHILD		"child::"
 #define ROXML_L_DESC_O_SELF	"descendant-or-self::"
@@ -355,64 +355,6 @@ typedef struct node {
  */
 #define ROXML_WHITE(n) ((n==' ')||(n=='\t')||(n=='\n')||(n=='\r'))
 
-/**
- * \def ROXML_USE_NODE(n)
- * 
- * declare current document position storage
- */
-#define ROXML_USE_NODE	unsigned int _prv = 0;
-
-/**
- * \def PUSH(n)
- * 
- * save current document position and recall to node
- */
-#define PUSH(n)	{if((n->type & ROXML_FILE) == ROXML_FILE){_prv = ftell(n->src.fil); fseek(n->src.fil, n->pos, SEEK_SET);} else { _prv = *(n->idx); *(n->idx) = n->pos;}}
-
-/**
- * \def POP(n)
- * 
- * restore old document position
- */
-#define POP(n)	{if((n->type & ROXML_FILE) == ROXML_FILE){fseek(n->src.fil, _prv, SEEK_SET);} else { *(n->idx) = _prv; }}
-
-/**
- * \def ROXML_FGETC(n)
- * 
- * get next char
- */
-#define ROXML_FGETC(n)	(((n->type & ROXML_FILE) == ROXML_FILE)?fgetc(n->src.fil):n->src.buf[(*(n->idx))++])
-
-/**
- * \def ROXML_FTELL(n)
- * 
- * get stream position
- */
-#define ROXML_FTELL(n)	(((n->type & ROXML_FILE) == ROXML_FILE)?ftell(n->src.fil):*((int*)n->idx))
-
-/**
- * \def ROXML_FSEEK(n, pos)
- * 
- * set stream position
- */
-#define ROXML_FSEEK(n, pos)	{if((n->type & ROXML_FILE) == ROXML_FILE){ fseek((n)->src.fil, pos, SEEK_SET); } else { *((int*)(n)->idx)=(pos); } }
-
-/**
- * \def ROXML_FEOF(n)
- * 
- * get end of stream
- */
-#define ROXML_FEOF(n)	(((n->type & ROXML_FILE) == ROXML_FILE)?feof(n->src.fil):((*(n->idx))>=(strlen(n->src.buf)-1)))
-
-/**
- * \def ROXML_FREAD(b, len, size, n)
- * 
- * get chunck of stream
- */
-#define ROXML_FREAD(b, len, size, n)	{if((n->type & ROXML_FILE) == ROXML_FILE){fread(b, len, size, n->src.fil);} else { memcpy(b, n->src.buf+*(n->idx), (size)*(len)); }}
-
-extern memory_cell_t head_cell;
-
 /** \brief internal function
  *
  * \fn void ROXML_INT roxml_free_node(node_t *n);
@@ -521,6 +463,7 @@ void * ROXML_INT roxml_malloc(int size, int num, int type);
 extern unsigned int _nb_node;
 extern unsigned int _nb_attr;
 extern unsigned int _nb_text;
+extern memory_cell_t head_cell;
 #endif
 #endif /* ROXML_INT_H */
 
