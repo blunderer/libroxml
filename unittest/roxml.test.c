@@ -879,6 +879,58 @@ int test_get_attr(void)
 	RETURN
 }
 
+int test_parse_xpath(void)
+{
+	INIT
+
+	xpath_node_t *ptr;
+	char mypath[128] = "/node[first() or last()]/item/title/@version || /node/item/title[@version < 3]";
+	int ret = roxml_parse_xpath(mypath, &ptr);	
+
+	ASSERT_EQUAL(ret, 2)
+	ASSERT_NULL(ptr[0].axis);
+	ASSERT_NULL(ptr[0].cond);
+	ASSERT_NOT_NULL(ptr[0].next);
+	ASSERT_NOT_NULL(ptr[0].next->next);
+	ASSERT_NOT_NULL(ptr[0].next->next->next);
+	ASSERT_NOT_NULL(ptr[0].next->next->next->next);
+	ASSERT_NULL(ptr[0].next->next->next->next->next);
+	ASSERT_STRING_EQUAL(ptr[0].next->axis, "node")
+	ASSERT_NOT_NULL(ptr[0].next->cond)
+	ASSERT_NOT_NULL(ptr[0].next->cond->next)
+	ASSERT_NULL(ptr[0].next->cond->next->next)
+	ASSERT_STRING_EQUAL(ptr[0].next->cond->arg1, "first()")
+	ASSERT_STRING_EQUAL(ptr[0].next->cond->next->arg1, "last()")
+	ASSERT_EQUAL(ptr[0].next->cond->next->func, ROXML_FUNC_LAST)
+	ASSERT_EQUAL(ptr[0].next->cond->func, ROXML_FUNC_FIRST)
+	ASSERT_EQUAL(ptr[0].next->cond->next->rel, ROXML_OPERATOR_OR)
+	ASSERT_STRING_EQUAL(ptr[0].next->next->axis, "item")
+	ASSERT_NULL(ptr[0].next->next->cond)
+	ASSERT_STRING_EQUAL(ptr[0].next->next->next->axis, "title")
+	ASSERT_NULL(ptr[0].next->next->next->cond)
+	ASSERT_STRING_EQUAL(ptr[0].next->next->next->next->axis, "@version")
+	ASSERT_NULL(ptr[0].next->next->next->next->cond)
+
+	ASSERT_NULL(ptr[1].axis);
+	ASSERT_NULL(ptr[1].cond);
+	ASSERT_NOT_NULL(ptr[1].next);
+	ASSERT_EQUAL(ptr[1].rel, ROXML_OPERATOR_OR)
+	ASSERT_NOT_NULL(ptr[1].next->next);
+	ASSERT_NOT_NULL(ptr[1].next->next->next);
+	ASSERT_NOT_NULL(ptr[1].next->next->next);
+	ASSERT_NULL(ptr[1].next->next->next->next);
+	ASSERT_STRING_EQUAL(ptr[1].next->axis, "node")
+	ASSERT_STRING_EQUAL(ptr[1].next->next->axis, "item")
+	ASSERT_NULL(ptr[1].next->next->cond)
+	ASSERT_STRING_EQUAL(ptr[1].next->next->next->axis, "title")
+	ASSERT_NOT_NULL(ptr[1].next->next->next->cond)
+	ASSERT_NULL(ptr[1].next->next->next->cond->next)
+	ASSERT_STRING_EQUAL(ptr[1].next->next->next->cond->arg1, "@version")
+	ASSERT_STRING_EQUAL(ptr[1].next->next->next->cond->arg2, "3")
+	ASSERT_EQUAL(ptr[1].next->next->next->cond->op, ROXML_OPERATOR_INF)
+	RETURN
+}
+
 int test_xpath(void)
 {
 	INIT
@@ -1129,6 +1181,7 @@ int main(int argc, char ** argv)	{
 	TEST_FUNC(test_get_content)
 	TEST_FUNC(test_get_attr_nb)
 	TEST_FUNC(test_get_attr)
+	TEST_FUNC(test_parse_xpath)
 	TEST_FUNC(test_xpath)
 	TEST_FUNC(test_get_node_type)
 	TEST_FUNC(test_get_node_index)

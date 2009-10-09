@@ -53,6 +53,36 @@ typedef struct memory_cell {
 	struct memory_cell *prev;	/*!< prev memory cell */
 } memory_cell_t;
 
+/** \struct xpath_cond_t
+ *
+ * \brief xpath cond structure
+ * 
+ * This is the structure for a xpath cond. It contains the
+ * node condition
+ */
+typedef struct _xpath_cond {
+	char rel;			/*!< relation with previous */
+	char op;			/*!< operator used */
+	char func;			/*!< function to process */
+	char *arg1;			/*!< condition arg1 as string */
+	char *arg2;			/*!< condition arg2 as string */
+	struct _xpath_cond*	next;	/*!< next xpath condition pointer */
+} xpath_cond_t;
+
+/** \struct xpath_node_t
+ *
+ * \brief xpath node structure
+ * 
+ * This is the structure for a xpath node. It contains the
+ * node axis and conditions
+ */
+typedef struct _xpath_node {
+	char rel;			/*!< relation with previous */
+	char *axis;			/*!< axis string */
+	struct _xpath_cond *cond;	/*!< condition list */
+	struct _xpath_node*	next;	/*!< next xpath pointer */
+} xpath_node_t;
+
 /** \struct node_t
  *
  * \brief node_t structure
@@ -81,6 +111,30 @@ typedef struct node {
 
 #define ROXML_PRIVATE
 #include "roxml.h"
+
+#define ROXML_PATH_OR	"||"
+#define ROXML_PATH_AND	"&&"
+#define ROXML_COND_OR	"or"
+#define ROXML_COND_AND	"and"
+
+#define ROXML_OPERATOR_OR	1
+#define ROXML_OPERATOR_AND	2
+#define ROXML_OPERATOR_INF	3
+#define ROXML_OPERATOR_SUP	4
+#define ROXML_OPERATOR_EINF	5
+#define ROXML_OPERATOR_ESUP	6
+#define ROXML_OPERATOR_DIFF	7
+#define ROXML_OPERATOR_EQU	8
+
+#define ROXML_FUNC_INTCOMP	0
+#define ROXML_FUNC_STRCOMP	1
+#define ROXML_FUNC_POS		2
+#define ROXML_FUNC_FIRST	3
+#define ROXML_FUNC_LAST		4
+
+#define ROXML_FUNC_POS_STR	"position()"
+#define ROXML_FUNC_FIRST_STR	"first()"
+#define ROXML_FUNC_LAST_STR	"last()"
 
 #define ROXML_BULK_READ		4096
 #define ROXML_BULK_CTX		8
@@ -457,6 +511,8 @@ int ROXML_INT roxml_xpath_conditionnal		(node_t *n, char *condition);
  * \param type the kind of pointer
  */
 void * ROXML_INT roxml_malloc(int size, int num, int type);
+
+int roxml_parse_xpath(char *path, xpath_node_t ** xpath);
 
 
 #ifdef __DEBUG

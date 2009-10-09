@@ -682,15 +682,21 @@ node_t * roxml_load(node_t *current_node, FILE *file, char *buffer)
 	return current_node;
 }
 
-int roxml_parse_xpath(char *path)
+/** \comment xpath is something like "/node[first() or last()]/item/title/@version || /node/item/title[@version < 3]" */
+int roxml_parse_xpath(char *path, xpath_node_t ** xpath)
 {
 	int cur;
-	int nbaxes = 1;
+	int i = 0;
+	int nbpath = 1;
 	int bracket = 0;
 	int parenthesys = 0;
 	int quoted = 0;
 	int dquoted = 0;
 	int len = strlen(path);
+
+	xpath_node_t * first_node = (xpath_node_t*)calloc(1, sizeof(xpath_node_t));
+	xpath_node_t * new_node = first_node;
+	xpath_cond_t * new_cond = NULL;
 
 	for(cur = 0; cur < len; cur++)	{
 		if(path[cur] == '"') {
@@ -708,61 +714,246 @@ int roxml_parse_xpath(char *path)
 		} else if((path[cur] == '[')||(path[cur] == ']')) {
 			if(!quoted && !dquoted) {
 				bracket = (bracket+1)%2;
+				path[cur] = '\0';
+
+				if(bracket)	{
+					xpath_cond_t * tmp_cond = (xpath_cond_t*)calloc(1, sizeof(xpath_cond_t));
+					new_node->cond = tmp_cond;
+					new_cond = tmp_cond;
+					new_cond->arg1 = path+cur+1;
+				}
 			}
 		} else if(path[cur] == '/') {
 			if(!quoted && !dquoted && !parenthesys && !bracket)	{
-				nbaxes++;
 				path[cur] = '\0';
+				i = 0;
+				xpath_node_t * tmp_node = (xpath_node_t*)calloc(1, sizeof(xpath_node_t));
+				if(new_node)	{ new_node->next = tmp_node; }
+				new_node = tmp_node;
+				new_node->axis = path+cur+1;
+			}
+		} else	{
+			if(!bracket && !quoted && !dquoted) {
+				if(strncmp(path+cur, ROXML_PATH_OR, strlen(ROXML_PATH_OR)) == 0)	{
+					// we are in the middle of a multiple xpath
+					path[cur-1] = '\0';
+					cur += strlen(ROXML_PATH_OR)-1;
+					xpath_node_t * tmp_node = (xpath_node_t*)calloc(nbpath+1, sizeof(xpath_node_t));
+					memcpy(tmp_node, first_node, nbpath*sizeof(xpath_node_t));
+					free(first_node);
+					first_node = tmp_node;
+					new_node = tmp_node+nbpath;
+					new_node->rel = ROXML_OPERATOR_OR;
+					nbpath++;
+				} else if(strncmp(path+cur, ROXML_PATH_AND, strlen(ROXML_PATH_AND)) == 0)	{
+					// we are in the middle of a multiple xpath
+					path[cur-1] = '\0';
+					cur += strlen(ROXML_PATH_AND)-1;
+					xpath_node_t * tmp_node = (xpath_node_t*)calloc(nbpath+1, sizeof(xpath_node_t));
+					memcpy(tmp_node, first_node, nbpath*sizeof(xpath_node_t));
+					free(first_node);
+					first_node = tmp_node;
+					new_node = tmp_node+nbpath;
+					new_node->rel = ROXML_OPERATOR_AND;
+					nbpath++;
+				} 
+			} else if(bracket && !quoted && !dquoted) {
+				if(strncmp(path+cur, ROXML_COND_OR, strlen(ROXML_COND_OR)) == 0)	{
+					// we are in the middle of a splitted condition
+					i = 0;
+					path[cur-1] = '\0';
+					cur += strlen(ROXML_COND_OR);
+					xpath_cond_t * tmp_cond = (xpath_cond_t*)calloc(1, sizeof(xpath_cond_t));
+					if(new_cond) { new_cond->next = tmp_cond; }
+					new_cond = tmp_cond;
+					new_cond->rel = ROXML_OPERATOR_OR;
+					new_cond->arg1 = path+cur+1;
+				} else if(strncmp(path+cur, ROXML_COND_AND, strlen(ROXML_COND_AND)) == 0)	{
+					// we are in the middle of a splitted condition
+					i = 0;
+					path[cur-1] = '\0';
+					cur += strlen(ROXML_COND_AND);
+					xpath_cond_t * tmp_cond = (xpath_cond_t*)calloc(1, sizeof(xpath_cond_t));
+					if(new_cond) { new_cond->next = tmp_cond; }
+					new_cond = tmp_cond;
+					new_cond->rel = ROXML_OPERATOR_AND;
+					new_cond->arg1 = path+cur+1;
+				}
+				if(strncmp(path+cur, ROXML_FUNC_POS_STR, strlen(ROXML_FUNC_POS_STR)) == 0) {
+					cur += strlen(ROXML_FUNC_POS_STR)-1;
+					new_cond->func = ROXML_FUNC_POS;
+				} else if(strncmp(path+cur, ROXML_FUNC_FIRST_STR, strlen(ROXML_FUNC_FIRST_STR)) == 0) {
+					cur += strlen(ROXML_FUNC_FIRST_STR)-1;
+					new_cond->func = ROXML_FUNC_FIRST;
+				} else if(strncmp(path+cur, ROXML_FUNC_LAST_STR, strlen(ROXML_FUNC_LAST_STR)) == 0) {
+					cur += strlen(ROXML_FUNC_LAST_STR)-1;
+					new_cond->func = ROXML_FUNC_LAST;
+				} else if(path[cur] == '=') {
+					new_cond->op = ROXML_OPERATOR_EQU;
+					path[cur] = '\0';
+					if(ROXML_WHITE(path[cur-1])) {
+						path[cur-1] = '\0';
+					}
+					if(ROXML_WHITE(path[cur+1])) {
+						cur++;
+						path[cur] = '\0';
+					}
+					new_cond->arg2 = path+cur+1;
+				} else if(path[cur] == '>') {
+					path[cur] = '\0';
+					new_cond->op = ROXML_OPERATOR_SUP;
+					if(ROXML_WHITE(path[cur-1])) {
+						path[cur-1] = '\0';
+					}
+					if(path[cur+1] == '=') { 
+						cur++;
+						path[cur] = '\0';
+						new_cond->op = ROXML_OPERATOR_ESUP; 
+					}
+					if(ROXML_WHITE(path[cur+1])) {
+						cur++;
+						path[cur] = '\0';
+					}
+					new_cond->arg2 = path+cur+1;
+				} else if(path[cur] == '<') {
+					path[cur] = '\0';
+					new_cond->op = ROXML_OPERATOR_INF;
+					if(ROXML_WHITE(path[cur-1])) {
+						path[cur-1] = '\0';
+					}
+					if(path[cur+1] == '=') { 
+						cur++;
+						path[cur] = '\0';
+						new_cond->op = ROXML_OPERATOR_EINF; 
+					}
+					if(ROXML_WHITE(path[cur+1])) {
+						cur++;
+						path[cur] = '\0';
+					}
+					new_cond->arg2 = path+cur+1;
+				} else if(path[cur] == '!') {
+					path[cur] = '\0';
+					new_cond->op = ROXML_OPERATOR_DIFF;
+					path[cur] = '\0';
+					if(ROXML_WHITE(path[cur-1])) {
+						path[cur-1] = '\0';
+					}
+					if(ROXML_WHITE(path[cur+1])) {
+						cur++;
+						path[cur] = '\0';
+					}
+					new_cond->arg2 = path+cur+1;
+				}
 			}
 		}
 	}
 
-	/*for(cur = 0; cur < nbaxes; cur++)	{
-		printf("%d '%s'\n",cur, path);
-		path+= strlen(path)+1;
-	}*/
-	return nbaxes;
+	if(xpath)	{
+		*xpath = first_node;
+	}
+	return nbpath;
 }
 
-int rowml_parse_axe(char *axe)
+void roxml_free_xcond(xpath_cond_t *xcond)
+{
+	if(xcond->next) {
+		roxml_free_xcond(xcond->next);
+	}
+	free(xcond);
+}
+
+void roxml_free_xpath(xpath_node_t *xpath, int nb)
 {
 	int i = 0;
-	int escaped = 0;
-	int quoted = 0;
-	int predicat = 0;
+	for(i = 0; i < nb; i++)	{
+		if(xpath[i].next)	{
+			roxml_free_xpath(xpath[i].next, 1);
+		}
+		if(xpath[i].cond)	{
+			roxml_free_xcond(xpath[i].cond);
+		}
+	}
+	free(xpath);
+}
 
-	while(axe[i] != '\0') {
-		if(!escaped)	{
-			if(axe[i] == '"') { quoted = (quoted+1)%2; }
-			if((axe[i] == '[')||(axe[i] == ']')) {
-				if(axe[i] == '[') { predicat++; };
-				axe[i] = '\0';
+int roxml_int_cmp(int a, int b, int op)
+{
+	if(op == ROXML_OPERATOR_DIFF) {
+		return (a!=b);
+	} else if(op == ROXML_OPERATOR_EINF) {
+		return (a<=b);
+	} else if(op == ROXML_OPERATOR_INF) {
+		return (a<b);
+	} else if(op == ROXML_OPERATOR_ESUP) {
+		return (a>=b);
+	} else if(op == ROXML_OPERATOR_SUP) {
+		return (a>b);
+	} else if(op == ROXML_OPERATOR_EQU) {
+		return (a==b);
+	}
+	return 0;
+}
+
+int roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
+{
+	int first = 1;
+	int valid = 0;
+	xpath_cond_t *condition = xn->cond;
+
+	if(!condition)	{
+		return 1;
+	}
+
+	while(condition) {
+		int status = 0;
+		int iarg1;
+		int iarg2;
+		char * sarg1;
+		char * sarg2;
+
+		if(condition->func == ROXML_FUNC_POS) {
+			iarg1 = roxml_get_node_index(candidat, NULL);
+			iarg2 = atoi(condition->arg2);
+			status = roxml_int_cmp(iarg1, iarg2, condition->op);
+		} else if(condition->func == ROXML_FUNC_LAST) {
+			iarg1 = roxml_get_node_index(candidat, &iarg2);
+			status = roxml_int_cmp(iarg1, iarg2, ROXML_OPERATOR_EQU);
+		} else if(condition->func == ROXML_FUNC_FIRST) {
+			iarg1 = roxml_get_node_index(candidat, NULL);
+			status = roxml_int_cmp(iarg1, 0, ROXML_OPERATOR_EQU);
+		} else if(condition->func == ROXML_FUNC_INTCOMP) {
+			iarg1 = 0; /* atoi(process arg1); */
+			iarg2 = atoi(condition->arg2);
+			status = roxml_int_cmp(iarg1, iarg2, condition->op);
+		} else if(condition->func == ROXML_FUNC_STRCOMP) {
+			sarg1 = NULL; /* process arg1 */;
+			sarg2 = condition->arg2;
+			status = (strcmp(sarg1, sarg2)==0);
+		}
+
+		if(first) {
+			valid = status;
+			first = 0;
+		} else {
+			if(condition->rel == ROXML_OPERATOR_OR) {
+				valid = valid || status;
+			} else if(condition->rel == ROXML_OPERATOR_AND) {
+				valid = valid && status;
 			}
 		}
-		if(axe[i] == '\\') { escaped = (escaped+1)%2; 
-		} else	{ escaped = 0; }
-		i++;
+		condition = condition->next;
 	}
-	return predicat;
+
+	return valid;
 }
 
-int roxml_validate_predicat(char *axes, char *predicat, node_t *candidat)
+int roxml_validate_axes(node_t *candidat, char *axes, node_t ***ans, int *nb, int *max, xpath_node_t *xn)
 {
-	axes = NULL;
-	predicat = NULL;
-	candidat = NULL;
-	return 1;
-}
-
-int roxml_validate_axes(node_t *candidat, char *axes, node_t ***ans, int *nb, int *max, int xleave)
-{
-	int predicat = 0;
 	int valid = 0;
 	char intern_buff[INTERNAL_BUF_SIZE];
 	char axe[INTERNAL_BUF_SIZE];
 
 	strncpy(axe, axes, INTERNAL_BUF_SIZE);
-	predicat = rowml_parse_axe(axes);
 
 	if(strcmp("*", axes) == 0)  {
 		valid = 1;
@@ -776,11 +967,12 @@ int roxml_validate_axes(node_t *candidat, char *axes, node_t ***ans, int *nb, in
 		roxml_release(name);
 	}
 
-	if(valid && predicat)	{
-		valid = roxml_validate_predicat(axes, axes+strlen(axes)+1, candidat);
+	if(valid)	{
+		valid = roxml_validate_predicat(xn, candidat);
 	}
 
-	if((valid)&&(xleave==1)) {
+	if((valid)&&(xn->next==NULL)) {
+		printf("id %lu\n",candidat->end);
 		if((*nb) >= (*max))	{
 			int new_max = (*max)+10;
 			node_t ** new_ans = roxml_malloc(sizeof(node_t*), new_max, PTR_NODE_RESULT);
@@ -797,108 +989,108 @@ int roxml_validate_axes(node_t *candidat, char *axes, node_t ***ans, int *nb, in
 	return valid;
 }
 
-void roxml_check_node(char *xp, int again, node_t *context, node_t ***ans, int *nb, int *max, int ignore)
+void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb, int *max, int ignore)
 {
-	if(again == 0)	{ return; }
+	if(!xp)	{ return; }
 
 	// tests axes
-	if((strncmp(ROXML_L_SELF, xp, strlen(ROXML_L_SELF))==0)||(strncmp(ROXML_S_SELF, xp, strlen(ROXML_S_SELF))==0)) {
+	if((strncmp(ROXML_L_SELF, xp->axis, strlen(ROXML_L_SELF))==0)||(strncmp(ROXML_S_SELF, xp->axis, strlen(ROXML_S_SELF))==0)) {
 		// ROXML_L_SELF & ROXML_S_SELF
-		roxml_validate_axes(context, "*", ans, nb, max, again);
-		roxml_check_node(xp+strlen(xp)+1, again-1, context, ans, nb, max, ignore);
-	} else if((strncmp(ROXML_L_PARENT, xp, strlen(ROXML_L_PARENT))==0)||(strncmp(ROXML_S_SELF, xp, strlen(ROXML_S_SELF))==0)) {
+		roxml_validate_axes(context, "*", ans, nb, max, xp);
+		roxml_check_node(xp->next, context, ans, nb, max, ignore);
+	} else if((strncmp(ROXML_L_PARENT, xp->axis, strlen(ROXML_L_PARENT))==0)||(strncmp(ROXML_S_SELF, xp->axis, strlen(ROXML_S_SELF))==0)) {
 		// ROXML_L_PARENT & ROXML_S_SELF
-		roxml_validate_axes(context->prnt, "*", ans, nb, max, again);
-		roxml_check_node(xp+strlen(xp)+1, again-1, context->prnt, ans, nb, max, ignore);
-	} else if(strncmp(ROXML_L_DESC_O_SELF, xp, strlen(ROXML_L_DESC_O_SELF))==0) {
+		roxml_validate_axes(context->prnt, "*", ans, nb, max, xp);
+		roxml_check_node(xp->next, context->prnt, ans, nb, max, ignore);
+	} else if(strncmp(ROXML_L_DESC_O_SELF, xp->axis, strlen(ROXML_L_DESC_O_SELF))==0) {
 		// ROXML_L_DESC_O_SELF
-		roxml_check_node(xp+strlen(ROXML_L_DESC_O_SELF), again, context, ans, nb, max, ROXML_SELF_AND_DESC);
-	} else if(strncmp(ROXML_L_DESC, xp, strlen(ROXML_L_DESC))==0) {
+		roxml_check_node(xp->next, context, ans, nb, max, ROXML_SELF_AND_DESC);
+	} else if(strncmp(ROXML_L_DESC, xp->axis, strlen(ROXML_L_DESC))==0) {
 		// ROXML_L_DESC
-		roxml_check_node(xp+1, again-1, context, ans, nb, max, ROXML_DESC_ONLY);
-	} else if(strlen(xp)==0) {
+		roxml_check_node(xp->next, context, ans, nb, max, ROXML_DESC_ONLY);
+	} else if(strlen(xp->axis)==0) {
 		// ROXML_S_DESC_O_SELF
-		roxml_check_node(xp+1, again-1, context, ans, nb, max, ROXML_SELF_AND_DESC);
-	} else if(strncmp(ROXML_L_ATTR, xp, strlen(ROXML_L_ATTR))==0) {
+		roxml_check_node(xp->next, context, ans, nb, max, ROXML_SELF_AND_DESC);
+	} else if(strncmp(ROXML_L_ATTR, xp->axis, strlen(ROXML_L_ATTR))==0) {
 		// ROXML_L_ATTR
 		node_t *attribute = context->attr;
 		while(attribute)  {
-			if(roxml_validate_axes(attribute, xp+strlen(ROXML_L_ATTR), ans, nb, max, again))	{
-				roxml_check_node(xp+strlen(xp)+1, again-1, context, ans, nb, max, ignore);
+			if(roxml_validate_axes(attribute, xp->axis+strlen(ROXML_L_ATTR), ans, nb, max, xp))	{
+				roxml_check_node(xp->next, context, ans, nb, max, ignore);
 			}
 			attribute = attribute->sibl;
 		}
-	} else if(strncmp(ROXML_S_ATTR, xp, strlen(ROXML_S_ATTR))==0) {
+	} else if(strncmp(ROXML_S_ATTR, xp->axis, strlen(ROXML_S_ATTR))==0) {
 		// ROXML_S_ATTR
 		node_t *attribute = context->attr;
 		while(attribute)  {
-			if(roxml_validate_axes(attribute, xp+strlen(ROXML_S_ATTR), ans, nb, max, again))	{
-				roxml_check_node(xp+strlen(xp)+1, again-1, context, ans, nb, max, ignore);
+			if(roxml_validate_axes(attribute, xp->axis+strlen(ROXML_S_ATTR), ans, nb, max, xp))	{
+				roxml_check_node(xp->next, context, ans, nb, max, ignore);
 			}
 			attribute = attribute->sibl;
 		}
-	} else if(strncmp(ROXML_L_ANC, xp, strlen(ROXML_L_ANC))==0) {
+	} else if(strncmp(ROXML_L_ANC, xp->axis, strlen(ROXML_L_ANC))==0) {
 		// ROXML_L_ANC
 		node_t *current = context->prnt;
 		while(current)	{
-			if(roxml_validate_axes(current, xp+strlen(ROXML_L_ANC), ans, nb, max, again))	{
-				roxml_check_node(xp+strlen(xp)+1, again-1, current, ans, nb, max, ROXML_DIRECT);
+			if(roxml_validate_axes(current, xp->axis+strlen(ROXML_L_ANC), ans, nb, max, xp))	{
+				roxml_check_node(xp->next, current, ans, nb, max, ROXML_DIRECT);
 			}
 			current = current->prnt;
 		}
-	} else if(strncmp(ROXML_L_ANC_O_SELF, xp, strlen(ROXML_L_ANC_O_SELF))==0) {
+	} else if(strncmp(ROXML_L_ANC_O_SELF, xp->axis, strlen(ROXML_L_ANC_O_SELF))==0) {
 		// ROXML_L_ANC_O_SELF
 		node_t *current = context;
 		while(current)	{
-			if(roxml_validate_axes(current, xp+strlen(ROXML_L_ANC_O_SELF), ans, nb, max, again))	{
-				roxml_check_node(xp+strlen(xp)+1, again-1, current, ans, nb, max, ROXML_DIRECT);
+			if(roxml_validate_axes(current, xp->axis+strlen(ROXML_L_ANC_O_SELF), ans, nb, max, xp))	{
+				roxml_check_node(xp->next, current, ans, nb, max, ROXML_DIRECT);
 			}
 			current = current->prnt;
 		}
-	} else if(strncmp(ROXML_L_NEXT_SIBL, xp, strlen(ROXML_L_NEXT_SIBL))==0) {
+	} else if(strncmp(ROXML_L_NEXT_SIBL, xp->axis, strlen(ROXML_L_NEXT_SIBL))==0) {
 		// ROXML_L_NEXT_SIBL
 		node_t *current = context->sibl;
 		while(current)	{
-			if(roxml_validate_axes(current, xp+strlen(ROXML_L_NEXT_SIBL), ans, nb, max, again))	{
-				roxml_check_node(xp+strlen(xp)+1, again-1, current, ans, nb, max, ROXML_DIRECT);
+			if(roxml_validate_axes(current, xp->axis+strlen(ROXML_L_NEXT_SIBL), ans, nb, max, xp))	{
+				roxml_check_node(xp->next, current, ans, nb, max, ROXML_DIRECT);
 			}
 			current = current->sibl;
 		}
-	} else if(strncmp(ROXML_L_PREV_SIBL, xp, strlen(ROXML_L_PREV_SIBL))==0) {
+	} else if(strncmp(ROXML_L_PREV_SIBL, xp->axis, strlen(ROXML_L_PREV_SIBL))==0) {
 		// ROXML_L_PREV_SIBL
 		node_t *current = context->prnt->chld;
 		while(current != context)	{
-			if(roxml_validate_axes(current, xp+strlen(ROXML_L_PREV_SIBL), ans, nb, max, again))	{
-				roxml_check_node(xp+strlen(xp)+1, again-1, current, ans, nb, max, ROXML_DIRECT);
+			if(roxml_validate_axes(current, xp->axis+strlen(ROXML_L_PREV_SIBL), ans, nb, max, xp))	{
+				roxml_check_node(xp->next, current, ans, nb, max, ROXML_DIRECT);
 			}
 			current = current->sibl;
 		}
-	} else if(strncmp(ROXML_L_NEXT, xp, strlen(ROXML_L_NEXT))==0) {
+	} else if(strncmp(ROXML_L_NEXT, xp->axis, strlen(ROXML_L_NEXT))==0) {
 		// ROXML_L_NEXT
 		node_t *current = context->next;
 		while(current)  {
-			if(roxml_validate_axes(current, xp+strlen(ROXML_L_NEXT), ans, nb, max, again))	{
-				roxml_check_node(xp+strlen(xp)+1, again-1, context, ans, nb, max, ignore);
+			if(roxml_validate_axes(current, xp->axis+strlen(ROXML_L_NEXT), ans, nb, max, xp))	{
+				roxml_check_node(xp->next, context, ans, nb, max, ignore);
 			}
 			current = current->next;
 		}
-	} else if(strncmp(ROXML_L_PREV, xp, strlen(ROXML_L_PREV))==0) {
+	} else if(strncmp(ROXML_L_PREV, xp->axis, strlen(ROXML_L_PREV))==0) {
 		// ROXML_L_PREV
 		node_t *current = context->prev;
 		while(current)  {
-			if(roxml_validate_axes(current, xp+strlen(ROXML_L_PREV), ans, nb, max, again))	{
-				roxml_check_node(xp+strlen(xp)+1, again-1, context, ans, nb, max, ignore);
+			if(roxml_validate_axes(current, xp->axis+strlen(ROXML_L_PREV), ans, nb, max, xp))	{
+				roxml_check_node(xp->next, context, ans, nb, max, ignore);
 			}
 			current = current->prev;
 		}
-	} else if(strncmp(ROXML_L_NS, xp, strlen(ROXML_L_NS))==0) {
+	} else if(strncmp(ROXML_L_NS, xp->axis, strlen(ROXML_L_NS))==0) {
 		// ROXML_L_NS is not handled
-	} else if(strncmp(ROXML_L_CHILD, xp, strlen(ROXML_L_CHILD))==0) {
+	} else if(strncmp(ROXML_L_CHILD, xp->axis, strlen(ROXML_L_CHILD))==0) {
 		// ROXML_L_CHILD
 		node_t *current = context->chld;
 		while(current)	{
-			if(roxml_validate_axes(current, xp+strlen(ROXML_L_CHILD), ans, nb, max, again))	{
-				roxml_check_node(xp+strlen(xp)+1, again-1, current, ans, nb, max, ROXML_DIRECT);
+			if(roxml_validate_axes(current, xp->axis+strlen(ROXML_L_CHILD), ans, nb, max, xp))	{
+				roxml_check_node(xp->next, current, ans, nb, max, ROXML_DIRECT);
 			}
 			current = current->sibl;
 		}
@@ -906,8 +1098,8 @@ void roxml_check_node(char *xp, int again, node_t *context, node_t ***ans, int *
 		// ROXML_S_CHILD
 		node_t *current = context->chld;
 		while(current)	{
-			if(roxml_validate_axes(current, xp, ans, nb, max, again))	{
-				roxml_check_node(xp+strlen(xp)+1, again-1, current, ans, nb, max, ROXML_DIRECT);
+			if(roxml_validate_axes(current, xp->axis, ans, nb, max, xp))	{
+				roxml_check_node(xp->next, current, ans, nb, max, ROXML_DIRECT);
 			}
 			current = current->sibl;
 		}
@@ -917,11 +1109,11 @@ void roxml_check_node(char *xp, int again, node_t *context, node_t ***ans, int *
 	if(ignore)	{
 		node_t *current = context->chld;
 		while(current)	{
-			roxml_check_node(xp, again, current, ans, nb, max, ROXML_DESC_ONLY);
+			roxml_check_node(xp, current, ans, nb, max, ROXML_DESC_ONLY);
 			current = current->sibl;
 		}
 		if(ignore == ROXML_SELF_AND_DESC)	{
-			roxml_validate_axes(context, xp, ans, nb, max, again);
+			roxml_validate_axes(context, xp->axis, ans, nb, max, xp);
 		}
 	}
 
@@ -930,9 +1122,11 @@ void roxml_check_node(char *xp, int again, node_t *context, node_t ***ans, int *
 
 node_t ** roxml_xpath(node_t *n, char * path, int *nb_ans)
 {
+	int path_id;
 	int index = 0;
 	int ansnb = 0;
 	int ansmax = 1;
+	xpath_node_t *xpath = NULL;
 
 	if(n == NULL)	{ 
 		if(nb_ans) { *nb_ans = 0; }
@@ -943,18 +1137,20 @@ node_t ** roxml_xpath(node_t *n, char * path, int *nb_ans)
 	char * full_path_to_find = strdup(path);
 	char * path_to_find = full_path_to_find;
 
-	index = roxml_parse_xpath(path_to_find);
+	index = roxml_parse_xpath(path_to_find, &xpath);
 
-	if(path_to_find[0] == 0)	{
-		if(path_to_find[1] != 0)	{
-			// context node is root
-			while(n->prnt) { n = n->prnt; }
+	for(path_id = 0; path_id < index; path_id++)	{
+		node_t *orig = n;
+		if(xpath[path_id].axis == NULL)	{
+			if(xpath[path_id].next && !xpath[path_id].next->axis)	{
+				// context node is root
+				while(orig->prnt) { orig = orig->prnt; }
+			}
 		}
-		index--;
-		path_to_find += strlen(path_to_find)+1;
+		roxml_check_node(&xpath[path_id], orig, &ans, &ansnb, &ansmax, ROXML_DIRECT);
 	}
 
-	roxml_check_node(path_to_find, index, n, &ans, &ansnb, &ansmax, ROXML_DIRECT);
+	roxml_free_xpath(xpath, 0);
 
 	free(full_path_to_find);
 
