@@ -8,7 +8,7 @@
 int main(int argc, char ** argv)
 {
 	int nb, len, ram;
-	char *name = NULL;
+	//char *name = NULL;
 	struct timeval dt_load;
 	struct timeval dt_close;
 	struct timeval dt_xpath;

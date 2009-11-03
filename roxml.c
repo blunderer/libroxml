@@ -258,7 +258,6 @@ char * roxml_get_content(node_t *n, char * name, int size)
 
 char * roxml_get_name(node_t *n, char * name, int size)
 {
-	char c;
 	int count = 0;
 	char tmp_name[INTERNAL_BUF_SIZE];
 	memset(tmp_name, 0, INTERNAL_BUF_SIZE*sizeof(char));
@@ -563,7 +562,7 @@ node_t * roxml_load(node_t *current_node, FILE *file, char *buffer)
 			int_len = fread(int_buffer, 1, ROXML_BULK_READ, file);
 		} else {
 			int_ptr = buffer + int_abs_pos;
-			int_len = ((int_abs_pos+ROXML_BULK_READ)<int_buffer_len)?ROXML_BULK_READ:(int_abs_pos+ROXML_BULK_READ);
+			int_len = ROXML_BULK_READ>strlen(int_ptr)?strlen(int_ptr):ROXML_BULK_READ;
 		}
 
 		for(int_rel_pos = int_abs_pos; int_rel_pos < int_abs_pos+int_len; int_rel_pos++) {
