@@ -884,10 +884,10 @@ int test_parse_xpath(void)
 	INIT
 
 	xpath_node_t *ptr;
-	char mypath[128] = "/node[first() or last()]/item/title/@version || /node/item/title[@version < 3]";
+	char mypath[128] = "/node[first() or last()]/item/title/@version || /node/item/title[@version < 3] || /node/item/title[@version = v1]";
 	int ret = roxml_parse_xpath(mypath, &ptr);	
 
-	ASSERT_EQUAL(ret, 2)
+	ASSERT_EQUAL(ret, 3)
 	ASSERT_NULL(ptr[0].axis);
 	ASSERT_NULL(ptr[0].cond);
 	ASSERT_NOT_NULL(ptr[0].next);
@@ -927,7 +927,28 @@ int test_parse_xpath(void)
 	ASSERT_NULL(ptr[1].next->next->next->cond->next)
 	ASSERT_STRING_EQUAL(ptr[1].next->next->next->cond->arg1, "@version")
 	ASSERT_STRING_EQUAL(ptr[1].next->next->next->cond->arg2, "3")
+	ASSERT_EQUAL(ptr[1].next->next->next->cond->func, ROXML_FUNC_INTCOMP)
 	ASSERT_EQUAL(ptr[1].next->next->next->cond->op, ROXML_OPERATOR_INF)
+
+	ASSERT_NULL(ptr[2].axis);
+	ASSERT_NULL(ptr[2].cond);
+	ASSERT_NOT_NULL(ptr[2].next);
+	ASSERT_EQUAL(ptr[2].rel, ROXML_OPERATOR_OR)
+	ASSERT_NOT_NULL(ptr[2].next->next);
+	ASSERT_NOT_NULL(ptr[2].next->next->next);
+	ASSERT_NOT_NULL(ptr[2].next->next->next);
+	ASSERT_NULL(ptr[2].next->next->next->next);
+	ASSERT_STRING_EQUAL(ptr[2].next->axis, "node")
+	ASSERT_STRING_EQUAL(ptr[2].next->next->axis, "item")
+	ASSERT_NULL(ptr[2].next->next->cond)
+	ASSERT_STRING_EQUAL(ptr[2].next->next->next->axis, "title")
+	ASSERT_NOT_NULL(ptr[2].next->next->next->cond)
+	ASSERT_NULL(ptr[2].next->next->next->cond->next)
+	ASSERT_STRING_EQUAL(ptr[2].next->next->next->cond->arg1, "@version")
+	ASSERT_STRING_EQUAL(ptr[2].next->next->next->cond->arg2, "v1")
+	ASSERT_EQUAL(ptr[2].next->next->next->cond->func, ROXML_FUNC_STRCOMP)
+	ASSERT_EQUAL(ptr[2].next->next->next->cond->op, ROXML_OPERATOR_EQU)
+
 	RETURN
 }
 
