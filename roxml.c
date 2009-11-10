@@ -697,6 +697,10 @@ int roxml_parse_xpath(char *path, xpath_node_t ** xpath)
 	xpath_node_t * new_node = first_node;
 	xpath_cond_t * new_cond = NULL;
 
+	if(path[0] != '/') {
+		first_node->axis = path;
+	}
+
 	for(cur = 0; cur < len; cur++)	{
 		if(path[cur] == '"') {
 			if(!quoted) {
@@ -798,6 +802,9 @@ int roxml_parse_xpath(char *path, xpath_node_t ** xpath)
 						path[cur] = '\0';
 					}
 					new_cond->arg2 = path+cur+1;
+					if((new_cond->arg2[0] > '9')||(new_cond->arg2[0] < '0')) {
+						new_cond->func = ROXML_FUNC_STRCOMP;
+					}
 				} else if(path[cur] == '>') {
 					path[cur] = '\0';
 					new_cond->op = ROXML_OPERATOR_SUP;
@@ -842,6 +849,9 @@ int roxml_parse_xpath(char *path, xpath_node_t ** xpath)
 						path[cur] = '\0';
 					}
 					new_cond->arg2 = path+cur+1;
+					if((new_cond->arg2[0] > '9')||(new_cond->arg2[0] < '0')) {
+						new_cond->func = ROXML_FUNC_STRCOMP;
+					}
 				}
 			}
 		}
@@ -921,11 +931,15 @@ int roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 			iarg1 = roxml_get_node_index(candidat, NULL);
 			status = roxml_int_cmp(iarg1, 0, ROXML_OPERATOR_EQU);
 		} else if(condition->func == ROXML_FUNC_INTCOMP) {
-			iarg1 = 0; /* atoi(process arg1); */
+			char strval[128];
+			node_t *val = roxml_get_attr(candidat, condition->arg1+1, 0);
+			iarg1 = atoi(roxml_get_content(val, strval, 128));
 			iarg2 = atoi(condition->arg2);
 			status = roxml_int_cmp(iarg1, iarg2, condition->op);
 		} else if(condition->func == ROXML_FUNC_STRCOMP) {
-			sarg1 = NULL; /* process arg1 */;
+			char strval[128];
+			node_t *val = roxml_get_attr(candidat, condition->arg1+1, 0);
+			sarg1 = roxml_get_content(val, strval, 128);
 			sarg2 = condition->arg2;
 			status = (strcmp(sarg1, sarg2)==0);
 		}
@@ -971,9 +985,8 @@ int roxml_validate_axes(node_t *candidat, char *axes, node_t ***ans, int *nb, in
 	}
 
 	if((valid)&&(xn->next==NULL)) {
-		printf("id %lu\n",candidat->end);
 		if((*nb) >= (*max))	{
-			int new_max = (*max)+10;
+			int new_max = (*max)*2;
 			node_t ** new_ans = roxml_malloc(sizeof(node_t*), new_max, PTR_NODE_RESULT);
 			memcpy(new_ans, (*ans), *(max)*sizeof(node_t*)); 
 			roxml_release(*ans);
@@ -990,32 +1003,37 @@ int roxml_validate_axes(node_t *candidat, char *axes, node_t ***ans, int *nb, in
 
 void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb, int *max, int ignore)
 {
+	int validate_node = 0;
+
 	if(!xp)	{ return; }
 
 	// tests axes
-	if((strncmp(ROXML_L_SELF, xp->axis, strlen(ROXML_L_SELF))==0)||(strncmp(ROXML_S_SELF, xp->axis, strlen(ROXML_S_SELF))==0)) {
-		// ROXML_L_SELF & ROXML_S_SELF
-		roxml_validate_axes(context, "*", ans, nb, max, xp);
-		roxml_check_node(xp->next, context, ans, nb, max, ignore);
-	} else if((strncmp(ROXML_L_PARENT, xp->axis, strlen(ROXML_L_PARENT))==0)||(strncmp(ROXML_S_SELF, xp->axis, strlen(ROXML_S_SELF))==0)) {
-		// ROXML_L_PARENT & ROXML_S_SELF
-		roxml_validate_axes(context->prnt, "*", ans, nb, max, xp);
-		roxml_check_node(xp->next, context->prnt, ans, nb, max, ignore);
-	} else if(strncmp(ROXML_L_DESC_O_SELF, xp->axis, strlen(ROXML_L_DESC_O_SELF))==0) {
-		// ROXML_L_DESC_O_SELF
+	if((xp->axis == NULL)||(strlen(xp->axis) == 0)) {
+		// ROXML_S_DESC_O_SELF
 		roxml_check_node(xp->next, context, ans, nb, max, ROXML_SELF_AND_DESC);
+		return;
 	} else if(strncmp(ROXML_L_DESC, xp->axis, strlen(ROXML_L_DESC))==0) {
 		// ROXML_L_DESC
 		roxml_check_node(xp->next, context, ans, nb, max, ROXML_DESC_ONLY);
-	} else if(strlen(xp->axis)==0) {
-		// ROXML_S_DESC_O_SELF
+		return;
+	} else if((strncmp(ROXML_L_SELF, xp->axis, strlen(ROXML_L_SELF))==0)||(strncmp(ROXML_S_SELF, xp->axis, strlen(ROXML_S_SELF))==0)) {
+		// ROXML_L_SELF & ROXML_S_SELF
+		validate_node = roxml_validate_axes(context, "*", ans, nb, max, xp);
+		roxml_check_node(xp->next, context, ans, nb, max, ROXML_DIRECT);
+	} else if((strncmp(ROXML_L_PARENT, xp->axis, strlen(ROXML_L_PARENT))==0)||(strncmp(ROXML_S_SELF, xp->axis, strlen(ROXML_S_SELF))==0)) {
+		// ROXML_L_PARENT & ROXML_S_SELF
+		validate_node = roxml_validate_axes(context->prnt, "*", ans, nb, max, xp);
+		roxml_check_node(xp->next, context->prnt, ans, nb, max, ROXML_DIRECT);
+	} else if(strncmp(ROXML_L_DESC_O_SELF, xp->axis, strlen(ROXML_L_DESC_O_SELF))==0) {
+		// ROXML_L_DESC_O_SELF
 		roxml_check_node(xp->next, context, ans, nb, max, ROXML_SELF_AND_DESC);
 	} else if(strncmp(ROXML_L_ATTR, xp->axis, strlen(ROXML_L_ATTR))==0) {
 		// ROXML_L_ATTR
 		node_t *attribute = context->attr;
 		while(attribute)  {
-			if(roxml_validate_axes(attribute, xp->axis+strlen(ROXML_L_ATTR), ans, nb, max, xp))	{
-				roxml_check_node(xp->next, context, ans, nb, max, ignore);
+			validate_node = roxml_validate_axes(attribute, xp->axis+strlen(ROXML_L_ATTR), ans, nb, max, xp);
+			if(validate_node)	{
+				roxml_check_node(xp->next, context, ans, nb, max, ROXML_DIRECT);
 			}
 			attribute = attribute->sibl;
 		}
@@ -1023,8 +1041,9 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 		// ROXML_S_ATTR
 		node_t *attribute = context->attr;
 		while(attribute)  {
-			if(roxml_validate_axes(attribute, xp->axis+strlen(ROXML_S_ATTR), ans, nb, max, xp))	{
-				roxml_check_node(xp->next, context, ans, nb, max, ignore);
+			validate_node = roxml_validate_axes(attribute, xp->axis+strlen(ROXML_S_ATTR), ans, nb, max, xp);
+			if(validate_node)	{
+				roxml_check_node(xp->next, context, ans, nb, max, ROXML_DIRECT);
 			}
 			attribute = attribute->sibl;
 		}
@@ -1032,7 +1051,8 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 		// ROXML_L_ANC
 		node_t *current = context->prnt;
 		while(current)	{
-			if(roxml_validate_axes(current, xp->axis+strlen(ROXML_L_ANC), ans, nb, max, xp))	{
+			validate_node = roxml_validate_axes(current, xp->axis+strlen(ROXML_L_ANC), ans, nb, max, xp);
+			if(validate_node)	{
 				roxml_check_node(xp->next, current, ans, nb, max, ROXML_DIRECT);
 			}
 			current = current->prnt;
@@ -1041,7 +1061,8 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 		// ROXML_L_ANC_O_SELF
 		node_t *current = context;
 		while(current)	{
-			if(roxml_validate_axes(current, xp->axis+strlen(ROXML_L_ANC_O_SELF), ans, nb, max, xp))	{
+			validate_node = roxml_validate_axes(current, xp->axis+strlen(ROXML_L_ANC_O_SELF), ans, nb, max, xp);
+			if(validate_node)	{
 				roxml_check_node(xp->next, current, ans, nb, max, ROXML_DIRECT);
 			}
 			current = current->prnt;
@@ -1050,7 +1071,8 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 		// ROXML_L_NEXT_SIBL
 		node_t *current = context->sibl;
 		while(current)	{
-			if(roxml_validate_axes(current, xp->axis+strlen(ROXML_L_NEXT_SIBL), ans, nb, max, xp))	{
+			validate_node = roxml_validate_axes(current, xp->axis+strlen(ROXML_L_NEXT_SIBL), ans, nb, max, xp);
+			if(validate_node)	{
 				roxml_check_node(xp->next, current, ans, nb, max, ROXML_DIRECT);
 			}
 			current = current->sibl;
@@ -1059,7 +1081,8 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 		// ROXML_L_PREV_SIBL
 		node_t *current = context->prnt->chld;
 		while(current != context)	{
-			if(roxml_validate_axes(current, xp->axis+strlen(ROXML_L_PREV_SIBL), ans, nb, max, xp))	{
+			validate_node = roxml_validate_axes(current, xp->axis+strlen(ROXML_L_PREV_SIBL), ans, nb, max, xp);
+			if(validate_node)	{
 				roxml_check_node(xp->next, current, ans, nb, max, ROXML_DIRECT);
 			}
 			current = current->sibl;
@@ -1068,8 +1091,9 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 		// ROXML_L_NEXT
 		node_t *current = context->next;
 		while(current)  {
-			if(roxml_validate_axes(current, xp->axis+strlen(ROXML_L_NEXT), ans, nb, max, xp))	{
-				roxml_check_node(xp->next, context, ans, nb, max, ignore);
+			validate_node = roxml_validate_axes(current, xp->axis+strlen(ROXML_L_NEXT), ans, nb, max, xp);
+			if(validate_node)	{
+				roxml_check_node(xp->next, context, ans, nb, max, ROXML_DIRECT);
 			}
 			current = current->next;
 		}
@@ -1077,8 +1101,9 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 		// ROXML_L_PREV
 		node_t *current = context->prev;
 		while(current)  {
-			if(roxml_validate_axes(current, xp->axis+strlen(ROXML_L_PREV), ans, nb, max, xp))	{
-				roxml_check_node(xp->next, context, ans, nb, max, ignore);
+			validate_node = roxml_validate_axes(current, xp->axis+strlen(ROXML_L_PREV), ans, nb, max, xp);
+			if(validate_node)	{
+				roxml_check_node(xp->next, context, ans, nb, max, ROXML_DIRECT);
 			}
 			current = current->prev;
 		}
@@ -1088,7 +1113,8 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 		// ROXML_L_CHILD
 		node_t *current = context->chld;
 		while(current)	{
-			if(roxml_validate_axes(current, xp->axis+strlen(ROXML_L_CHILD), ans, nb, max, xp))	{
+			validate_node = roxml_validate_axes(current, xp->axis+strlen(ROXML_L_CHILD), ans, nb, max, xp);
+			if(validate_node)	{
 				roxml_check_node(xp->next, current, ans, nb, max, ROXML_DIRECT);
 			}
 			current = current->sibl;
@@ -1097,7 +1123,8 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 		// ROXML_S_CHILD
 		node_t *current = context->chld;
 		while(current)	{
-			if(roxml_validate_axes(current, xp->axis, ans, nb, max, xp))	{
+			validate_node = roxml_validate_axes(current, xp->axis, ans, nb, max, xp);
+			if(validate_node)	{
 				roxml_check_node(xp->next, current, ans, nb, max, ROXML_DIRECT);
 			}
 			current = current->sibl;
@@ -1105,7 +1132,7 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 	}
 
 	// if found a "all document" axes
-	if(ignore)	{
+	if((ignore != ROXML_DIRECT)&&(1/*!validate_node*/))	{
 		node_t *current = context->chld;
 		while(current)	{
 			roxml_check_node(xp, current, ans, nb, max, ROXML_DESC_ONLY);
@@ -1113,6 +1140,7 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 		}
 		if(ignore == ROXML_SELF_AND_DESC)	{
 			roxml_validate_axes(context, xp->axis, ans, nb, max, xp);
+			roxml_check_node(xp->next, context, ans, nb, max, ROXML_DIRECT);
 		}
 	}
 
@@ -1140,13 +1168,15 @@ node_t ** roxml_xpath(node_t *n, char * path, int *nb_ans)
 
 	for(path_id = 0; path_id < index; path_id++)	{
 		node_t *orig = n;
+		xpath_node_t *cur_xpath = &xpath[path_id];
 		if(xpath[path_id].axis == NULL)	{
-			if(xpath[path_id].next && !xpath[path_id].next->axis)	{
+			if(xpath[path_id].next && strlen(xpath[path_id].next->axis))	{
 				// context node is root
 				while(orig->prnt) { orig = orig->prnt; }
+				cur_xpath = cur_xpath->next;
 			}
 		}
-		roxml_check_node(&xpath[path_id], orig, &ans, &ansnb, &ansmax, ROXML_DIRECT);
+		roxml_check_node(cur_xpath, orig, &ans, &ansnb, &ansmax, ROXML_DIRECT);
 	}
 
 	roxml_free_xpath(xpath, 0);

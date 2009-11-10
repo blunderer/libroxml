@@ -92,7 +92,7 @@ typedef struct _xpath_node {
  * tree links
  */
 typedef struct node {
-	int type;			/*!< document or buffer / attribute or value */
+	char type;			/*!< document or buffer / attribute or value */
 	unsigned int *idx;		/*!< index in buffer address */
 	union {
 		char *buf;		/*!< buffer address */
