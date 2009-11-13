@@ -137,6 +137,8 @@ typedef struct node {
 #define ROXML_FUNC_LAST_STR	"last()"
 
 #define ROXML_BULK_READ		4096
+#define ROXML_LONG_LEN		512
+#define ROXML_BASE_LEN		128
 #define ROXML_BULK_CTX		8
 
 #define ROXML_L_CHILD		"child::"
@@ -275,6 +277,14 @@ typedef struct node {
  * constant for file document
  */
 #define ROXML_TXT	0x10
+
+/**
+ * \def ROXML_PENDING
+ * 
+ * constant for pending node
+ */
+#define ROXML_PENDING	0x20
+
 
 /**
  * \def STATE_NODE_NONE

@@ -170,7 +170,7 @@ char*	ROXML_API roxml_get_name		(node_t *n, char * name, int size);
  * \param n is one node of the tree
  * \return the content
  */
-char *	ROXML_API roxml_get_content		(node_t *n, char * name, int size);
+char *	ROXML_API roxml_get_content		(node_t *n, char * name, int buf_size, int * size);
 
 /** \brief number of attribute getter function
  *
@@ -262,7 +262,9 @@ int roxml_get_type(node_t *n);
 
 
 /////////// TODO LIBRWXML
-void roxml_commit_changes(node_t *n);
+void roxml_commit_changes(node_t *n, char * dest, char ** buffer, int human);
+void roxml_del_node(node_t * n);
+node_t * roxml_add_node(node_t * parent, int type, char *name, char *value);
 
 /** \brief internal function
  *
