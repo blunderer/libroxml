@@ -199,6 +199,12 @@ void roxml_close_node(node_t *n, node_t *close)
 
 void roxml_free_node(node_t *n)
 {
+	if(n->type & ROXML_PENDING) {
+		free(n->src.buf);
+	}
+	if(!n->prnt) {
+		free(n->idx);
+	}
 	free(n);
 }
 
@@ -429,8 +435,7 @@ void roxml_close(node_t *n)
 	if((root->type & ROXML_FILE) == ROXML_FILE)	{
 		fclose(root->src.fil);
 	}
-	free(root->idx);
-	free(root);
+	roxml_free_node(root);
 }
 
 void roxml_del_tree(node_t *n)
@@ -440,7 +445,7 @@ void roxml_del_tree(node_t *n)
 	roxml_del_tree(n->text);
 	roxml_del_tree(n->sibl);
 	roxml_del_tree(n->attr);
-	free(n);
+	roxml_free_node(n);
 }
 
 int roxml_get_chld_nb(node_t *n)
@@ -499,17 +504,6 @@ node_t *roxml_get_parent(node_t *n)
 int roxml_get_type(node_t *n)
 {
 	return (n->type & (ROXML_ATTR_NODE | ROXML_STD_NODE | ROXML_TXT_NODE));
-}
-
-node_t * roxml_set_prev_next(node_t *candidat, node_t *parent)
-{
-	node_t *node = parent;		// node5
-	candidat->prev = parent;	// node6
-	while((node)&&(node->next == NULL))	{
-		node->next = candidat;
-		node = node->prev;
-	}
-	return candidat;
 }
 
 int roxml_get_node_index(node_t *n, int * last)
@@ -571,7 +565,6 @@ node_t * roxml_load(node_t *current_node, FILE *file, char *buffer)
 	int state = STATE_NODE_NONE;
 	int mode = MODE_COMMENT_NONE;
 	int inside_node_state = STATE_INSIDE_ARG_BEG;
-	node_t *previous_node = current_node;
 	node_t *candidat_node = NULL;
 	node_t *candidat_txt = NULL;
 	node_t *candidat_arg = NULL;
@@ -709,7 +702,6 @@ node_t * roxml_load(node_t *current_node, FILE *file, char *buffer)
 				} else	{
 					if(state == STATE_NODE_BEG) {
 						state = STATE_NODE_NAME;
-						previous_node = roxml_set_prev_next(candidat_node, previous_node);
 					}
 					if(state == STATE_NODE_ATTR)	{
 						if(inside_node_state == STATE_INSIDE_ARG_BEG)	{
@@ -1149,23 +1141,37 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 		}
 	} else if(strncmp(ROXML_L_NEXT, xp->axis, strlen(ROXML_L_NEXT))==0) {
 		// ROXML_L_NEXT
-		node_t *current = context->next;
+		node_t *current = context;
 		while(current)  {
-			validate_node = roxml_validate_axes(current, xp->axis+strlen(ROXML_L_NEXT), ans, nb, max, xp);
-			if(validate_node)	{
-				roxml_check_node(xp->next, context, ans, nb, max, ROXML_DIRECT);
+			node_t * following = current->sibl;
+			while(following) {
+				validate_node = roxml_validate_axes(following, xp->axis+strlen(ROXML_L_NEXT), ans, nb, max, xp);
+				if(validate_node)	{
+					roxml_check_node(xp->next, following, ans, nb, max, ROXML_DIRECT);
+				} else {
+					// TODO: check all sons of following
+				}
+				following = following->sibl;
 			}
-			current = current->next;
+			following = current->prnt->chld;
+			while(following != current) { following = following->sibl; }
+			current = following->sibl;
 		}
 	} else if(strncmp(ROXML_L_PREV, xp->axis, strlen(ROXML_L_PREV))==0) {
 		// ROXML_L_PREV
-		node_t *current = context->prev;
-		while(current)  {
-			validate_node = roxml_validate_axes(current, xp->axis+strlen(ROXML_L_PREV), ans, nb, max, xp);
-			if(validate_node)	{
-				roxml_check_node(xp->next, context, ans, nb, max, ROXML_DIRECT);
+		node_t *current = context;
+		while(current && current->prnt) {
+			node_t *preceding = current->prnt->chld;
+			while(preceding != current)  {
+				validate_node = roxml_validate_axes(preceding, xp->axis+strlen(ROXML_L_PREV), ans, nb, max, xp);
+				if(validate_node)	{
+					roxml_check_node(xp->next, context, ans, nb, max, ROXML_DIRECT);
+				} else {
+					// TODO: check all sons of following
+				}
+				preceding = preceding->sibl;
 			}
-			current = current->prev;
+			current = current->prnt;
 		}
 	} else if(strncmp(ROXML_L_NS, xp->axis, strlen(ROXML_L_NS))==0) {
 		// ROXML_L_NS is not handled
@@ -1408,16 +1414,9 @@ void roxml_del_std_node(node_t * n)
 		}
 		current->sibl = n->sibl;
 	}
-	
-	if(n->prev) {
-		n->prev->next = n->next;
-	}
-	if(n->next) {
-		n->next->prev = n->prev;
-	}
-	// still have to delete tree
-	// still have to handle real remove node and attr and text
-	// still have to modify next and prev nodes
+	roxml_del_tree(n->chld);
+	roxml_del_tree(n->text);
+	roxml_del_tree(n->attr);
 } 
 
 node_t * roxml_add_node(node_t * parent, int type, char *name, char *value) 

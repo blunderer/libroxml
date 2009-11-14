@@ -106,8 +106,7 @@ typedef struct node {
 	struct node *prnt;		/*!< ref to parent */
 	struct node *attr;		/*!< ref to attributes */
 	struct node *text;		/*!< ref to content */
-	struct node *next;		/*!< ref to next node in doc */
-	struct node *prev;		/*!< ref to previous node in doc */
+	struct node *next;		/*!< ref to next internal use */
 } node_t;
 
 #define ROXML_PRIVATE
