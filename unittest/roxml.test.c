@@ -641,17 +641,15 @@ int test_create_node(void)
 	INIT
 
 	FILE * doc = (FILE *)0x42;
-	unsigned int * idx = (unsigned int *)0x43;
 	char * buf = (char *)0x44;
 
-	node_t * node = roxml_create_node(1, doc, buf, idx, ROXML_FILE | ROXML_STD_NODE);
-	node_t * cnode = roxml_create_node(1, doc, NULL, NULL, ROXML_FILE | ROXML_STD_NODE);
-	node_t * anode = roxml_create_node(1, doc, NULL, NULL, ROXML_FILE | ROXML_ATTR_NODE);
-	node_t * close = roxml_create_node(10, doc, NULL, NULL, ROXML_FILE | ROXML_STD_NODE);
+	node_t * node = roxml_create_node(1, doc, buf, ROXML_FILE | ROXML_STD_NODE);
+	node_t * cnode = roxml_create_node(1, doc, NULL, ROXML_FILE | ROXML_STD_NODE);
+	node_t * anode = roxml_create_node(1, doc, NULL, ROXML_FILE | ROXML_ATTR_NODE);
+	node_t * close = roxml_create_node(10, doc, NULL, ROXML_FILE | ROXML_STD_NODE);
 	roxml_close_node(node, close);
 	ASSERT_EQUAL(node->type, ROXML_FILE | ROXML_STD_NODE)
 	ASSERT_EQUAL(node->src.buf, buf)
-	ASSERT_EQUAL(node->idx, idx)
 	ASSERT_EQUAL(node->pos, 1)
 	ASSERT_EQUAL(node->end, 10)
 	ASSERT_NULL(node->prnt)
@@ -1125,8 +1123,8 @@ int test_get_node_type(void)
 
 	int type;
 
-	node_t * cnode = roxml_create_node(1, NULL, NULL, NULL, ROXML_FILE | ROXML_STD_NODE);
-	node_t * anode = roxml_create_node(1, NULL, NULL, NULL, ROXML_FILE | ROXML_ATTR_NODE);
+	node_t * cnode = roxml_create_node(1, NULL, NULL, ROXML_FILE | ROXML_STD_NODE);
+	node_t * anode = roxml_create_node(1, NULL, NULL, ROXML_FILE | ROXML_ATTR_NODE);
 
 	type = roxml_get_type(cnode);
 	ASSERT_EQUAL(type & ROXML_STD_NODE, ROXML_STD_NODE)

@@ -94,7 +94,6 @@ typedef struct _xpath_node {
  */
 typedef struct node {
 	char type;			/*!< document or buffer / attribute or value */
-	unsigned int *idx;		/*!< index in buffer address */
 	union {
 		char *buf;		/*!< buffer address */
 		FILE *fil;		/*!< loaded document */
@@ -409,16 +408,15 @@ void	ROXML_INT roxml_free_node		(node_t *n);
 
 /** \brief internal function
  *
- * \fn node_t* ROXML_INT roxml_create_node(int pos, FILE *file, char * buf, unsigned int * idx);
+ * \fn node_t* ROXML_INT roxml_create_node(int pos, FILE *file, char * buf, int * type);
  * This function allocate a new node 
  * \param pos is the beginning offset of the node in the file
  * \param file is the pointer to the opened document
  * \param buffer is the pointer to the buffer
- * \param idx is the position pointer inside the buffer
  * \param type is the type of node between arg and val
  * \return the new node
  */
-node_t* ROXML_INT roxml_create_node		(int pos, FILE *file, char * buf, unsigned int * idx, int type);
+node_t* ROXML_INT roxml_create_node		(int pos, FILE *file, char * buf, int type);
 
 /** \brief internal function
  *
