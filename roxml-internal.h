@@ -23,6 +23,7 @@
 #ifndef ROXML_INT_H
 #define ROXML_INT_H
 
+#define IGNORE_EMPTY_TEXT_NODES
 
 /**
  * \def ROXML_INT
@@ -256,27 +257,6 @@ typedef struct node {
  * constant for buffer document
  */
 #define ROXML_BUFF	0x02
-
-/**
- * \def ROXML_ARG
- * 
- * constant for file document
- */
-#define ROXML_ARG	0x04
-
-/**
- * \def ROXML_VAL
- * 
- * constant for file document
- */
-#define ROXML_VAL	0x08
-
-/**
- * \def ROXML_TXT
- * 
- * constant for file document
- */
-#define ROXML_TXT	0x10
 
 /**
  * \def ROXML_PENDING

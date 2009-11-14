@@ -73,7 +73,37 @@ int test_tree_on_doc(void)
 	// node7
 	ASSERT_NULL(root->chld->chld->sibl->sibl->attr)
 
+#ifdef IGNORE_EMPTY_TEXT_NODES
 	// node0
+	ASSERT_NULL(root->chld->text)
+
+	// node1
+	ASSERT_NOT_NULL(root->chld->chld->text)
+	ASSERT_NULL(root->chld->chld->text->sibl)
+
+	// node2
+	ASSERT_NULL(root->chld->chld->sibl->text)
+
+	// node3
+	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->text)
+	ASSERT_NULL(root->chld->chld->sibl->chld->text->sibl)
+
+	// node4
+	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->text)
+
+	// node5
+	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->text)
+	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->text->sibl)
+	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->text->sibl->sibl)
+
+	// node6
+	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->text)
+	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->text->sibl)
+
+	// node7
+	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->text)
+	ASSERT_NULL(root->chld->chld->sibl->sibl->text->sibl)
+#else /* !IGNORE_EMPTY_TEXT_NODES */
 	ASSERT_NOT_NULL(root->chld->text)
 	ASSERT_NOT_NULL(root->chld->text->sibl)
 	ASSERT_NOT_NULL(root->chld->text->sibl->sibl)
@@ -110,6 +140,7 @@ int test_tree_on_doc(void)
 	// node7
 	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->text)
 	ASSERT_NULL(root->chld->chld->sibl->sibl->text->sibl)
+#endif /* !IGNORE_EMPTY_TEXT_NODES */
 
 	roxml_close(root);
 
@@ -651,12 +682,12 @@ int test_create_node(void)
 	unsigned int * idx = (unsigned int *)0x43;
 	char * buf = (char *)0x44;
 
-	node_t * node = roxml_create_node(1, doc, buf, idx, ROXML_FILE | ROXML_VAL);
-	node_t * cnode = roxml_create_node(1, doc, NULL, NULL, ROXML_FILE | ROXML_VAL);
-	node_t * anode = roxml_create_node(1, doc, NULL, NULL, ROXML_FILE | ROXML_ARG);
-	node_t * close = roxml_create_node(10, doc, NULL, NULL, ROXML_FILE | ROXML_VAL);
+	node_t * node = roxml_create_node(1, doc, buf, idx, ROXML_FILE | ROXML_STD_NODE);
+	node_t * cnode = roxml_create_node(1, doc, NULL, NULL, ROXML_FILE | ROXML_STD_NODE);
+	node_t * anode = roxml_create_node(1, doc, NULL, NULL, ROXML_FILE | ROXML_ATTR_NODE);
+	node_t * close = roxml_create_node(10, doc, NULL, NULL, ROXML_FILE | ROXML_STD_NODE);
 	roxml_close_node(node, close);
-	ASSERT_EQUAL(node->type, ROXML_FILE | ROXML_VAL)
+	ASSERT_EQUAL(node->type, ROXML_FILE | ROXML_STD_NODE)
 	ASSERT_EQUAL(node->src.buf, buf)
 	ASSERT_EQUAL(node->idx, idx)
 	ASSERT_EQUAL(node->pos, 1)
@@ -1132,16 +1163,16 @@ int test_get_node_type(void)
 
 	int type;
 
-	node_t * cnode = roxml_create_node(1, NULL, NULL, NULL, ROXML_FILE | ROXML_VAL);
-	node_t * anode = roxml_create_node(1, NULL, NULL, NULL, ROXML_FILE | ROXML_ARG);
+	node_t * cnode = roxml_create_node(1, NULL, NULL, NULL, ROXML_FILE | ROXML_STD_NODE);
+	node_t * anode = roxml_create_node(1, NULL, NULL, NULL, ROXML_FILE | ROXML_ATTR_NODE);
 
 	type = roxml_get_type(cnode);
-	ASSERT_EQUAL(type & ROXML_VAL, ROXML_VAL)
-	ASSERT_NOT_EQUAL(type & ROXML_ARG, ROXML_ARG)
+	ASSERT_EQUAL(type & ROXML_STD_NODE, ROXML_STD_NODE)
+	ASSERT_NOT_EQUAL(type & ROXML_ATTR_NODE, ROXML_ATTR_NODE)
 
 	type = roxml_get_type(anode);
-	ASSERT_NOT_EQUAL(type & ROXML_VAL, ROXML_VAL)
-	ASSERT_EQUAL(type & ROXML_ARG, ROXML_ARG)
+	ASSERT_NOT_EQUAL(type & ROXML_STD_NODE, ROXML_STD_NODE)
+	ASSERT_EQUAL(type & ROXML_ATTR_NODE, ROXML_ATTR_NODE)
 
 	roxml_free_node(cnode);
 	roxml_free_node(anode);
@@ -1183,13 +1214,16 @@ int test_write_tree(void)
 {
 	INIT /* init context macro */
 
-	node_t * root = roxml_add_node(NULL, ROXML_VAL, "xml", NULL);
-	node_t *node = roxml_add_node(root, ROXML_VAL, "node1", "content1");
-	roxml_add_node(root, ROXML_ARG, "attr1", "value1");
-	roxml_add_node(node, ROXML_VAL, "node2", "content2");
-	roxml_add_node(node, ROXML_VAL, "node3", "content3");
+	node_t * root = roxml_add_node(NULL, ROXML_STD_NODE, "xml", NULL);
+	node_t *node = roxml_add_node(root, ROXML_STD_NODE, "node1", "content1");
+	roxml_add_node(root, ROXML_ATTR_NODE, "attr1", "value1");
+	node_t *node2 = roxml_add_node(node, ROXML_STD_NODE, "node2", "content2");
+	roxml_add_node(node, ROXML_TXT_NODE, NULL, "content1bis");
+	roxml_add_node(node2, ROXML_TXT_NODE, NULL, "content2bis");
+	roxml_add_node(node, ROXML_STD_NODE, "node3", "content3");
 	
-	roxml_commit_changes(root, "out.xml", NULL, 1);
+	roxml_commit_changes(root, "out.xml", NULL, 0);
+	roxml_commit_changes(root, "out.xml.human", NULL, 1);
 	roxml_close(root);
 	
 	RETURN /* close context macro */

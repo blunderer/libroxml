@@ -133,7 +133,7 @@ node_t * roxml_parent_node(node_t *parent, node_t *n)
 {
 	n->prnt = parent;
 	if(parent)	{
-		if(roxml_get_type(n) == ROXML_ARG)	{
+		if(roxml_get_type(n) == ROXML_ATTR_NODE)	{
 			if(parent->attr) {
 				parent->attr->next->sibl = n;
 				parent->attr->next = n;
@@ -141,7 +141,7 @@ node_t * roxml_parent_node(node_t *parent, node_t *n)
 				parent->attr = n;
 				parent->attr->next = n;
 			}
-		} else if(roxml_get_type(n) == ROXML_TXT){
+		} else if(roxml_get_type(n) == ROXML_TXT_NODE){
 			if(parent->text) {
 				parent->text->next->sibl = n;
 				parent->text->next = n;
@@ -149,7 +149,7 @@ node_t * roxml_parent_node(node_t *parent, node_t *n)
 				parent->text = n;
 				parent->text->next = n;
 			}
-		} else if(roxml_get_type(n) == ROXML_VAL){
+		} else if(roxml_get_type(n) == ROXML_STD_NODE){
 			if(parent->chld) {
 				parent->next->sibl = n;
 				parent->next->next = n;
@@ -185,14 +185,14 @@ void roxml_close_node(node_t *n, node_t *close)
 	n->end = close->pos;
 	roxml_free_node(close);
 
-	if((n->type & ROXML_VAL) == ROXML_VAL) {
+	if((n->type & ROXML_STD_NODE) == ROXML_STD_NODE) {
 		n->next = NULL;
 	}
 
 #ifdef __DEBUG
-	if(n->type & ROXML_VAL) _nb_node++;
-	if(n->type & ROXML_ARG) _nb_attr++;
-	if(n->type & ROXML_TXT) _nb_text++;
+	if(n->type & ROXML_STD_NODE) _nb_node++;
+	if(n->type & ROXML_ATTR_NODE) _nb_attr++;
+	if(n->type & ROXML_TXT_NODE) _nb_text++;
 #endif
 
 }
@@ -215,7 +215,7 @@ char * roxml_get_content(node_t *n, char * name, int bufsize, int *size)
 		return NULL;
 	}
 
-	if(n->type & ROXML_VAL)	{
+	if(n->type & ROXML_STD_NODE)	{
 		ptr = n->text;
 		while(ptr)	{
 			total += ptr->end - ptr->pos;
@@ -237,7 +237,17 @@ char * roxml_get_content(node_t *n, char * name, int bufsize, int *size)
 			total += ptr->end - ptr->pos;
 			ptr = ptr->sibl;
 		}
-	} else if(n->type & ROXML_ARG)	{
+	} else if(n->type & ROXML_TXT_NODE)	{
+		total = n->end - n->pos;
+		content = roxml_malloc(sizeof(char), total+1, PTR_CHAR);
+		if(content == NULL) { return NULL; }
+		if(n->type & ROXML_FILE) {
+			fseek(n->src.fil, n->pos, SEEK_SET);
+			fread(content, n->end - n->pos, 1, n->src.fil);
+		} else {
+			memcpy(content, n->src.buf+n->pos, n->end - n->pos);
+		}
+	} else if(n->type & ROXML_ATTR_NODE)	{
 		node_t *ptr = n->text;
 		total = ptr->end - ptr->pos;
 		content = roxml_malloc(sizeof(char), total+1, PTR_CHAR);
@@ -273,7 +283,7 @@ char * roxml_get_name(node_t *n, char * name, int size)
 
 	if(n->prnt == NULL)	{
 		strcpy(tmp_name, "root");
-	} else if(n->type & ROXML_ARG)	{
+	} else if(n->type & ROXML_ATTR_NODE)	{
 		int offset = 0;
 		char *internal_ptr;
 		char internal_buf[INTERNAL_BUF_SIZE];
@@ -290,7 +300,7 @@ char * roxml_get_name(node_t *n, char * name, int size)
 			offset++;
 			count++;
 		}
-	} else if(n->type & ROXML_VAL)	{
+	} else if(n->type & ROXML_STD_NODE)	{
 		int offset = 0;
 		char *internal_ptr;
 		char internal_buf[INTERNAL_BUF_SIZE];
@@ -307,7 +317,7 @@ char * roxml_get_name(node_t *n, char * name, int size)
 			offset++;
 			count++;
 		}
-	} else if(n->type & ROXML_TXT) {
+	} else if(n->type & ROXML_TXT_NODE) {
 		strcpy(tmp_name, "");
 	}
 
@@ -318,6 +328,42 @@ char * roxml_get_name(node_t *n, char * name, int size)
 		strncpy(name, tmp_name, size);
 	}
 	return name;
+}
+
+int ROXML_API roxml_get_text_nb(node_t *n)
+{
+	node_t *ptr = n;
+	int nb = 0;
+	if(ptr->text)	{
+		ptr = ptr->text;
+		nb++;
+		while(ptr->sibl)	{
+			nb++;
+			ptr = ptr->sibl;
+		}
+	}
+	return nb;
+}
+
+node_t *roxml_get_text(node_t *n, int nb)
+{
+	int count = 0;
+	node_t *ptr = n;
+	ptr = n->text;
+	
+	if(ptr == NULL)	{
+		return NULL;
+	}
+
+	if(nb == 0)	{
+		return ptr;
+	}
+	while((ptr->sibl)&&(nb > count)) {
+		count++;
+		ptr = ptr->sibl;
+	}
+	if(nb > count)	{ return NULL; }
+	return ptr;
 }
 
 int ROXML_API roxml_get_attr_nb(node_t *n)
@@ -452,7 +498,7 @@ node_t *roxml_get_parent(node_t *n)
 
 int roxml_get_type(node_t *n)
 {
-	return (n->type & (ROXML_ARG | ROXML_VAL | ROXML_TXT));
+	return (n->type & (ROXML_ATTR_NODE | ROXML_STD_NODE | ROXML_TXT_NODE));
 }
 
 node_t * roxml_set_prev_next(node_t *candidat, node_t *parent)
@@ -499,7 +545,7 @@ node_t * roxml_load_doc(char *filename)
 	}
 	unsigned int *index = (unsigned int *)malloc(sizeof(unsigned int));
 	*index = 0;
-	current_node = roxml_create_node(0, file, NULL, index, ROXML_VAL | ROXML_FILE);
+	current_node = roxml_create_node(0, file, NULL, index, ROXML_STD_NODE | ROXML_FILE);
 	current_node = roxml_parent_node(NULL, current_node);
 	return roxml_load(current_node,  file, NULL);
 }
@@ -510,7 +556,7 @@ node_t * roxml_load_buf(char *buffer)
 	node_t *current_node = NULL;
 	unsigned int *index = (unsigned int *)malloc(sizeof(unsigned int));
 	*index = 0;
-	current_node = roxml_create_node(0, NULL, buffer, index, ROXML_VAL | ROXML_BUFF);
+	current_node = roxml_create_node(0, NULL, buffer, index, ROXML_STD_NODE | ROXML_BUFF);
 	current_node = roxml_parent_node(NULL, current_node);
 	return roxml_load(current_node, NULL, buffer);
 }
@@ -570,17 +616,17 @@ node_t * roxml_load(node_t *current_node, FILE *file, char *buffer)
 				continue;
 			}
 			
-			// STUB
-			empty_text_node = 0;
+#ifdef IGNORE_EMPTY_TEXT_NODES
 			if(state == STATE_NODE_CONTENT)	{
-				if(!ROXML_WHITE(c)) {
+				if(!ROXML_WHITE(c) && (c != '<')) {
 					empty_text_node = 0;
 				}
 			}
+#endif /* IGNORE_EMPTY_TEXT_NODES */
 			if((state == STATE_NODE_ATTR)&&(inside_node_state == STATE_INSIDE_VAL_BEG))	{
 				if(mode == MODE_COMMENT_NONE)	{ current_attr_quoted = 0; }
 				else { current_attr_quoted = 1; }
-				candidat_val = roxml_create_node(int_rel_pos, file, buffer, current_node->idx, ROXML_TXT | type);
+				candidat_val = roxml_create_node(int_rel_pos, file, buffer, current_node->idx, ROXML_TXT_NODE | type);
 				candidat_val = roxml_parent_node(candidat_arg, candidat_val);
 				inside_node_state = STATE_INSIDE_VAL;
 			}
@@ -588,47 +634,50 @@ node_t * roxml_load(node_t *current_node, FILE *file, char *buffer)
 				if(c == '<')	{
 					state = STATE_NODE_BEG;
 					if(candidat_txt)	{
+#ifdef IGNORE_EMPTY_TEXT_NODES
 						if(empty_text_node == 0) {
-							node_t * to_be_closed = roxml_create_node(int_rel_pos, file, buffer, current_node->idx, ROXML_TXT | type);
+#endif /* IGNORE_EMPTY_TEXT_NODES */
+							node_t * to_be_closed = roxml_create_node(int_rel_pos, file, buffer, current_node->idx, ROXML_TXT_NODE | type);
 							roxml_close_node(candidat_txt, to_be_closed);
+#ifdef IGNORE_EMPTY_TEXT_NODES
 						} else {
 							roxml_del_node(candidat_txt);
-							roxml_free_node(candidat_txt);
 						}
+#endif /* IGNORE_EMPTY_TEXT_NODES */
 						candidat_txt = NULL;
 					}
-					candidat_node = roxml_create_node(int_rel_pos, file, buffer, current_node->idx, ROXML_VAL | type);
+					candidat_node = roxml_create_node(int_rel_pos, file, buffer, current_node->idx, ROXML_STD_NODE | type);
 				} else if(c == '>')	{
 					if(state == STATE_NODE_NAME)	{
 						empty_text_node = 1;
 						state = STATE_NODE_CONTENT;
 						current_node = roxml_parent_node(current_node, candidat_node);
-						candidat_txt = roxml_create_node(int_rel_pos+1, file, buffer, current_node->idx, ROXML_TXT | type);
+						candidat_txt = roxml_create_node(int_rel_pos+1, file, buffer, current_node->idx, ROXML_TXT_NODE | type);
 						candidat_txt = roxml_parent_node(current_node, candidat_txt);
 					} else if(state == STATE_NODE_ATTR)	{
 						if(inside_node_state == STATE_INSIDE_VAL)	{
 							int off = current_attr_quoted;
-							node_t * to_be_closed = roxml_create_node(int_rel_pos-off, file, buffer, current_node->idx, ROXML_ARG | type);
+							node_t * to_be_closed = roxml_create_node(int_rel_pos-off, file, buffer, current_node->idx, ROXML_ATTR_NODE | type);
 							roxml_close_node(candidat_val, to_be_closed);
 						}
 						current_node = roxml_parent_node(current_node, candidat_node);
 						state = STATE_NODE_CONTENT;
 						inside_node_state = STATE_INSIDE_ARG_BEG;
-						candidat_txt = roxml_create_node(int_rel_pos+1, file, buffer, current_node->idx, ROXML_TXT | type);
+						candidat_txt = roxml_create_node(int_rel_pos+1, file, buffer, current_node->idx, ROXML_TXT_NODE | type);
 						candidat_txt = roxml_parent_node(current_node, candidat_txt);
 					} else if(state == STATE_NODE_SINGLE)	{
 						empty_text_node = 1;
 						state = STATE_NODE_CONTENT;
 						current_node = roxml_parent_node(current_node, candidat_node);
 						if(current_node->prnt != NULL) { current_node = current_node->prnt; }
-						candidat_txt = roxml_create_node(int_rel_pos+1, file, buffer, current_node->idx, ROXML_TXT | type);
+						candidat_txt = roxml_create_node(int_rel_pos+1, file, buffer, current_node->idx, ROXML_TXT_NODE | type);
 						candidat_txt = roxml_parent_node(current_node, candidat_txt);
 					} else if(state == STATE_NODE_END)	{
 						empty_text_node = 1;
 						state = STATE_NODE_CONTENT;
 						roxml_close_node(current_node, candidat_node);
 						if(current_node->prnt != NULL) { current_node = current_node->prnt; }
-						candidat_txt = roxml_create_node(int_rel_pos+1, file, buffer, current_node->idx, ROXML_TXT | type);
+						candidat_txt = roxml_create_node(int_rel_pos+1, file, buffer, current_node->idx, ROXML_TXT_NODE | type);
 						candidat_txt = roxml_parent_node(current_node, candidat_txt);
 					}
 				} else if(c == '/')	{
@@ -639,7 +688,7 @@ node_t * roxml_load(node_t *current_node, FILE *file, char *buffer)
 					} else if(state == STATE_NODE_ATTR)	{
 						if(inside_node_state == STATE_INSIDE_VAL)	{
 							int off = current_attr_quoted;
-							node_t * to_be_closed = roxml_create_node(int_rel_pos-off, file, buffer, current_node->idx, ROXML_ARG | type);
+							node_t * to_be_closed = roxml_create_node(int_rel_pos-off, file, buffer, current_node->idx, ROXML_ATTR_NODE | type);
 							roxml_close_node(candidat_val, to_be_closed);
 						}
 						inside_node_state = STATE_INSIDE_ARG_BEG;
@@ -652,7 +701,7 @@ node_t * roxml_load(node_t *current_node, FILE *file, char *buffer)
 					} else if(state == STATE_NODE_ATTR)	{
 						if(inside_node_state == STATE_INSIDE_VAL)   {
 							int off = current_attr_quoted;
-							node_t * to_be_closed = roxml_create_node(int_rel_pos-off, file, buffer, current_node->idx, ROXML_ARG | type);
+							node_t * to_be_closed = roxml_create_node(int_rel_pos-off, file, buffer, current_node->idx, ROXML_ATTR_NODE | type);
 							roxml_close_node(candidat_val, to_be_closed);
 							inside_node_state = STATE_INSIDE_ARG_BEG;
 						}
@@ -664,12 +713,12 @@ node_t * roxml_load(node_t *current_node, FILE *file, char *buffer)
 					}
 					if(state == STATE_NODE_ATTR)	{
 						if(inside_node_state == STATE_INSIDE_ARG_BEG)	{
-							candidat_arg = roxml_create_node(int_rel_pos-1, file, buffer, current_node->idx, ROXML_ARG | type);
+							candidat_arg = roxml_create_node(int_rel_pos-1, file, buffer, current_node->idx, ROXML_ATTR_NODE | type);
 							candidat_arg = roxml_parent_node(candidat_node, candidat_arg);
 							inside_node_state = STATE_INSIDE_ARG;
 						} else if((inside_node_state == STATE_INSIDE_ARG)&&(c == '='))	{
 							inside_node_state = STATE_INSIDE_VAL_BEG;
-							node_t * to_be_closed = roxml_create_node(int_rel_pos, file, buffer, current_node->idx, ROXML_ARG | type);
+							node_t * to_be_closed = roxml_create_node(int_rel_pos, file, buffer, current_node->idx, ROXML_ATTR_NODE | type);
 							roxml_close_node(candidat_arg, to_be_closed);
 						}
 					}
@@ -1274,12 +1323,14 @@ void roxml_write_node(node_t * n, FILE *f, char * buf, int human, int lvl, int *
 				if(human) {
 					roxml_print_space(f, buf, offset, len, lvl+1);
 				}
-				value = roxml_get_content(text->prnt, val, ROXML_LONG_LEN, &status);
+				value = roxml_get_content(text, val, ROXML_LONG_LEN, &status);
 				if(status >= ROXML_LONG_LEN) {
-					value = roxml_get_content(text->prnt, NULL, 0, &status);
+					value = roxml_get_content(text, NULL, 0, &status);
 				}
 				roxml_write_string(buf, f, value, offset, len);
-				roxml_write_string(buf, f, "\n", offset, len);
+				if(human) {
+					roxml_write_string(buf, f, "\n", offset, len);
+				}
 				text = text->sibl;
 			}
 			if(chld) {
@@ -1309,29 +1360,63 @@ void roxml_write_node(node_t * n, FILE *f, char * buf, int human, int lvl, int *
 
 void roxml_del_node(node_t * n) {
 	if(n == NULL) return;
+	if(n->type & ROXML_STD_NODE) {
+		roxml_del_std_node(n);
+	} else if(n->type & ROXML_ATTR_NODE) {
+		roxml_del_arg_node(n);
+	} else if(n->type & ROXML_TXT_NODE) {
+		roxml_del_txt_node(n);
+	}
+	roxml_free_node(n);
+}
 
-	node_t *current = n->chld;
-	node_t *last_child = NULL;
-	while(current) {
-		last_child = current;
-		current->prnt = n->prnt;
-		current = current->sibl;
-	}
-	if(n->prnt) {
-		if(n->prnt->chld == n) {
-			n->prnt->chld = n->chld;
-			last_child->sibl = n->sibl;
-		} else {
-			current = n->prnt->chld;
-			while(current->sibl) {
-				current = current->sibl;
-			}
-			current->sibl = n->chld;
+void roxml_del_arg_node(node_t * n) 
+{
+	node_t *current = n->prnt->attr;
+	if(current == n) {
+		n->prnt->attr = n->sibl;
+	} else if(current) {
+		while(current->sibl && current->sibl != n) {
+			current = current->sibl;
 		}
+		current->sibl = n->sibl;
 	}
+	return;
+}
+
+void roxml_del_txt_node(node_t * n)
+{
+	node_t *current = n->prnt->text;
+	if(current == n) {
+		n->prnt->text = n->sibl;
+	} else if(current) {
+		while(current->sibl && current->sibl != n) {
+			current = current->sibl;
+		}
+		current->sibl = n->sibl;
+	}
+} 
+
+void roxml_del_std_node(node_t * n)
+{
+	node_t *current = n->prnt->chld;
+	if(current == n) {
+		n->prnt->chld = n->sibl;
+	} else if(current) {
+		while(current->sibl && current->sibl != n) {
+			current = current->sibl;
+		}
+		current->sibl = n->sibl;
+	}
+	
+	if(n->prev) {
+		n->prev->next = n->next;
+	}
+	if(n->next) {
+		n->next->prev = n->prev;
+	}
+	// still have to delete tree
 	// still have to handle real remove node and attr and text
-	// still have to handle removing a arg node
-	// still have to handle removing a text node
 	// still have to modify next and prev nodes
 } 
 
@@ -1344,6 +1429,9 @@ node_t * roxml_add_node(node_t * parent, int type, char *name, char *value)
 	int end_content = 0;
 	char * buffer = NULL;
 
+	if(parent && !(parent->type & ROXML_STD_NODE)) {
+		return NULL;
+	}
 	if(value) {
 		content_l = strlen(value);
 	}
@@ -1351,14 +1439,21 @@ node_t * roxml_add_node(node_t * parent, int type, char *name, char *value)
 		name_l = strlen(name);
 	}
 
-	if(type & ROXML_ARG) {
+	if(type & ROXML_ATTR_NODE) {
 		if(!name || !value) { return NULL; }
 		buffer = (char*)malloc(sizeof(char)*(name_l+content_l+2));
 		sprintf(buffer,"%s=%s",name, value);
 		content_pos = name_l+1;
 		end_node = name_l + 1;
 		end_content = name_l + content_l + 2;
-	} else if(type & ROXML_VAL) {
+	} else if(type & ROXML_TXT_NODE) {
+		if(!value) { return NULL; }
+		buffer = (char*)malloc(sizeof(char)*(content_l+1));
+		sprintf(buffer,"%s", value);
+		content_pos = 0;
+		end_node = content_l + 1;
+		end_content = content_l + 1;
+	} else if(type & ROXML_STD_NODE) {
 		if(!name) { return NULL; }
 		if(content_l)	{
 			if(!value) { return NULL; }
@@ -1376,8 +1471,8 @@ node_t * roxml_add_node(node_t * parent, int type, char *name, char *value)
 	node_t *new_node = roxml_create_node(0, NULL, buffer, NULL, type | ROXML_PENDING | ROXML_BUFF);
 	new_node->end = end_node;
 
-	if(content_l) {
-		node_t *new_txt = roxml_create_node(content_pos, NULL, buffer, NULL, ROXML_TXT | ROXML_PENDING | ROXML_BUFF);
+	if(content_l && name_l) {
+		node_t *new_txt = roxml_create_node(content_pos, NULL, buffer, NULL, ROXML_TXT_NODE | ROXML_PENDING | ROXML_BUFF);
 		roxml_parent_node(new_node, new_txt);
 		new_txt->end = end_content;
 	}

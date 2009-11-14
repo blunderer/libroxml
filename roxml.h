@@ -67,6 +67,27 @@ typedef struct node node_t;
 #endif
 
 /**
+ * \def ROXML_ATTR_NODE
+ * 
+ * constant for file document
+ */
+#define ROXML_ATTR_NODE	0x04
+
+/**
+ * \def ROXML_STD_NODE
+ * 
+ * constant for file document
+ */
+#define ROXML_STD_NODE	0x08
+
+/**
+ * \def ROXML_TXT_NODE
+ * 
+ * constant for file document
+ */
+#define ROXML_TXT_NODE	0x10
+
+/**
  * \def RELEASE_ALL
  * 
  * release all allocated memory
@@ -262,9 +283,12 @@ int roxml_get_type(node_t *n);
 
 
 /////////// TODO LIBRWXML
-void roxml_commit_changes(node_t *n, char * dest, char ** buffer, int human);
 void roxml_del_node(node_t * n);
+void roxml_del_std_node(node_t * n);
+void roxml_del_txt_node(node_t * n);
+void roxml_del_arg_node(node_t * n);
 node_t * roxml_add_node(node_t * parent, int type, char *name, char *value);
+void roxml_commit_changes(node_t *n, char * dest, char ** buffer, int human);
 
 /** \brief internal function
  *
