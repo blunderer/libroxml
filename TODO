@@ -1,0 +1,14 @@
+
+do recursiv prev and next in xpath
+do unicity of xpath answers (when using descendant or preceding or following)
+do missing axis ancestor-or-self
+do last and first as function (like position()  = last())
+do operation on function (like last() - 1)
+do node textual content in xpath (text())
+do axis in conditions
+do position() shorten (node[5])
+do double predicat (node[3][2])
+do select node that as a particular child in conditions : node[childname]
+do some functions in xpath syntax (lang, string, number, count...)
+do check memory leaks
+
