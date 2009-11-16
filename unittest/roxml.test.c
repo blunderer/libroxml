@@ -1093,13 +1093,23 @@ int test_xpath(void)
 	ASSERT_EQUAL(nbans, 1)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node0")
 
-	node_set = roxml_xpath(node0, "descendant-or-self::node1/@*", &nbans);
+	/*node_set = roxml_xpath(node0, "descendant-or-self::node1/@*", &nbans);
 	ASSERT_EQUAL(nbans, 2)
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "\"name1\"")
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[1], NULL, 0, NULL), "\"value1\"")
+	*/	
+	node_set = roxml_xpath(root, "//*[@name=\"name1\"]", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node1")
 
 	node_set = roxml_xpath(root, "//*", &nbans);
 	ASSERT_EQUAL(nbans, 9)
+
+	node_set = roxml_xpath(root, "//text()", &nbans);
+	ASSERT_EQUAL(nbans, 8)
+
+	node_set = roxml_xpath(root, "//node()", &nbans);
+	ASSERT_EQUAL(nbans, 22)
 
 	node_set = roxml_xpath(root, "*", &nbans);
 	ASSERT_EQUAL(nbans, 1)
@@ -1107,19 +1117,19 @@ int test_xpath(void)
 	node_set = roxml_xpath(node0, "*", &nbans);
 	ASSERT_EQUAL(nbans, 3)
 
-	/*node_set = roxml_xpath(root, "//@name", &nbans);
+	node_set = roxml_xpath(root, "//@name", &nbans);
 	ASSERT_EQUAL(nbans, 3)
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "\"name1\"")
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[1], NULL, 0, NULL), "name2")
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[2], NULL, 0, NULL), "name4")
-	*/
+	
 	roxml_close(root);
 
 	roxml_release(RELEASE_ALL);
 
 	root = roxml_load_doc("roxml.test.xml.multiple");
 	ASSERT_NOT_NULL(root)
-
+	
 	node_set = roxml_xpath(root, "node", &nbans);
 	ASSERT_EQUAL(nbans, 0)
 

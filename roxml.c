@@ -22,9 +22,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef ROXML_C
-#define ROXML_C
-
 #include "roxml-internal.h"
 
 #ifdef __DEBUG
@@ -1040,6 +1037,9 @@ int roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 {
 	int first = 1;
 	int valid = 0;
+
+	if(xn == NULL) { return 1; }
+
 	xpath_cond_t *condition = xn->cond;
 
 	if(!condition)	{
@@ -1054,35 +1054,44 @@ int roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 		char * sarg2;
 
 		if(condition->func == ROXML_FUNC_POS) {
+			status = 0;
 			iarg1 = roxml_get_node_index(candidat, NULL);
 			iarg2 = atoi(condition->arg2);
 			status = roxml_int_cmp(iarg1, iarg2, condition->op);
 		} else if(condition->func == ROXML_FUNC_LAST) {
+			status = 0;
 			iarg1 = roxml_get_node_index(candidat, &iarg2);
 			status = roxml_int_cmp(iarg1, iarg2, ROXML_OPERATOR_EQU);
 		} else if(condition->func == ROXML_FUNC_FIRST) {
+			status = 0;
 			iarg1 = roxml_get_node_index(candidat, NULL);
 			status = roxml_int_cmp(iarg1, 0, ROXML_OPERATOR_EQU);
 		} else if(condition->func == ROXML_FUNC_INTCOMP) {
+			status = 0;
 			char strval[ROXML_BASE_LEN];
 			node_t *val = roxml_get_attr(candidat, condition->arg1+1, 0);
-			iarg1 = atoi(roxml_get_content(val, strval, ROXML_BASE_LEN, &status));
-			if(status >= ROXML_BASE_LEN) {
-				iarg1 = atoi(roxml_get_content(val, NULL, 0, &status));
+			if(val) {
+				iarg1 = atoi(roxml_get_content(val, strval, ROXML_BASE_LEN, &status));
+				if(status >= ROXML_BASE_LEN) {
+					iarg1 = atoi(roxml_get_content(val, NULL, 0, &status));
+				}
+				iarg2 = atoi(condition->arg2);
+				status = roxml_int_cmp(iarg1, iarg2, condition->op);
+				roxml_release(RELEASE_LAST);
 			}
-			iarg2 = atoi(condition->arg2);
-			status = roxml_int_cmp(iarg1, iarg2, condition->op);
-			roxml_release(RELEASE_LAST);
 		} else if(condition->func == ROXML_FUNC_STRCOMP) {
+			status = 0;
 			char strval[ROXML_BASE_LEN];
 			node_t *val = roxml_get_attr(candidat, condition->arg1+1, 0);
-			sarg1 = roxml_get_content(val, strval, ROXML_BASE_LEN, &status);
-			if(status >= ROXML_BASE_LEN) {
-				sarg1 = roxml_get_content(val, NULL, 0, &status);
+			if(val) {
+				sarg1 = roxml_get_content(val, strval, ROXML_BASE_LEN, &status);
+				if(status >= ROXML_BASE_LEN) {
+					sarg1 = roxml_get_content(val, NULL, 0, &status);
+				}
+				sarg2 = condition->arg2;
+				status = (strcmp(sarg1, sarg2)==0);
+				roxml_release(sarg1);
 			}
-			sarg2 = condition->arg2;
-			status = (strcmp(sarg1, sarg2)==0);
-			roxml_release(sarg1);
 		}
 
 		if(first) {
@@ -1101,13 +1110,28 @@ int roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 	return valid;
 }
 
-int roxml_validate_axes(node_t *candidat, char *axes, node_t ***ans, int *nb, int *max, xpath_node_t *xn)
+int roxml_validate_axes(node_t *candidat, node_t ***ans, int *nb, int *max, xpath_node_t *xn)
 {
+	
 	int valid = 0;
+	int path_end = 0;
+	char * axes = NULL;
 	char intern_buff[INTERNAL_BUF_SIZE];
 
-	if(strcmp("*", axes) == 0)  { valid = 1; }
-
+	if(xn == NULL) {
+		valid = 1;
+		path_end = 1;
+	} else {
+		axes = xn->name;
+		if(strcmp("*", axes) == 0)  { 
+			if(candidat->type & ROXML_STD_NODE) { valid = 1; }
+		} else if(strcmp("text()", axes) == 0)  { 
+			if(candidat->type & ROXML_TXT_NODE) { valid = 1; }
+		} else if(strcmp("node()", axes) == 0)  { 
+			valid = 1;
+		}
+		if(xn->next == NULL) { path_end = 1; }
+	}
 	if(!valid) {
 		char * name  = roxml_get_name(candidat, intern_buff, INTERNAL_BUF_SIZE);
 		if(strcmp(name, axes) == 0)	{
@@ -1120,7 +1144,7 @@ int roxml_validate_axes(node_t *candidat, char *axes, node_t ***ans, int *nb, in
 		valid = roxml_validate_predicat(xn, candidat);
 	}
 
-	if((valid)&&(xn->next==NULL)) {
+	if((valid)&&(path_end)) {
 		if((*nb) >= (*max))	{
 			int new_max = (*max)*2;
 			node_t ** new_ans = roxml_malloc(sizeof(node_t*), new_max, PTR_NODE_RESULT);
@@ -1146,11 +1170,25 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 		case ROXML_ID_CHILD: {
 			node_t *current = context->chld;
 			while(current)	{
-				validate_node = roxml_validate_axes(current, xp->name, ans, nb, max, xp);
+				validate_node = roxml_validate_axes(current, ans, nb, max, xp);
 				if(validate_node)	{
 					roxml_check_node(xp->next, current, ans, nb, max, ROXML_DIRECT);
 				}
 				current = current->sibl;
+			}
+			if((strcmp(xp->name, "text()") == 0)||(strcmp(xp->name, "node()") == 0)) {
+				node_t *current = context->text;
+				while(current)	{
+					validate_node = roxml_validate_axes(current, ans, nb, max, xp);
+					current = current->sibl;
+				}
+			}
+			if(strcmp(xp->name, "node()") == 0) {
+				node_t *current = context->attr;
+				while(current)	{
+					validate_node = roxml_validate_axes(current, ans, nb, max, xp);
+					current = current->sibl;
+				}
 			}
 		} break;
 		case ROXML_ID_DESC: {
@@ -1162,17 +1200,17 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 			ignore = ROXML_DESC_O_SELF;
 		} break;
 		case ROXML_ID_SELF: {
-			validate_node = roxml_validate_axes(context, "*", ans, nb, max, xp);
+			validate_node = roxml_validate_axes(context, ans, nb, max, NULL);
 			roxml_check_node(xp->next, context, ans, nb, max, ROXML_DIRECT);
 		} break;
 		case ROXML_ID_PARENT: {
-			validate_node = roxml_validate_axes(context->prnt, "*", ans, nb, max, xp);
+			validate_node = roxml_validate_axes(context->prnt, ans, nb, max, NULL);
 			roxml_check_node(xp->next, context->prnt, ans, nb, max, ROXML_DIRECT);
 		} break;
 		case ROXML_ID_ATTR: {
 			node_t *attribute = context->attr;
 			while(attribute)  {
-				validate_node = roxml_validate_axes(attribute, xp->name, ans, nb, max, xp);
+				validate_node = roxml_validate_axes(attribute, ans, nb, max, xp);
 				if(validate_node)	{
 					roxml_check_node(xp->next, context, ans, nb, max, ROXML_DIRECT);
 				}
@@ -1182,7 +1220,7 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 		case ROXML_ID_ANC: {
 			node_t *current = context->prnt;
 			while(current)	{
-				validate_node = roxml_validate_axes(current, xp->name, ans, nb, max, xp);
+				validate_node = roxml_validate_axes(current, ans, nb, max, xp);
 				if(validate_node)	{
 					roxml_check_node(xp->next, current, ans, nb, max, ROXML_DIRECT);
 				}
@@ -1192,7 +1230,7 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 		case ROXML_ID_NEXT_SIBL: {
 			node_t *current = context->sibl;
 			while(current)	{
-				validate_node = roxml_validate_axes(current, xp->name, ans, nb, max, xp);
+				validate_node = roxml_validate_axes(current, ans, nb, max, xp);
 				if(validate_node)	{
 					roxml_check_node(xp->next, current, ans, nb, max, ROXML_DIRECT);
 				}
@@ -1202,7 +1240,7 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 		case ROXML_ID_PREV_SIBL: {
 			node_t *current = context->prnt->chld;
 			while(current != context)	{
-				validate_node = roxml_validate_axes(current, xp->name, ans, nb, max, xp);
+				validate_node = roxml_validate_axes(current, ans, nb, max, xp);
 				if(validate_node)	{
 					roxml_check_node(xp->next, current, ans, nb, max, ROXML_DIRECT);
 				}
@@ -1214,7 +1252,7 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 			while(current)  {
 				node_t * following = current->sibl;
 				while(following) {
-					validate_node = roxml_validate_axes(following, xp->name, ans, nb, max, xp);
+					validate_node = roxml_validate_axes(following, ans, nb, max, xp);
 					if(validate_node)	{
 						roxml_check_node(xp->next, following, ans, nb, max, ROXML_DIRECT);
 					} else {
@@ -1234,7 +1272,7 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 			while(current && current->prnt) {
 				node_t *preceding = current->prnt->chld;
 				while(preceding != current)  {
-					validate_node = roxml_validate_axes(preceding, xp->name, ans, nb, max, xp);
+					validate_node = roxml_validate_axes(preceding, ans, nb, max, xp);
 					if(validate_node)	{
 						roxml_check_node(xp->next, preceding, ans, nb, max, ROXML_DIRECT);
 					} else {
@@ -1253,7 +1291,7 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 		case ROXML_ID_ANC_O_SELF: {
 			node_t *current = context;
 			while(current)	{
-				validate_node = roxml_validate_axes(current, xp->name, ans, nb, max, xp);
+				validate_node = roxml_validate_axes(current, ans, nb, max, xp);
 				if(validate_node)	{
 					roxml_check_node(xp->next, current, ans, nb, max, ROXML_DIRECT);
 				}
@@ -1560,6 +1598,4 @@ void roxml_commit_changes(node_t *n, char * dest, char ** buffer, int human)
 		fclose(fout);
 	}
 }
-
-#endif /* ROXML_C */
 
