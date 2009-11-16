@@ -33,7 +33,9 @@ int test_tree_on_doc(void)
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl);	//node4
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl);	//node5
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld);	//node6
-	ASSERT_NULL(root->chld->chld->sibl->sibl->chld);
+	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->chld);	//node8
+	ASSERT_NULL(root->chld->chld->sibl->sibl->chld->chld);
+	ASSERT_NULL(root->chld->chld->sibl->sibl->chld->sibl);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->sibl);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->chld);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->chld);
@@ -102,7 +104,8 @@ int test_tree_on_doc(void)
 
 	// node7
 	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->text)
-	ASSERT_NULL(root->chld->chld->sibl->sibl->text->sibl)
+	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->text->sibl)
+	ASSERT_NULL(root->chld->chld->sibl->sibl->text->sibl->sibl)
 #else /* !IGNORE_EMPTY_TEXT_NODES */
 	ASSERT_NOT_NULL(root->chld->text)
 	ASSERT_NOT_NULL(root->chld->text->sibl)
@@ -239,7 +242,9 @@ int test_tree_on_buf(void)
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl);	//node4
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl);	//node5
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld);	//node6
-	ASSERT_NULL(root->chld->chld->sibl->sibl->chld);
+	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->chld);
+	ASSERT_NULL(root->chld->chld->sibl->sibl->chld->chld);
+	ASSERT_NULL(root->chld->chld->sibl->sibl->chld->sibl);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->sibl);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->chld);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->chld);
@@ -361,7 +366,9 @@ int test_tree_on_human_doc(void)
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl);	//node4
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl);	//node5
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld);	//node6
-	ASSERT_NULL(root->chld->chld->sibl->sibl->chld);
+	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->chld);
+	ASSERT_NULL(root->chld->chld->sibl->sibl->chld->chld);
+	ASSERT_NULL(root->chld->chld->sibl->sibl->chld->sibl);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->sibl);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->chld);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->chld);
@@ -495,7 +502,9 @@ int test_tree_on_human_buf(void)
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl);	//node4
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl);	//node5
 	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld);	//node6
-	ASSERT_NULL(root->chld->chld->sibl->sibl->chld);
+	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->chld);
+	ASSERT_NULL(root->chld->chld->sibl->sibl->chld->chld);
+	ASSERT_NULL(root->chld->chld->sibl->sibl->chld->sibl);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->sibl);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->chld);
 	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->chld);
@@ -738,6 +747,8 @@ int test_get_chld_nb(void)
 	nb = roxml_get_chld_nb(root->chld->chld->sibl);	// node2
 	ASSERT_EQUAL(nb, 3);
 	nb = roxml_get_chld_nb(root->chld->chld->sibl->sibl);	// node7
+	ASSERT_EQUAL(nb, 1);
+	nb = roxml_get_chld_nb(root->chld->chld->sibl->sibl->chld);	// node8
 	ASSERT_EQUAL(nb, 0);
 	nb = roxml_get_chld_nb(root->chld->chld->sibl->chld); // node3
 	ASSERT_EQUAL(nb, 0);
@@ -761,7 +772,7 @@ int test_get_content(void)
 	ASSERT_STRING_EQUAL(roxml_get_content(root->chld, NULL, 0, NULL), ""); // node0
 	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld, NULL, 0, NULL), "text1");	// node1
 	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl, NULL, 0, NULL), "");	// node2
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->sibl, NULL, 0, NULL), "\"<node8>\"");	// node7
+	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->sibl, NULL, 0, NULL), "\"\"");	// node7
 	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->chld, NULL, 0, NULL), "text2");	//node3
 	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->chld->sibl, NULL, 0, NULL), "");	//node4
 	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->chld->sibl->sibl, NULL, 0, NULL), "text3text4");	//node5
@@ -769,12 +780,12 @@ int test_get_content(void)
 
 	ASSERT_NULL(roxml_get_content(root->chld->attr, NULL, 0, NULL))
 
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->attr, NULL, 0, NULL), "name1")
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->attr->sibl, NULL, 0, NULL), "value1")
+	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->attr, NULL, 0, NULL), "\"name1\"")
+	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->attr->sibl, NULL, 0, NULL), "\"value1\"")
 	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->attr, NULL, 0, NULL), "name2")
 	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->attr->sibl, NULL, 0, NULL), "value2")
 	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->chld->sibl->attr, NULL, 0, NULL), "name4")
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->chld->sibl->attr->sibl, NULL, 0, NULL), "value4")
+	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->chld->sibl->attr->sibl, NULL, 0, NULL), "\"value4\"")
 
 	roxml_release(RELEASE_ALL);
 	roxml_close(root);
@@ -879,28 +890,29 @@ int test_parse_xpath(void)
 	int ret = roxml_parse_xpath(mypath, &ptr);	
 
 	ASSERT_EQUAL(ret, 3)
-	ASSERT_NULL(ptr[0].axis);
-	ASSERT_NULL(ptr[0].cond);
 	ASSERT_NOT_NULL(ptr[0].next);
 	ASSERT_NOT_NULL(ptr[0].next->next);
 	ASSERT_NOT_NULL(ptr[0].next->next->next);
-	ASSERT_NOT_NULL(ptr[0].next->next->next->next);
-	ASSERT_NULL(ptr[0].next->next->next->next->next);
-	ASSERT_STRING_EQUAL(ptr[0].next->axis, "node")
-	ASSERT_NOT_NULL(ptr[0].next->cond)
-	ASSERT_NOT_NULL(ptr[0].next->cond->next)
-	ASSERT_NULL(ptr[0].next->cond->next->next)
-	ASSERT_STRING_EQUAL(ptr[0].next->cond->arg1, "first()")
-	ASSERT_STRING_EQUAL(ptr[0].next->cond->next->arg1, "last()")
-	ASSERT_EQUAL(ptr[0].next->cond->next->func, ROXML_FUNC_LAST)
-	ASSERT_EQUAL(ptr[0].next->cond->func, ROXML_FUNC_FIRST)
-	ASSERT_EQUAL(ptr[0].next->cond->next->rel, ROXML_OPERATOR_OR)
-	ASSERT_STRING_EQUAL(ptr[0].next->next->axis, "item")
+	ASSERT_NULL(ptr[0].next->next->next->next);
+	ASSERT_EQUAL(ptr[0].axis, ROXML_ID_CHILD)
+	ASSERT_STRING_EQUAL(ptr[0].name, "node")
+	ASSERT_NOT_NULL(ptr[0].cond)
+	ASSERT_NOT_NULL(ptr[0].cond->next)
+	ASSERT_NULL(ptr[0].cond->next->next)
+	ASSERT_STRING_EQUAL(ptr[0].cond->arg1, "first()")
+	ASSERT_STRING_EQUAL(ptr[0].cond->next->arg1, "last()")
+	ASSERT_EQUAL(ptr[0].cond->next->func, ROXML_FUNC_LAST)
+	ASSERT_EQUAL(ptr[0].cond->func, ROXML_FUNC_FIRST)
+	ASSERT_EQUAL(ptr[0].cond->next->rel, ROXML_OPERATOR_OR)
+	ASSERT_EQUAL(ptr[0].next->axis, ROXML_ID_CHILD)
+	ASSERT_STRING_EQUAL(ptr[0].next->name, "item")
+	ASSERT_NULL(ptr[0].next->cond)
+	ASSERT_EQUAL(ptr[0].next->next->axis, ROXML_ID_CHILD)
+	ASSERT_STRING_EQUAL(ptr[0].next->next->name, "title")
 	ASSERT_NULL(ptr[0].next->next->cond)
-	ASSERT_STRING_EQUAL(ptr[0].next->next->next->axis, "title")
+	ASSERT_EQUAL(ptr[0].next->next->next->axis, ROXML_ID_ATTR)
+	ASSERT_STRING_EQUAL(ptr[0].next->next->next->name, "version")
 	ASSERT_NULL(ptr[0].next->next->next->cond)
-	ASSERT_STRING_EQUAL(ptr[0].next->next->next->next->axis, "@version")
-	ASSERT_NULL(ptr[0].next->next->next->next->cond)
 
 	ASSERT_NULL(ptr[1].axis);
 	ASSERT_NULL(ptr[1].cond);
@@ -910,10 +922,13 @@ int test_parse_xpath(void)
 	ASSERT_NOT_NULL(ptr[1].next->next->next);
 	ASSERT_NOT_NULL(ptr[1].next->next->next);
 	ASSERT_NULL(ptr[1].next->next->next->next);
-	ASSERT_STRING_EQUAL(ptr[1].next->axis, "node")
-	ASSERT_STRING_EQUAL(ptr[1].next->next->axis, "item")
+	ASSERT_EQUAL(ptr[1].next->axis, ROXML_ID_CHILD)
+	ASSERT_STRING_EQUAL(ptr[1].next->name, "node")
+	ASSERT_EQUAL(ptr[1].next->next->axis, ROXML_ID_CHILD)
+	ASSERT_STRING_EQUAL(ptr[1].next->next->name, "item")
 	ASSERT_NULL(ptr[1].next->next->cond)
-	ASSERT_STRING_EQUAL(ptr[1].next->next->next->axis, "title")
+	ASSERT_EQUAL(ptr[1].next->next->next->axis, ROXML_ID_CHILD)
+	ASSERT_STRING_EQUAL(ptr[1].next->next->next->name, "title")
 	ASSERT_NOT_NULL(ptr[1].next->next->next->cond)
 	ASSERT_NULL(ptr[1].next->next->next->cond->next)
 	ASSERT_STRING_EQUAL(ptr[1].next->next->next->cond->arg1, "@version")
@@ -929,10 +944,13 @@ int test_parse_xpath(void)
 	ASSERT_NOT_NULL(ptr[2].next->next->next);
 	ASSERT_NOT_NULL(ptr[2].next->next->next);
 	ASSERT_NULL(ptr[2].next->next->next->next);
-	ASSERT_STRING_EQUAL(ptr[2].next->axis, "node")
-	ASSERT_STRING_EQUAL(ptr[2].next->next->axis, "item")
+	ASSERT_EQUAL(ptr[2].next->axis, ROXML_ID_CHILD)
+	ASSERT_STRING_EQUAL(ptr[2].next->name, "node")
+	ASSERT_EQUAL(ptr[2].next->next->axis, ROXML_ID_CHILD)
+	ASSERT_STRING_EQUAL(ptr[2].next->next->name, "item")
 	ASSERT_NULL(ptr[2].next->next->cond)
-	ASSERT_STRING_EQUAL(ptr[2].next->next->next->axis, "title")
+	ASSERT_EQUAL(ptr[2].next->next->next->axis, ROXML_ID_CHILD)
+	ASSERT_STRING_EQUAL(ptr[2].next->next->next->name, "title")
 	ASSERT_NOT_NULL(ptr[2].next->next->next->cond)
 	ASSERT_NULL(ptr[2].next->next->next->cond->next)
 	ASSERT_STRING_EQUAL(ptr[2].next->next->next->cond->arg1, "@version")
@@ -984,6 +1002,10 @@ int test_xpath(void)
 	ASSERT_EQUAL(nbans, 1)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node6")
 
+	node_set = roxml_xpath(root, "/node0/node1[@name=\"name1\"]", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node1")
+
 	node_set = roxml_xpath(root, "/node0/node2", &nbans);
 	ASSERT_EQUAL(nbans, 1)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node2")
@@ -1007,6 +1029,8 @@ int test_xpath(void)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node4")
 
 	node_set = roxml_xpath(node2, "//node7", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	node_set = roxml_xpath(node2, "descendant-or-self::node7", &nbans);
 	ASSERT_EQUAL(nbans, 0)
 
 	node_set = roxml_xpath(node2, "/node3", &nbans);
@@ -1015,6 +1039,14 @@ int test_xpath(void)
 	node_set = roxml_xpath(node2, "preceding::node1", &nbans);
 	ASSERT_EQUAL(nbans, 1)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node1")
+
+	node_set = roxml_xpath(root, "/node0/node7/preceding::node4", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node4")
+
+	node_set = roxml_xpath(root, "/node0/node2/following::node8", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node8")
 
 	node_set = roxml_xpath(node2, "preceding::node7", &nbans);
 	ASSERT_EQUAL(nbans, 0)
@@ -1061,10 +1093,10 @@ int test_xpath(void)
 	ASSERT_EQUAL(nbans, 1)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node0")
 
-	node_set = roxml_xpath(node0, "//node1/@*", &nbans);
+	node_set = roxml_xpath(node0, "descendant-or-self::node1/@*", &nbans);
 	ASSERT_EQUAL(nbans, 2)
-	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "name1")
-	ASSERT_STRING_EQUAL(roxml_get_content(node_set[1], NULL, 0, NULL), "value1")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "\"name1\"")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[1], NULL, 0, NULL), "\"value1\"")
 
 	node_set = roxml_xpath(root, "//*", &nbans);
 	ASSERT_EQUAL(nbans, 9)
@@ -1075,12 +1107,12 @@ int test_xpath(void)
 	node_set = roxml_xpath(node0, "*", &nbans);
 	ASSERT_EQUAL(nbans, 3)
 
-	node_set = roxml_xpath(root, "//@name", &nbans);
+	/*node_set = roxml_xpath(root, "//@name", &nbans);
 	ASSERT_EQUAL(nbans, 3)
-	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "name1")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "\"name1\"")
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[1], NULL, 0, NULL), "name2")
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[2], NULL, 0, NULL), "name4")
-	
+	*/
 	roxml_close(root);
 
 	roxml_release(RELEASE_ALL);

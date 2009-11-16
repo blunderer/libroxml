@@ -1,7 +1,7 @@
 
 do recursiv prev and next in xpath
 do unicity of xpath answers (when using descendant or preceding or following)
-do missing axis ancestor-or-self
+do decod more the xpath string
 do last and first as function (like position()  = last())
 do operation on function (like last() - 1)
 do node textual content in xpath (text())

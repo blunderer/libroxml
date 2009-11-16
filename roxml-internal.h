@@ -63,11 +63,14 @@ typedef struct memory_cell {
  */
 typedef struct _xpath_cond {
 	char rel;			/*!< relation with previous */
+	char axis;			/*!< axis for operator */
 	char op;			/*!< operator used */
+	char op2;			/*!< operator used on arg2 */
 	char func;			/*!< function to process */
+	char func2;			/*!< function to process in arg2 */
 	char *arg1;			/*!< condition arg1 as string */
 	char *arg2;			/*!< condition arg2 as string */
-	struct _xpath_cond*	next;	/*!< next xpath condition pointer */
+	struct _xpath_cond *next;	/*!< next xpath condition pointer */
 } xpath_cond_t;
 
 /** \struct xpath_node_t
@@ -78,10 +81,12 @@ typedef struct _xpath_cond {
  * node axis and conditions
  */
 typedef struct _xpath_node {
+	char abs;			/*!< for first node: is path absolute */
 	char rel;			/*!< relation with previous */
-	char *axis;			/*!< axis string */
+	char axis;			/*!< axis type */
+	char *name;			/*!< axis string */
 	struct _xpath_cond *cond;	/*!< condition list */
-	struct _xpath_node*	next;	/*!< next xpath pointer */
+	struct _xpath_node *next;	/*!< next xpath pointer */
 } xpath_node_t;
 
 /** \struct node_t
@@ -130,15 +135,33 @@ typedef struct node {
 #define ROXML_FUNC_POS		2
 #define ROXML_FUNC_FIRST	3
 #define ROXML_FUNC_LAST		4
+#define ROXML_FUNC_TEXT		5
+#define ROXML_FUNC_NODE		6
 
 #define ROXML_FUNC_POS_STR	"position()"
 #define ROXML_FUNC_FIRST_STR	"first()"
 #define ROXML_FUNC_LAST_STR	"last()"
+#define ROXML_FUNC_TEXT_STR	"text()"
+#define ROXML_FUNC_NODE_STR	"node()"
 
 #define ROXML_BULK_READ		4096
 #define ROXML_LONG_LEN		512
 #define ROXML_BASE_LEN		128
 #define ROXML_BULK_CTX		8
+
+#define ROXML_ID_CHILD		0
+#define ROXML_ID_DESC_O_SELF	1
+#define ROXML_ID_SELF		2
+#define ROXML_ID_PARENT		3
+#define ROXML_ID_ATTR		4
+#define ROXML_ID_DESC		5
+#define ROXML_ID_ANC		6
+#define ROXML_ID_NEXT_SIBL	7
+#define ROXML_ID_PREV_SIBL	8
+#define ROXML_ID_NEXT		9
+#define ROXML_ID_PREV		10
+#define ROXML_ID_NS		11
+#define ROXML_ID_ANC_O_SELF	12
 
 #define ROXML_L_CHILD		"child::"
 #define ROXML_L_DESC_O_SELF	"descendant-or-self::"
@@ -162,7 +185,7 @@ typedef struct node {
 
 #define ROXML_DIRECT		0
 #define ROXML_DESC_ONLY		1
-#define ROXML_SELF_AND_DESC	2
+#define ROXML_DESC_O_SELF	2
 
 
 /**
