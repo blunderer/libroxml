@@ -1089,7 +1089,28 @@ int test_xpath(void)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node0")
 	node0 = node_set[0];
 
-	node_set = roxml_xpath(node0, "//node0", &nbans);
+	node_set = roxml_xpath(root, "/descendant-or-self::node1/attribute::name", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "name")
+
+	node_set = roxml_xpath(root, "/descendant-or-self::/attribute::name", &nbans);
+	ASSERT_EQUAL(nbans, 3)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "name")
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[1], NULL, 0), "name")
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[2], NULL, 0), "name")
+
+	node_set = roxml_xpath(node0, ".//node0", &nbans);
+	ASSERT_EQUAL(nbans, 0)
+
+	node_set = roxml_xpath(root, ".//node0", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node0")
+
+	node_set = roxml_xpath(root, "//node0", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node0")
+
+	node_set = roxml_xpath(root, "/descendant-or-self::node()/node0", &nbans);
 	ASSERT_EQUAL(nbans, 1)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node0")
 
@@ -1106,10 +1127,16 @@ int test_xpath(void)
 	ASSERT_EQUAL(nbans, 9)
 
 	node_set = roxml_xpath(root, "//text()", &nbans);
-	ASSERT_EQUAL(nbans, 8)
+	ASSERT_EQUAL(nbans, 7)
+
+	node_set = roxml_xpath(root, "/descendant-or-self::node()/node()", &nbans);
+	ASSERT_EQUAL(nbans, 22)
 
 	node_set = roxml_xpath(root, "//node()", &nbans);
 	ASSERT_EQUAL(nbans, 22)
+
+	node_set = roxml_xpath(root, "//", &nbans);
+	ASSERT_EQUAL(nbans, 23)
 
 	node_set = roxml_xpath(root, "*", &nbans);
 	ASSERT_EQUAL(nbans, 1)
@@ -1119,9 +1146,9 @@ int test_xpath(void)
 
 	node_set = roxml_xpath(root, "//@name", &nbans);
 	ASSERT_EQUAL(nbans, 3)
-	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "\"name1\"")
-	ASSERT_STRING_EQUAL(roxml_get_content(node_set[1], NULL, 0, NULL), "name2")
-	ASSERT_STRING_EQUAL(roxml_get_content(node_set[2], NULL, 0, NULL), "name4")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "name4")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[1], NULL, 0, NULL), "\"name1\"")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[2], NULL, 0, NULL), "name2")
 	
 	roxml_close(root);
 

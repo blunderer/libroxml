@@ -695,6 +695,12 @@ node_t * roxml_load(node_t *current_node, FILE *file, char *buffer)
 		int_abs_pos += int_len;
 	} while(int_len == ROXML_BULK_READ);
 
+#ifdef IGNORE_EMPTY_TEXT_NODES
+	if(empty_text_node == 1) {
+		roxml_del_node(candidat_txt);
+	}
+#endif /* IGNORE_EMPTY_TEXT_NODES */
+
 	while(current_node->prnt)	{ current_node = current_node->prnt; }
 	return current_node;
 }
@@ -710,16 +716,22 @@ xpath_node_t * roxml_set_axis(xpath_node_t *node, char *axis, int *offset)
 	if(axis[0] == '/') {
 		// ROXML_S_DESC_O_SELF
 		node->axis = ROXML_ID_DESC_O_SELF;
-		node->name = axis;
+		node->name = axis+1;
 		tmp_node = (xpath_node_t*)calloc(1, sizeof(xpath_node_t));
+		tmp_node->axis = ROXML_ID_CHILD;
 		node->next = tmp_node;
-		node = roxml_set_axis(tmp_node, axis+1, offset);
+		if(strlen(node->name) > 0) {
+			tmp_node = (xpath_node_t*)calloc(1, sizeof(xpath_node_t));
+			node->next->next = tmp_node;
+			node = roxml_set_axis(tmp_node, axis+1, offset);
+		}
 	} else if(strncmp(ROXML_L_DESC_O_SELF, axis, strlen(ROXML_L_DESC_O_SELF))==0) {
 		// ROXML_L_DESC_O_SELF
 		node->axis = ROXML_ID_DESC_O_SELF;
 		node->name = axis+strlen(ROXML_L_DESC_O_SELF);
 		*offset += strlen(ROXML_L_DESC_O_SELF);
 		tmp_node = (xpath_node_t*)calloc(1, sizeof(xpath_node_t));
+		tmp_node->axis = ROXML_ID_CHILD;
 		node->next = tmp_node;
 		node = roxml_set_axis(tmp_node, axis+strlen(ROXML_L_DESC_O_SELF), offset);
 	} else if(strncmp(ROXML_L_DESC, axis, strlen(ROXML_L_DESC))==0) {
@@ -728,6 +740,7 @@ xpath_node_t * roxml_set_axis(xpath_node_t *node, char *axis, int *offset)
 		node->name = axis+strlen(ROXML_L_DESC);
 		*offset += strlen(ROXML_L_DESC);
 		tmp_node = (xpath_node_t*)calloc(1, sizeof(xpath_node_t));
+		tmp_node->axis = ROXML_ID_CHILD;
 		node->next = tmp_node;
 		node = roxml_set_axis(tmp_node, axis+strlen(ROXML_L_DESC), offset);
 	} else if(strncmp(ROXML_L_SELF, axis, strlen(ROXML_L_SELF))==0) {
@@ -1123,15 +1136,17 @@ int roxml_validate_axes(node_t *candidat, node_t ***ans, int *nb, int *max, xpat
 		path_end = 1;
 	} else {
 		axes = xn->name;
-		if(strcmp("*", axes) == 0)  { 
+		if((axes == NULL) || (strcmp("node()", axes) == 0))  { 
+			valid = 1;
+		} else if(strcmp("*", axes) == 0)  { 
 			if(candidat->type & ROXML_STD_NODE) { valid = 1; }
 		} else if(strcmp("text()", axes) == 0)  { 
 			if(candidat->type & ROXML_TXT_NODE) { valid = 1; }
-		} else if(strcmp("node()", axes) == 0)  { 
-			valid = 1;
 		}
 		if(xn->next == NULL) { path_end = 1; }
+		if((xn->axis == ROXML_ID_SELF)||(xn->axis == ROXML_ID_PARENT)) { valid = 1; }
 	}
+
 	if(!valid) {
 		char * name  = roxml_get_name(candidat, intern_buff, INTERNAL_BUF_SIZE);
 		if(strcmp(name, axes) == 0)	{
@@ -1166,6 +1181,15 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 
 	if(!xp)	{ return; }
 
+	// if found a "all document" axes
+	if(ignore == ROXML_DESC_ONLY)	{
+		node_t *current = context->chld;
+		while(current)	{
+			roxml_check_node(xp, current, ans, nb, max, ignore);
+			current = current->sibl;
+		}
+	}
+
 	switch(xp->axis) {
 		case ROXML_ID_CHILD: {
 			node_t *current = context->chld;
@@ -1176,14 +1200,14 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 				}
 				current = current->sibl;
 			}
-			if((strcmp(xp->name, "text()") == 0)||(strcmp(xp->name, "node()") == 0)) {
+			if((xp->name == NULL)||(strcmp(xp->name, "text()") == 0)||(strcmp(xp->name, "node()") == 0)) {
 				node_t *current = context->text;
 				while(current)	{
 					validate_node = roxml_validate_axes(current, ans, nb, max, xp);
 					current = current->sibl;
 				}
-			}
-			if(strcmp(xp->name, "node()") == 0) {
+			} 
+			if((xp->name == NULL)||(strcmp(xp->name, "node()") == 0)) {
 				node_t *current = context->attr;
 				while(current)	{
 					validate_node = roxml_validate_axes(current, ans, nb, max, xp);
@@ -1193,18 +1217,22 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 		} break;
 		case ROXML_ID_DESC: {
 			xp = xp->next;
-			ignore = ROXML_DESC_ONLY;
+			roxml_check_node(xp, context, ans, nb, max, ROXML_DESC_ONLY);
 		} break;
 		case ROXML_ID_DESC_O_SELF: {
 			xp = xp->next;
-			ignore = ROXML_DESC_O_SELF;
+			validate_node = roxml_validate_axes(context, ans, nb, max, xp);
+			if(validate_node) {
+				roxml_check_node(xp->next, context, ans, nb, max, ROXML_DIRECT);
+			}
+			roxml_check_node(xp, context, ans, nb, max, ROXML_DESC_ONLY);
 		} break;
 		case ROXML_ID_SELF: {
-			validate_node = roxml_validate_axes(context, ans, nb, max, NULL);
+			validate_node = roxml_validate_axes(context, ans, nb, max, xp);
 			roxml_check_node(xp->next, context, ans, nb, max, ROXML_DIRECT);
 		} break;
 		case ROXML_ID_PARENT: {
-			validate_node = roxml_validate_axes(context->prnt, ans, nb, max, NULL);
+			validate_node = roxml_validate_axes(context->prnt, ans, nb, max, xp);
 			roxml_check_node(xp->next, context->prnt, ans, nb, max, ROXML_DIRECT);
 		} break;
 		case ROXML_ID_ATTR: {
@@ -1300,16 +1328,6 @@ void roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb,
 		} break;
 	}
 
-	// if found a "all document" axes
-	if(ignore == ROXML_DESC_O_SELF)	{
-		roxml_check_node(xp, context, ans, nb, max, ROXML_DESC_ONLY);
-	} else if(ignore == ROXML_DESC_ONLY)	{
-		node_t *current = context->chld;
-		while(current)	{
-			roxml_check_node(xp, current, ans, nb, max, ROXML_DESC_ONLY);
-			current = current->sibl;
-		}
-	}
 
 	return;
 }

@@ -9,5 +9,6 @@ do position() shorten (node[5])
 do double predicat (node[3][2])
 do select node that as a particular child in conditions : node[childname]
 do some functions in xpath syntax (lang, string, number, count...)
+do parse comment note (comment()) and processing-instruction (processing-instruction())
 do check memory leaks
 

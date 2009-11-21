@@ -7,7 +7,7 @@ OBJ2 = $(SRC2:.c=.o)
 CC = gcc
 RM = rm -f
 
-CFLAGS = -g -DUNITTEST -DREENTRANT -DLINUX -Wall -Wextra -D__DEBUG
+CFLAGS = -g -DUNITTEST -DREENTRANT -DLINUX -Wall -Wextra -D__DEBUG -DIGNORE_EMPTY_TEXT_NODES
 TARGET1 = roxml.unitC
 TARGET2 = roxml.perf
 
