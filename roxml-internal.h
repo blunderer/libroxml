@@ -23,8 +23,6 @@
 #ifndef ROXML_INT_H
 #define ROXML_INT_H
 
-#define IGNORE_EMPTY_TEXT_NODES
-
 /**
  * \def ROXML_INT
  *
@@ -63,7 +61,7 @@ typedef struct memory_cell {
  */
 typedef struct _xpath_cond {
 	char rel;			/*!< relation with previous */
-	char axis;			/*!< axis for operator */
+	char axes;			/*!< axes for operator */
 	char op;			/*!< operator used */
 	char op2;			/*!< operator used on arg2 */
 	char func;			/*!< function to process */
@@ -78,16 +76,41 @@ typedef struct _xpath_cond {
  * \brief xpath node structure
  * 
  * This is the structure for a xpath node. It contains the
- * node axis and conditions
+ * node axes and conditions
  */
 typedef struct _xpath_node {
 	char abs;			/*!< for first node: is path absolute */
 	char rel;			/*!< relation with previous */
-	char axis;			/*!< axis type */
-	char *name;			/*!< axis string */
+	char axes;			/*!< axes type */
+	char *name;			/*!< axes string */
 	struct _xpath_cond *cond;	/*!< condition list */
 	struct _xpath_node *next;	/*!< next xpath pointer */
 } xpath_node_t;
+
+/** \struct xpath_tok_t
+ *
+ * \brief xpath token structure
+ * 
+ * This is the structure for a xpath token. It contains the
+ * xpath id
+ */
+typedef struct _xpath_tok_table {
+	unsigned char id;		/*!< token id == ROXML_REQTABLE_ID */
+	unsigned char ids[256];		/*!< token id table */
+	struct _xpath_tok *next;	/*!< next xpath token */
+} xpath_tok_table_t;
+
+/** \struct xpath_tok_t
+ *
+ * \brief xpath token structure
+ * 
+ * This is the structure for a xpath token. It contains the
+ * xpath id
+ */
+typedef struct _xpath_tok {
+	unsigned char id;		/*!< token id */
+	struct _xpath_tok *next;	/*!< next xpath token */
+} xpath_tok_t;
 
 /** \struct node_t
  *
@@ -110,7 +133,8 @@ typedef struct node {
 	struct node *prnt;		/*!< ref to parent */
 	struct node *attr;		/*!< ref to attributes */
 	struct node *text;		/*!< ref to content */
-	struct node *next;		/*!< ref to next internal use */
+	struct node *next;		/*!< ref to next (internal use) */
+	void *priv;			/*!< ref to xpath tok (internal use) */
 } node_t;
 
 #define ROXML_PRIVATE
@@ -187,6 +211,7 @@ typedef struct node {
 #define ROXML_DESC_ONLY		1
 #define ROXML_DESC_O_SELF	2
 
+#define ROXML_REQTABLE_ID	0
 
 /**
  * \def INTERNAL_BUF_SIZE
@@ -523,6 +548,8 @@ int ROXML_INT roxml_xpath_conditionnal		(node_t *n, char *condition);
 void * ROXML_INT roxml_malloc(int size, int num, int type);
 
 int roxml_parse_xpath(char *path, xpath_node_t ** xpath);
+
+void roxml_free_xpath(xpath_node_t *xpath, int nb);
 
 
 #ifdef __DEBUG

@@ -894,7 +894,7 @@ int test_parse_xpath(void)
 	ASSERT_NOT_NULL(ptr[0].next->next);
 	ASSERT_NOT_NULL(ptr[0].next->next->next);
 	ASSERT_NULL(ptr[0].next->next->next->next);
-	ASSERT_EQUAL(ptr[0].axis, ROXML_ID_CHILD)
+	ASSERT_EQUAL(ptr[0].axes, ROXML_ID_CHILD)
 	ASSERT_STRING_EQUAL(ptr[0].name, "node")
 	ASSERT_NOT_NULL(ptr[0].cond)
 	ASSERT_NOT_NULL(ptr[0].cond->next)
@@ -904,17 +904,17 @@ int test_parse_xpath(void)
 	ASSERT_EQUAL(ptr[0].cond->next->func, ROXML_FUNC_LAST)
 	ASSERT_EQUAL(ptr[0].cond->func, ROXML_FUNC_FIRST)
 	ASSERT_EQUAL(ptr[0].cond->next->rel, ROXML_OPERATOR_OR)
-	ASSERT_EQUAL(ptr[0].next->axis, ROXML_ID_CHILD)
+	ASSERT_EQUAL(ptr[0].next->axes, ROXML_ID_CHILD)
 	ASSERT_STRING_EQUAL(ptr[0].next->name, "item")
 	ASSERT_NULL(ptr[0].next->cond)
-	ASSERT_EQUAL(ptr[0].next->next->axis, ROXML_ID_CHILD)
+	ASSERT_EQUAL(ptr[0].next->next->axes, ROXML_ID_CHILD)
 	ASSERT_STRING_EQUAL(ptr[0].next->next->name, "title")
 	ASSERT_NULL(ptr[0].next->next->cond)
-	ASSERT_EQUAL(ptr[0].next->next->next->axis, ROXML_ID_ATTR)
+	ASSERT_EQUAL(ptr[0].next->next->next->axes, ROXML_ID_ATTR)
 	ASSERT_STRING_EQUAL(ptr[0].next->next->next->name, "version")
 	ASSERT_NULL(ptr[0].next->next->next->cond)
 
-	ASSERT_NULL(ptr[1].axis);
+	ASSERT_EQUAL(ptr[1].axes, ROXML_ID_CHILD);
 	ASSERT_NULL(ptr[1].cond);
 	ASSERT_NOT_NULL(ptr[1].next);
 	ASSERT_EQUAL(ptr[1].rel, ROXML_OPERATOR_OR)
@@ -922,12 +922,12 @@ int test_parse_xpath(void)
 	ASSERT_NOT_NULL(ptr[1].next->next->next);
 	ASSERT_NOT_NULL(ptr[1].next->next->next);
 	ASSERT_NULL(ptr[1].next->next->next->next);
-	ASSERT_EQUAL(ptr[1].next->axis, ROXML_ID_CHILD)
+	ASSERT_EQUAL(ptr[1].next->axes, ROXML_ID_CHILD)
 	ASSERT_STRING_EQUAL(ptr[1].next->name, "node")
-	ASSERT_EQUAL(ptr[1].next->next->axis, ROXML_ID_CHILD)
+	ASSERT_EQUAL(ptr[1].next->next->axes, ROXML_ID_CHILD)
 	ASSERT_STRING_EQUAL(ptr[1].next->next->name, "item")
 	ASSERT_NULL(ptr[1].next->next->cond)
-	ASSERT_EQUAL(ptr[1].next->next->next->axis, ROXML_ID_CHILD)
+	ASSERT_EQUAL(ptr[1].next->next->next->axes, ROXML_ID_CHILD)
 	ASSERT_STRING_EQUAL(ptr[1].next->next->next->name, "title")
 	ASSERT_NOT_NULL(ptr[1].next->next->next->cond)
 	ASSERT_NULL(ptr[1].next->next->next->cond->next)
@@ -936,7 +936,7 @@ int test_parse_xpath(void)
 	ASSERT_EQUAL(ptr[1].next->next->next->cond->func, ROXML_FUNC_INTCOMP)
 	ASSERT_EQUAL(ptr[1].next->next->next->cond->op, ROXML_OPERATOR_INF)
 
-	ASSERT_NULL(ptr[2].axis);
+	ASSERT_EQUAL(ptr[2].axes, ROXML_ID_CHILD);
 	ASSERT_NULL(ptr[2].cond);
 	ASSERT_NOT_NULL(ptr[2].next);
 	ASSERT_EQUAL(ptr[2].rel, ROXML_OPERATOR_OR)
@@ -944,12 +944,12 @@ int test_parse_xpath(void)
 	ASSERT_NOT_NULL(ptr[2].next->next->next);
 	ASSERT_NOT_NULL(ptr[2].next->next->next);
 	ASSERT_NULL(ptr[2].next->next->next->next);
-	ASSERT_EQUAL(ptr[2].next->axis, ROXML_ID_CHILD)
+	ASSERT_EQUAL(ptr[2].next->axes, ROXML_ID_CHILD)
 	ASSERT_STRING_EQUAL(ptr[2].next->name, "node")
-	ASSERT_EQUAL(ptr[2].next->next->axis, ROXML_ID_CHILD)
+	ASSERT_EQUAL(ptr[2].next->next->axes, ROXML_ID_CHILD)
 	ASSERT_STRING_EQUAL(ptr[2].next->next->name, "item")
 	ASSERT_NULL(ptr[2].next->next->cond)
-	ASSERT_EQUAL(ptr[2].next->next->next->axis, ROXML_ID_CHILD)
+	ASSERT_EQUAL(ptr[2].next->next->next->axes, ROXML_ID_CHILD)
 	ASSERT_STRING_EQUAL(ptr[2].next->next->next->name, "title")
 	ASSERT_NOT_NULL(ptr[2].next->next->next->cond)
 	ASSERT_NULL(ptr[2].next->next->next->cond->next)
@@ -958,6 +958,7 @@ int test_parse_xpath(void)
 	ASSERT_EQUAL(ptr[2].next->next->next->cond->func, ROXML_FUNC_STRCOMP)
 	ASSERT_EQUAL(ptr[2].next->next->next->cond->op, ROXML_OPERATOR_EQU)
 
+	roxml_free_xpath(ptr, ret);
 	RETURN
 }
 
