@@ -1,7 +1,7 @@
 
-SRC1 = unittest.c roxml.test.c ../roxml.c
+SRC1 = unittest.c roxml.test.c ../roxml.c ../roxml-internal.c
 OBJ1 = $(SRC1:.c=.o)
-SRC2 = roxml.perf.c ../roxml.c
+SRC2 = roxml.perf.c ../roxml.c ../roxml-internal.c
 OBJ2 = $(SRC2:.c=.o)
 
 CC = gcc

@@ -520,3 +520,65 @@ void ROXML_API roxml_commit_changes(node_t *n, char * dest, char ** buffer, int 
 	}
 }
 
+node_t * roxml_add_node(node_t * parent, int type, char *name, char *value) 
+{
+	int name_l = 0;
+	int end_node = 0;
+	int content_l = 0;
+	int content_pos = 0;
+	int end_content = 0;
+	char * buffer = NULL;
+
+	if(parent && !(parent->type & ROXML_STD_NODE)) {
+		return NULL;
+	}
+	if(value) {
+		content_l = strlen(value);
+	}
+	if(name) {
+		name_l = strlen(name);
+	}
+
+	if(type & ROXML_ATTR_NODE) {
+		if(!name || !value) { return NULL; }
+		buffer = (char*)malloc(sizeof(char)*(name_l+content_l+2));
+		sprintf(buffer,"%s=%s",name, value);
+		content_pos = name_l+1;
+		end_node = name_l + 1;
+		end_content = name_l + content_l + 2;
+	} else if(type & ROXML_TXT_NODE) {
+		if(!value) { return NULL; }
+		buffer = (char*)malloc(sizeof(char)*(content_l+1));
+		sprintf(buffer,"%s", value);
+		content_pos = 0;
+		end_node = content_l + 1;
+		end_content = content_l + 1;
+	} else if(type & ROXML_STD_NODE) {
+		if(!name) { return NULL; }
+		if(content_l)	{
+			if(!value) { return NULL; }
+			buffer = (char*)malloc(sizeof(char)*(name_l*2+content_l+6));
+			sprintf(buffer,"<%s>%s</%s>",name, value, name);
+			content_pos = name_l+2;
+			end_node = name_l + content_l + 2;
+			end_content = end_node;
+		} else {
+			buffer = (char*)malloc(sizeof(char)*(name_l+4));
+			sprintf(buffer,"<%s/>",name);
+		}
+	}
+
+	node_t *new_node = roxml_create_node(0, NULL, buffer, type | ROXML_PENDING | ROXML_BUFF);
+	new_node->end = end_node;
+
+	if(content_l && name_l) {
+		node_t *new_txt = roxml_create_node(content_pos, NULL, buffer, ROXML_TXT_NODE | ROXML_PENDING | ROXML_BUFF);
+		roxml_parent_node(new_node, new_txt);
+		new_txt->end = end_content;
+	}
+
+	roxml_parent_node(parent, new_node);
+
+	return new_node;
+}
+
