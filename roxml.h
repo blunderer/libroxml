@@ -52,9 +52,14 @@
 #include <string.h>
 #include <pthread.h>
 
+/**
+ * \def ROXML_API
+ * 
+ * part of the public API
+ */
 #define ROXML_API
 
-#ifndef ROXML_PRIVATE
+#ifndef ROXML_INT
 /** \struct node_t
  *
  * \brief node_t structure
@@ -133,7 +138,7 @@ node_t*	ROXML_API roxml_load_doc		(char *filename);
  * \return void
  * \see roxml_load_doc
  */
-void 	ROXML_API roxml_close		(node_t *n);
+void 	ROXML_API roxml_close			(node_t *n);
 
 /** \brief parent getter function
  *
@@ -234,16 +239,16 @@ node_t*	ROXML_API roxml_get_attr		(node_t *n, char * name, int nb);
  * \param nb_ans the number of results
  * \return the node table or NULL 
  */
-node_t ** ROXML_API roxml_xpath(node_t *n, char * path, int *nb_ans);
+node_t ** ROXML_API roxml_xpath			(node_t *n, char * path, int *nb_ans);
 
 /** \brief node type function
  *
- * \fn roxml_get_node_type(node_t *n);
+ * \fn roxml_get_type(node_t *n);
  * This function tells if a node is a arg or real node.
  * \param n is the node to test
  * \return the node type
  */
-int ROXML_API roxml_get_node_type(node_t *n);
+int ROXML_API roxml_get_type			(node_t *n);
 
 /** \brief node get index function
  *
@@ -253,7 +258,7 @@ int ROXML_API roxml_get_node_type(node_t *n);
  * \param last is the index of last homonym
  * \return the idx or -1 if only one node
  */
-int ROXML_API roxml_get_node_index(node_t *n, int * last);
+int ROXML_API roxml_get_node_index		(node_t *n, int * last);
 
 /** \brief memory cleanning function
  *
@@ -270,7 +275,7 @@ int ROXML_API roxml_get_node_index(node_t *n, int * last);
  * \param data the pointer to delete or NULL or RELEASE_ALL or RELEASE_LAST
  * \return void
  */
-void ROXML_API roxml_release(void * data);
+void ROXML_API roxml_release			(void * data);
 
 /** \brief node type getter function
  *
@@ -279,26 +284,67 @@ void ROXML_API roxml_release(void * data);
  * \param n the node to return type for
  * \return the node type
  */
-int roxml_get_type(node_t *n);
+int roxml_get_type				(node_t *n);
 
-
-/////////// TODO LIBRWXML
-void roxml_del_node(node_t * n);
-void roxml_del_std_node(node_t * n);
-void roxml_del_txt_node(node_t * n);
-void roxml_del_arg_node(node_t * n);
-node_t * roxml_add_node(node_t * parent, int type, char *name, char *value);
-void roxml_commit_changes(node_t *n, char * dest, char ** buffer, int human);
-
-/** \brief internal function
+/** \brief add a node to the tree
  *
- * \fn node_t* ROXML_INT roxml_parent_node(node_t *parent, node_t *n);
- * This function give a node to its parent and the parent to the node
- * \param parent is the parent node
- * \param n is one orphan node of the tree
- * \return the parented node
+ * \fn roxml_add_node(node_t * parent, int type, char *name, char *value);
+ * this function add a new node to the tree. This will not update de buffer or file,
+ * only the RAM loaded tree
+ * \param parent the parent node
+ * \param type the type of node between ROXML_ATTR_NODE, ROXML_STD_NODE, ROXML_TXT_NODE
+ * \param name the name of the node (for ROXML_ATTR_NODE and ROXML_STD_NODE only)
+ * \param value the text content (for ROXML_STD_NODE, ROXML_TXT_NODE) or the attribute value (ROXML_ATTR_NODE)
+ * \return the new node
+ * \see roxml_commit_changes
+ * \see roxml_del_node
  */
-node_t * ROXML_API roxml_parent_node(node_t *parent, node_t *n);
+node_t * ROXML_API roxml_add_node		(node_t * parent, int type, char *name, char *value);
+
+/** \brief text content getter function
+ *
+ * \fn roxml_get_text(node_t *n, int nb);
+ * this function return the text content of a node as a TEXT node
+ * \param n the node that contains text
+ * \param nb the nth text node to retrieve
+ * \return the text node or NULL
+ * \see roxml_get_text_nb
+ */
+node_t * ROXML_API roxml_get_text		(node_t *n, int nb);
+
+/** \brief text node number getter function
+ *
+ * \fn roxml_get_text_nb(node_t *n);
+ * this function return the number of text nodes in 
+ * a standard node
+ * \param n the node to search into
+ * \return the number of text node
+ * \see roxml_get_text
+ */
+int ROXML_API roxml_get_text_nb			(node_t *n);
+
+/** \brief node deletion function
+ *
+ * \fn roxml_del_node(node_t * n);
+ * this function delete a node from the tree. The node is not really deleted 
+ * from the file or buffer until the roxml_commit_changes is called.
+ * \param n the node to delete
+ * \return 
+ */
+void ROXML_API roxml_del_node			(node_t * n);
+
+/** \brief sync function
+ *
+ * \fn roxml_commit_changes(node_t *n, char * dest, char ** buffer, int human);
+ * this function sync changes to the given buffer or file in human or one-line format 
+ * \param n the root node of the tree to write
+ * \param dest the path to a file to write tree to
+ * \param buffer the adress of a buffer where tre will be written
+ * \param human 0 for one-line tree, or 1 for human format (using tabs, newlines...)
+ * \return 
+ */
+void ROXML_API roxml_commit_changes		(node_t *n, char * dest, char ** buffer, int human);
+
 
 #endif /* ROXML_H */
 

@@ -35,415 +35,9 @@
 #include <string.h>
 #include <pthread.h>
 
-/** \struct memory_cell_t
- *
- * \brief memory cell structure
- * 
- * This is the structure for a memory cell. It contains the
- * pointer info and type. It also contains the caller id so that
- * it can free without reference to a specific pointer
- */
-typedef struct memory_cell {
-	int type;			/*!< pointer type from PTR_NODE, PTR_CHAR... */
-	int occ;			/*!< number of element */
-	void *ptr;			/*!< pointer */
-	pthread_t id;			/*!< thread id of allocator */
-	struct memory_cell *next;	/*!< next memory cell */
-	struct memory_cell *prev;	/*!< prev memory cell */
-} memory_cell_t;
-
-/** \struct xpath_cond_t
- *
- * \brief xpath cond structure
- * 
- * This is the structure for a xpath cond. It contains the
- * node condition
- */
-typedef struct _xpath_cond {
-	char rel;			/*!< relation with previous */
-	char axes;			/*!< axes for operator */
-	char op;			/*!< operator used */
-	char op2;			/*!< operator used on arg2 */
-	char func;			/*!< function to process */
-	char func2;			/*!< function to process in arg2 */
-	char *arg1;			/*!< condition arg1 as string */
-	char *arg2;			/*!< condition arg2 as string */
-	struct _xpath_cond *next;	/*!< next xpath condition pointer */
-} xpath_cond_t;
-
-/** \struct xpath_node_t
- *
- * \brief xpath node structure
- * 
- * This is the structure for a xpath node. It contains the
- * node axes and conditions
- */
-typedef struct _xpath_node {
-	char abs;			/*!< for first node: is path absolute */
-	char rel;			/*!< relation with previous */
-	char axes;			/*!< axes type */
-	char *name;			/*!< axes string */
-	struct _xpath_cond *cond;	/*!< condition list */
-	struct _xpath_node *next;	/*!< next xpath pointer */
-} xpath_node_t;
-
-/** \struct xpath_tok_t
- *
- * \brief xpath token structure
- * 
- * This is the structure for a xpath token. It contains the
- * xpath id
- */
-typedef struct _xpath_tok_table {
-	unsigned char id;		/*!< token id == ROXML_REQTABLE_ID */
-	unsigned char ids[256];		/*!< token id table */
-	struct _xpath_tok *next;	/*!< next xpath token */
-} xpath_tok_table_t;
-
-/** \struct xpath_tok_t
- *
- * \brief xpath token structure
- * 
- * This is the structure for a xpath token. It contains the
- * xpath id
- */
-typedef struct _xpath_tok {
-	unsigned char id;		/*!< token id */
-	struct _xpath_tok *next;	/*!< next xpath token */
-} xpath_tok_t;
-
-/** \struct node_t
- *
- * \brief node_t structure
- * 
- * This is the structure for a node. This struct is very
- * little as it only contains offset for node in file and
- * tree links
- */
-typedef struct node {
-	char type;			/*!< document or buffer / attribute or value */
-	union {
-		char *buf;		/*!< buffer address */
-		FILE *fil;		/*!< loaded document */
-	} src;
-	unsigned long pos;		/*!< offset of begining of opening node in file */
-	unsigned long end;		/*!< offset of begining of closing node in file */
-	struct node *sibl;		/*!< ref to brother */
-	struct node *chld;		/*!< ref to chld */
-	struct node *prnt;		/*!< ref to parent */
-	struct node *attr;		/*!< ref to attributes */
-	struct node *text;		/*!< ref to content */
-	struct node *next;		/*!< ref to next (internal use) */
-	void *priv;			/*!< ref to xpath tok (internal use) */
-} node_t;
-
-#define ROXML_PRIVATE
+#include "roxml-defines.h"
+#include "roxml-types.h"
 #include "roxml.h"
-
-#define ROXML_PATH_OR	"||"
-#define ROXML_PATH_AND	"&&"
-#define ROXML_COND_OR	"or"
-#define ROXML_COND_AND	"and"
-
-#define ROXML_OPERATOR_OR	1
-#define ROXML_OPERATOR_AND	2
-#define ROXML_OPERATOR_INF	3
-#define ROXML_OPERATOR_SUP	4
-#define ROXML_OPERATOR_EINF	5
-#define ROXML_OPERATOR_ESUP	6
-#define ROXML_OPERATOR_DIFF	7
-#define ROXML_OPERATOR_EQU	8
-
-#define ROXML_FUNC_INTCOMP	0
-#define ROXML_FUNC_STRCOMP	1
-#define ROXML_FUNC_POS		2
-#define ROXML_FUNC_FIRST	3
-#define ROXML_FUNC_LAST		4
-#define ROXML_FUNC_TEXT		5
-#define ROXML_FUNC_NODE		6
-
-#define ROXML_FUNC_POS_STR	"position()"
-#define ROXML_FUNC_FIRST_STR	"first()"
-#define ROXML_FUNC_LAST_STR	"last()"
-#define ROXML_FUNC_TEXT_STR	"text()"
-#define ROXML_FUNC_NODE_STR	"node()"
-
-#define ROXML_BULK_READ		4096
-#define ROXML_LONG_LEN		512
-#define ROXML_BASE_LEN		128
-#define ROXML_BULK_CTX		8
-
-#define ROXML_ID_CHILD		0
-#define ROXML_ID_DESC_O_SELF	1
-#define ROXML_ID_SELF		2
-#define ROXML_ID_PARENT		3
-#define ROXML_ID_ATTR		4
-#define ROXML_ID_DESC		5
-#define ROXML_ID_ANC		6
-#define ROXML_ID_NEXT_SIBL	7
-#define ROXML_ID_PREV_SIBL	8
-#define ROXML_ID_NEXT		9
-#define ROXML_ID_PREV		10
-#define ROXML_ID_NS		11
-#define ROXML_ID_ANC_O_SELF	12
-
-#define ROXML_L_CHILD		"child::"
-#define ROXML_L_DESC_O_SELF	"descendant-or-self::"
-#define ROXML_L_SELF		"self::"
-#define ROXML_L_PARENT		"parent::"
-#define ROXML_L_ATTR		"attribute::"
-#define ROXML_L_DESC		"descendant::"
-#define ROXML_L_ANC		"ancestor::"
-#define ROXML_L_NEXT_SIBL	"following-sibling::"
-#define ROXML_L_PREV_SIBL	"preceding-sibling::"
-#define ROXML_L_NEXT		"following::"
-#define ROXML_L_PREV		"preceding::"
-#define ROXML_L_NS		"namespace::"
-#define ROXML_L_ANC_O_SELF	"ancestor-or-self::"
-
-#define ROXML_S_CHILD
-#define ROXML_S_DESC_O_SELF	""
-#define ROXML_S_SELF		"."
-#define ROXML_S_PARENT		".."
-#define ROXML_S_ATTR		"@"
-
-#define ROXML_DIRECT		0
-#define ROXML_DESC_ONLY		1
-#define ROXML_DESC_O_SELF	2
-
-#define ROXML_REQTABLE_ID	0
-
-/**
- * \def INTERNAL_BUF_SIZE
- * 
- * constant for internal buffer size
- */
-#define INTERNAL_BUF_SIZE	512
-
-/**
- * \def PTR_NONE
- * 
- * constant for void pointers
- */
-#define PTR_NONE	-1
-
-/**
- * \def PTR_VOID
- * 
- * constant for void pointers
- */
-#define PTR_VOID	0
-
-/**
- * \def PTR_CHAR
- * 
- * constant for char pointers
- */
-#define PTR_CHAR	2
-
-/**
- * \def PTR_CHAR_STAR
- * 
- * constant for char table pointers
- */
-#define PTR_CHAR_START	3
-
-/**
- * \def PTR_NODE
- * 
- * constant for node pointers
- */
-#define PTR_NODE	4
-
-/**
- * \def PTR_NODE_STAR
- * 
- * constant for node table pointers
- */
-#define PTR_NODE_STAR	5
-
-/**
- * \def PTR_INT
- * 
- * constant for int pointer
- */
-#define PTR_INT	6
-
-/**
- * \def PTR_INT_STAR
- * 
- * constant for int table pointers
- */
-#define PTR_INT_STAR	7
-
-/**
- * \def PTR_RESULT
- * 
- * constant for node table pointers where node are not to delete
- */
-#define PTR_NODE_RESULT	8
-
-/**
- * \def PTR_IS_STAR(a)
- * 
- * macro returning if a memory_cell is a star cell
- */
-#define PTR_IS_STAR(a)	((a)->type % 2)
-
-/**
- * \def ROXML_FILE
- * 
- * constant for argument node
- */
-#define ROXML_FILE	0x01
-
-/**
- * \def ROXML_BUFF
- * 
- * constant for buffer document
- */
-#define ROXML_BUFF	0x02
-
-/**
- * \def ROXML_PENDING
- * 
- * constant for pending node
- */
-#define ROXML_PENDING	0x20
-
-
-/**
- * \def STATE_NODE_NONE
- * 
- * state for the state machine for init
- */
-#define STATE_NODE_NONE		0
-
-/**
- * \def STATE_NODE_BEG
- * 
- * state for the state machine for begining of a node
- */
-#define STATE_NODE_BEG		1
-
-/**
- * \def STATE_NODE_NAME
- * 
- * state for the state machine for name read 
- */
-#define STATE_NODE_NAME		2
-
-/**
- * \def STATE_NODE_CONTENT
- * 
- * state for the state machine for content read
- */
-#define STATE_NODE_CONTENT	3
-
-/**
- * \def STATE_NODE_END
- * 
- * state for the state machine for end of node
- */
-#define STATE_NODE_END		4
-
-/**
- * \def STATE_NODE_SINGLE
- * 
- * state for the state machine for single nodes 
- */
-#define STATE_NODE_SINGLE	5
-
-/**
- * \def STATE_NODE_ATTR
- * 
- * state for the state machine for attribut reading 
- */
-#define STATE_NODE_ATTR		6
-
-/**
- * \def STATE_NODE_STRING
- * 
- * state for the state machine for string reading 
- */
-#define STATE_NODE_STRING	7
-
-/**
- * \def STATE_NODE_ARG
- * 
- * state for the state machine for attribute name reading 
- */
-#define STATE_NODE_ARG		9
-
-/**
- * \def STATE_NODE_ARGVAL
- * 
- * state for the state machine for attribute value reading 
- */
-#define STATE_NODE_ARGVAL	10
-
-/**
- * \def STATE_NODE_SEP	
- * 
- * state for the state machine for separator reading
- */
-#define STATE_NODE_SEP		11
-
-/**
- * \def MODE_COMMENT_NONE
- * 
- * mode init in state machine 
- */
-#define MODE_COMMENT_NONE	0
-
-/**
- * \def MODE_COMMENT_QUOTE
- * 
- * mode quoted in state machine
- */
-#define MODE_COMMENT_QUOTE	1
-
-/**
- * \def MODE_COMMENT_DQUOTE
- * 
- * mode double quoted in state machine
- */
-#define MODE_COMMENT_DQUOTE	2
-
-/**
- * \def STATE_INSIDE_ARG_BEG
- * 
- * inside node state begining (attribute declaration)
- */
-#define STATE_INSIDE_ARG_BEG	0
-
-/**
- * \def STATE_INSIDE_ARG
- * 
- * inside node state arg name
- */
-#define STATE_INSIDE_ARG	1
-
-/**
- * \def STATE_INSIDE_VAL_BEG
- * 
- * inside node state arg value
- */
-#define STATE_INSIDE_VAL_BEG	2
-
-/**
- * \def STATE_INSIDE_VAL
- * 
- * inside node state arg value
- */
-#define STATE_INSIDE_VAL	3
-
-/**
- * \def ROXML_WHITE(n)
- * 
- * save current document position and recall to node
- */
-#define ROXML_WHITE(n) ((n==' ')||(n=='\t')||(n=='\n')||(n=='\r'))
 
 /** \brief internal function
  *
@@ -478,20 +72,6 @@ void 	ROXML_INT roxml_del_tree		(node_t *n);
 
 /** \brief internal function
  *
- * \fn void ROXML_INT roxml_parse_node(node_t *n, char *name, char * arg, char * value, int * num, int max);
- * This function read a node in the file and return all datas required
- * \param n is one node of the tree
- * \param name a pointer where name of node will be stored or NULL
- * \param arg a pointer where nth arg of node will be stored or NULL
- * \param value a pointer where nth value of node will be stored or NULL
- * \param num a pointer where the number of attributes will be stored
- * \param max the id of attribute or value we want to read
- * \return void
- */
-void 	ROXML_INT roxml_parse_node		(node_t *n, char *name, char * arg, char * value, int * num, int max);
-
-/** \brief internal function
- *
  * \fn void ROXML_INT roxml_close_node(node_t *n, node_t *close);
  * This function close the node (add the end offset) and parent the node
  * \param n is the node to close
@@ -514,29 +94,17 @@ void 	ROXML_INT roxml_close_node		(node_t *n, node_t *close);
  */
 node_t*	ROXML_INT roxml_load			(node_t *current_node, FILE *file, char *buffer);
 
-/** \brief recursiv resolv path function
+/** \brief internal function
  *
- * \fn void ROXML_INT roxml_resolv_path(node_t *n, char * path, int *idx, node_t ***res);
- * this function resolv a chunk of path and call itself recursively
- * \param current_node, the current node 
- * \param path the path to resolv
- * \param idx the actual number of results
- * \param res the place where to store resulting nodes
- * see roxml_close
+ * \fn node_t* ROXML_INT roxml_parent_node(node_t *parent, node_t *n);
+ * This function give a node to its parent and the parent to the node
+ * \param parent is the parent node
+ * \param n is one orphan node of the tree
+ * \return the parented node
  */
-void ROXML_INT roxml_resolv_path		(node_t *n, char * path, int *idx, node_t ***res);
+node_t * ROXML_INT roxml_parent_node		(node_t *parent, node_t *n);
 
-/** \brief recursiv resolv path function
- *
- * \fn int ROXML_INT roxml_xpath_conditionnal(node_t *n, char *condition);
- * this function resolv an xpath condition
- * \param n, the current node 
- * \param condition the condition in brackets
- * see roxml_resolv_path
- */
-int ROXML_INT roxml_xpath_conditionnal		(node_t *n, char *condition);
-
-/** \brief alloc memory function function
+/** \brief alloc memory function
  *
  * \fn roxml_malloc(int size, int num, int type)
  * this function allocate some memory that will be reachable at
@@ -545,18 +113,205 @@ int ROXML_INT roxml_xpath_conditionnal		(node_t *n, char *condition);
  * \param num the number of element
  * \param type the kind of pointer
  */
-void * ROXML_INT roxml_malloc(int size, int num, int type);
+void * ROXML_INT roxml_malloc			(int size, int num, int type);
 
-int roxml_parse_xpath(char *path, xpath_node_t ** xpath);
+/** \brief axes setter function
+ *
+ * \fn roxml_set_axes(xpath_node_t *node, char *axes, int *offset);
+ * this function set the axe to a xpath node from xpath string
+ * \param node the xpath node to fill
+ * \param axes the string where axe is extracted from 
+ * \param offset the detected offset in axe string
+ * \return the filled xpath_node
+ */
+xpath_node_t * ROXML_INT roxml_set_axes		(xpath_node_t *node, char *axes, int *offset); 
 
-void roxml_free_xpath(xpath_node_t *xpath, int nb);
+/** \brief xpath parsing function
+ *
+ * \fn roxml_parse_xpath(char *path, xpath_node_t ** xpath); 
+ * this function convert an xpath string to a table of list of xpath_node_t
+ * \param path the xpath string
+ * \param xpath the parsed xpath
+ * \return the number of xpath list in the table
+ */
+int ROXML_INT roxml_parse_xpath			(char *path, xpath_node_t ** xpath); 
 
+/** \brief xpath condition free function
+ *
+ * \fn roxml_free_xcond(xpath_cond_t *xcond); 
+ * this function frees an xpath_cond_t cell
+ * \param xcond the xcond to free
+ * \return 
+ */
+void ROXML_INT roxml_free_xcond			(xpath_cond_t *xcond); 
+
+/** \brief xpath free function
+ *
+ * \fn roxml_free_xpath(xpath_node_t *xpath, int nb); 
+ * this function frees the parsed xpath structure
+ * \param xpath the xpath to free
+ * \param nb the number of xpath structures in the table
+ * \return 
+ */
+void ROXML_INT roxml_free_xpath			(xpath_node_t *xpath, int nb); 
+
+/** \brief integer comparison function
+ *
+ * \fn roxml_int_cmp(int a, int b, int op);
+ * this function  compare to integer using one defined operator
+ * \param a first operand
+ * \param b second operand
+ * \param op the operator to use
+ * \return 1 if comparison is ok, esle 0
+ */
+int ROXML_INT roxml_int_cmp			(int a, int b, int op); 
+
+/** \brief predicat validation function
+ *
+ * \fn roxml_validate_predicat(xpath_node_t *xn, node_t *candidat);
+ * this function check for predicat validity. predicat is part between brackets
+ * \param xn the xpath node containing the predicat to test
+ * \param candidat the node to test
+ * \return 1 if predicat is validated, else 0
+ */
+int ROXML_INT roxml_validate_predicat		(xpath_node_t *xn, node_t *candidat); 
+
+/** \brief id reservation function
+ *
+ * \fn roxml_request_id(node_t *root);
+ * this function request an available id for a new xpath search on the tree
+ * \param root the root of the tree where id table is stored
+ * \return the id between 1 - 255 or -1 if failed
+ */
+int ROXML_INT roxml_request_id			(node_t *root); 
+
+/** \brief release id function
+ *
+ * \fn roxml_release_id(node_t *root, node_t **pool, int pool_len, int req_id); 
+ * this function release a previously required id and remove all id token from the pool
+ * \param root the root of the tree that was used for id request
+ * \param pool the result from xpath search using this id
+ * \param pool_len the number of node in pool
+ * \param req_id the id to release
+ * \return 
+ */
+void ROXML_INT roxml_release_id			(node_t *root, node_t **pool, int pool_len, int req_id); 
+
+/** \brief add a token top node function
+ *
+ * \fn roxml_add_to_pool(node_t *n, int req_id); 
+ * this function add a token to target node. This token is used to garanty
+ * unicity in xpath results
+ * \param n the node to mark
+ * \param req_id the id to use
+ * \return 0 if already in the pool, else 1
+ */
+int ROXML_INT roxml_add_to_pool			(node_t *n, int req_id); 
+
+/** \brief axe validation function
+ *
+ * \fn roxml_validate_axes(node_t *candidat, node_t ***ans, int *nb, int *max, xpath_node_t *xn, int req_id); 
+ * this function validate if an axe is matching the current node
+ * \param candidat the node to test
+ * \param ans the pointer to answers pool
+ * \param nb the number of answers in pool
+ * \param max the current size of the pool
+ * \param xn the xpath node to test
+ * \param req_id the pool id
+ * \return 1 if axe is validated, else 0
+ */
+int ROXML_INT roxml_validate_axes		(node_t *candidat, node_t ***ans, int *nb, int *max, xpath_node_t *xn, int req_id); 
+
+/** \brief real xpath validation function
+ *
+ * \fn roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb, int *max, int ignore, int req_id); 
+ * this function perform the xpath test on a tree
+ * \param xp the xpath nodes to test
+ * \param context the current context node
+ * \param ans the pointer to answers pool
+ * \param nb the number of answers in pool
+ * \param max the current size of the pool
+ * \param ignore a flag for some axes that are going thru all document
+ * \param req_id the pool id
+ * \return 
+ */
+void ROXML_INT roxml_check_node			(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb, int *max, int ignore, int req_id); 
+
+/** \brief space printing function
+ *
+ * \fn roxml_print_space(FILE *f, char ** buf, int * offset, int * len, int lvl); 
+ * this function add some space to output when committing change in human format
+ * \param f the file pointer if any
+ * \param buf the pointer to string if any
+ * \param offset the current offset in stream
+ * \param len the total len of buffer if any
+ * \param lvl the level in the tree
+ * \return 
+ */
+void ROXML_INT roxml_print_space		(FILE *f, char ** buf, int * offset, int * len, int lvl); 
+
+/** \brief string writter function
+ *
+ * \fn roxml_write_string(char ** buf, FILE * f, char * str, int *offset, int * len); 
+ * this function write a string to output when committing change
+ * \param f the file pointer if any
+ * \param buf the pointer to string if any
+ * \param str the string to write
+ * \param offset the current offset in stream
+ * \param len the total len of buffer if any
+ * \return 
+ */
+void ROXML_INT roxml_write_string		(char ** buf, FILE * f, char * str, int *offset, int * len); 
+
+/** \brief tree write function
+ *
+ * \fn roxml_write_node(node_t * n, FILE *f, char * buf, int human, int lvl, int *offset, int *len); 
+ * this function write each node of the tree to output
+ * \param n the node to write
+ * \param f the file pointer if any
+ * \param buf the pointer to string if any
+ * \param human 1 to use the human format else 0
+ * \param lvl the current level in tree
+ * \param offset the current offset in stream
+ * \param len the total len of buffer if any
+ * \return 
+ */
+void ROXML_INT roxml_write_node			(node_t * n, FILE *f, char * buf, int human, int lvl, int *offset, int *len); 
+
+/** \brief attribute node deletion function
+ *
+ * \fn roxml_del_arg_node(node_t * n); 
+ * this function delete an attribute node
+ * \param n the node to delete
+ * \return 
+ */
+void ROXML_INT roxml_del_arg_node		(node_t * n); 
+
+/** \brief text node deletion function
+ *
+ * \fn roxml_del_txt_node(node_t * n); 
+ * this function delete a text node
+ * \param n the node to delete
+ * \return 
+ */
+void ROXML_INT roxml_del_txt_node		(node_t * n); 
+
+/** \brief node deletion function
+ *
+ * \fn roxml_del_std_node(node_t * n); 
+ * this function delete a standard node
+ * \param n the node to delete
+ * \return 
+ */
+void ROXML_INT roxml_del_std_node		(node_t * n); 
 
 #ifdef __DEBUG
 extern unsigned int _nb_node;
 extern unsigned int _nb_attr;
 extern unsigned int _nb_text;
-extern memory_cell_t head_cell;
 #endif
+
+extern memory_cell_t head_cell;
+
 #endif /* ROXML_INT_H */
 
