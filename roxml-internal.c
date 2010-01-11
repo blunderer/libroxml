@@ -699,15 +699,19 @@ int ROXML_INT roxml_request_id(node_t *root)
 		table = (xpath_tok_table_t*)calloc(1, sizeof(xpath_tok_table_t));
 		table->id = ROXML_REQTABLE_ID;
 		table->ids[ROXML_REQTABLE_ID] = 1;
+		pthread_mutex_init(&table->mut, NULL);
 		root->priv = (void*)table;
 	}
 	table = (xpath_tok_table_t*)root->priv;
+	pthread_mutex_lock(&table->mut);
 	for(i = 1; i < 255; i++) {
 		if(table->ids[i] == 0) {
 			table->ids[i]++;
+			pthread_mutex_unlock(&table->mut);
 			return i;
 		}
 	}
+	pthread_mutex_unlock(&table->mut);
 	return -1;
 }
 
@@ -718,6 +722,7 @@ void ROXML_INT roxml_release_id(node_t *root, node_t **pool, int pool_len, int r
 	for(i = 0; i < pool_len; i++) {
 		node_t *n = pool[i];
 		if(n->priv) {
+			pthread_mutex_lock(&table->mut);
 			xpath_tok_t * prev = (xpath_tok_t*)n->priv;
 			xpath_tok_t * tok = (xpath_tok_t*)n->priv;
 			if(tok->id == req_id) {
@@ -734,6 +739,7 @@ void ROXML_INT roxml_release_id(node_t *root, node_t **pool, int pool_len, int r
 					tok = tok->next;
 				}
 			}
+			pthread_mutex_unlock(&table->mut);
 		}
 	}
 	table->ids[req_id] = 0;
@@ -741,10 +747,18 @@ void ROXML_INT roxml_release_id(node_t *root, node_t **pool, int pool_len, int r
 
 int ROXML_INT roxml_add_to_pool(node_t *n, int req_id)
 {
+	node_t * root = n;
+	while(n->prnt) { n = n->prnt; }
+
+	xpath_tok_table_t * table = (xpath_tok_table_t*)root->priv;
+
+	pthread_mutex_lock(&table->mut);
 	xpath_tok_t * tok = (xpath_tok_t*)n->priv;
 	xpath_tok_t * last_tok = NULL;
+
 	while(tok) {
 		if(tok->id == req_id) {
+			pthread_mutex_unlock(&table->mut);
 			return 0;
 		}
 		last_tok = tok;
@@ -758,6 +772,7 @@ int ROXML_INT roxml_add_to_pool(node_t *n, int req_id)
 		last_tok = last_tok->next;
 	}
 	last_tok->id = req_id;
+	pthread_mutex_unlock(&table->mut);
 
 	return 1;
 }

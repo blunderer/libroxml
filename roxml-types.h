@@ -85,6 +85,7 @@ typedef struct _xpath_node {
 typedef struct _xpath_tok_table {
 	unsigned char id;		/*!< token id == ROXML_REQTABLE_ID */
 	unsigned char ids[256];		/*!< token id table */
+	pthread_mutex_t mut;		/*!< token table allocation mutex */
 	struct _xpath_tok *next;	/*!< next xpath token */
 } xpath_tok_table_t;
 
