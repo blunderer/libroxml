@@ -748,7 +748,7 @@ void ROXML_INT roxml_release_id(node_t *root, node_t **pool, int pool_len, int r
 int ROXML_INT roxml_add_to_pool(node_t *n, int req_id)
 {
 	node_t * root = n;
-	while(n->prnt) { n = n->prnt; }
+	while(root->prnt) { root = root->prnt; }
 
 	xpath_tok_table_t * table = (xpath_tok_table_t*)root->priv;
 
