@@ -3,11 +3,11 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <sys/time.h>
-#include "../roxml-internal.h"
+#include "roxml-internal.h"
 
 int main(int argc, char ** argv)
 {
-	int nb, len, ram;
+	int nb, len;
 	//char *name = NULL;
 	struct timeval dt_load;
 	struct timeval dt_close;
@@ -39,24 +39,6 @@ int main(int argc, char ** argv)
 	gettimeofday(&tv2, NULL);
 	dt_load.tv_sec = (tv2.tv_sec - tv1.tv_sec);
 	dt_load.tv_usec = (tv2.tv_usec - tv1.tv_usec);
-
-	int pgsize = 0;
-	int size = 0;
-	int resident = 0;
-	int share = 0;
-	int text = 0;
-	int lib = 0;
-	int data = 0;
-	int dt = 0;
-	char statfile[512];
-	sprintf(statfile, "/proc/%d/statm", getpid());
-	FILE * fstatfile = fopen(statfile, "r");
-	if(fstatfile)   {
-		fscanf(fstatfile, "%d %d %d %d %d %d %d", &size, &resident, &share, &text, &lib, &data, &dt);
-		fclose(fstatfile);
-	}
-	pgsize = getpagesize();
-	ram = pgsize*resident;
 
 	gettimeofday(&tv1, NULL);
 	node_t ** set = roxml_xpath(root, "//*", &nb);
@@ -98,18 +80,12 @@ int main(int argc, char ** argv)
 	if(dt_close.tv_usec < 0) { dt_close.tv_sec++; dt_close.tv_usec = 1000000-dt_close.tv_usec; }
 
 	printf("stats for '%s':\n", input);
-	printf("\tload_doc (%d bytes):\t\t %d.%06d sec\n", len, (int)dt_load.tv_sec, (int)dt_load.tv_usec);
+	printf("\tload_doc (%d bytes):\t %d.%06d sec\n", len, (int)dt_load.tv_sec, (int)dt_load.tv_usec);
 	printf("\txpath processed %d nodes:\t %d.%06d sec\n", nb, (int)dt_xpath.tv_sec, (int)dt_xpath.tv_usec);
-	printf("\tread first node:\t\t %d.%06d sec\n", (int)dt_name1.tv_sec, (int)dt_name1.tv_usec);
-	printf("\tread last node:\t\t\t %d.%06d sec\n", (int)dt_name2.tv_sec, (int)dt_name2.tv_usec);
+	//printf("\tread first node:\t\t %d.%06d sec\n", (int)dt_name1.tv_sec, (int)dt_name1.tv_usec);
+	//printf("\tread last node:\t\t\t %d.%06d sec\n", (int)dt_name2.tv_sec, (int)dt_name2.tv_usec);
 	printf("\trelease result:\t\t\t %d.%06d sec\n", (int)dt_release.tv_sec, (int)dt_release.tv_usec);
 	printf("\tclose_doc:\t\t\t %d.%06d sec\n", (int)dt_close.tv_sec, (int)dt_close.tv_usec);
-	printf("\ttotal node:\t\t\t %u\n",_nb_node);
-	printf("\ttotal attr:\t\t\t %u\n",_nb_attr);
-	printf("\ttotal text:\t\t\t %u\n",_nb_text);
-	printf("\tram tree:\t\t\t %u bytes\n",sizeof(node_t)*(_nb_node+_nb_attr+_nb_text));
-	printf("\tram total:\t\t\t %d bytes\n",ram);
-	printf("\tram ratio:\t\t\t %f\n",(float)(sizeof(node_t)*(_nb_node+_nb_attr+_nb_text))/(float)len);
 
 	return 0;
 }

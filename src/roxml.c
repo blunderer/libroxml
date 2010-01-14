@@ -421,7 +421,7 @@ node_t * ROXML_API roxml_load_doc(char *filename)
 	if(file == NULL)	{
 		return NULL;
 	}
-	current_node = roxml_create_node(0, file, NULL, ROXML_STD_NODE | ROXML_FILE);
+	current_node = roxml_create_node(0, file, ROXML_STD_NODE | ROXML_FILE);
 	current_node = roxml_parent_node(NULL, current_node);
 	return roxml_load(current_node,  file, NULL);
 }
@@ -430,7 +430,7 @@ node_t * ROXML_API roxml_load_buf(char *buffer)
 {
 	if(buffer == NULL)	{ return NULL; }
 	node_t *current_node = NULL;
-	current_node = roxml_create_node(0, NULL, buffer, ROXML_STD_NODE | ROXML_BUFF);
+	current_node = roxml_create_node(0, buffer, ROXML_STD_NODE | ROXML_BUFF);
 	current_node = roxml_parent_node(NULL, current_node);
 	return roxml_load(current_node, NULL, buffer);
 }
@@ -467,7 +467,7 @@ node_t ** ROXML_API roxml_xpath(node_t *n, char * path, int *nb_ans)
 		}
 		// assign a new request ID
 		req_id = roxml_request_id(root);
-		roxml_check_node(cur_xpath, orig, &ans, &ansnb, &ansmax, ROXML_DIRECT, req_id);
+		roxml_check_node(cur_xpath, root, orig, &ans, &ansnb, &ansmax, ROXML_DIRECT, req_id);
 		roxml_release_id(root, ans, ansnb, req_id);
 	}
 
@@ -568,11 +568,11 @@ node_t * roxml_add_node(node_t * parent, int type, char *name, char *value)
 		}
 	}
 
-	node_t *new_node = roxml_create_node(0, NULL, buffer, type | ROXML_PENDING | ROXML_BUFF);
+	node_t *new_node = roxml_create_node(0, buffer, type | ROXML_PENDING | ROXML_BUFF);
 	new_node->end = end_node;
 
 	if(content_l && name_l) {
-		node_t *new_txt = roxml_create_node(content_pos, NULL, buffer, ROXML_TXT_NODE | ROXML_PENDING | ROXML_BUFF);
+		node_t *new_txt = roxml_create_node(content_pos, buffer, ROXML_TXT_NODE | ROXML_PENDING | ROXML_BUFF);
 		roxml_parent_node(new_node, new_txt);
 		new_txt->end = end_content;
 	}

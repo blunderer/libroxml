@@ -53,12 +53,11 @@ void	ROXML_INT roxml_free_node		(node_t *n);
  * \fn node_t* ROXML_INT roxml_create_node(int pos, FILE *file, char * buf, int * type);
  * This function allocate a new node 
  * \param pos is the beginning offset of the node in the file
- * \param file is the pointer to the opened document
- * \param buffer is the pointer to the buffer
+ * \param src is the pointer to the buffer or file
  * \param type is the type of node between arg and val
  * \return the new node
  */
-node_t* ROXML_INT roxml_create_node		(int pos, FILE *file, char * buf, int type);
+node_t* ROXML_INT roxml_create_node		(int pos, void * src, int type);
 
 /** \brief internal function
  *
@@ -199,19 +198,21 @@ void ROXML_INT roxml_release_id			(node_t *root, node_t **pool, int pool_len, in
 
 /** \brief add a token top node function
  *
- * \fn roxml_add_to_pool(node_t *n, int req_id); 
+ * \fn roxml_add_to_pool(node_t *root, node_t *n, int req_id); 
  * this function add a token to target node. This token is used to garanty
  * unicity in xpath results
+ * \param root the root node
  * \param n the node to mark
  * \param req_id the id to use
  * \return 0 if already in the pool, else 1
  */
-int ROXML_INT roxml_add_to_pool			(node_t *n, int req_id); 
+int ROXML_INT roxml_add_to_pool			(node_t *root, node_t *n, int req_id); 
 
 /** \brief axe validation function
  *
- * \fn roxml_validate_axes(node_t *candidat, node_t ***ans, int *nb, int *max, xpath_node_t *xn, int req_id); 
+ * \fn roxml_validate_axes(node_t *root, node_t *candidat, node_t ***ans, int *nb, int *max, xpath_node_t *xn, int req_id); 
  * this function validate if an axe is matching the current node
+ * \param root the root node
  * \param candidat the node to test
  * \param ans the pointer to answers pool
  * \param nb the number of answers in pool
@@ -220,13 +221,14 @@ int ROXML_INT roxml_add_to_pool			(node_t *n, int req_id);
  * \param req_id the pool id
  * \return 1 if axe is validated, else 0
  */
-int ROXML_INT roxml_validate_axes		(node_t *candidat, node_t ***ans, int *nb, int *max, xpath_node_t *xn, int req_id); 
+int ROXML_INT roxml_validate_axes		(node_t *root, node_t *candidat, node_t ***ans, int *nb, int *max, xpath_node_t *xn, int req_id); 
 
 /** \brief real xpath validation function
  *
- * \fn roxml_check_node(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb, int *max, int ignore, int req_id); 
+ * \fn roxml_check_node(xpath_node_t *xp, node_t *root, node_t *context, node_t ***ans, int *nb, int *max, int ignore, int req_id); 
  * this function perform the xpath test on a tree
  * \param xp the xpath nodes to test
+ * \param root the root node
  * \param context the current context node
  * \param ans the pointer to answers pool
  * \param nb the number of answers in pool
@@ -235,7 +237,7 @@ int ROXML_INT roxml_validate_axes		(node_t *candidat, node_t ***ans, int *nb, in
  * \param req_id the pool id
  * \return 
  */
-void ROXML_INT roxml_check_node			(xpath_node_t *xp, node_t *context, node_t ***ans, int *nb, int *max, int ignore, int req_id); 
+void ROXML_INT roxml_check_node			(xpath_node_t *xp, node_t *root, node_t *context, node_t ***ans, int *nb, int *max, int ignore, int req_id); 
 
 /** \brief space printing function
  *

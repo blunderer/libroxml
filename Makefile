@@ -8,9 +8,9 @@ override V =
 endif
 
 # files
-INC = roxml.h
-SRC_LIB = roxml.c roxml-internal.c
-SRC_BIN = roxml-parser.c
+INC = inc/roxml.h
+SRC_LIB = src/roxml.c src/roxml-internal.c
+SRC_BIN = src/roxml-parser.c
 DEPS = $(patsubst %.c, $O/%.d, $(SRC_LIB) $(SRC_BIN))
 OBJS = $(OBJ_LIB) $(OBJ_BIN)
 OBJ_LIB = $(SRC_LIB:%.c=$O/%.o)
@@ -20,8 +20,8 @@ TARGET_SLIB = $O/libroxml.a
 TARGET_LIB = $O/libroxml.so
 TARGET_BIN = $O/roxml
 # options
-override CPPFLAGS +=
-override CFLAGS += -g -Wall -Wextra -Werror -DIGNORE_EMPTY_TEXT_NODES
+override CPPFLAGS += -Iinc/
+override CFLAGS += -g -Wall -Wextra -Werror -Iinc/ -DIGNORE_EMPTY_TEXT_NODES
 override LDFLAGS += -lpthread
 
 # first rule (default)

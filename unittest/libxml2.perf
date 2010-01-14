@@ -1,0 +1,46 @@
+#!/usr/bin/python
+
+import datetime
+import libxml2
+import sys
+
+
+name = "test-1200K.xml"
+if len(sys.argv) > 1:
+	name = sys.argv[1]
+else:
+	print "no input file use 'test-1200K.xml'"
+
+doc = open(name)
+doc.seek(0, 2)
+size = doc.tell()
+
+t1=datetime.datetime.now()
+doc = libxml2.parseFile(name)
+t2=datetime.datetime.now()
+ctxt = doc.xpathNewContext()
+res = ctxt.xpathEval("//*")
+t3=datetime.datetime.now()
+nb_node = len(res)
+t4=datetime.datetime.now()
+ctxt.xpathFreeContext()
+t5=datetime.datetime.now()
+doc.freeDoc()
+t6=datetime.datetime.now()
+
+dload = t2 - t1
+dxpath = t3 - t2
+dfree = t5 - t4
+dclose = t6 - t5
+
+dt_load = dload.seconds + dload.microseconds / 1000000.0
+dt_xpath = dxpath.seconds + dxpath.microseconds / 1000000.0
+dt_free = dfree.seconds + dfree.microseconds / 1000000.0
+dt_close = dclose.seconds + dclose.microseconds / 1000000.0
+
+print "stats for '%s':" % name
+print "\tload_doc (%d bytes): \t %f sec" % (size, dt_load)
+print "\txpath processed %d nodes:\t %f sec" % (nb_node, dt_xpath)
+print "\trelease result:\t\t\t %f sec" % dt_free
+print "\tclose_doc:\t\t\t %f sec" % dt_close
+

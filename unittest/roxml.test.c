@@ -1,6 +1,6 @@
 
 #include "unittest.h"		
-#include "../roxml-internal.h"
+#include "roxml-internal.h"
 
 int test_load_doc(void)
 {
@@ -652,10 +652,10 @@ int test_create_node(void)
 	FILE * doc = (FILE *)0x42;
 	char * buf = (char *)0x44;
 
-	node_t * node = roxml_create_node(1, doc, buf, ROXML_FILE | ROXML_STD_NODE);
-	node_t * cnode = roxml_create_node(1, doc, NULL, ROXML_FILE | ROXML_STD_NODE);
-	node_t * anode = roxml_create_node(1, doc, NULL, ROXML_FILE | ROXML_ATTR_NODE);
-	node_t * close = roxml_create_node(10, doc, NULL, ROXML_FILE | ROXML_STD_NODE);
+	node_t * node = roxml_create_node(1, buf, ROXML_FILE | ROXML_STD_NODE);
+	node_t * cnode = roxml_create_node(1, doc, ROXML_FILE | ROXML_STD_NODE);
+	node_t * anode = roxml_create_node(1, doc, ROXML_FILE | ROXML_ATTR_NODE);
+	node_t * close = roxml_create_node(10, doc, ROXML_FILE | ROXML_STD_NODE);
 	roxml_close_node(node, close);
 	ASSERT_EQUAL(node->type, ROXML_FILE | ROXML_STD_NODE)
 	ASSERT_EQUAL(node->src.buf, buf)
@@ -1193,8 +1193,8 @@ int test_get_node_type(void)
 
 	int type;
 
-	node_t * cnode = roxml_create_node(1, NULL, NULL, ROXML_FILE | ROXML_STD_NODE);
-	node_t * anode = roxml_create_node(1, NULL, NULL, ROXML_FILE | ROXML_ATTR_NODE);
+	node_t * cnode = roxml_create_node(1, NULL, ROXML_FILE | ROXML_STD_NODE);
+	node_t * anode = roxml_create_node(1, NULL, ROXML_FILE | ROXML_ATTR_NODE);
 
 	type = roxml_get_type(cnode);
 	ASSERT_EQUAL(type & ROXML_STD_NODE, ROXML_STD_NODE)

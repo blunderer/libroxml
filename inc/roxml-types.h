@@ -114,6 +114,7 @@ typedef struct node {
 	union {
 		char *buf;		/*!< buffer address */
 		FILE *fil;		/*!< loaded document */
+		void *src;		/*!< xml src address */
 	} src;
 	unsigned long pos;		/*!< offset of begining of opening node in file */
 	unsigned long end;		/*!< offset of begining of closing node in file */
