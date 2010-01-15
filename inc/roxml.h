@@ -167,7 +167,6 @@ node_t*	ROXML_API roxml_get_chld		(node_t *n, char * name, int nb);
  * This function return the number of chlds for a given node
  * \param n is one node of the tree
  * \return  the number of chlds
- * \see roxml_get_chld_nth
  */
 int 	ROXML_API roxml_get_chld_nb		(node_t *n);
 
@@ -188,12 +187,15 @@ char*	ROXML_API roxml_get_name		(node_t *n, char * name, int size);
 
 /** \brief content getter function
  *
- * \fn char * ROXML_API roxml_get_content(node_t *n, char * name, int size);
+ * \fn char * ROXML_API roxml_get_content(node_t *n, char * name, int buf_size, int * size);
  *
  * This function returns a pointer with text content of a node (chld are NOT included as text).;
  * if the returned pointer is NULL then the node was empty.
  * returned string should be roxml_release when not used anymore
  * \param n is one node of the tree
+ * \param name is the buffer where result will be written or NULL for internal allocation
+ * \param buf_size the size if the name buffer
+ * \param size the actual size of result. if name was not NULL and size == buf_size, then maybe given buffer was too small
  * \return the content
  */
 char *	ROXML_API roxml_get_content		(node_t *n, char * name, int buf_size, int * size);
@@ -202,11 +204,9 @@ char *	ROXML_API roxml_get_content		(node_t *n, char * name, int buf_size, int *
  *
  * \fn int ROXML_API roxml_get_attr_nb(node_t *n);
  * 
+ * This function returns the number of attributes for a given node
  * \param n is one node of the tree
  * \return the number of attributes in node
- * \see roxml_get_attr_val_nth
- * \see roxml_get_attr_nth
- * \see roxml_parse_node
  */
 int	ROXML_API roxml_get_attr_nb		(node_t *n);
 
@@ -219,9 +219,6 @@ int	ROXML_API roxml_get_attr_nb		(node_t *n);
  * \param nb the id of attribute to read
  * \param name is the name of the child to get
  * \return the attribute corresponding to name or id (if both are set, name is used)
- * \see roxml_get_nb_attr
- * \see roxml_get_attr_val_nth
- * \see roxml_parse_node
  */
 node_t*	ROXML_API roxml_get_attr		(node_t *n, char * name, int nb);
 

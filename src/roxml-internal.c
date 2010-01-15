@@ -547,13 +547,14 @@ int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t ** xpath)
 						path[cur] = '\0';
 					}
 					new_cond->arg2 = path+cur+1;
-				} else if(path[cur] == '!') {
+				} else if((path[cur] == '!')&&(path[cur+1] == '=')) {
 					path[cur] = '\0';
+					path[cur+1] = '\0';
 					new_cond->op = ROXML_OPERATOR_DIFF;
-					path[cur] = '\0';
 					if(ROXML_WHITE(path[cur-1])) {
 						path[cur-1] = '\0';
 					}
+					cur++;
 					if(ROXML_WHITE(path[cur+1])) {
 						cur++;
 						path[cur] = '\0';
