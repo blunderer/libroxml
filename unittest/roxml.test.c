@@ -886,7 +886,7 @@ int test_parse_xpath(void)
 	INIT
 
 	xpath_node_t *ptr;
-	char mypath[128] = "/node[first() or last()]/item/title/@version || /node/item/title[@version < 3] || /node/item/title[@version = v1]";
+	char mypath[128] = "/node[first() or last()]/item/title/@version || /node/item/title[@version < 3] && /node/item/title[@version = v1]";
 	int ret = roxml_parse_xpath(mypath, &ptr);	
 
 	ASSERT_EQUAL(ret, 3)
@@ -939,7 +939,7 @@ int test_parse_xpath(void)
 	ASSERT_EQUAL(ptr[2].axes, ROXML_ID_CHILD);
 	ASSERT_NULL(ptr[2].cond);
 	ASSERT_NOT_NULL(ptr[2].next);
-	ASSERT_EQUAL(ptr[2].rel, ROXML_OPERATOR_OR)
+	ASSERT_EQUAL(ptr[2].rel, ROXML_OPERATOR_AND)
 	ASSERT_NOT_NULL(ptr[2].next->next);
 	ASSERT_NOT_NULL(ptr[2].next->next->next);
 	ASSERT_NOT_NULL(ptr[2].next->next->next);
@@ -1154,6 +1154,10 @@ int test_xpath(void)
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "name4")
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[1], NULL, 0, NULL), "\"name1\"")
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[2], NULL, 0, NULL), "name2")
+
+	node_set = roxml_xpath(node0, "node1/text()", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "text1")
 	
 	roxml_close(root);
 

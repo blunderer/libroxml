@@ -441,6 +441,7 @@ node_t ** ROXML_API roxml_xpath(node_t *n, char * path, int *nb_ans)
 	int index = 0;
 	int ansnb = 0;
 	int ansmax = 1;
+	int req_id = -1;
 	xpath_node_t *xpath = NULL;
 	node_t *root = n;
 
@@ -458,7 +459,6 @@ node_t ** ROXML_API roxml_xpath(node_t *n, char * path, int *nb_ans)
 	index = roxml_parse_xpath(path_to_find, &xpath);
 
 	for(path_id = 0; path_id < index; path_id++)	{
-		int req_id;
 		node_t *orig = n;
 		xpath_node_t *cur_xpath = &xpath[path_id];
 		if(cur_xpath->abs)	{
