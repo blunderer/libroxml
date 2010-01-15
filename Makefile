@@ -92,14 +92,17 @@ mrproper: clean
 
 .PHONY: install
 install: $(TARGETS) doxy
+	mkdir -p $(DESTDIR)/usr/bin
+	mkdir -p $(DESTDIR)/usr/include
+	mkdir -p $(DESTDIR)/usr/lib/pkgconfig
+	mkdir -p $(DESTDIR)/usr/share/doc/libroxml/html
 	install -D $(TARGET_SLIB) $(DESTDIR)/usr/lib
 	install -D $(TARGET_LIB) $(DESTDIR)/usr/lib
 	install -D $(TARGET_BIN) $(DESTDIR)/usr/bin
 	install -D $(INC) $(DESTDIR)/usr/include
 	install -D libroxml.pc $(DESTDIR)/usr/lib/pkgconfig
-	install -d $(DESTDIR)/usr/share/doc/libroxml/html
 	install -D LGPL.txt $(DESTDIR)/usr/share/doc/libroxml/
-	install -D docs/html/* $(DESTDIR)/usr/share/doc/libroxml
+	install -D docs/html/* $(DESTDIR)/usr/share/doc/libroxml/html/
 
 .PHONY: uninstall
 uninstall:
