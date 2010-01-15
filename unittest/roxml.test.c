@@ -1115,11 +1115,15 @@ int test_xpath(void)
 	ASSERT_EQUAL(nbans, 1)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node0")
 
-	/*node_set = roxml_xpath(node0, "descendant-or-self::node1/@*", &nbans);
+	node_set = roxml_xpath(node0, "descendant-or-self::node1", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node1")
+
+	node_set = roxml_xpath(node0, "descendant-or-self::node1/@*", &nbans);
 	ASSERT_EQUAL(nbans, 2)
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "\"name1\"")
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[1], NULL, 0, NULL), "\"value1\"")
-	*/	
+		
 	node_set = roxml_xpath(root, "//*[@name=\"name1\"]", &nbans);
 	ASSERT_EQUAL(nbans, 1)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node1")

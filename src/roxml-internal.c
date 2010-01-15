@@ -791,6 +791,7 @@ int ROXML_INT roxml_validate_axes(node_t *root, node_t *candidat, node_t ***ans,
 			valid = 1;
 		} else if(strcmp("*", axes) == 0)  { 
 			if(candidat->type & ROXML_STD_NODE) { valid = 1; }
+			if(candidat->type & ROXML_ATTR_NODE) { valid = 1; }
 		} else if(strcmp("text()", axes) == 0)  { 
 			if(candidat->type & ROXML_TXT_NODE) { valid = 1; }
 		}

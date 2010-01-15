@@ -216,8 +216,8 @@ int	ROXML_API roxml_get_attr_nb		(node_t *n);
  * This function get the nth attribute of a node.
  * User should roxml_release the returned buffer when no longer needed.
  * \param n is one node of the tree
- * \param nb the id of attribute to read
  * \param name is the name of the child to get
+ * \param nb the id of attribute to read
  * \return the attribute corresponding to name or id (if both are set, name is used)
  */
 node_t*	ROXML_API roxml_get_attr		(node_t *n, char * name, int nb);
