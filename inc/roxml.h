@@ -74,23 +74,37 @@ typedef struct node node_t;
 /**
  * \def ROXML_ATTR_NODE
  * 
- * constant for file document
+ * constant for attribute nodes
  */
 #define ROXML_ATTR_NODE	0x04
 
 /**
  * \def ROXML_STD_NODE
  * 
- * constant for file document
+ * constant for standard nodes
  */
 #define ROXML_STD_NODE	0x08
 
 /**
  * \def ROXML_TXT_NODE
  * 
- * constant for file document
+ * constant for text nodes
  */
 #define ROXML_TXT_NODE	0x10
+
+/**
+ * \def ROXML_CMT_NODE
+ * 
+ * constant for comment nodes
+ */
+#define ROXML_TXT_NODE	0x20
+
+/**
+ * \def ROXML_PROC_NODE
+ * 
+ * constant forprocessing_intruction nodes
+ */
+#define ROXML_TXT_NODE	0x40
 
 /**
  * \def RELEASE_ALL
