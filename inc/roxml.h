@@ -100,11 +100,11 @@ typedef struct node node_t;
 #define ROXML_CMT_NODE	0x20
 
 /**
- * \def ROXML_PROC_NODE
+ * \def ROXML_PI_NODE
  * 
- * constant forprocessing_intruction nodes
+ * constant for processing_intruction nodes
  */
-#define ROXML_PROC_NODE	0x40
+#define ROXML_PI_NODE	0x40
 
 /**
  * \def RELEASE_ALL

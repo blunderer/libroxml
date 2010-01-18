@@ -146,6 +146,12 @@ char * ROXML_API roxml_get_content(node_t *n, char * name, int bufsize, int *siz
 		} else {
 			memcpy(content, n->src.buf+n->pos, n->end - n->pos);
 		}
+	} else if(n->type & ROXML_CMT_NODE)	{
+		/* not implemented yet */
+		return NULL;
+	} else if(n->type & ROXML_PI_NODE)	{
+		/* not implemented yet */
+		return NULL;
 	} else if(n->type & ROXML_ATTR_NODE)	{
 		node_t *ptr = n->text;
 		total = ptr->end - ptr->pos;
@@ -181,7 +187,7 @@ char * ROXML_API roxml_get_name(node_t *n, char * name, int size)
 	}
 
 	if(n->prnt == NULL)	{
-		strcpy(tmp_name, "root");
+		strcpy(tmp_name, "documentRoot");
 	} else if(n->type & ROXML_ATTR_NODE)	{
 		int offset = 0;
 		char *internal_ptr;
@@ -217,7 +223,11 @@ char * ROXML_API roxml_get_name(node_t *n, char * name, int size)
 			count++;
 		}
 	} else if(n->type & ROXML_TXT_NODE) {
-		strcpy(tmp_name, "");
+		return NULL;
+	} else if(n->type & ROXML_CMT_NOD) {
+		return NULL;
+	} else if(n->type & ROXML_PI_NODE) {
+		return NULL;
 	}
 
 	if(name == NULL)	{
@@ -387,7 +397,7 @@ node_t * ROXML_API roxml_get_parent(node_t *n)
 
 int ROXML_API roxml_get_type(node_t *n)
 {
-	return (n->type & (ROXML_ATTR_NODE | ROXML_STD_NODE | ROXML_TXT_NODE));
+	return (n->type & (ROXML_ATTR_NODE | ROXML_STD_NODE | ROXML_TXT_NODE | ROXML_PI_NODE | ROXML_CMT_NODE));
 }
 
 int ROXML_API roxml_get_node_index(node_t *n, int * last)
@@ -494,6 +504,10 @@ void ROXML_API roxml_del_node(node_t * n)
 		roxml_del_std_node(n);
 	} else if(n->type & ROXML_ATTR_NODE) {
 		roxml_del_arg_node(n);
+	} else if(n->type & ROXML_PI_NODE) {
+		roxml_del_std_node(n);
+	} else if(n->type & ROXML_CMT_NODE) {
+		roxml_del_std_node(n);
 	} else if(n->type & ROXML_TXT_NODE) {
 		roxml_del_txt_node(n);
 	}
@@ -546,6 +560,10 @@ node_t * roxml_add_node(node_t * parent, int type, char *name, char *value)
 		content_pos = name_l+1;
 		end_node = name_l + 1;
 		end_content = name_l + content_l + 2;
+	} else if(type & ROXML_CMT_NODE) {
+		/* not implemented yet */
+	} else if(type & ROXML_PI_NODE) {
+		/* not implemented yet */
 	} else if(type & ROXML_TXT_NODE) {
 		if(!value) { return NULL; }
 		buffer = (char*)malloc(sizeof(char)*(content_l+1));

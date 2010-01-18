@@ -65,7 +65,6 @@ int main(int argc, char ** argv)
 		fprintf(stdout,"no such file '%s'\n", argv[optind]);
 	}
 
-
 	ans = roxml_xpath(cur, argv[optind + 1],  &max);
 
 	for(j = 0; j < max; j++)
@@ -77,12 +76,7 @@ int main(int argc, char ** argv)
 		}
 		fprintf(stdout,"%s\n", c);
 	}
-	roxml_release(RELEASE_LAST);
-	roxml_release(RELEASE_LAST);
 	roxml_release(RELEASE_ALL);
-	roxml_release(RELEASE_ALL);
-	roxml_release(RELEASE_LAST);
-	roxml_release(RELEASE_LAST);
 
 	roxml_close(root);
 	return 0;

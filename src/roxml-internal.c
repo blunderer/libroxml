@@ -123,7 +123,6 @@ node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 	node_t *candidat_txt = NULL;
 	node_t *candidat_arg = NULL;
 	node_t *candidat_val = NULL;
-	int current_attr_quoted = 1;
 	int type;
 
 	void * src = NULL;
@@ -151,6 +150,14 @@ node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 		for(int_rel_pos = int_abs_pos; int_rel_pos < int_abs_pos+int_len; int_rel_pos++) {
 			char c = int_ptr[int_rel_pos-int_abs_pos];
 
+			if(c == '"') {
+				if(mode == MODE_COMMENT_NONE) {
+					mode = MODE_COMMENT_DQUOTE;
+				} else if(mode == MODE_COMMENT_DQUOTE) {
+					mode = MODE_COMMENT_NONE;
+				}
+			}
+
 #ifdef IGNORE_EMPTY_TEXT_NODES
 			if(state == STATE_NODE_CONTENT)	{
 				if(!ROXML_WHITE(c) && (c != '<')) {
@@ -159,102 +166,97 @@ node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 			}
 #endif /* IGNORE_EMPTY_TEXT_NODES */
 			if((state == STATE_NODE_ATTR)&&(inside_node_state == STATE_INSIDE_VAL_BEG))	{
-				if(mode == MODE_COMMENT_NONE)	{ current_attr_quoted = 0; }
-				else { current_attr_quoted = 1; }
 				candidat_val = roxml_create_node(int_rel_pos, src, ROXML_TXT_NODE | type);
 				candidat_val = roxml_parent_node(candidat_arg, candidat_val);
 				inside_node_state = STATE_INSIDE_VAL;
 			}
-			if(mode == MODE_COMMENT_NONE)	{
-				if(c == '<')	{
-					state = STATE_NODE_BEG;
-					if(candidat_txt)	{
+			if(c == '<')	{
+				state = STATE_NODE_BEG;
+				if(candidat_txt)	{
 #ifdef IGNORE_EMPTY_TEXT_NODES
-						if(empty_text_node == 0) {
+					if(empty_text_node == 0) {
 #endif /* IGNORE_EMPTY_TEXT_NODES */
-							node_t * to_be_closed = roxml_create_node(int_rel_pos, src, ROXML_TXT_NODE | type);
-							roxml_close_node(candidat_txt, to_be_closed);
+						node_t * to_be_closed = roxml_create_node(int_rel_pos, src, ROXML_TXT_NODE | type);
+						roxml_close_node(candidat_txt, to_be_closed);
 #ifdef IGNORE_EMPTY_TEXT_NODES
-						} else {
-							roxml_del_node(candidat_txt);
-						}
+					} else {
+						roxml_del_node(candidat_txt);
+					}
 #endif /* IGNORE_EMPTY_TEXT_NODES */
-						candidat_txt = NULL;
+					candidat_txt = NULL;
+				}
+				candidat_node = roxml_create_node(int_rel_pos, src, ROXML_STD_NODE | type);
+			} else if(c == '>')	{
+				if(state == STATE_NODE_NAME)	{
+					empty_text_node = 1;
+					state = STATE_NODE_CONTENT;
+					current_node = roxml_parent_node(current_node, candidat_node);
+					candidat_txt = roxml_create_node(int_rel_pos+1, src, ROXML_TXT_NODE | type);
+					candidat_txt = roxml_parent_node(current_node, candidat_txt);
+				} else if(state == STATE_NODE_ATTR)	{
+					if(mode == MODE_COMMENT_DQUOTE) { continue; }
+					if(inside_node_state == STATE_INSIDE_VAL)	{
+						node_t * to_be_closed = roxml_create_node(int_rel_pos, src, ROXML_ATTR_NODE | type);
+						roxml_close_node(candidat_val, to_be_closed);
 					}
-					candidat_node = roxml_create_node(int_rel_pos, src, ROXML_STD_NODE | type);
-				} else if(c == '>')	{
-					if(state == STATE_NODE_NAME)	{
-						empty_text_node = 1;
-						state = STATE_NODE_CONTENT;
-						current_node = roxml_parent_node(current_node, candidat_node);
-						candidat_txt = roxml_create_node(int_rel_pos+1, src, ROXML_TXT_NODE | type);
-						candidat_txt = roxml_parent_node(current_node, candidat_txt);
-					} else if(state == STATE_NODE_ATTR)	{
-						if(inside_node_state == STATE_INSIDE_VAL)	{
-							int off = current_attr_quoted;
-							node_t * to_be_closed = roxml_create_node(int_rel_pos-off, src, ROXML_ATTR_NODE | type);
-							roxml_close_node(candidat_val, to_be_closed);
-						}
-						current_node = roxml_parent_node(current_node, candidat_node);
-						state = STATE_NODE_CONTENT;
+					current_node = roxml_parent_node(current_node, candidat_node);
+					state = STATE_NODE_CONTENT;
+					inside_node_state = STATE_INSIDE_ARG_BEG;
+					candidat_txt = roxml_create_node(int_rel_pos+1, src, ROXML_TXT_NODE | type);
+					candidat_txt = roxml_parent_node(current_node, candidat_txt);
+				} else if(state == STATE_NODE_SINGLE)	{
+					empty_text_node = 1;
+					state = STATE_NODE_CONTENT;
+					current_node = roxml_parent_node(current_node, candidat_node);
+					if(current_node->prnt != NULL) { current_node = current_node->prnt; }
+					candidat_txt = roxml_create_node(int_rel_pos+1, src, ROXML_TXT_NODE | type);
+					candidat_txt = roxml_parent_node(current_node, candidat_txt);
+				} else if(state == STATE_NODE_END)	{
+					empty_text_node = 1;
+					state = STATE_NODE_CONTENT;
+					roxml_close_node(current_node, candidat_node);
+					if(current_node->prnt != NULL) { current_node = current_node->prnt; }
+					candidat_txt = roxml_create_node(int_rel_pos+1, src, ROXML_TXT_NODE | type);
+					candidat_txt = roxml_parent_node(current_node, candidat_txt);
+				}
+			} else if(c == '/')	{
+				if(state == STATE_NODE_BEG)	{
+					state = STATE_NODE_END;
+				} else if(state == STATE_NODE_NAME)	{
+					state = STATE_NODE_SINGLE;
+				} else if(state == STATE_NODE_ATTR)	{
+					if(mode == MODE_COMMENT_DQUOTE) { continue; }
+					if(inside_node_state == STATE_INSIDE_VAL)	{
+						node_t * to_be_closed = roxml_create_node(int_rel_pos, src, ROXML_ATTR_NODE | type);
+						roxml_close_node(candidat_val, to_be_closed);
+					}
+					inside_node_state = STATE_INSIDE_ARG_BEG;
+					state = STATE_NODE_SINGLE;
+				}
+			} else if(ROXML_WHITE(c))	{
+				if(state == STATE_NODE_NAME)	{
+					state = STATE_NODE_ATTR;
+					inside_node_state = STATE_INSIDE_ARG_BEG;
+				} else if(state == STATE_NODE_ATTR)	{
+					if(inside_node_state == STATE_INSIDE_VAL)   {
+						node_t * to_be_closed = roxml_create_node(int_rel_pos, src, ROXML_ATTR_NODE | type);
+						roxml_close_node(candidat_val, to_be_closed);
 						inside_node_state = STATE_INSIDE_ARG_BEG;
-						candidat_txt = roxml_create_node(int_rel_pos+1, src, ROXML_TXT_NODE | type);
-						candidat_txt = roxml_parent_node(current_node, candidat_txt);
-					} else if(state == STATE_NODE_SINGLE)	{
-						empty_text_node = 1;
-						state = STATE_NODE_CONTENT;
-						current_node = roxml_parent_node(current_node, candidat_node);
-						if(current_node->prnt != NULL) { current_node = current_node->prnt; }
-						candidat_txt = roxml_create_node(int_rel_pos+1, src, ROXML_TXT_NODE | type);
-						candidat_txt = roxml_parent_node(current_node, candidat_txt);
-					} else if(state == STATE_NODE_END)	{
-						empty_text_node = 1;
-						state = STATE_NODE_CONTENT;
-						roxml_close_node(current_node, candidat_node);
-						if(current_node->prnt != NULL) { current_node = current_node->prnt; }
-						candidat_txt = roxml_create_node(int_rel_pos+1, src, ROXML_TXT_NODE | type);
-						candidat_txt = roxml_parent_node(current_node, candidat_txt);
 					}
-				} else if(c == '/')	{
-					if(state == STATE_NODE_BEG)	{
-						state = STATE_NODE_END;
-					} else if(state == STATE_NODE_NAME)	{
-						state = STATE_NODE_SINGLE;
-					} else if(state == STATE_NODE_ATTR)	{
-						if(inside_node_state == STATE_INSIDE_VAL)	{
-							int off = current_attr_quoted;
-							node_t * to_be_closed = roxml_create_node(int_rel_pos-off, src, ROXML_ATTR_NODE | type);
-							roxml_close_node(candidat_val, to_be_closed);
-						}
-						inside_node_state = STATE_INSIDE_ARG_BEG;
-						state = STATE_NODE_SINGLE;
-					}
-				} else if(ROXML_WHITE(c))	{
-					if(state == STATE_NODE_NAME)	{
-						state = STATE_NODE_ATTR;
-						inside_node_state = STATE_INSIDE_ARG_BEG;
-					} else if(state == STATE_NODE_ATTR)	{
-						if(inside_node_state == STATE_INSIDE_VAL)   {
-							int off = current_attr_quoted;
-							node_t * to_be_closed = roxml_create_node(int_rel_pos-off, src, ROXML_ATTR_NODE | type);
-							roxml_close_node(candidat_val, to_be_closed);
-							inside_node_state = STATE_INSIDE_ARG_BEG;
-						}
-					}
-				} else	{
-					if(state == STATE_NODE_BEG) {
-						state = STATE_NODE_NAME;
-					}
-					if(state == STATE_NODE_ATTR)	{
-						if(inside_node_state == STATE_INSIDE_ARG_BEG)	{
-							candidat_arg = roxml_create_node(int_rel_pos-1, src, ROXML_ATTR_NODE | type);
-							candidat_arg = roxml_parent_node(candidat_node, candidat_arg);
-							inside_node_state = STATE_INSIDE_ARG;
-						} else if((inside_node_state == STATE_INSIDE_ARG)&&(c == '='))	{
-							inside_node_state = STATE_INSIDE_VAL_BEG;
-							node_t * to_be_closed = roxml_create_node(int_rel_pos, src, ROXML_ATTR_NODE | type);
-							roxml_close_node(candidat_arg, to_be_closed);
-						}
+				}
+			} else	{
+				if(state == STATE_NODE_BEG) {
+					state = STATE_NODE_NAME;
+				}
+				if(state == STATE_NODE_ATTR)	{
+					if(inside_node_state == STATE_INSIDE_ARG_BEG)	{
+						candidat_arg = roxml_create_node(int_rel_pos-1, src, ROXML_ATTR_NODE | type);
+						candidat_arg = roxml_parent_node(candidat_node, candidat_arg);
+						inside_node_state = STATE_INSIDE_ARG;
+					} else if((inside_node_state == STATE_INSIDE_ARG)&&(c == '='))	{
+						inside_node_state = STATE_INSIDE_VAL_BEG;
+						node_t * to_be_closed = roxml_create_node(int_rel_pos, src, ROXML_ATTR_NODE | type);
+						roxml_close_node(candidat_arg, to_be_closed);
 					}
 				}
 			}
@@ -310,14 +312,6 @@ xpath_node_t * ROXML_INT roxml_set_axes(xpath_node_t *node, char *axes, int *off
 		tmp_node->axes = ROXML_ID_CHILD;
 		node->next = tmp_node;
 		node = roxml_set_axes(tmp_node, axes+strlen(ROXML_L_DESC), offset);
-	} else if(strncmp(ROXML_L_SELF, axes, strlen(ROXML_L_SELF))==0) {
-		// ROXML_L_SELF
-		node->axes = ROXML_ID_SELF;
-		node->name = axes+strlen(ROXML_L_SELF);
-	} else if(strncmp(ROXML_S_SELF, axes, strlen(ROXML_S_SELF))==0) {
-		// ROXML_S_SELF
-		node->axes = ROXML_ID_SELF;
-		node->name = axes+strlen(ROXML_S_SELF);
 	} else if(strncmp(ROXML_L_PARENT, axes, strlen(ROXML_L_PARENT))==0) {
 		// ROXML_L_PARENT
 		node->axes = ROXML_ID_PARENT;
@@ -326,6 +320,14 @@ xpath_node_t * ROXML_INT roxml_set_axes(xpath_node_t *node, char *axes, int *off
 		// ROXML_S_PARENT
 		node->axes = ROXML_ID_PARENT;
 		node->name = axes+strlen(ROXML_S_PARENT);
+	} else if(strncmp(ROXML_L_SELF, axes, strlen(ROXML_L_SELF))==0) {
+		// ROXML_L_SELF
+		node->axes = ROXML_ID_SELF;
+		node->name = axes+strlen(ROXML_L_SELF);
+	} else if(strncmp(ROXML_S_SELF, axes, strlen(ROXML_S_SELF))==0) {
+		// ROXML_S_SELF
+		node->axes = ROXML_ID_SELF;
+		node->name = axes+strlen(ROXML_S_SELF);
 	} else if(strncmp(ROXML_L_ATTR, axes, strlen(ROXML_L_ATTR))==0) {
 		// ROXML_L_ATTR
 		node->axes = ROXML_ID_ATTR;
@@ -387,6 +389,7 @@ int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t ** xpath)
 	int len = strlen(path);
 	int is_first_node = 1;
 	int wait_first_node = 1;
+	int shorten_cond = 0;
 
 	xpath_node_t * first_node = (xpath_node_t*)calloc(1, sizeof(xpath_node_t));
 	xpath_node_t * new_node = first_node;
@@ -405,7 +408,10 @@ int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t ** xpath)
 					first_node = tmp_node;
 					new_node = tmp_node;
 					first_node->abs = 1;
-				} else if(is_first_node) {
+				} else if((path[cur] == '/')&&(wait_first_node)) { 
+					free(tmp_node);
+					first_node->abs = 1;
+				} else if((is_first_node)||(wait_first_node)) {
 					free(tmp_node);
 				} else {
 					if(new_node)	{ new_node->next = tmp_node; }
@@ -435,6 +441,7 @@ int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t ** xpath)
 				path[cur] = '\0';
 
 				if(bracket)	{
+					shorten_cond = 1;
 					xpath_cond_t * tmp_cond = (xpath_cond_t*)calloc(1, sizeof(xpath_cond_t));
 					new_node->cond = tmp_cond;
 					new_cond = tmp_cond;
@@ -490,7 +497,12 @@ int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t ** xpath)
 					new_cond->rel = ROXML_OPERATOR_AND;
 					new_cond->arg1 = path+cur+1;
 				}
-				if(strncmp(path+cur, ROXML_FUNC_POS_STR, strlen(ROXML_FUNC_POS_STR)) == 0) {
+				if((path[cur] >= '0') && (path[cur] <= '9') && shorten_cond) {
+					new_cond->func = ROXML_FUNC_POS;
+					new_cond->op = ROXML_OPERATOR_EQU;
+					new_cond->arg2 = path+cur;
+					while((path[cur+1] >= '0') && (path[cur+1] <= '9')) { cur++; }
+				} else if(strncmp(path+cur, ROXML_FUNC_POS_STR, strlen(ROXML_FUNC_POS_STR)) == 0) {
 					cur += strlen(ROXML_FUNC_POS_STR)-1;
 					new_cond->func = ROXML_FUNC_POS;
 				} else if(strncmp(path+cur, ROXML_FUNC_FIRST_STR, strlen(ROXML_FUNC_FIRST_STR)) == 0) {
@@ -564,6 +576,7 @@ int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t ** xpath)
 						new_cond->func = ROXML_FUNC_STRCOMP;
 					}
 				}
+				shorten_cond = 0;
 			}
 		}
 	}
@@ -792,8 +805,21 @@ int ROXML_INT roxml_validate_axes(node_t *root, node_t *candidat, node_t ***ans,
 		} else if(strcmp("*", axes) == 0)  { 
 			if(candidat->type & ROXML_STD_NODE) { valid = 1; }
 			if(candidat->type & ROXML_ATTR_NODE) { valid = 1; }
+		} else if(strcmp("comment()", axes) == 0)  { 
+			if(candidat->type & ROXML_CMT_NODE) { valid = 1; }
+		} else if(strcmp("processing-instruction()", axes) == 0)  { 
+			if(candidat->type & ROXML_PI_NODE) { valid = 1; }
 		} else if(strcmp("text()", axes) == 0)  { 
 			if(candidat->type & ROXML_TXT_NODE) { valid = 1; }
+		} else if(strcmp("", axes) == 0)  {
+			if(xn->abs) {
+				candidat = root;
+				valid = 1;
+			}
+		}
+		if(!valid) {
+			if(candidat->type & ROXML_PI_NODE) { return 0; }
+			if(candidat->type & ROXML_CMT_NODE) { return 0; }
 		}
 		if(xn->next == NULL) { path_end = 1; }
 		if((xn->axes == ROXML_ID_SELF)||(xn->axes == ROXML_ID_PARENT)) { valid = 1; }

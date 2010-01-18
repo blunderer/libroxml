@@ -62,16 +62,17 @@ static int xmlfs_getattr(const char *path, struct stat *stbuf)
 	if(ptr = strstr(newpath, NODE_CONTENT))	{
 		*ptr = 0;
 		content = 1;
+		strcat(newpath, ".");
 	}
 
 	DEBUG("trying '%s'",newpath);
-	node_t **ans = roxml_exec_path(root, newpath, &nb);
+	node_t **ans = roxml_xpath(root, newpath, &nb);
 
 	if(ans) {
 		DEBUG("got ans")
 		n = ans[0];
-		if((roxml_is_arg(n))||(content))	{
-			char * txt = roxml_get_content(n);
+		if((roxml_get_type(n)==ROXML_ATTR_NODE)||(content))	{
+			char * txt = roxml_get_content(n, NULL, 0, NULL);
 			fsize = strlen(txt);
 			roxml_release(txt);
 			stbuf->st_mode = S_IFREG;
@@ -105,23 +106,24 @@ static int xmlfs_getattr(const char *path, struct stat *stbuf)
 static int xmlfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, off_t offset, struct fuse_file_info *fi)
 {
 	DEBUG("here")
+	DEBUG("trying '%s'",path);
 	int i;
 	int nb;
 	node_t *n = NULL;
 	node_t *root = fuse_get_context()->private_data;
-	node_t **ans = roxml_exec_path(root, (char*)path, &nb);
+	node_t **ans = roxml_xpath(root, (char*)path, &nb);
 
 	if(ans)	{
 		n = ans[0];
 		roxml_release(ans);
 
-		nb = roxml_get_son_nb(n);
+		nb = roxml_get_chld_nb(n);
 		DEBUG("%d dirs", nb)
 		for(i = 0; i < nb; i++)	{
 			int idx;
 			char fname[512] = "";
-			node_t *tmp = roxml_get_son_nth(n, i);
-			char *name = roxml_get_name(tmp);
+			node_t *tmp = roxml_get_chld(n, NULL, i);
+			char *name = roxml_get_name(tmp, NULL, 0);
 			idx = roxml_get_node_index(tmp, NULL);
 			if(idx != -1)	{
 				sprintf(fname,"%s[%d]",name,idx);
@@ -135,14 +137,17 @@ static int xmlfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, of
 		DEBUG("%d files", nb)
 		for(i = 0; i < nb; i++)	{
 			char fname[512] = "@";
-			char *name = roxml_get_attr_nth(n, i);
+			char *name = roxml_get_name(roxml_get_attr(n, NULL, i), NULL, 0);
 			strcat(fname, name);
 			filler(buf, fname, NULL, 0);
 			roxml_release(name);
 		}
-		if(roxml_get_content(n))	{
-			filler(buf, NODE_CONTENT, NULL, 0);
-			roxml_release(RELEASE_LAST);
+		nb = roxml_get_text_nb(n);
+		if(nb > 0)	{
+			DEBUG("content file")
+			char fname[512];
+			sprintf(fname, "%s", NODE_CONTENT, i);
+			filler(buf, fname, NULL, 0);
 		}
 
 		return 0;
@@ -168,8 +173,9 @@ static int xmlfs_open(const char *path, struct fuse_file_info *fi)
 	strcpy(newpath, path);
 	if(ptr = strstr(newpath, NODE_CONTENT))	{
 		*ptr = 0;
+		strcat(newpath, ".");
 	}
-	node_t **ans = roxml_exec_path(root, (char*)newpath, &nb);
+	node_t **ans = roxml_xpath(root, (char*)newpath, &nb);
 
 	if(ans)	{
 		node_t *n = ans[0];
@@ -199,7 +205,7 @@ static int xmlfs_read(const char *path, char *buf, size_t size, off_t offset, st
 
 	if (!n) { return -ENOENT; }
 
-	content = roxml_get_content(n);
+	content = roxml_get_content(n, NULL, 0, NULL);
 	bsize = strlen(content);
 
 	if((size + offset) >= bsize)	{

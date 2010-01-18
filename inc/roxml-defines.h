@@ -50,6 +50,8 @@
 #define ROXML_FUNC_LAST_STR	"last()"
 #define ROXML_FUNC_TEXT_STR	"text()"
 #define ROXML_FUNC_NODE_STR	"node()"
+#define ROXML_FUNC_COMMENT_STR	"comment()"
+#define ROXML_FUNC_PI_STR	"processing-instruction()"
 
 #define ROXML_BULK_READ		4096
 #define ROXML_LONG_LEN		512

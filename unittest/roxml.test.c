@@ -690,7 +690,7 @@ int test_get_chld(void)
 	INIT
 	node_t *root = roxml_load_doc("roxml.test.xml");
 
-	ASSERT_STRING_EQUAL(roxml_get_name(root, NULL, 0), "root")
+	ASSERT_STRING_EQUAL(roxml_get_name(root, NULL, 0), "documentRoot")
 
 	node_t * node0 = roxml_get_chld(root, NULL, 0);
 	ASSERT_STRING_EQUAL(roxml_get_name(node0, NULL, 0), "node0")
@@ -886,8 +886,30 @@ int test_parse_xpath(void)
 	INIT
 
 	xpath_node_t *ptr;
-	char mypath[128] = "/node[first() or last()]/item/title/@version || /node/item/title[@version < 3] && /node/item/title[@version = v1]";
+	char mypath[256] = "/node/item[12]/title";
 	int ret = roxml_parse_xpath(mypath, &ptr);	
+
+	ASSERT_EQUAL(ret, 1)
+	ASSERT_EQUAL(ptr[0].axes, ROXML_ID_CHILD);
+	ASSERT_NULL(ptr[0].cond);
+	ASSERT_STRING_EQUAL(ptr[0].name, "node")
+	ASSERT_NOT_NULL(ptr[0].next);
+	ASSERT_STRING_EQUAL(ptr[0].next->name, "item")
+	ASSERT_EQUAL(ptr[0].next->axes, ROXML_ID_CHILD)
+	ASSERT_NOT_NULL(ptr[0].next->cond);
+	ASSERT_EQUAL(ptr[0].next->cond->func, ROXML_FUNC_POS)
+	ASSERT_STRING_EQUAL(ptr[0].next->cond->arg2, "12")
+	ASSERT_STRING_EQUAL(ptr[0].next->cond->arg1, "12")
+	ASSERT_EQUAL(ptr[0].next->next->axes, ROXML_ID_CHILD)
+	ASSERT_NOT_NULL(ptr[0].next->next);
+	ASSERT_NULL(ptr[0].next->next->next);
+	ASSERT_STRING_EQUAL(ptr[0].next->next->name, "title")
+	ASSERT_NULL(ptr[0].next->next->cond)
+
+	roxml_free_xpath(ptr, ret);
+
+	strcpy(mypath, "/node[first() or last()]/item/title/@version || /node/item/title[@version < 3] && /node/item/title[@version = v1]");
+	ret = roxml_parse_xpath(mypath, &ptr);	
 
 	ASSERT_EQUAL(ret, 3)
 	ASSERT_NOT_NULL(ptr[0].next);
@@ -918,45 +940,41 @@ int test_parse_xpath(void)
 	ASSERT_NULL(ptr[1].cond);
 	ASSERT_NOT_NULL(ptr[1].next);
 	ASSERT_EQUAL(ptr[1].rel, ROXML_OPERATOR_OR)
-	ASSERT_NOT_NULL(ptr[1].next->next);
-	ASSERT_NOT_NULL(ptr[1].next->next->next);
-	ASSERT_NOT_NULL(ptr[1].next->next->next);
-	ASSERT_NULL(ptr[1].next->next->next->next);
+	ASSERT_EQUAL(ptr[1].axes, ROXML_ID_CHILD)
+	ASSERT_STRING_EQUAL(ptr[1].name, "node")
+	ASSERT_STRING_EQUAL(ptr[1].next->name, "item")
 	ASSERT_EQUAL(ptr[1].next->axes, ROXML_ID_CHILD)
-	ASSERT_STRING_EQUAL(ptr[1].next->name, "node")
+	ASSERT_NOT_NULL(ptr[1].next->next);
+	ASSERT_NULL(ptr[1].next->cond)
+	ASSERT_NULL(ptr[1].next->next->next);
 	ASSERT_EQUAL(ptr[1].next->next->axes, ROXML_ID_CHILD)
-	ASSERT_STRING_EQUAL(ptr[1].next->next->name, "item")
-	ASSERT_NULL(ptr[1].next->next->cond)
-	ASSERT_EQUAL(ptr[1].next->next->next->axes, ROXML_ID_CHILD)
-	ASSERT_STRING_EQUAL(ptr[1].next->next->next->name, "title")
-	ASSERT_NOT_NULL(ptr[1].next->next->next->cond)
-	ASSERT_NULL(ptr[1].next->next->next->cond->next)
-	ASSERT_STRING_EQUAL(ptr[1].next->next->next->cond->arg1, "@version")
-	ASSERT_STRING_EQUAL(ptr[1].next->next->next->cond->arg2, "3")
-	ASSERT_EQUAL(ptr[1].next->next->next->cond->func, ROXML_FUNC_INTCOMP)
-	ASSERT_EQUAL(ptr[1].next->next->next->cond->op, ROXML_OPERATOR_INF)
+	ASSERT_STRING_EQUAL(ptr[1].next->next->name, "title")
+	ASSERT_NOT_NULL(ptr[1].next->next->cond)
+	ASSERT_NULL(ptr[1].next->next->cond->next)
+	ASSERT_STRING_EQUAL(ptr[1].next->next->cond->arg1, "@version")
+	ASSERT_STRING_EQUAL(ptr[1].next->next->cond->arg2, "3")
+	ASSERT_EQUAL(ptr[1].next->next->cond->func, ROXML_FUNC_INTCOMP)
+	ASSERT_EQUAL(ptr[1].next->next->cond->op, ROXML_OPERATOR_INF)
 
 	ASSERT_EQUAL(ptr[2].axes, ROXML_ID_CHILD);
 	ASSERT_NULL(ptr[2].cond);
-	ASSERT_NOT_NULL(ptr[2].next);
 	ASSERT_EQUAL(ptr[2].rel, ROXML_OPERATOR_AND)
+	ASSERT_NOT_NULL(ptr[2].next);
 	ASSERT_NOT_NULL(ptr[2].next->next);
-	ASSERT_NOT_NULL(ptr[2].next->next->next);
-	ASSERT_NOT_NULL(ptr[2].next->next->next);
-	ASSERT_NULL(ptr[2].next->next->next->next);
+	ASSERT_NULL(ptr[2].next->next->next);
+	ASSERT_EQUAL(ptr[2].axes, ROXML_ID_CHILD)
+	ASSERT_STRING_EQUAL(ptr[2].name, "node")
 	ASSERT_EQUAL(ptr[2].next->axes, ROXML_ID_CHILD)
-	ASSERT_STRING_EQUAL(ptr[2].next->name, "node")
+	ASSERT_STRING_EQUAL(ptr[2].next->name, "item")
+	ASSERT_NULL(ptr[2].next->cond)
 	ASSERT_EQUAL(ptr[2].next->next->axes, ROXML_ID_CHILD)
-	ASSERT_STRING_EQUAL(ptr[2].next->next->name, "item")
-	ASSERT_NULL(ptr[2].next->next->cond)
-	ASSERT_EQUAL(ptr[2].next->next->next->axes, ROXML_ID_CHILD)
-	ASSERT_STRING_EQUAL(ptr[2].next->next->next->name, "title")
-	ASSERT_NOT_NULL(ptr[2].next->next->next->cond)
-	ASSERT_NULL(ptr[2].next->next->next->cond->next)
-	ASSERT_STRING_EQUAL(ptr[2].next->next->next->cond->arg1, "@version")
-	ASSERT_STRING_EQUAL(ptr[2].next->next->next->cond->arg2, "v1")
-	ASSERT_EQUAL(ptr[2].next->next->next->cond->func, ROXML_FUNC_STRCOMP)
-	ASSERT_EQUAL(ptr[2].next->next->next->cond->op, ROXML_OPERATOR_EQU)
+	ASSERT_STRING_EQUAL(ptr[2].next->next->name, "title")
+	ASSERT_NOT_NULL(ptr[2].next->next->cond)
+	ASSERT_NULL(ptr[2].next->next->cond->next)
+	ASSERT_STRING_EQUAL(ptr[2].next->next->cond->arg1, "@version")
+	ASSERT_STRING_EQUAL(ptr[2].next->next->cond->arg2, "v1")
+	ASSERT_EQUAL(ptr[2].next->next->cond->func, ROXML_FUNC_STRCOMP)
+	ASSERT_EQUAL(ptr[2].next->next->cond->op, ROXML_OPERATOR_EQU)
 
 	roxml_free_xpath(ptr, ret);
 	RETURN
@@ -1020,6 +1038,25 @@ int test_xpath(void)
 	ASSERT_EQUAL(nbans, 1)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node2")
 	node2 = node_set[0];
+
+	node_set = roxml_xpath(node2, ".", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node2")
+
+	node_set = roxml_xpath(node2, "..", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node0")
+
+	node_set = roxml_xpath(node2, "node2", &nbans);
+	ASSERT_EQUAL(nbans, 0)
+
+	node_set = roxml_xpath(root, "/", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "documentRoot")
+
+	node_set = roxml_xpath(node2, "/", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "documentRoot")
 
 	node_set = roxml_xpath(node2, "node3", &nbans);
 	ASSERT_EQUAL(nbans, 1)
@@ -1231,6 +1268,11 @@ int test_xpath(void)
 	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "5")
 	
 	node_set = roxml_xpath(root, "/node0/item[position() = 2]", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	attr = roxml_get_attr(node_set[0], "id", 0);
+	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "2")
+	
+	node_set = roxml_xpath(root, "/node0/item[2]", &nbans);
 	ASSERT_EQUAL(nbans, 1)
 	attr = roxml_get_attr(node_set[0], "id", 0);
 	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "2")
