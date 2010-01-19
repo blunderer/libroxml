@@ -190,12 +190,11 @@
 #define ROXML_BUFF	0x02
 
 /**
- * \def ROXML_PENDING
+ * \def ROXML_INT_ROOT
  * 
  * constant for pending node
  */
-#define ROXML_PENDING	0x20
-
+#define ROXML_PENDING	0x04
 
 /**
  * \def STATE_NODE_NONE
@@ -273,6 +272,34 @@
  * state for the state machine for separator reading
  */
 #define STATE_NODE_SEP		11
+
+/**
+ * \def STATE_NODE_PI
+ * 
+ * state for the state machine for separator reading
+ */
+#define STATE_NODE_PI		12
+
+/**
+ * \def STATE_NODE_COMMENT_BEG
+ * 
+ * state for the state machine for separator reading
+ */
+#define STATE_NODE_COMMENT_BEG		13
+
+/**
+ * \def STATE_NODE_COMMENT	
+ * 
+ * state for the state machine for separator reading
+ */
+#define STATE_NODE_COMMENT		15
+
+/**
+ * \def STATE_NODE_COMMENT_END	
+ * 
+ * state for the state machine for separator reading
+ */
+#define STATE_NODE_COMMENT_END		16
 
 /**
  * \def MODE_COMMENT_NONE

@@ -36,6 +36,7 @@ clean:
 	$(RM) $(OBJ1)
 	$(RM) $(OBJ2)
 	$(RM) $(OBJ3)
+	$(RM) out.xml.copy out.xml out.xml.human
 	
 mrproper: clean
 	$(RM) $(TARGET1)

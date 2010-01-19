@@ -1,0 +1,4 @@
+<node>
+<!--this is a comment-->
+<? value="2" ?>
+</node>

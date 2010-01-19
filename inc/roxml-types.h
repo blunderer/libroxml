@@ -110,7 +110,7 @@ typedef struct _xpath_tok {
  * tree links
  */
 typedef struct node {
-	char type;			/*!< document or buffer / attribute or value */
+	unsigned char type;		/*!< document or buffer / attribute or value */
 	union {
 		char *buf;		/*!< buffer address */
 		FILE *fil;		/*!< loaded document */

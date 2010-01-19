@@ -103,6 +103,17 @@ node_t*	ROXML_INT roxml_load			(node_t *current_node, FILE *file, char *buffer);
  */
 node_t * ROXML_INT roxml_parent_node		(node_t *parent, node_t *n);
 
+/** \brief node relocate function
+ *
+ * \fn roxml_parent_node_at(node_t *parent, node_t *n, int position);
+ * this function change the position of a node in its parent list
+ * \param parent the parent node
+ * \param n the node to parent
+ * \param position the position, 0 means or > nb children means at the end
+ * \return 
+ */
+void ROXML_INT roxml_parent_node_at		(node_t *parent, node_t * n, int position);
+
 /** \brief alloc memory function
  *
  * \fn roxml_malloc(int size, int num, int type)
@@ -306,6 +317,16 @@ void ROXML_INT roxml_del_txt_node		(node_t * n);
  * \return 
  */
 void ROXML_INT roxml_del_std_node		(node_t * n); 
+
+/** \brief node type setter function
+ *
+ * \fn roxml_set_type(node_t * n, int type); 
+ * this function change the type of a node
+ * \param n the node to modify
+ * \param type the new type to set
+ * \return 
+ */
+void ROXML_INT roxml_set_type			(node_t * n, int type);
 
 #ifdef __DEBUG
 extern unsigned int _nb_node;

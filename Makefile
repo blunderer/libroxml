@@ -74,9 +74,11 @@ $(TARGET_BIN): | $(if $(filter -static, $(LDFLAGS)), $(TARGET_SLIB), $(TARGET_LI
 all: $(TARGET_SLIB) $(if $(filter -static, $(LDFLAGS)), , $(TARGET_LIB)) $(TARGET_BIN)
 
 .PHONY: doxy
-doxy: doxy.cfg
-	$(call ECHO_DO, '  DOXYGEN', \
-	doxygen $< &> /dev/null)
+doxy: doxy.cfg man.cfg
+	$(call ECHO_DO, '  HTML DOXYGEN', \
+	doxygen doxy.cfg &> /dev/null)
+	$(call ECHO_DO, '  MAN DOXYGEN', \
+	doxygen man.cfg &> /dev/null)
 
 .PHONY: clean
 clean:
@@ -95,6 +97,7 @@ install: $(TARGETS) doxy
 	mkdir -p $(DESTDIR)/usr/bin
 	mkdir -p $(DESTDIR)/usr/include
 	mkdir -p $(DESTDIR)/usr/lib/pkgconfig
+	mkdir -p $(DESTDIR)/usr/share/man/man3
 	mkdir -p $(DESTDIR)/usr/share/doc/libroxml/html
 	install -D $(TARGET_SLIB) $(DESTDIR)/usr/lib
 	install -D $(TARGET_LIB) $(DESTDIR)/usr/lib
@@ -102,6 +105,7 @@ install: $(TARGETS) doxy
 	install -D $(INC) $(DESTDIR)/usr/include
 	install -D libroxml.pc $(DESTDIR)/usr/lib/pkgconfig
 	install -D LGPL.txt $(DESTDIR)/usr/share/doc/libroxml/
+	install -D docs/man/man3/* $(DESTDIR)/usr/share/man/man3/
 	install -D docs/html/* $(DESTDIR)/usr/share/doc/libroxml/html/
 
 .PHONY: uninstall

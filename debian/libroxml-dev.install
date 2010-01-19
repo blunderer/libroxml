@@ -1,3 +1,4 @@
 usr/include/*
 usr/lib/pkgconfig/*
 usr/share/doc/libroxml/html/*
+usr/share/man/man3/*

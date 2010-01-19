@@ -76,35 +76,35 @@ typedef struct node node_t;
  * 
  * constant for attribute nodes
  */
-#define ROXML_ATTR_NODE	0x04
+#define ROXML_ATTR_NODE	0x08
 
 /**
  * \def ROXML_STD_NODE
  * 
  * constant for standard nodes
  */
-#define ROXML_STD_NODE	0x08
+#define ROXML_STD_NODE	0x10
 
 /**
  * \def ROXML_TXT_NODE
  * 
  * constant for text nodes
  */
-#define ROXML_TXT_NODE	0x10
+#define ROXML_TXT_NODE	0x20
 
 /**
  * \def ROXML_CMT_NODE
  * 
  * constant for comment nodes
  */
-#define ROXML_CMT_NODE	0x20
+#define ROXML_CMT_NODE	0x40
 
 /**
  * \def ROXML_PI_NODE
  * 
  * constant for processing_intruction nodes
  */
-#define ROXML_PI_NODE	0x40
+#define ROXML_PI_NODE	0x80
 
 /**
  * \def RELEASE_ALL
@@ -299,10 +299,11 @@ int roxml_get_type				(node_t *n);
 
 /** \brief add a node to the tree
  *
- * \fn roxml_add_node(node_t * parent, int type, char *name, char *value);
+ * \fn roxml_add_node(node_t * parent, int position, int type, char *name, char *value);
  * this function add a new node to the tree. This will not update de buffer or file,
  * only the RAM loaded tree
  * \param parent the parent node
+ * \param position the position as a child of parent (0 for auto position at the end of children list)
  * \param type the type of node between ROXML_ATTR_NODE, ROXML_STD_NODE, ROXML_TXT_NODE
  * \param name the name of the node (for ROXML_ATTR_NODE and ROXML_STD_NODE only)
  * \param value the text content (for ROXML_STD_NODE, ROXML_TXT_NODE) or the attribute value (ROXML_ATTR_NODE)
@@ -310,7 +311,7 @@ int roxml_get_type				(node_t *n);
  * \see roxml_commit_changes
  * \see roxml_del_node
  */
-node_t * ROXML_API roxml_add_node		(node_t * parent, int type, char *name, char *value);
+node_t * ROXML_API roxml_add_node		(node_t * parent, int position, int type, char *name, char *value);
 
 /** \brief text content getter function
  *

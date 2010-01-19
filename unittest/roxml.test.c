@@ -1413,20 +1413,84 @@ int test_get_node_index(void)
 	RETURN
 }
 
+int test_spec_nodes(void)
+{
+	INIT /* init context macro */
+
+	int nbans;
+	node_t *root = roxml_load_doc("roxml.test.xml.specnodes");
+
+	// test internal struct
+	ASSERT_NOT_NULL(root)
+	ASSERT_NOT_NULL(root->chld) // node
+	ASSERT_NOT_NULL(root->chld->chld) // comment
+	ASSERT_NOT_NULL(root->chld->chld->sibl) // pi
+	ASSERT_EQUAL(root->chld->chld->type, ROXML_CMT_NODE | ROXML_FILE) // comment
+	ASSERT_EQUAL(root->chld->chld->sibl->type, ROXML_PI_NODE | ROXML_FILE) // pi
+
+	// test content
+	char * content = roxml_get_content(root->chld->chld, NULL, 0, NULL);
+	ASSERT_STRING_EQUAL(content, "this is a comment")
+	content = roxml_get_content(root->chld->chld->sibl, NULL, 0, NULL);
+	ASSERT_STRING_EQUAL(content, " value=\"2\" ")
+
+	// test xpath
+	node_t **node_set = roxml_xpath(root, "//comment()", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "this is a comment")
+	node_set = roxml_xpath(root, "//processing-instruction()", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), " value=\"2\" ")
+	node_set = roxml_xpath(root, "//*", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node")
+	node_set = roxml_xpath(root, "//node()", &nbans);
+	ASSERT_EQUAL(nbans, 3)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[1], NULL, 0, NULL), "this is a comment")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[2], NULL, 0, NULL), " value=\"2\" ")
+
+	roxml_close(root);
+	
+	RETURN /* close context macro */
+}
+
 int test_write_tree(void)
 {
 	INIT /* init context macro */
 
-	node_t * root = roxml_add_node(NULL, ROXML_STD_NODE, "xml", NULL);
-	node_t *node = roxml_add_node(root, ROXML_STD_NODE, "node1", "content1");
-	roxml_add_node(root, ROXML_ATTR_NODE, "attr1", "value1");
-	node_t *node2 = roxml_add_node(node, ROXML_STD_NODE, "node2", "content2");
-	roxml_add_node(node, ROXML_TXT_NODE, NULL, "content1bis");
-	roxml_add_node(node2, ROXML_TXT_NODE, NULL, "content2bis");
-	roxml_add_node(node, ROXML_STD_NODE, "node3", "content3");
+	node_t *root = roxml_load_doc("roxml.test.xml");
+	node_t *node = roxml_add_node(root, 1, ROXML_CMT_NODE, NULL, "this is a test XML file");
+	node = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "this was a test XML file");
+	node = roxml_add_node(root, 2, ROXML_PI_NODE, NULL, "value=\"2\"");
+	roxml_commit_changes(root, "out.xml.copy", NULL, 1);
+	roxml_close(root);
+
+	root = roxml_add_node(NULL, 0, ROXML_STD_NODE, "xml", NULL);
+	node = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "this is a test XML file");
+	node = roxml_add_node(root, 0, ROXML_PI_NODE, NULL, "value=\"2\"");
+	node = roxml_add_node(root, 0, ROXML_STD_NODE, "node1", "content1");
+	roxml_add_node(root, 0, ROXML_ATTR_NODE, "attr1", "value1");
+	node_t *node2 = roxml_add_node(node, 0, ROXML_STD_NODE, "node2", "content2");
+	roxml_add_node(node, 0, ROXML_TXT_NODE, NULL, "content1bis");
+	roxml_add_node(node2, 0, ROXML_TXT_NODE, NULL, "content2bis");
+	roxml_add_node(node, 0, ROXML_STD_NODE, "node3", "content3");
 	
-	roxml_commit_changes(root, "out.xml", NULL, 0);
-	roxml_commit_changes(root, "out.xml.human", NULL, 1);
+	ASSERT_NOT_NULL(root)	// xml
+	ASSERT_NOT_NULL(root->attr) // attr1
+	ASSERT_NOT_NULL(root->chld) // cmt
+	ASSERT_NOT_NULL(root->chld->sibl) // pi
+	ASSERT_NOT_NULL(root->chld->sibl->sibl) // node1
+	ASSERT_NOT_NULL(root->chld->sibl->sibl->text) // content1
+	ASSERT_NOT_NULL(root->chld->sibl->sibl->text->sibl) // content1bis
+	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld) // node2
+	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld->text) // content2
+	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld->text->sibl) // content2bis
+	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld->sibl) // node3
+	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld->sibl->text) // content3
+
+	roxml_commit_changes(root, "out.xml", NULL, 1);
+	roxml_commit_changes(root, "out.xml.human", NULL, 0);
 	roxml_close(root);
 	
 	RETURN /* close context macro */
@@ -1460,6 +1524,7 @@ int main(int argc, char ** argv)	{
 	TEST_FUNC(test_get_node_type)
 	TEST_FUNC(test_get_node_index)
 	TEST_FUNC(test_write_tree) 
+	TEST_FUNC(test_spec_nodes) 
 
 	EXEC_UNITTEST /* exec tests depending on command line option see available options with --help */
 
