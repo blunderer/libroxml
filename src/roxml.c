@@ -605,7 +605,7 @@ node_t * roxml_add_node(node_t * parent, int position, int type, char *name, cha
 			end_node = name_l + content_l + 2;
 			end_content = end_node;
 		} else {
-			buffer = (char*)malloc(sizeof(char)*(name_l+4));
+			buffer = (char*)malloc(sizeof(char)*(name_l+5));
 			sprintf(buffer,"<%s />",name);
 		}
 	}

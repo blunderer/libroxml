@@ -127,5 +127,21 @@ typedef struct node {
 	void *priv;			/*!< ref to xpath tok (internal use) */
 } node_t;
 
+typedef struct {
+	int pos;
+	int empty_text_node;
+	int state;
+	int previous_state;
+	int mode;
+	int inside_node_state;
+	int type;
+	void * src;
+	node_t *candidat_node;
+	node_t *candidat_txt;
+	node_t *candidat_arg;
+	node_t *candidat_val;
+	node_t *current_node;
+} roxml_parse_ctx_t;
+
 #endif /* ROXML_TYPES_H */
 

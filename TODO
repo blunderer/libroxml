@@ -5,6 +5,5 @@ do operation on function (like last() - 1)
 do double predicat (node[3][2])
 do select node that as a particular child in conditions : node[childname]
 do some functions in xpath syntax (lang, string, number, count...)
-do parse CDATA syntaxe
 do check memory leaks
 

@@ -218,88 +218,109 @@
 #define STATE_NODE_NAME		2
 
 /**
- * \def STATE_NODE_CONTENT
- * 
- * state for the state machine for content read
- */
-#define STATE_NODE_CONTENT	3
-
-/**
  * \def STATE_NODE_END
  * 
  * state for the state machine for end of node
  */
-#define STATE_NODE_END		4
-
-/**
- * \def STATE_NODE_SINGLE
- * 
- * state for the state machine for single nodes 
- */
-#define STATE_NODE_SINGLE	5
-
-/**
- * \def STATE_NODE_ATTR
- * 
- * state for the state machine for attribut reading 
- */
-#define STATE_NODE_ATTR		6
+#define STATE_NODE_END		3
 
 /**
  * \def STATE_NODE_STRING
  * 
  * state for the state machine for string reading 
  */
-#define STATE_NODE_STRING	7
+#define STATE_NODE_STRING	4
 
 /**
  * \def STATE_NODE_ARG
  * 
  * state for the state machine for attribute name reading 
  */
-#define STATE_NODE_ARG		9
+#define STATE_NODE_ARG		5
 
 /**
  * \def STATE_NODE_ARGVAL
  * 
  * state for the state machine for attribute value reading 
  */
-#define STATE_NODE_ARGVAL	10
+#define STATE_NODE_ARGVAL	6
 
 /**
  * \def STATE_NODE_SEP	
  * 
  * state for the state machine for separator reading
  */
-#define STATE_NODE_SEP		11
+#define STATE_NODE_SEP		7
 
 /**
  * \def STATE_NODE_PI
  * 
  * state for the state machine for separator reading
  */
-#define STATE_NODE_PI		12
+#define STATE_NODE_PI		8
+
+/**
+ * \def STATE_NODE_SINGLE
+ * 
+ * state for the state machine for single nodes 
+ */
+#define STATE_NODE_SINGLE	9
+
+/**
+ * \def STATE_NODE_ATTR
+ * 
+ * state for the state machine for attribut reading 
+ */
+#define STATE_NODE_ATTR		10
+
+/**
+ * \def STATE_NODE_CONTENT
+ * 
+ * state for the state machine for content read
+ */
+#define STATE_NODE_CONTENT	11
 
 /**
  * \def STATE_NODE_COMMENT_BEG
  * 
  * state for the state machine for separator reading
  */
-#define STATE_NODE_COMMENT_BEG		13
+#define STATE_NODE_COMMENT_BEG		12
 
 /**
  * \def STATE_NODE_COMMENT	
  * 
  * state for the state machine for separator reading
  */
-#define STATE_NODE_COMMENT		15
+#define STATE_NODE_COMMENT		14
 
 /**
  * \def STATE_NODE_COMMENT_END	
  * 
  * state for the state machine for separator reading
  */
-#define STATE_NODE_COMMENT_END		16
+#define STATE_NODE_COMMENT_END		15
+
+/**
+ * \def STATE_NODE_CDATA_BEG
+ * 
+ * state for the state machine for separator reading
+ */
+#define STATE_NODE_CDATA_BEG		16
+
+/**
+ * \def STATE_NODE_CDATA
+ * 
+ * state for the state machine for separator reading
+ */
+#define STATE_NODE_CDATA		22
+
+/**
+ * \def STATE_NODE_CDATA_END
+ * 
+ * state for the state machine for separator reading
+ */
+#define STATE_NODE_CDATA_END		23
 
 /**
  * \def MODE_COMMENT_NONE
