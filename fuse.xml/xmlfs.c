@@ -124,7 +124,7 @@ static int xmlfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, of
 			char fname[512] = "";
 			node_t *tmp = roxml_get_chld(n, NULL, i);
 			char *name = roxml_get_name(tmp, NULL, 0);
-			idx = roxml_get_node_index(tmp, NULL);
+			idx = roxml_get_node_position(tmp);
 			if(idx != -1)	{
 				sprintf(fname,"%s[%d]",name,idx);
 				filler(buf, fname, NULL, 0);

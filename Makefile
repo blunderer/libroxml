@@ -17,11 +17,11 @@ OBJ_LIB = $(SRC_LIB:%.c=$O/%.o)
 OBJ_BIN = $(SRC_BIN:%.c=$O/%.o)
 TARGETS = $(TARGET_SLIB) $(TARGET_LIB) $(TARGET_BIN)
 TARGET_SLIB = $O/libroxml.a
-TARGET_LIB = $O/libroxml.so
+TARGET_LIB = $O/libroxml.so.2.0.0
 TARGET_BIN = $O/roxml
 # options
 override CPPFLAGS += -Iinc/
-override CFLAGS += -g -Wall -Wextra -Werror -Iinc/ -DIGNORE_EMPTY_TEXT_NODES
+override CFLAGS += -g -O3 -Wall -Wextra -Werror -Iinc/ -DIGNORE_EMPTY_TEXT_NODES
 override LDFLAGS += -lpthread
 
 # first rule (default)
@@ -91,6 +91,8 @@ mrproper: clean
 	- rm -fr docs )
 	$(call ECHO_DO, '  CLEAN   debian', \
 	- fakeroot $(MAKE) -f $(abspath debian/rules) clean )
+	$(call ECHO_DO, '  CLEAN   fuse.xml', \
+	- $(MAKE) -C $(abspath fuse.xml) clean )
 
 .PHONY: install
 install: $(TARGETS) doxy

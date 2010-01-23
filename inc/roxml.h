@@ -261,15 +261,14 @@ node_t ** ROXML_API roxml_xpath			(node_t *n, char * path, int *nb_ans);
  */
 int ROXML_API roxml_get_type			(node_t *n);
 
-/** \brief node get index function
+/** \brief node get position function
  *
- * \fn roxml_get_node_index(node_t *n, int * last);
+ * \fn roxml_get_node_position(node_t *n);
  * This function tells the index of a node between all its homonyns.
  * \param n is the node to test
- * \param last is the index of last homonym
- * \return the idx or -1 if only one node
+ * \return the postion
  */
-int ROXML_API roxml_get_node_index		(node_t *n, int * last);
+int ROXML_API roxml_get_node_position		(node_t *n);
 
 /** \brief memory cleanning function
  *

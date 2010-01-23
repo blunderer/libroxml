@@ -138,13 +138,14 @@ xpath_node_t * ROXML_INT roxml_set_axes		(xpath_node_t *node, char *axes, int *o
 
 /** \brief xpath parsing function
  *
- * \fn roxml_parse_xpath(char *path, xpath_node_t ** xpath); 
+ * \fn roxml_parse_xpath(char *path, xpath_node_t ** xpath, int context); 
  * this function convert an xpath string to a table of list of xpath_node_t
  * \param path the xpath string
  * \param xpath the parsed xpath
+ * \param context 0 for a real xpath, 1 for a xpath in predicat
  * \return the number of xpath list in the table
  */
-int ROXML_INT roxml_parse_xpath			(char *path, xpath_node_t ** xpath); 
+int ROXML_INT roxml_parse_xpath			(char *path, xpath_node_t ** xpath, int context); 
 
 /** \brief xpath condition free function
  *
@@ -167,14 +168,25 @@ void ROXML_INT roxml_free_xpath			(xpath_node_t *xpath, int nb);
 
 /** \brief integer comparison function
  *
- * \fn roxml_int_cmp(int a, int b, int op);
+ * \fn roxml_int_cmp(float a, float b, int op);
  * this function  compare to integer using one defined operator
  * \param a first operand
  * \param b second operand
  * \param op the operator to use
  * \return 1 if comparison is ok, esle 0
  */
-int ROXML_INT roxml_int_cmp			(int a, int b, int op); 
+int ROXML_INT roxml_int_cmp			(float a, float b, int op); 
+
+/** \brief integer operation function
+ *
+ * \fn roxml_int_oper(float a, float b, int op);
+ * this function  compare to integer using one defined operator
+ * \param a first operand
+ * \param b second operand
+ * \param op the operator to use
+ * \return 1 if comparison is ok, esle 0
+ */
+float ROXML_INT roxml_int_oper(float a, float b, int op);
 
 /** \brief predicat validation function
  *
@@ -327,6 +339,12 @@ void ROXML_INT roxml_del_std_node		(node_t * n);
  * \return 
  */
 void ROXML_INT roxml_set_type			(node_t * n, int type);
+
+void ROXML_INT roxml_compute_and(node_t * root, node_t **node_set, int *count, int cur_req_id, int prev_req_id); 
+void ROXML_INT roxml_compute_or(node_t * root, node_t **node_set, int *count, int req_id, int glob_id); 
+void ROXML_INT roxml_del_from_pool(node_t * root, node_t *n, int req_id);
+int ROXML_INT roxml_in_pool(node_t * root, node_t *n, int req_id);
+node_t ** ROXML_INT roxml_exec_xpath(node_t *root, node_t *n, xpath_node_t *xpath, int index, int * count);
 
 #ifdef __DEBUG
 extern unsigned int _nb_node;

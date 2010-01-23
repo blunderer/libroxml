@@ -23,8 +23,8 @@
 #ifndef ROXML_DEF_H
 #define ROXML_DEF_H
 
-#define ROXML_PATH_OR	"||"
-#define ROXML_PATH_AND	"&&"
+#define ROXML_PATH_OR	"|"
+#define ROXML_PATH_AND	"&"
 #define ROXML_COND_OR	"or"
 #define ROXML_COND_AND	"and"
 
@@ -36,6 +36,8 @@
 #define ROXML_OPERATOR_ESUP	6
 #define ROXML_OPERATOR_DIFF	7
 #define ROXML_OPERATOR_EQU	8
+#define ROXML_OPERATOR_ADD	9
+#define ROXML_OPERATOR_SUB	10
 
 #define ROXML_FUNC_INTCOMP	0
 #define ROXML_FUNC_STRCOMP	1
@@ -44,6 +46,9 @@
 #define ROXML_FUNC_LAST		4
 #define ROXML_FUNC_TEXT		5
 #define ROXML_FUNC_NODE		6
+#define ROXML_FUNC_COMMENT	7
+#define ROXML_FUNC_PI		8
+#define ROXML_FUNC_XPATH	9
 
 #define ROXML_FUNC_POS_STR	"position()"
 #define ROXML_FUNC_FIRST_STR	"first()"

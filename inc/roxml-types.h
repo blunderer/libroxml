@@ -56,6 +56,7 @@ typedef struct _xpath_cond {
 	char func2;			/*!< function to process in arg2 */
 	char *arg1;			/*!< condition arg1 as string */
 	char *arg2;			/*!< condition arg2 as string */
+	struct _xpath_node *xp;		/*!< xpath that have to be resolved for condition */
 	struct _xpath_cond *next;	/*!< next xpath condition pointer */
 } xpath_cond_t;
 
@@ -71,6 +72,7 @@ typedef struct _xpath_node {
 	char rel;			/*!< relation with previous */
 	char axes;			/*!< axes type */
 	char *name;			/*!< axes string */
+	struct _xpath_cond *xp_cond;    /*!< condition for total xpath */
 	struct _xpath_cond *cond;	/*!< condition list */
 	struct _xpath_node *next;	/*!< next xpath pointer */
 } xpath_node_t;

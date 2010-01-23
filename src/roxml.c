@@ -414,28 +414,17 @@ int ROXML_API roxml_get_type(node_t *n)
 	return (n->type & (ROXML_ATTR_NODE | ROXML_STD_NODE | ROXML_TXT_NODE | ROXML_PI_NODE | ROXML_CMT_NODE));
 }
 
-int ROXML_API roxml_get_node_index(node_t *n, int * last)
+int ROXML_API roxml_get_node_position(node_t *n)
 {
-	int i = 0, idx = 0;
-	int nb_sibl = 0, nb_same_sibl = 0;
-	char intern_buff[INTERNAL_BUF_SIZE];
-	char intern_buff2[INTERNAL_BUF_SIZE];
-	char * realn = roxml_get_name(n, intern_buff, INTERNAL_BUF_SIZE);
+	int idx = 1;
 
-	nb_sibl = roxml_get_chld_nb(n->prnt);
-	for(i = 0; i < nb_sibl; i++)	{
-		node_t *tmp = roxml_get_chld(n->prnt, NULL, i);
-		char * name = roxml_get_name(tmp, intern_buff2, INTERNAL_BUF_SIZE);
-		if(tmp == n)	{ idx = nb_same_sibl; }
-		if(strcmp(name, realn) == 0)	{ nb_same_sibl++; }
-		roxml_release(name);
+	node_t * first = n->prnt->chld;
+	while(first != n) {
+		idx++;
+		first = first->sibl;
 	}
-	roxml_release(realn);		
 
-	if(last) { *last = nb_same_sibl-1; }
-
-	if(nb_same_sibl > 1)	{ return idx; }
-	return -1;
+	return idx;
 }
 
 node_t * ROXML_API roxml_load_doc(char *filename)
@@ -461,12 +450,10 @@ node_t * ROXML_API roxml_load_buf(char *buffer)
 
 node_t ** ROXML_API roxml_xpath(node_t *n, char * path, int *nb_ans)
 {
-	int path_id;
 	int index = 0;
-	int ansnb = 0;
-	int ansmax = 1;
-	int req_id = -1;
+	int count = 0;
 	xpath_node_t *xpath = NULL;
+	node_t **node_set = NULL;
 	node_t *root = n;
 
 	if(n == NULL)	{ 
@@ -476,39 +463,26 @@ node_t ** ROXML_API roxml_xpath(node_t *n, char * path, int *nb_ans)
 
 	while(root->prnt) { root = root->prnt; }
 
-	node_t **ans = roxml_malloc(sizeof(node_t*), ansmax, PTR_NODE_RESULT);
 	char * full_path_to_find = strdup(path);
 	char * path_to_find = full_path_to_find;
 
-	index = roxml_parse_xpath(path_to_find, &xpath);
+	index = roxml_parse_xpath(path_to_find, &xpath, 0);
 
-	for(path_id = 0; path_id < index; path_id++)	{
-		node_t *orig = n;
-		xpath_node_t *cur_xpath = &xpath[path_id];
-		if(cur_xpath->abs)	{
-			// context node is root
-			orig = root;
-		}
-		// assign a new request ID
-		req_id = roxml_request_id(root);
-		roxml_check_node(cur_xpath, root, orig, &ans, &ansnb, &ansmax, ROXML_DIRECT, req_id);
-		roxml_release_id(root, ans, ansnb, req_id);
-	}
+	node_set = roxml_exec_xpath(root, n, xpath, index, &count);
 
 	roxml_free_xpath(xpath, index);
-
 	free(full_path_to_find);
 
 	if(nb_ans)	{
-		*nb_ans = ansnb;
+		*nb_ans = count;
 	}
 
-	if(ansnb == 0)	{
-		roxml_release(ans);
+	if(count == 0)	{
+		roxml_release(node_set);
 		return NULL;
 	}
 
-	return ans;
+	return node_set;
 }
 
 void ROXML_API roxml_del_node(node_t * n) 
