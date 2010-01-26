@@ -363,9 +363,13 @@ int ROXML_API roxml_get_chld_nb(node_t *n)
 	int nb = 0;
 	if(ptr->chld)	{
 		ptr = ptr->chld;
-		nb++;
-		while(ptr->sibl)	{
+		if(ptr->type & ROXML_STD_NODE) {
 			nb++;
+		}
+		while(ptr->sibl)	{
+			if(ptr->type & ROXML_STD_NODE) {
+				nb++;
+			}
 			ptr = ptr->sibl;
 		}
 	}
@@ -382,7 +386,9 @@ node_t * ROXML_API roxml_get_chld(node_t *n, char * name, int nb)
 			return ptr;
 		}
 		while((ptr->sibl)&&(nb > count)) {
-			count++;
+			if(ptr->type & ROXML_STD_NODE) {
+				count++;
+			}
 			ptr = ptr->sibl;
 		}
 		if(nb > count)	{ return NULL; }
@@ -417,11 +423,20 @@ int ROXML_API roxml_get_type(node_t *n)
 int ROXML_API roxml_get_node_position(node_t *n)
 {
 	int idx = 1;
+	if(n == NULL) { return 0; }
 
-	node_t * first = n->prnt->chld;
-	while(first != n) {
+	node_t *prnt = n->prnt;
+	printf("parent = %p\n",prnt);
+	if(!prnt) {
+		return 1;
+	}
+	node_t * first = prnt->chld;
+	printf("first = %p\n",first);
+
+	while((first)&&(first != n)) {
 		idx++;
 		first = first->sibl;
+		printf("first = %p idx = %d\n",first, idx);
 	}
 
 	return idx;

@@ -149,6 +149,10 @@ int ROXML_INT roxml_process_multichar_ids(roxml_parse_ctx_t *context, char c)
 			} else if(c == '[') {
 				context->state = STATE_NODE_CDATA_BEG;
 				return 1; 
+			} else {
+				roxml_process_begin_node(context, context->pos-1);
+				context->state = STATE_NODE_SINGLE;
+				return 1; 
 			}
 			context->state = STATE_NODE_BEG;
 		break;
@@ -371,7 +375,7 @@ node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 			char c = int_ptr[int_rel_pos-int_abs_pos];
 
 			context.pos = int_rel_pos;
-			if(!roxml_process_multichar_ids(&context, c)) {
+			if(roxml_process_multichar_ids(&context, c) == 0) {
 				roxml_process_state(&context, c);
 			}
 		}
@@ -839,6 +843,9 @@ void ROXML_INT roxml_free_xcond(xpath_cond_t *xcond)
 	if(xcond->next) {
 		roxml_free_xcond(xcond->next);
 	}
+	if(xcond->xp) {
+		roxml_free_xpath(xcond->xp, xcond->func2);
+	}
 	free(xcond);
 }
 
@@ -852,6 +859,7 @@ void ROXML_INT roxml_free_xpath(xpath_node_t *xpath, int nb)
 		if(xpath[i].cond)	{
 			roxml_free_xcond(xpath[i].cond);
 		}
+		free(xpath[i].xp_cond);
 	}
 	free(xpath);
 }
@@ -1019,7 +1027,6 @@ int ROXML_INT roxml_in_pool(node_t * root, node_t *n, int req_id)
 		xpath_tok_t * prev = (xpath_tok_t*)n->priv;
 		xpath_tok_t * tok = (xpath_tok_t*)n->priv;
 		if(tok->id == req_id) {
-			n->priv = (void*)tok->next;
 			pthread_mutex_unlock(&table->mut);
 			return 1;
 		} else {
@@ -1078,6 +1085,7 @@ int ROXML_INT roxml_add_to_pool(node_t *root, node_t *n, int req_id)
 {
 	if(req_id == 0) { return 1; }
 	xpath_tok_table_t * table = (xpath_tok_table_t*)root->priv;
+
 
 	pthread_mutex_lock(&table->mut);
 	xpath_tok_t * tok = (xpath_tok_t*)n->priv;
@@ -1657,6 +1665,10 @@ void roxml_compute_and(node_t * root, node_t **node_set, int *count, int cur_req
 		if((!roxml_in_pool(root, node_set[i], cur_req_id)) || (!roxml_in_pool(root, node_set[i], prev_req_id))) {
 			(*count)--;
 			roxml_del_from_pool(root, node_set[i], cur_req_id);
+			roxml_del_from_pool(root, node_set[i], prev_req_id);
+			if(*count > 0) {
+				node_set[i] = node_set[(*count)-1];
+			}
 		}
 	}
 }
@@ -1667,6 +1679,7 @@ void roxml_compute_or(node_t * root, node_t **node_set, int *count, int req_id, 
 	for(i = 0; i < *count; i++) {
 		if(roxml_in_pool(root, node_set[i], req_id)) {
 			roxml_add_to_pool(root, node_set[i], glob_id);
+			roxml_del_from_pool(root, node_set[i], req_id);
 		}
 	}
 }
@@ -1692,7 +1705,7 @@ node_t ** roxml_exec_xpath(node_t *root, node_t *n, xpath_node_t *xpath, int ind
 		xpath_node_t *next_xpath = NULL;
 		xpath_node_t *prev_xpath = NULL;
 		cur_xpath = &xpath[path_id];
-		if(path_id < index) { next_xpath = &xpath[path_id+1]; }
+		if(path_id < index-1) { next_xpath = &xpath[path_id+1]; }
 		if(path_id > 0) { prev_xpath = &xpath[path_id+1]; }
 
 		if((cur_xpath->rel == ROXML_OPERATOR_AND)||((next_xpath) && (next_xpath->rel == ROXML_OPERATOR_AND))) {
@@ -1708,7 +1721,6 @@ node_t ** roxml_exec_xpath(node_t *root, node_t *n, xpath_node_t *xpath, int ind
 			
 			if(cur_xpath->rel == ROXML_OPERATOR_AND) {
 				roxml_compute_and(root, node_set,  count, req_id, req_ids[path_id-1]);
-				roxml_release_id(root, node_set, *count, req_ids[path_id-1]);
 			}
 			req_ids[path_id] = req_id;
 		}
@@ -1734,6 +1746,12 @@ node_t ** roxml_exec_xpath(node_t *root, node_t *n, xpath_node_t *xpath, int ind
 		}
 	}
 	roxml_release_id(root, node_set, *count, glob_id);
+
+	for(path_id = 0; path_id < index; path_id++)	{
+		if(req_ids[path_id] != 0) {
+			roxml_release_id(root, node_set, *count, req_ids[path_id]);
+		}
+	}
 
 	free(req_ids);
 

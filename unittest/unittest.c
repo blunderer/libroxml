@@ -24,7 +24,7 @@ void setfunc(PROTO_FUNC func, char * name)
 {
 	unittest_func * unittest_list = unittest_head;
 	if(unittest_list == NULL)	{
-		unittest_head = (unittest_func*)malloc(sizeof(unittest_func));
+		unittest_head = (unittest_func*)calloc(1, sizeof(unittest_func));
 		unittest_head->next = NULL;
 		unittest_head->func = func;
 		memset(unittest_head->name, 0, 256*sizeof(char));
@@ -32,7 +32,7 @@ void setfunc(PROTO_FUNC func, char * name)
 		
 	} else	{
 		while(unittest_list->next != NULL)	unittest_list = unittest_list->next;
-		unittest_list->next = (unittest_func*)malloc(sizeof(unittest_func));
+		unittest_list->next = (unittest_func*)calloc(1, sizeof(unittest_func));
 		unittest_list = unittest_list->next;
 		unittest_list->next = NULL;
 		unittest_list->func = func;

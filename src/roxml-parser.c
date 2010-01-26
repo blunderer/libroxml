@@ -71,10 +71,22 @@ int main(int argc, char ** argv)
 	{
 		char *c = NULL;
 		c = roxml_get_content(ans[j], NULL, 0, NULL);
-		if (! quiet)	{
-			fprintf(stdout,"ans[%d]: ", j);
+		if(strlen(c)==0) {
+			int i = 0;
+			int nb_chld = roxml_get_chld_nb(ans[j]);
+			for(i = 0; i < nb_chld; i++)	{
+				c = roxml_get_name(ans[j], NULL, 0);
+				if (! quiet)	{
+					fprintf(stdout,"ans[%d]: ", j);
+				}
+				fprintf(stdout,"%s\n", c);
+			}
+		} else {
+			if (! quiet)	{
+				fprintf(stdout,"ans[%d]: ", j);
+			}
+			fprintf(stdout,"%s\n", c);
 		}
-		fprintf(stdout,"%s\n", c);
 	}
 	roxml_release(RELEASE_ALL);
 

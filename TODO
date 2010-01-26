@@ -1,7 +1,6 @@
 
 do double predicat (node[3][2])
 do some functions in xpath syntax (lang, string, number, count...)
-do <!DOCTYPE> handling
 do unclosed <link> from html document handling
 do global parsing error check => return an ERROR: position + type
 do check memory leaks

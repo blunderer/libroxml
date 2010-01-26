@@ -1569,21 +1569,22 @@ int test_spec_nodes(void)
 
 	// test internal struct
 	ASSERT_NOT_NULL(root)
-	ASSERT_NOT_NULL(root->chld) // node
-	ASSERT_NOT_NULL(root->chld->chld) // comment
-	ASSERT_NOT_NULL(root->chld->chld->sibl) // pi
-	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl) // node1
-	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->text) // text
-	ASSERT_NULL(root->chld->chld->sibl->sibl->chld) // node2
-	ASSERT_EQUAL(root->chld->chld->type, ROXML_CMT_NODE | ROXML_FILE) // comment
-	ASSERT_EQUAL(root->chld->chld->sibl->type, ROXML_PI_NODE | ROXML_FILE) // pi
+	ASSERT_NOT_NULL(root->chld) // DOCTYPE
+	ASSERT_NOT_NULL(root->chld->sibl) // node
+	ASSERT_NOT_NULL(root->chld->sibl->chld) // comment
+	ASSERT_NOT_NULL(root->chld->sibl->chld->sibl) // pi
+	ASSERT_NOT_NULL(root->chld->sibl->chld->sibl->sibl) // node1
+	ASSERT_NOT_NULL(root->chld->sibl->chld->sibl->sibl->text) // text
+	ASSERT_NULL(root->chld->sibl->chld->sibl->sibl->chld) // node2
+	ASSERT_EQUAL(root->chld->sibl->chld->type, ROXML_CMT_NODE | ROXML_FILE) // comment
+	ASSERT_EQUAL(root->chld->sibl->chld->sibl->type, ROXML_PI_NODE | ROXML_FILE) // pi
 
 	// test content
-	char * content = roxml_get_content(root->chld->chld, NULL, 0, NULL);
+	char * content = roxml_get_content(root->chld->sibl->chld, NULL, 0, NULL);
 	ASSERT_STRING_EQUAL(content, "this is a comment")
-	content = roxml_get_content(root->chld->chld->sibl, NULL, 0, NULL);
+	content = roxml_get_content(root->chld->sibl->chld->sibl, NULL, 0, NULL);
 	ASSERT_STRING_EQUAL(content, " value=\"2\" ")
-	content = roxml_get_content(root->chld->chld->sibl->sibl, NULL, 0, NULL);
+	content = roxml_get_content(root->chld->sibl->chld->sibl->sibl, NULL, 0, NULL);
 	ASSERT_STRING_EQUAL(content, " <![CDATA[ <node2></node2> ]]> ")
 
 	// test xpath
@@ -1595,23 +1596,27 @@ int test_spec_nodes(void)
 	ASSERT_EQUAL(nbans, 1)
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), " value=\"2\" ")
 	node_set = roxml_xpath(root, "//*", &nbans);
-	ASSERT_EQUAL(nbans, 2)
-	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node")
+	ASSERT_EQUAL(nbans, 3)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "!DOCTYPE")
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[1], NULL, 0), "node")
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[2], NULL, 0), "node1")
 	node_set = roxml_xpath(root, "//node()", &nbans);
-	ASSERT_EQUAL(nbans, 6)
+	ASSERT_EQUAL(nbans, 7)
 	ASSERT_EQUAL(roxml_get_type(node_set[0]), ROXML_STD_NODE)
-	ASSERT_EQUAL(roxml_get_type(node_set[1]), ROXML_TXT_NODE)
-	ASSERT_EQUAL(roxml_get_type(node_set[2]), ROXML_CMT_NODE)
-	ASSERT_EQUAL(roxml_get_type(node_set[3]), ROXML_PI_NODE)
-	ASSERT_EQUAL(roxml_get_type(node_set[4]), ROXML_STD_NODE)
-	ASSERT_EQUAL(roxml_get_type(node_set[5]), ROXML_CMT_NODE)
-	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node")
-	ASSERT_STRING_EQUAL(roxml_get_name(node_set[4], NULL, 0), "node1")
-	ASSERT_STRING_EQUAL(roxml_get_content(node_set[1], NULL, 0, NULL), " <![CDATA[ <node2></node2> ]]> ")
-	ASSERT_STRING_EQUAL(roxml_get_content(node_set[2], NULL, 0, NULL), "this is a comment")
-	ASSERT_STRING_EQUAL(roxml_get_content(node_set[3], NULL, 0, NULL), " value=\"2\" ")
-	ASSERT_STRING_EQUAL(roxml_get_content(node_set[4], NULL, 0, NULL), " <![CDATA[ <node2></node2> ]]> ")
-	ASSERT_STRING_EQUAL(roxml_get_content(node_set[5], NULL, 0, NULL), " <toto/> ")
+	ASSERT_EQUAL(roxml_get_type(node_set[1]), ROXML_STD_NODE)
+	ASSERT_EQUAL(roxml_get_type(node_set[2]), ROXML_TXT_NODE)
+	ASSERT_EQUAL(roxml_get_type(node_set[3]), ROXML_CMT_NODE)
+	ASSERT_EQUAL(roxml_get_type(node_set[4]), ROXML_PI_NODE)
+	ASSERT_EQUAL(roxml_get_type(node_set[5]), ROXML_STD_NODE)
+	ASSERT_EQUAL(roxml_get_type(node_set[6]), ROXML_CMT_NODE)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "!DOCTYPE")
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[1], NULL, 0), "node")
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[5], NULL, 0), "node1")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[2], NULL, 0, NULL), " <![CDATA[ <node2></node2> ]]> ")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[3], NULL, 0, NULL), "this is a comment")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[4], NULL, 0, NULL), " value=\"2\" ")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[5], NULL, 0, NULL), " <![CDATA[ <node2></node2> ]]> ")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[6], NULL, 0, NULL), " <toto/> ")
 
 	roxml_release(RELEASE_ALL);
 	roxml_close(root);

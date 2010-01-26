@@ -83,7 +83,7 @@ static int xmlfs_getattr(const char *path, struct stat *stbuf)
 		}
 		
 		stbuf->st_ino = 0;
-		stbuf->st_mode |= S_IRUSR | S_IRGRP | S_IROTH;
+		stbuf->st_mode |= S_IRUSR | S_IRGRP | S_IROTH /*| S_IWUSR | S_IWGRP | S_IWOTH*/;
 		stbuf->st_nlink = 0;
 		stbuf->st_uid = 0;
 		stbuf->st_gid = 0;
@@ -124,14 +124,18 @@ static int xmlfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, of
 			char fname[512] = "";
 			node_t *tmp = roxml_get_chld(n, NULL, i);
 			char *name = roxml_get_name(tmp, NULL, 0);
+			DEBUG("get position of %s", name)
 			idx = roxml_get_node_position(tmp);
 			if(idx != -1)	{
+				DEBUG("here")
 				sprintf(fname,"%s[%d]",name,idx);
 				filler(buf, fname, NULL, 0);
 			} else	{
+				DEBUG("here")
 				filler(buf, name, NULL, 0);
 			}
 			roxml_release(name);
+			DEBUG("here")
 		}
 		nb = roxml_get_attr_nb(n);
 		DEBUG("%d files", nb)
@@ -157,8 +161,35 @@ static int xmlfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, of
  
 static int xmlfs_create(const char *path, mode_t mode, struct fuse_file_info *fi)
 {
-	DEBUG("here")
-	return -ENOENT;
+	DEBUG("here %s", path)
+
+	int nb = 0;
+	char *dirname = strdup(path);
+	char *filename = dirname;
+	char *ptr = dirname;
+	node_t *root = fuse_get_context()->private_data;
+
+	while(ptr = strstr("/", dirname)) {
+		filename = ptr;
+	}
+	filename[0] = '\0';
+	filename++;
+
+	DEBUG("file '%s' in '%s'", filename, dirname);
+	node_t **parent = roxml_xpath(root, strlen(dirname)?dirname:"/", &nb);
+
+	DEBUG("%d results", nb);
+	if(nb > 0) {
+		DEBUG("parent is : '%s'\n",roxml_get_name(parent[0], NULL, 0));
+		roxml_add_node(parent[0], 0, ROXML_STD_NODE, filename, NULL);
+		roxml_release(RELEASE_LAST);
+	} else {
+		DEBUG("zero results for %s", dirname)
+		return -ENOENT;
+	}
+
+	free(dirname);
+	return 0;
 }
  
 static int xmlfs_open(const char *path, struct fuse_file_info *fi)

@@ -17,7 +17,7 @@ OBJ_LIB = $(SRC_LIB:%.c=$O/%.o)
 OBJ_BIN = $(SRC_BIN:%.c=$O/%.o)
 TARGETS = $(TARGET_SLIB) $(TARGET_LIB) $(TARGET_BIN)
 TARGET_SLIB = $O/libroxml.a
-TARGET_LIB = $O/libroxml.so.2.0.0
+TARGET_LIB = $O/libroxml.so
 TARGET_BIN = $O/roxml
 # options
 override CPPFLAGS += -Iinc/
