@@ -1,9 +1,17 @@
+libroxml (2.0-RC2) unstable; urgency=low
+
+  * various corrections
+  * some more node handling in main parser:
+  - CDATA syntax
+  - !DOCTYPE parsing (handled as a single node named !DOCTYPE)
+
+ -- blunderer <blunderer@blunderer.org>  Thu, 28 Jan 2010 10:21:12 +0100
+
 libroxml (2.0-RC1) unstable; urgency=low
 
   * Version 2.0 RC 1 : 
   - new parser
   - enhanced xpath expressions
-
 
  -- blunderer <blunderer@blunderer.org>  Thu, 18 Jan 2010 10:44:05 +0100
 
