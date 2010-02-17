@@ -1,12 +1,12 @@
 %define name libroxml
-%define version 1.3
+%define version 2.0
 %define release 1
 
 Summary: a light and powerfull xml parsing library
 Name: %{name}
 Version: %{version}
 Release: %{release}
-Source: http://libroxml.googlecode.com/files/libroxml-1.3.tar.gz
+Source: http://libroxml.googlecode.com/files/libroxml-%{version}.tar.gz
 Vendor: blunderer
 URL:  http://code.google.com/p/libroxml/
 License: LGPL

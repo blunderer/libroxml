@@ -340,6 +340,7 @@ void ROXML_INT roxml_del_std_node		(node_t * n);
  */
 void ROXML_INT roxml_set_type			(node_t * n, int type);
 
+int ROXML_INT roxml_get_node_internal_position(node_t *n);
 void ROXML_INT roxml_compute_and(node_t * root, node_t **node_set, int *count, int cur_req_id, int prev_req_id); 
 void ROXML_INT roxml_compute_or(node_t * root, node_t **node_set, int *count, int req_id, int glob_id); 
 void ROXML_INT roxml_del_from_pool(node_t * root, node_t *n, int req_id);

@@ -60,9 +60,8 @@ static int xmlfs_getattr(const char *path, struct stat *stbuf)
 
 	strcpy(newpath, path);
 	if(ptr = strstr(newpath, NODE_CONTENT))	{
-		*ptr = 0;
+		*(ptr-1) = 0;
 		content = 1;
-		strcat(newpath, ".");
 	}
 
 	DEBUG("trying '%s'",newpath);
@@ -122,11 +121,23 @@ static int xmlfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, of
 		for(i = 0; i < nb; i++)	{
 			int idx;
 			char fname[512] = "";
+			char rname[512] = "";
 			node_t *tmp = roxml_get_chld(n, NULL, i);
 			char *name = roxml_get_name(tmp, NULL, 0);
 			DEBUG("get position of %s", name)
 			idx = roxml_get_node_position(tmp);
-			if(idx != -1)	{
+			if(name == NULL) {
+				switch(roxml_get_type(tmp)) {
+					case ROXML_PI_NODE:
+						strcpy(rname,"processing-instruction()");
+					break;
+					case ROXML_CMT_NODE:
+						strcpy(rname,"comment()");
+					break;
+				}
+				name = rname;
+			}
+			if(idx > 1)	{
 				DEBUG("here")
 				sprintf(fname,"%s[%d]",name,idx);
 				filler(buf, fname, NULL, 0);
@@ -149,6 +160,12 @@ static int xmlfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, of
 		nb = roxml_get_text_nb(n);
 		if(nb > 0)	{
 			DEBUG("content file")
+			char fname[512];
+			sprintf(fname, "%s", NODE_CONTENT, i);
+			filler(buf, fname, NULL, 0);
+		}
+		if((roxml_get_type(n) == ROXML_PI_NODE)||(roxml_get_type(n) == ROXML_CMT_NODE)) {
+			DEBUG("specnode file")
 			char fname[512];
 			sprintf(fname, "%s", NODE_CONTENT, i);
 			filler(buf, fname, NULL, 0);
@@ -203,8 +220,7 @@ static int xmlfs_open(const char *path, struct fuse_file_info *fi)
 
 	strcpy(newpath, path);
 	if(ptr = strstr(newpath, NODE_CONTENT))	{
-		*ptr = 0;
-		strcat(newpath, ".");
+		*(ptr-1) = 0;
 	}
 	node_t **ans = roxml_xpath(root, (char*)newpath, &nb);
 

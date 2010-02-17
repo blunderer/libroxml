@@ -499,6 +499,25 @@ xpath_node_t * ROXML_INT roxml_set_axes(xpath_node_t *node, char *axes, int *off
 	}
 	return node;
 }
+int ROXML_INT roxml_get_node_internal_position(node_t *n)
+{
+	int idx = 1;
+
+	if(n == NULL) { return 0; }
+
+	node_t *prnt = n->prnt;
+	if(!prnt) {
+		return 1;
+	}
+	node_t * first = prnt->chld;
+
+	while((first)&&(first != n)) {
+		idx++;
+		first = first->sibl;
+	}
+
+	return idx;
+}
 
 /** \comment xpath is something like "/node[first() or last()]/item/title/@version || /node/item/title[@version < 3]" */
 int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t ** xpath, int context)
@@ -721,16 +740,19 @@ int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t ** xpath, int context)
 						new_cond->arg2 = path+cur;
 						while((path[cur+1] >= '0') && (path[cur+1] <= '9')) { cur++; }
 					} else if(strncmp(path+cur, ROXML_FUNC_POS_STR, strlen(ROXML_FUNC_POS_STR)) == 0) {
+						int func = ROXML_FUNC_POS;
 						cur += strlen(ROXML_FUNC_POS_STR)-1;
-						new_cond->func = ROXML_FUNC_POS;
+						new_cond->func = func;
 					} else if(strncmp(path+cur, ROXML_FUNC_FIRST_STR, strlen(ROXML_FUNC_FIRST_STR)) == 0) {
+						int func = ROXML_FUNC_FIRST;
 						cur += strlen(ROXML_FUNC_FIRST_STR)-1;
-						if(new_cond->op > 0) { new_cond->func2 = ROXML_FUNC_FIRST; }
-						else { new_cond->func = ROXML_FUNC_FIRST; }
+						if(new_cond->op > 0) { new_cond->func2 = func; }
+						else { new_cond->func = func; }
 					} else if(strncmp(path+cur, ROXML_FUNC_LAST_STR, strlen(ROXML_FUNC_LAST_STR)) == 0) {
+						int func = ROXML_FUNC_LAST;
 						cur += strlen(ROXML_FUNC_LAST_STR)-1;
-						if(new_cond->op > 0) { new_cond->func2 = ROXML_FUNC_LAST; }
-						else { new_cond->func = ROXML_FUNC_LAST; }
+						if(new_cond->op > 0) { new_cond->func2 = func; }
+						else { new_cond->func = func; }
 					} else if(path[cur] == '=') {
 						new_cond->op = ROXML_OPERATOR_EQU;
 						path[cur] = '\0';
@@ -914,14 +936,22 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 
 		if(condition->func == ROXML_FUNC_POS) {
 			status = 0;
-			iarg1 = roxml_get_node_position(candidat);
 			iarg2 = atof(condition->arg2);
+			if(xn->name[0] == '*') {
+				iarg1 = roxml_get_node_internal_position(candidat);
+			} else {
+				iarg1 = roxml_get_node_position(candidat);
+			}
 			status = roxml_int_cmp(iarg1, iarg2, condition->op);
 		} else if(condition->func == ROXML_FUNC_LAST) {
 			int operand = 0;
 			status = 0;
-			iarg1 = roxml_get_node_position(candidat);
 			iarg2 = roxml_get_chld_nb(candidat->prnt);
+			if(xn->name[0] == '*') {
+				iarg1 = roxml_get_node_internal_position(candidat);
+			} else {
+				iarg1 = roxml_get_node_position(candidat);
+			}
 			if(condition->op > 0) {
 				operand = atof(condition->arg2);
 				iarg2 = roxml_int_oper(iarg2, operand, condition->op);
@@ -931,7 +961,11 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 			int operand = 0;
 			status = 0;
 			iarg2 = 1;
-			iarg1 = roxml_get_node_position(candidat);
+			if(xn->name[0] == '*') {
+				iarg1 = roxml_get_node_internal_position(candidat);
+			} else {
+				iarg1 = roxml_get_node_position(candidat);
+			}
 			if(condition->op > 0) {
 				operand = atof(condition->arg2);
 				iarg2 = roxml_int_oper(iarg2, operand, condition->op);

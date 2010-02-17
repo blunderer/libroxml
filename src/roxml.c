@@ -231,16 +231,19 @@ char * ROXML_API roxml_get_name(node_t *n, char * name, int size)
 			internal_ptr = n->src.buf + n->pos;
 		}
 		while((internal_ptr[offset] == '<')||(ROXML_WHITE(internal_ptr[offset]))) { offset++; }
-		while((internal_ptr[offset] != '>')&&(!ROXML_WHITE(internal_ptr[offset]))) { 
+		while((internal_ptr[offset] != '>')&&(internal_ptr[offset] != '/')&&(!ROXML_WHITE(internal_ptr[offset]))) { 
 			tmp_name[count] = internal_ptr[offset];
 			offset++;
 			count++;
 		}
 	} else if(n->type & ROXML_TXT_NODE) {
+		if(name) { strcpy(name, ""); }
 		return NULL;
 	} else if(n->type & ROXML_CMT_NODE) {
+		if(name) { strcpy(name, ""); }
 		return NULL;
 	} else if(n->type & ROXML_PI_NODE) {
+		if(name) { strcpy(name, ""); }
 		return NULL;
 	}
 
@@ -417,7 +420,11 @@ int ROXML_API roxml_get_type(node_t *n)
 int ROXML_API roxml_get_node_position(node_t *n)
 {
 	int idx = 1;
+	char name[256];
+
 	if(n == NULL) { return 0; }
+	
+	roxml_get_name(n, name, 256);
 
 	node_t *prnt = n->prnt;
 	if(!prnt) {
@@ -426,7 +433,9 @@ int ROXML_API roxml_get_node_position(node_t *n)
 	node_t * first = prnt->chld;
 
 	while((first)&&(first != n)) {
-		idx++;
+		char twin[256];
+		roxml_get_name(first, twin, 256);
+		if(strcmp(name, twin) == 0) { idx++; }
 		first = first->sibl;
 	}
 

@@ -1,3 +1,10 @@
+libroxml (2.0) unstable; urgency=low
+
+  * correct use of node postion (absolute vs twins)
+  * fuse module PI and COMMENT node support
+
+ -- blunderer <blunderer@blunderer.org>  Thu, 16 Fev 2010 20:12:13 +0100
+
 libroxml (2.0-RC2) unstable; urgency=low
 
   * various corrections
