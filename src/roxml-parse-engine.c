@@ -91,9 +91,6 @@ int roxml_parse_line(roxml_parser_item_t * head, char *line, roxml_parse_func fu
 
 int _func_ignore(char * chunk, void * data)
 {
-	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t*)data;
-	chunk = NULL;
-	ctx = NULL;
 	return 1;
 }
 
@@ -127,7 +124,6 @@ int _func_new_node(char * chunk, void * data)
 
 int _func_quote(char * chunk, void * data)
 {
-	chunk = NULL;
 	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t*)data;
 	if(!ctx->dquoted) {
 		ctx->quoted = (ctx->quoted+1)%2;
@@ -137,7 +133,6 @@ int _func_quote(char * chunk, void * data)
 
 int _func_dquote(char * chunk, void * data)
 {
-	chunk = NULL;
 	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t*)data;
 	if(!ctx->quoted) {
 		ctx->dquoted = (ctx->dquoted+1)%2;
@@ -147,7 +142,6 @@ int _func_dquote(char * chunk, void * data)
 
 int _func_open_parenthesys(char * chunk, void * data)
 {
-	chunk = NULL;
 	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t*)data;
 	if(!ctx->quoted && !ctx->dquoted) {
 		ctx->parenthesys = (ctx->parenthesys+1)%2;
@@ -157,7 +151,6 @@ int _func_open_parenthesys(char * chunk, void * data)
 
 int _func_close_parenthesys(char * chunk, void * data)
 {
-	chunk = NULL;
 	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t*)data;
 	if(!ctx->quoted && !ctx->dquoted) {
 		ctx->parenthesys = (ctx->parenthesys+1)%2;
@@ -186,7 +179,6 @@ int _func_open_brackets(char * chunk, void * data)
 int _func_close_brackets(char * chunk, void * data)
 {
 	int cur = 0;
-	chunk = NULL;
 	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t*)data;
 	if(!ctx->quoted && !ctx->dquoted) {
 		ctx->bracket = (ctx->bracket+1)%2;
@@ -483,7 +475,6 @@ int _func_number(char * chunk, void * data)
 
 int _func_position(char * chunk, void * data)
 {
-	chunk = NULL;
 	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t*)data;
 	int cur = 0;
 	if(ctx->new_cond->func != ROXML_FUNC_XPATH) {
@@ -496,7 +487,6 @@ int _func_position(char * chunk, void * data)
 
 int _func_first(char * chunk, void * data)
 {
-	chunk = NULL;
 	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t*)data;
 	int cur = 0;
 	if(ctx->new_cond->func != ROXML_FUNC_XPATH) {
@@ -510,7 +500,6 @@ int _func_first(char * chunk, void * data)
 
 int _func_last(char * chunk, void * data)
 {
-	chunk = NULL;
 	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t*)data;
 	int cur = 0;
 	if(ctx->new_cond->func != ROXML_FUNC_XPATH) {
@@ -609,7 +598,6 @@ int _func_default_xpath(char * chunk, void * data)
 
 int _func_xpath_all(char * chunk, void * data)
 {
-	chunk = NULL;
 	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t*)data;
 	if(ctx->bracket && !ctx->quoted && !ctx->dquoted) {
 		if(ctx->new_cond->func != ROXML_FUNC_XPATH) {
