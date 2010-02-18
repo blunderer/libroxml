@@ -340,11 +340,73 @@ void ROXML_INT roxml_del_std_node		(node_t * n);
  */
 void ROXML_INT roxml_set_type			(node_t * n, int type);
 
+/** \brief node absolute position get
+ *
+ * \fn roxml_get_node_internal_position(node_t *n);
+ * this function returns the absolute position of the node between siblings
+ * \param the node
+ * \return the absolute position starting at 1
+ */
 int ROXML_INT roxml_get_node_internal_position(node_t *n);
+
+/** \brief node set and function
+ *
+ * \fn roxml_compute_and(node_t * root, node_t **node_set, int *count, int cur_req_id, int prev_req_id);
+ * this function computes the AND of two node pools. The resulting pool will have the same ID as cur_req_id.
+ * \param root the root of the tree
+ * \param node_set the node set containing the 2 pools
+ * \param count number of node in the node set
+ * \param cur_req_id the id of the first group
+ * \param prev_req_id the id of the second group
+ */
 void ROXML_INT roxml_compute_and(node_t * root, node_t **node_set, int *count, int cur_req_id, int prev_req_id); 
+
+/** \brief node set or function
+ *
+ * \fn roxml_compute_or(node_t * root, node_t **node_set, int *count, int req_id, int glob_id);
+ * this function computes the OR of two node pools. The resulting pool will have the same ID as glob_id.
+ * \param root the root of the tree
+ * \param node_set the node set containing the 2 pools
+ * \param count number of node in the node set
+ * \param req_id the id of the first group
+ * \param glob the id of the second group
+ * \return 
+ */
 void ROXML_INT roxml_compute_or(node_t * root, node_t **node_set, int *count, int req_id, int glob_id); 
+
+/** \brief pool node delete function 
+ *
+ * \fn roxml_del_from_pool(node_t * root, node_t *n, int req_id);
+ * this function remove one node from a pool
+ * \param root the root of the tree
+ * \param n the node to remove
+ * \param req_id the pool id
+ * \return 
+ */
 void ROXML_INT roxml_del_from_pool(node_t * root, node_t *n, int req_id);
+
+/** \brief node pool presence tester function
+ *
+ * \fn roxml_in_pool(node_t * root, node_t *n, int req_id);
+ * this function test is a node is in a pool
+ * \param root the root of the tree
+ * \param n the node to test
+ * \param req_id the pool id
+ * \return 
+ */
 int ROXML_INT roxml_in_pool(node_t * root, node_t *n, int req_id);
+
+/** \brief real xpath execution
+ *
+ * \fn roxml_exec_xpath(node_t *root, node_t *n, xpath_node_t *xpath, int index, int * count);
+ * this function exec a decoded xpath strcuture
+ * \param root the root of the tree
+ * \param n the context node
+ * \param xpath the xpath structure
+ * \param index the number of xpath condition in string
+ * \param count the pointer to a variable that is filled with the resulting node number
+ * \return  the resulting node set that have to be freed with roxml_release
+ */
 node_t ** ROXML_INT roxml_exec_xpath(node_t *root, node_t *n, xpath_node_t *xpath, int index, int * count);
 
 #ifdef __DEBUG

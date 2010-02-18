@@ -9,7 +9,7 @@ endif
 
 # files
 INC = inc/roxml.h
-SRC_LIB = src/roxml.c src/roxml-internal.c
+SRC_LIB = src/roxml.c src/roxml-internal.c src/roxml-parse-engine.c
 SRC_BIN = src/roxml-parser.c
 DEPS = $(patsubst %.c, $O/%.d, $(SRC_LIB) $(SRC_BIN))
 OBJS = $(OBJ_LIB) $(OBJ_BIN)

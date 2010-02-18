@@ -23,6 +23,7 @@
  */
 
 #include "roxml-internal.h"
+#include "roxml-parse-engine.h"
 
 #ifdef __DEBUG
 unsigned int _nb_node = 0;
@@ -109,7 +110,7 @@ void ROXML_INT roxml_del_tree(node_t *n)
 	roxml_free_node(n);
 }
 
-void ROXML_INT roxml_process_begin_node(roxml_parse_ctx_t *context, int position)
+void ROXML_INT roxml_process_begin_node(roxml_load_ctx_t *context, int position)
 {
 	if(context->candidat_txt)	{
 #ifdef IGNORE_EMPTY_TEXT_NODES
@@ -127,7 +128,7 @@ void ROXML_INT roxml_process_begin_node(roxml_parse_ctx_t *context, int position
 	context->candidat_node = roxml_create_node(position, context->src, ROXML_STD_NODE | context->type);
 }
 
-int ROXML_INT roxml_process_multichar_ids(roxml_parse_ctx_t *context, char c)
+int ROXML_INT roxml_process_multichar_ids(roxml_load_ctx_t *context, char c)
 {
 	char cdata_string[] = "CDATA[";
 
@@ -216,7 +217,7 @@ int ROXML_INT roxml_process_multichar_ids(roxml_parse_ctx_t *context, char c)
 	return 0;
 }
 
-void ROXML_INT roxml_process_state(roxml_parse_ctx_t *context, char c)
+void ROXML_INT roxml_process_state(roxml_load_ctx_t *context, char c)
 {
 	switch(c) {
 		case '"':
@@ -345,9 +346,9 @@ node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 	int int_buffer_len = 0;
 	int int_abs_pos = 0;
 	int int_len = 0;
-	roxml_parse_ctx_t context;
+	roxml_load_ctx_t context;
 
-	memset(&context, 0, sizeof(roxml_parse_ctx_t));
+	memset(&context, 0, sizeof(roxml_load_ctx_t));
 	context.empty_text_node = 1;
 	context.current_node = current_node;
 
@@ -519,345 +520,64 @@ int ROXML_INT roxml_get_node_internal_position(node_t *n)
 	return idx;
 }
 
-/** \comment xpath is something like "/node[first() or last()]/item/title/@version || /node/item/title[@version < 3]" */
 int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t ** xpath, int context)
 {
-	int cur;
-	int i = 0;
-	int nbpath = 1;
-	int bracket = 0;
-	int parenthesys = 0;
-	int quoted = 0;
-	int dquoted = 0;
-	int len = strlen(path);
-	int is_first_node = 1;
-	int wait_first_node = 1;
-	int shorten_cond = 0;
+	roxml_xpath_ctx_t ctx;
+	ctx.pos = 0;
+	ctx.nbpath = 1;
+	ctx.bracket = 0;
+	ctx.parenthesys = 0;
+	ctx.quoted = 0;
+	ctx.dquoted = 0;
+	ctx.is_first_node = 1;
+	ctx.wait_first_node = 1;
+	ctx.shorten_cond = 0;
+	ctx.context = context;
+	ctx.first_node = (xpath_node_t*)calloc(1, sizeof(xpath_node_t));
+	ctx.new_node = ctx.first_node;
+	ctx.new_cond = NULL;
+	ctx.first_node->rel = ROXML_OPERATOR_OR;
 
-	xpath_node_t * first_node = (xpath_node_t*)calloc(1, sizeof(xpath_node_t));
-	xpath_node_t * new_node = first_node;
-	xpath_cond_t * new_cond = NULL;
+	roxml_parser_item_t * parser = NULL;
+	parser = roxml_append_parser_item(parser, " ", _func_ignore);
+	parser = roxml_append_parser_item(parser, "\t", _func_ignore);
+	parser = roxml_append_parser_item(parser, "\n", _func_ignore);
+	parser = roxml_append_parser_item(parser, "\r", _func_ignore);
+	parser = roxml_append_parser_item(parser, "/", _func_new_node);
+	parser = roxml_append_parser_item(parser, "(", _func_open_parenthesys);
+	parser = roxml_append_parser_item(parser, ")", _func_close_parenthesys);
+	parser = roxml_append_parser_item(parser, "[", _func_open_brackets);
+	parser = roxml_append_parser_item(parser, "]", _func_close_brackets);
+	parser = roxml_append_parser_item(parser, "=", _func_operator_equal);
+	parser = roxml_append_parser_item(parser, ">", _func_operator_sup);
+	parser = roxml_append_parser_item(parser, "<", _func_operator_inf);
+	parser = roxml_append_parser_item(parser, "!=", _func_operator_diff);
+	parser = roxml_append_parser_item(parser, "0", _func_number);
+	parser = roxml_append_parser_item(parser, "1", _func_number);
+	parser = roxml_append_parser_item(parser, "2", _func_number);
+	parser = roxml_append_parser_item(parser, "3", _func_number);
+	parser = roxml_append_parser_item(parser, "4", _func_number);
+	parser = roxml_append_parser_item(parser, "5", _func_number);
+	parser = roxml_append_parser_item(parser, "6", _func_number);
+	parser = roxml_append_parser_item(parser, "7", _func_number);
+	parser = roxml_append_parser_item(parser, "8", _func_number);
+	parser = roxml_append_parser_item(parser, "9", _func_number);
+	parser = roxml_append_parser_item(parser, "+", _func_operator_add);
+	parser = roxml_append_parser_item(parser, "-", _func_operator_subs);
+	parser = roxml_append_parser_item(parser, ROXML_PATH_OR, _func_xpath_or);
+	parser = roxml_append_parser_item(parser, ROXML_COND_OR, _func_condition_or);
+	parser = roxml_append_parser_item(parser, ROXML_COND_AND, _func_condition_and);
+	parser = roxml_append_parser_item(parser, ROXML_FUNC_POS_STR, _func_position);
+	parser = roxml_append_parser_item(parser, ROXML_FUNC_FIRST_STR, _func_first);
+	parser = roxml_append_parser_item(parser, ROXML_FUNC_LAST_STR, _func_last);
+	parser = roxml_append_parser_item(parser, NULL, _func_default_xpath);
 
-	first_node->rel = ROXML_OPERATOR_OR;
-
-	for(cur = 0; cur < len; cur++)	{
-		if(wait_first_node) {
-			if(ROXML_WHITE(path[cur])) { continue; }
-		}
-		if((path[cur] == '/')||(is_first_node)||(wait_first_node)) {
-			if(!quoted && !dquoted && !parenthesys && !bracket)	{
-				int offset = 0;
-				xpath_node_t * tmp_node = (xpath_node_t*)calloc(1, sizeof(xpath_node_t));
-				if((path[cur] == '/')&&(is_first_node)) { 
-					free(tmp_node);
-					new_node = first_node;
-					first_node->abs = 1;
-				} else if((path[cur] == '/')&&(wait_first_node)) { 
-					free(tmp_node);
-					first_node->abs = 1;
-				} else if((is_first_node)||(wait_first_node)) {
-					free(tmp_node);
-				} else {
-					if(new_node)	{ new_node->next = tmp_node; }
-					new_node = tmp_node;
-				}
-				i = 0;
-				is_first_node = 0;
-				wait_first_node = 0;
-				new_node = roxml_set_axes(new_node, path+cur, &offset);
-				cur += offset;
-			}
-		} else if(path[cur] == '"') {
-			if(!quoted) {
-				dquoted = (dquoted+1)%2;
-			}
-		} else if(path[cur] == '\'') {
-			if(!dquoted) {
-				quoted = (quoted+1)%2;
-			}
-		} else if((path[cur] == '(')||(path[cur] == ')')) {
-			if(!quoted && !dquoted) {
-				parenthesys = (parenthesys+1)%2;
-			}
-		} else if((path[cur] == '[')||(path[cur] == ']')) {
-			if(!quoted && !dquoted) {
-				bracket = (bracket+1)%2;
-				path[cur] = '\0';
-
-				if(bracket)	{
-					shorten_cond = 1;
-					xpath_cond_t * tmp_cond = (xpath_cond_t*)calloc(1, sizeof(xpath_cond_t));
-					new_node->cond = tmp_cond;
-					new_cond = tmp_cond;
-					new_cond->arg1 = path+cur+1;
-				} else {
-					if(new_cond->func == ROXML_FUNC_XPATH) {
-						xpath_node_t *xp;
-						new_cond->func2 = roxml_parse_xpath(new_cond->arg1, &xp, 1);
-						new_cond->xp = xp;
-					}
-				}
-			}
-		} else	{
-			if(!bracket && !quoted && !dquoted) {
-				if(strncmp(path+cur, ROXML_PATH_OR, strlen(ROXML_PATH_OR)) == 0)	{
-					// we are in the middle of a multiple xpath
-					path[cur-1] = '\0';
-					cur += strlen(ROXML_PATH_OR)-1;
-					xpath_node_t * tmp_node = (xpath_node_t*)calloc(nbpath+1, sizeof(xpath_node_t));
-					memcpy(tmp_node, first_node, nbpath*sizeof(xpath_node_t));
-					free(first_node);
-					first_node = tmp_node;
-					wait_first_node = 1;
-					new_node = tmp_node+nbpath;
-					new_node->rel = ROXML_OPERATOR_OR;
-					nbpath++;
-				} else if((strncmp(path+cur, ROXML_COND_AND, strlen(ROXML_COND_AND)) == 0)&&(context == 1))	{
-					// we are in the middle of a multiple xpath
-					path[cur-1] = '\0';
-					cur += strlen(ROXML_COND_AND)-1;
-					xpath_node_t * tmp_node = (xpath_node_t*)calloc(nbpath+1, sizeof(xpath_node_t));
-					memcpy(tmp_node, first_node, nbpath*sizeof(xpath_node_t));
-					free(first_node);
-					first_node = tmp_node;
-					wait_first_node = 1;
-					new_node = tmp_node+nbpath;
-					new_node->rel = ROXML_OPERATOR_AND;
-					nbpath++;
-				} else if((strncmp(path+cur, ROXML_COND_OR, strlen(ROXML_COND_OR)) == 0)&&(context == 1))	{
-					// we are in the middle of a multiple xpath
-					path[cur-1] = '\0';
-					cur += strlen(ROXML_COND_OR)-1;
-					xpath_node_t * tmp_node = (xpath_node_t*)calloc(nbpath+1, sizeof(xpath_node_t));
-					memcpy(tmp_node, first_node, nbpath*sizeof(xpath_node_t));
-					free(first_node);
-					first_node = tmp_node;
-					wait_first_node = 1;
-					new_node = tmp_node+nbpath;
-					new_node->rel = ROXML_OPERATOR_OR;
-					nbpath++;
-				} else if(path[cur] == '=') {
-					xpath_node_t *xp_root = new_node;
-					xpath_cond_t * xp_cond = (xpath_cond_t*)calloc(1, sizeof(xpath_cond_t));
-					xp_root->xp_cond = xp_cond;
-					xp_cond->op = ROXML_OPERATOR_EQU;
-					path[cur] = '\0';
-					if(ROXML_WHITE(path[cur-1])) {
-						path[cur-1] = '\0';
-					}
-					if(ROXML_WHITE(path[cur+1])) {
-						cur++;
-						path[cur] = '\0';
-					}
-					xp_cond->arg2 = path+cur+1;
-					if((xp_cond->arg2[0] > '9')||(xp_cond->arg2[0] < '0')) {
-						xp_cond->func = ROXML_FUNC_STRCOMP;
-					}
-				} else if(path[cur] == '>') {
-					xpath_node_t *xp_root = new_node;
-					xpath_cond_t * xp_cond = (xpath_cond_t*)calloc(1, sizeof(xpath_cond_t));
-					xp_root->xp_cond = xp_cond;
-					path[cur] = '\0';
-					xp_cond->op = ROXML_OPERATOR_SUP;
-					if(ROXML_WHITE(path[cur-1])) {
-						path[cur-1] = '\0';
-					}
-					if(path[cur+1] == '=') { 
-						cur++;
-						path[cur] = '\0';
-						xp_cond->op = ROXML_OPERATOR_ESUP; 
-					}
-					if(ROXML_WHITE(path[cur+1])) {
-						cur++;
-						path[cur] = '\0';
-					}
-					xp_cond->arg2 = path+cur+1;
-				} else if(path[cur] == '<') {
-					xpath_node_t *xp_root = new_node;
-					xpath_cond_t * xp_cond = (xpath_cond_t*)calloc(1, sizeof(xpath_cond_t));
-					xp_root->xp_cond = xp_cond;
-					path[cur] = '\0';
-					xp_cond->op = ROXML_OPERATOR_INF;
-					if(ROXML_WHITE(path[cur-1])) {
-						path[cur-1] = '\0';
-					}
-					if(path[cur+1] == '=') { 
-						cur++;
-						path[cur] = '\0';
-						xp_cond->op = ROXML_OPERATOR_EINF; 
-					}
-					if(ROXML_WHITE(path[cur+1])) {
-						cur++;
-						path[cur] = '\0';
-					}
-					xp_cond->arg2 = path+cur+1;
-				} else if((path[cur] == '!')&&(path[cur+1] == '=')) {
-					xpath_node_t *xp_root = new_node;
-					xpath_cond_t * xp_cond = (xpath_cond_t*)calloc(1, sizeof(xpath_cond_t));
-					xp_root->xp_cond = xp_cond;
-					path[cur] = '\0';
-					path[cur+1] = '\0';
-					xp_cond->op = ROXML_OPERATOR_DIFF;
-					if(ROXML_WHITE(path[cur-1])) {
-						path[cur-1] = '\0';
-					}
-					cur++;
-					if(ROXML_WHITE(path[cur+1])) {
-						cur++;
-						path[cur] = '\0';
-					}
-					xp_cond->arg2 = path+cur+1;
-					if((xp_cond->arg2[0] > '9')||(xp_cond->arg2[0] < '0')) {
-						xp_cond->func = ROXML_FUNC_STRCOMP;
-					}
-				} 
-			} else if(bracket && !quoted && !dquoted) {
-				if(new_cond->func != ROXML_FUNC_XPATH) {
-					if(strncmp(path+cur, ROXML_COND_OR, strlen(ROXML_COND_OR)) == 0)	{
-						// we are in the middle of a splitted condition
-						i = 0;
-						path[cur-1] = '\0';
-						cur += strlen(ROXML_COND_OR);
-						xpath_cond_t * tmp_cond = (xpath_cond_t*)calloc(1, sizeof(xpath_cond_t));
-						if(new_cond) { new_cond->next = tmp_cond; }
-						new_cond = tmp_cond;
-						new_cond->rel = ROXML_OPERATOR_OR;
-						new_cond->arg1 = path+cur+1;
-					} else if(strncmp(path+cur, ROXML_COND_AND, strlen(ROXML_COND_AND)) == 0)	{
-						// we are in the middle of a splitted condition
-						i = 0;
-						path[cur-1] = '\0';
-						cur += strlen(ROXML_COND_AND);
-						xpath_cond_t * tmp_cond = (xpath_cond_t*)calloc(1, sizeof(xpath_cond_t));
-						if(new_cond) { new_cond->next = tmp_cond; }
-						new_cond = tmp_cond;
-						new_cond->rel = ROXML_OPERATOR_AND;
-						new_cond->arg1 = path+cur+1;
-					}
-					if((path[cur] >= '0') && (path[cur] <= '9') && shorten_cond) {
-						new_cond->func = ROXML_FUNC_POS;
-						new_cond->op = ROXML_OPERATOR_EQU;
-						new_cond->arg2 = path+cur;
-						while((path[cur+1] >= '0') && (path[cur+1] <= '9')) { cur++; }
-					} else if(strncmp(path+cur, ROXML_FUNC_POS_STR, strlen(ROXML_FUNC_POS_STR)) == 0) {
-						int func = ROXML_FUNC_POS;
-						cur += strlen(ROXML_FUNC_POS_STR)-1;
-						new_cond->func = func;
-					} else if(strncmp(path+cur, ROXML_FUNC_FIRST_STR, strlen(ROXML_FUNC_FIRST_STR)) == 0) {
-						int func = ROXML_FUNC_FIRST;
-						cur += strlen(ROXML_FUNC_FIRST_STR)-1;
-						if(new_cond->op > 0) { new_cond->func2 = func; }
-						else { new_cond->func = func; }
-					} else if(strncmp(path+cur, ROXML_FUNC_LAST_STR, strlen(ROXML_FUNC_LAST_STR)) == 0) {
-						int func = ROXML_FUNC_LAST;
-						cur += strlen(ROXML_FUNC_LAST_STR)-1;
-						if(new_cond->op > 0) { new_cond->func2 = func; }
-						else { new_cond->func = func; }
-					} else if(path[cur] == '=') {
-						new_cond->op = ROXML_OPERATOR_EQU;
-						path[cur] = '\0';
-						if(ROXML_WHITE(path[cur-1])) {
-							path[cur-1] = '\0';
-						}
-						if(ROXML_WHITE(path[cur+1])) {
-							cur++;
-							path[cur] = '\0';
-						}
-						new_cond->arg2 = path+cur+1;
-						if((new_cond->arg2[0] > '9')||(new_cond->arg2[0] < '0')) {
-							new_cond->func = ROXML_FUNC_STRCOMP;
-						}
-					} else if(path[cur] == '>') {
-						path[cur] = '\0';
-						new_cond->op = ROXML_OPERATOR_SUP;
-						if(ROXML_WHITE(path[cur-1])) {
-							path[cur-1] = '\0';
-						}
-						if(path[cur+1] == '=') { 
-							cur++;
-							path[cur] = '\0';
-							new_cond->op = ROXML_OPERATOR_ESUP; 
-						}
-						if(ROXML_WHITE(path[cur+1])) {
-							cur++;
-							path[cur] = '\0';
-						}
-						new_cond->arg2 = path+cur+1;
-					} else if(path[cur] == '<') {
-						path[cur] = '\0';
-						new_cond->op = ROXML_OPERATOR_INF;
-						if(ROXML_WHITE(path[cur-1])) {
-							path[cur-1] = '\0';
-						}
-						if(path[cur+1] == '=') { 
-							cur++;
-							path[cur] = '\0';
-							new_cond->op = ROXML_OPERATOR_EINF; 
-						}
-						if(ROXML_WHITE(path[cur+1])) {
-							cur++;
-							path[cur] = '\0';
-						}
-						new_cond->arg2 = path+cur+1;
-					} else if((path[cur] == '!')&&(path[cur+1] == '=')) {
-						path[cur] = '\0';
-						path[cur+1] = '\0';
-						new_cond->op = ROXML_OPERATOR_DIFF;
-						if(ROXML_WHITE(path[cur-1])) {
-							path[cur-1] = '\0';
-						}
-						cur++;
-						if(ROXML_WHITE(path[cur+1])) {
-							cur++;
-							path[cur] = '\0';
-						}
-						new_cond->arg2 = path+cur+1;
-						if((new_cond->arg2[0] > '9')||(new_cond->arg2[0] < '0')) {
-							new_cond->func = ROXML_FUNC_STRCOMP;
-						}
-					} else if(path[cur] == '+') {
-						if((new_cond->func == ROXML_FUNC_LAST)||(new_cond->func == ROXML_FUNC_FIRST)) {
-							new_cond->op = ROXML_OPERATOR_ADD;
-						}
-						path[cur] = '\0';
-						if(ROXML_WHITE(path[cur+1])) {
-							cur++;
-							path[cur] = '\0';
-						}
-						new_cond->arg2 = path+cur+1;
-					} else if(path[cur] == '-') {
-						if((new_cond->func == ROXML_FUNC_LAST)||(new_cond->func == ROXML_FUNC_FIRST)) {
-							new_cond->op = ROXML_OPERATOR_SUB;
-						}
-						path[cur] = '\0';
-						if(ROXML_WHITE(path[cur+1])) {
-							cur++;
-							path[cur] = '\0';
-						}
-						new_cond->arg2 = path+cur+1;
-					} else {
-						if(shorten_cond) {
-							int bracket_lvl = 1;
-							new_cond->func = ROXML_FUNC_XPATH;
-							new_cond->arg1 = path+cur;
-							while(bracket_lvl > 0) {
-								if(path[cur] == '[') { bracket_lvl++; }
-								else if(path[cur] == ']') { bracket_lvl--; }
-								cur++;
-							}
-							cur-=2;
-						}
-					}
-					shorten_cond = 0;
-				}
-			}
-		}
-	}
+	roxml_parse_line(parser, path, _func_xpath_all, &ctx);
 
 	if(xpath)	{
-		*xpath = first_node;
+		*xpath = ctx.first_node;
 	}
-	return nbpath;
+	return ctx.nbpath;
 }
 
 void ROXML_INT roxml_free_xcond(xpath_cond_t *xcond)

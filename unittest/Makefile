@@ -1,9 +1,9 @@
 
-SRC1 = unittest.c roxml.test.c ../src/roxml.c ../src/roxml-internal.c
+SRC1 = unittest.c roxml.test.c ../src/roxml.c ../src/roxml-internal.c ../src/roxml-parse-engine.c
 OBJ1 = $(SRC1:.c=.o)
-SRC2 = roxml.perf.c ../src/roxml.c ../src/roxml-internal.c
+SRC2 = roxml.perf.c ../src/roxml.c ../src/roxml-internal.c ../src/roxml-parse-engine.c
 OBJ2 = $(SRC2:.c=.o)
-SRC3 = roxml.mem.c ../src/roxml.c ../src/roxml-internal.c
+SRC3 = roxml.mem.c ../src/roxml.c ../src/roxml-internal.c ../src/roxml-parse-engine.c
 OBJ3 = $(SRC3:.c=.o)
 
 CC = gcc

@@ -26,7 +26,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-void print_usage (const char *progname) {
+void print_usage (const char *progname)
+{
 	fprintf (stderr, "usage: %s [-q] <filename> [/]<node1>/<node2>/<node3>/.../<nodeN>\n", progname) ;
 }
 

@@ -143,7 +143,23 @@ typedef struct {
 	node_t *candidat_arg;
 	node_t *candidat_val;
 	node_t *current_node;
-} roxml_parse_ctx_t;
+} roxml_load_ctx_t;
+
+typedef struct {
+	int pos;
+	int is_first_node;
+	int wait_first_node;
+	int shorten_cond;
+	int nbpath;
+	int bracket;
+	int parenthesys;
+	int quoted;
+	int dquoted;
+	int context;
+	xpath_node_t * first_node;
+        xpath_node_t * new_node;
+	xpath_cond_t * new_cond;
+} roxml_xpath_ctx_t;
 
 #endif /* ROXML_TYPES_H */
 
