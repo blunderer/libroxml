@@ -21,7 +21,7 @@ TARGET_LIB = $O/libroxml.so
 TARGET_BIN = $O/roxml
 # options
 override CPPFLAGS += -Iinc/
-override CFLAGS += -g -O3 -Wall -Wextra -Werror -Iinc/ -DIGNORE_EMPTY_TEXT_NODES
+override CFLAGS += -g -O3 -Wall -Wextra -Wno-unused -Werror -Iinc/ -DIGNORE_EMPTY_TEXT_NODES
 override LDFLAGS += -lpthread
 
 # first rule (default)
