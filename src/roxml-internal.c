@@ -128,260 +128,54 @@ void ROXML_INT roxml_process_begin_node(roxml_load_ctx_t *context, int position)
 	context->candidat_node = roxml_create_node(position, context->src, ROXML_STD_NODE | context->type);
 }
 
-int ROXML_INT roxml_process_multichar_ids(roxml_load_ctx_t *context, char c)
-{
-	char cdata_string[] = "CDATA[";
-
-	switch(context->state) {
-#ifdef IGNORE_EMPTY_TEXT_NODES
-		case STATE_NODE_CONTENT:
-		case STATE_NODE_CDATA:
-			if(!ROXML_WHITE(c) && (c != '<')) {
-				context->empty_text_node = 0;
-			}
-		break;
-#endif /* IGNORE_EMPTY_TEXT_NODES */
-		case STATE_NODE_COMMENT_BEG:
-			if(c == '-') { 
-				roxml_process_begin_node(context, context->pos-2);
-				roxml_set_type(context->candidat_node, ROXML_CMT_NODE);
-				context->state = STATE_NODE_COMMENT_BEG+1;
-				return 1; 
-			} else if(c == '[') {
-				context->state = STATE_NODE_CDATA_BEG;
-				return 1; 
-			} else {
-				roxml_process_begin_node(context, context->pos-1);
-				context->state = STATE_NODE_SINGLE;
-				return 1; 
-			}
-			context->state = STATE_NODE_BEG;
-		break;
-		case STATE_NODE_COMMENT_BEG+1:
-			if(c == '-') {
-				context->state = STATE_NODE_COMMENT;
-				return 1; 
-			}
-			context->state = STATE_NODE_BEG;
-		break;
-		case STATE_NODE_CDATA_BEG:
-		case STATE_NODE_CDATA_BEG+1:
-		case STATE_NODE_CDATA_BEG+2:
-		case STATE_NODE_CDATA_BEG+3:
-		case STATE_NODE_CDATA_BEG+4:
-		case STATE_NODE_CDATA_BEG+5:
-			if(c == cdata_string[context->state-STATE_NODE_CDATA_BEG]) {
-				context->state++;
-				return 1; 
-			}
-			context->state = STATE_NODE_BEG;
-		break;
-		case STATE_NODE_COMMENT_END:
-			if(c != '-') { context->state = STATE_NODE_COMMENT; }
-			else { 
-				context->state = STATE_NODE_SINGLE;
-				context->previous_state = STATE_NODE_COMMENT_END;
-				context->candidat_node->end = context->pos-1;
-				return 1;
-			}
-		break;
-		case STATE_NODE_CDATA_END:
-			if(c != ']') { context->state = STATE_NODE_CDATA; }
-			else { 
-				context->state = STATE_NODE_SINGLE;
-				context->previous_state = STATE_NODE_CDATA_END;
-				context->candidat_node->end = context->pos-1;
-				return 1;
-			}
-		break;
-		case STATE_NODE_SINGLE:
-			if((context->previous_state == STATE_NODE_COMMENT_END)||
-				(context->previous_state == STATE_NODE_CDATA_END)|| 
-				(context->previous_state == STATE_NODE_PI)) 
-			{
-				if(c != '>') { context->state = context->previous_state; }
-				if(context->previous_state == STATE_NODE_CDATA_END) {
-					context->state = STATE_NODE_CONTENT;
-					return 1;
-				}
-			}
-		break;
-		case STATE_NODE_ATTR:
-			if(context->inside_node_state == STATE_INSIDE_VAL_BEG)	{
-				context->candidat_val = roxml_create_node(context->pos, context->src, ROXML_TXT_NODE | context->type);
-				context->candidat_val = roxml_parent_node(context->candidat_arg, context->candidat_val);
-				context->inside_node_state = STATE_INSIDE_VAL;
-			}
-		break;
-	}
-	return 0;
-}
-
-void ROXML_INT roxml_process_state(roxml_load_ctx_t *context, char c)
-{
-	switch(c) {
-		case '"':
-			if(context->mode == MODE_COMMENT_NONE) {
-				context->mode = MODE_COMMENT_DQUOTE;
-			} else if(context->mode == MODE_COMMENT_DQUOTE) {
-				context->mode = MODE_COMMENT_NONE;
-			}
-		break;
-		case '<':
-			if(context->state == STATE_NODE_CDATA) { return; }
-			if(context->state == STATE_NODE_COMMENT) { return; }
-			context->state = STATE_NODE_BEG;
-			context->previous_state = STATE_NODE_BEG;
-		break;
-		case '>':
-			if(context->state == STATE_NODE_CDATA) { return; }
-			if(context->state == STATE_NODE_COMMENT) { return; }
-			if(context->state == STATE_NODE_NAME)	{
-				context->empty_text_node = 1;
-				context->current_node = roxml_parent_node(context->current_node, context->candidat_node);
-			} else if(context->state == STATE_NODE_ATTR)	{
-				if(context->mode == MODE_COMMENT_DQUOTE) { return; }
-				if(context->inside_node_state == STATE_INSIDE_VAL)	{
-					node_t * to_be_closed = roxml_create_node(context->pos, context->src, ROXML_ATTR_NODE | context->type);
-					roxml_close_node(context->candidat_val, to_be_closed);
-				}
-				context->current_node = roxml_parent_node(context->current_node, context->candidat_node);
-				context->inside_node_state = STATE_INSIDE_ARG_BEG;
-			} else if(context->state == STATE_NODE_SINGLE)	{
-				context->empty_text_node = 1;
-				context->current_node = roxml_parent_node(context->current_node, context->candidat_node);
-				if(context->current_node->prnt != NULL) { context->current_node = context->current_node->prnt; }
-			} else if(context->state == STATE_NODE_END)	{
-				context->empty_text_node = 1;
-				roxml_close_node(context->current_node, context->candidat_node);
-				if(context->current_node->prnt != NULL) { context->current_node = context->current_node->prnt; }
-			}
-			context->state = STATE_NODE_CONTENT;
-			context->previous_state = STATE_NODE_CONTENT;
-			context->candidat_txt = roxml_create_node(context->pos+1, context->src, ROXML_TXT_NODE | context->type);
-			context->candidat_txt = roxml_parent_node(context->current_node, context->candidat_txt);
-		break;
-		case '!':
-			if(context->state == STATE_NODE_BEG)     {
-				context->state = STATE_NODE_COMMENT_BEG;
-			}
-		break;
-		case '-':
-			if(context->state == STATE_NODE_COMMENT)     {
-				context->state = STATE_NODE_COMMENT_END;
-			}
-		break;
-		case ']':
-			if(context->state == STATE_NODE_CDATA)     {
-				context->state = STATE_NODE_CDATA_END;
-			}
-		break;
-		case '?':
-			if(context->state == STATE_NODE_BEG)     {
-				roxml_process_begin_node(context, context->pos-1);
-				context->state = STATE_NODE_PI;
-				context->previous_state = STATE_NODE_PI;
-				roxml_set_type(context->candidat_node, ROXML_PI_NODE);
-			} else if(context->state == STATE_NODE_PI)     {
-				if(context->mode == MODE_COMMENT_NONE) {
-					context->candidat_node->end = context->pos;
-					context->previous_state = STATE_NODE_PI;
-					context->state = STATE_NODE_SINGLE;
-				}
-			}
-		break;
-		case '/':
-			if(context->state == STATE_NODE_BEG)	{
-				roxml_process_begin_node(context, context->pos-1);
-				context->state = STATE_NODE_END;
-			} else if(context->state == STATE_NODE_NAME)	{
-				context->state = STATE_NODE_SINGLE;
-			} else if(context->state == STATE_NODE_ATTR)	{
-				if(context->mode == MODE_COMMENT_DQUOTE) { return; }
-				if(context->inside_node_state == STATE_INSIDE_VAL)	{
-					node_t * to_be_closed = roxml_create_node(context->pos, context->src, ROXML_ATTR_NODE | context->type);
-					roxml_close_node(context->candidat_val, to_be_closed);
-				}
-				context->inside_node_state = STATE_INSIDE_ARG_BEG;
-				context->state = STATE_NODE_SINGLE;
-			}
-		break;
-		case ' ':
-		case '\t':
-		case '\n':
-		case '\r':
-			if(context->state == STATE_NODE_NAME)	{
-				context->state = STATE_NODE_ATTR;
-				context->inside_node_state = STATE_INSIDE_ARG_BEG;
-			} else if(context->state == STATE_NODE_ATTR)	{
-				if(context->inside_node_state == STATE_INSIDE_VAL)   {
-					node_t * to_be_closed = roxml_create_node(context->pos, context->src, ROXML_ATTR_NODE | context->type);
-					roxml_close_node(context->candidat_val, to_be_closed);
-					context->inside_node_state = STATE_INSIDE_ARG_BEG;
-				}
-			}
-		break;
-		default:
-			if(context->state == STATE_NODE_BEG) {
-				roxml_process_begin_node(context, context->pos-1);
-				context->state = STATE_NODE_NAME;
-			} else if(context->state == STATE_NODE_ATTR)	{
-				if(context->inside_node_state == STATE_INSIDE_ARG_BEG)	{
-					context->candidat_arg = roxml_create_node(context->pos-1, context->src, ROXML_ATTR_NODE | context->type);
-					context->candidat_arg = roxml_parent_node(context->candidat_node, context->candidat_arg);
-					context->inside_node_state = STATE_INSIDE_ARG;
-				} else if((context->inside_node_state == STATE_INSIDE_ARG)&&(c == '='))	{
-					context->inside_node_state = STATE_INSIDE_VAL_BEG;
-					node_t * to_be_closed = roxml_create_node(context->pos, context->src, ROXML_ATTR_NODE | context->type);
-					roxml_close_node(context->candidat_arg, to_be_closed);
-				}
-			}
-		break;
-	}
-}
-
 node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 {
-	char int_buffer[ROXML_BULK_READ];
-	int int_buffer_len = 0;
+	char int_buffer[ROXML_BULK_READ+1];
 	int int_abs_pos = 0;
 	int int_len = 0;
 	roxml_load_ctx_t context;
+	roxml_parser_item_t * parser = NULL;
 
 	memset(&context, 0, sizeof(roxml_load_ctx_t));
 	context.empty_text_node = 1;
 	context.current_node = current_node;
 
+	parser = roxml_append_parser_item(parser, " ", _func_load_white);
+	parser = roxml_append_parser_item(parser, "<", _func_load_open_node);
+	parser = roxml_append_parser_item(parser, ">", _func_load_close_node);
+	parser = roxml_append_parser_item(parser, "/", _func_load_end_node);
+	parser = roxml_append_parser_item(parser, "\"", _func_load_quoted);
+	parser = roxml_append_parser_item(parser, "\t", _func_load_white);
+	parser = roxml_append_parser_item(parser, "\n", _func_load_white);
+	parser = roxml_append_parser_item(parser, "\r", _func_load_white);
+	parser = roxml_append_parser_item(parser, "!", _func_load_open_spec_node);
+	parser = roxml_append_parser_item(parser, "]", _func_load_close_cdata);
+	parser = roxml_append_parser_item(parser, "-", _func_load_close_comment);
+	parser = roxml_append_parser_item(parser, "?", _func_load_close_pi);
+	parser = roxml_append_parser_item(parser, NULL, _func_load_default);
+
+	parser = roxml_parser_prepare(parser);
+
 	if(file)	{ 
 		context.type = ROXML_FILE;
 		context.src = (void*)file;
+		do {
+			int ret = 0;
+			int_len = fread(int_buffer, 1, ROXML_BULK_READ, file);
+			int_buffer[int_len] = '\0';
+
+			context.pos = int_abs_pos;
+			ret = roxml_parse_line(parser, int_buffer, int_len, &context);
+
+			int_abs_pos += ret;
+		} while(int_len == ROXML_BULK_READ);
 	} else	{
 		context.type = ROXML_BUFF;
 		context.src = (void*)buffer;
-		int_buffer_len = strlen(buffer);
+		roxml_parse_line(parser, buffer, 0, &context);
 	}
 
-	do {
-		int int_rel_pos = 0;
-		char * int_ptr = int_buffer;
-
-		if(context.type == ROXML_FILE)	{
-			int_len = fread(int_buffer, 1, ROXML_BULK_READ, file);
-		} else {
-			int_ptr = buffer + int_abs_pos;
-			int_len = ROXML_BULK_READ>strlen(int_ptr)?strlen(int_ptr):ROXML_BULK_READ;
-		}
-
-		for(int_rel_pos = int_abs_pos; int_rel_pos < int_abs_pos+int_len; int_rel_pos++) {
-			char c = int_ptr[int_rel_pos-int_abs_pos];
-
-			context.pos = int_rel_pos;
-			if(roxml_process_multichar_ids(&context, c) == 0) {
-				roxml_process_state(&context, c);
-			}
-		}
-		int_abs_pos += int_len;
-	} while(int_len == ROXML_BULK_READ);
+	roxml_parser_free(parser);
 
 #ifdef IGNORE_EMPTY_TEXT_NODES
 	if(context.empty_text_node == 1) {
@@ -539,40 +333,42 @@ int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t ** xpath, int context)
 	ctx.first_node->rel = ROXML_OPERATOR_OR;
 
 	roxml_parser_item_t * parser = NULL;
-	parser = roxml_append_parser_item(parser, " ", _func_ignore);
-	parser = roxml_append_parser_item(parser, "\t", _func_ignore);
-	parser = roxml_append_parser_item(parser, "\n", _func_ignore);
-	parser = roxml_append_parser_item(parser, "\r", _func_ignore);
-	parser = roxml_append_parser_item(parser, "/", _func_new_node);
-	parser = roxml_append_parser_item(parser, "(", _func_open_parenthesys);
-	parser = roxml_append_parser_item(parser, ")", _func_close_parenthesys);
-	parser = roxml_append_parser_item(parser, "[", _func_open_brackets);
-	parser = roxml_append_parser_item(parser, "]", _func_close_brackets);
-	parser = roxml_append_parser_item(parser, "=", _func_operator_equal);
-	parser = roxml_append_parser_item(parser, ">", _func_operator_sup);
-	parser = roxml_append_parser_item(parser, "<", _func_operator_inf);
-	parser = roxml_append_parser_item(parser, "!=", _func_operator_diff);
-	parser = roxml_append_parser_item(parser, "0", _func_number);
-	parser = roxml_append_parser_item(parser, "1", _func_number);
-	parser = roxml_append_parser_item(parser, "2", _func_number);
-	parser = roxml_append_parser_item(parser, "3", _func_number);
-	parser = roxml_append_parser_item(parser, "4", _func_number);
-	parser = roxml_append_parser_item(parser, "5", _func_number);
-	parser = roxml_append_parser_item(parser, "6", _func_number);
-	parser = roxml_append_parser_item(parser, "7", _func_number);
-	parser = roxml_append_parser_item(parser, "8", _func_number);
-	parser = roxml_append_parser_item(parser, "9", _func_number);
-	parser = roxml_append_parser_item(parser, "+", _func_operator_add);
-	parser = roxml_append_parser_item(parser, "-", _func_operator_subs);
-	parser = roxml_append_parser_item(parser, ROXML_PATH_OR, _func_xpath_or);
-	parser = roxml_append_parser_item(parser, ROXML_COND_OR, _func_condition_or);
-	parser = roxml_append_parser_item(parser, ROXML_COND_AND, _func_condition_and);
-	parser = roxml_append_parser_item(parser, ROXML_FUNC_POS_STR, _func_position);
-	parser = roxml_append_parser_item(parser, ROXML_FUNC_FIRST_STR, _func_first);
-	parser = roxml_append_parser_item(parser, ROXML_FUNC_LAST_STR, _func_last);
-	parser = roxml_append_parser_item(parser, NULL, _func_default_xpath);
+	parser = roxml_append_parser_item(parser, " ", _func_xpath_ignore);
+	parser = roxml_append_parser_item(parser, "\t", _func_xpath_ignore);
+	parser = roxml_append_parser_item(parser, "\n", _func_xpath_ignore);
+	parser = roxml_append_parser_item(parser, "\r", _func_xpath_ignore);
+	parser = roxml_append_parser_item(parser, "/", _func_xpath_new_node);
+	parser = roxml_append_parser_item(parser, "(", _func_xpath_open_parenthesys);
+	parser = roxml_append_parser_item(parser, ")", _func_xpath_close_parenthesys);
+	parser = roxml_append_parser_item(parser, "[", _func_xpath_open_brackets);
+	parser = roxml_append_parser_item(parser, "]", _func_xpath_close_brackets);
+	parser = roxml_append_parser_item(parser, "=", _func_xpath_operator_equal);
+	parser = roxml_append_parser_item(parser, ">", _func_xpath_operator_sup);
+	parser = roxml_append_parser_item(parser, "<", _func_xpath_operator_inf);
+	parser = roxml_append_parser_item(parser, "!", _func_xpath_operator_diff);
+	parser = roxml_append_parser_item(parser, "0", _func_xpath_number);
+	parser = roxml_append_parser_item(parser, "1", _func_xpath_number);
+	parser = roxml_append_parser_item(parser, "2", _func_xpath_number);
+	parser = roxml_append_parser_item(parser, "3", _func_xpath_number);
+	parser = roxml_append_parser_item(parser, "4", _func_xpath_number);
+	parser = roxml_append_parser_item(parser, "5", _func_xpath_number);
+	parser = roxml_append_parser_item(parser, "6", _func_xpath_number);
+	parser = roxml_append_parser_item(parser, "7", _func_xpath_number);
+	parser = roxml_append_parser_item(parser, "8", _func_xpath_number);
+	parser = roxml_append_parser_item(parser, "9", _func_xpath_number);
+	parser = roxml_append_parser_item(parser, "+", _func_xpath_operator_add);
+	parser = roxml_append_parser_item(parser, "-", _func_xpath_operator_subs);
+	parser = roxml_append_parser_item(parser, ROXML_PATH_OR, _func_xpath_path_or);
+	parser = roxml_append_parser_item(parser, ROXML_COND_OR, _func_xpath_condition_or);
+	parser = roxml_append_parser_item(parser, ROXML_COND_AND, _func_xpath_condition_and);
+	parser = roxml_append_parser_item(parser, ROXML_FUNC_POS_STR, _func_xpath_position);
+	parser = roxml_append_parser_item(parser, ROXML_FUNC_FIRST_STR, _func_xpath_first);
+	parser = roxml_append_parser_item(parser, ROXML_FUNC_LAST_STR, _func_xpath_last);
+	parser = roxml_append_parser_item(parser, NULL, _func_xpath_default);
 
-	roxml_parse_line(parser, path, _func_xpath_all, &ctx);
+	parser = roxml_parser_prepare(parser);
+	roxml_parse_line(parser, path, 0, &ctx);
+	roxml_parser_free(parser);
 
 	if(xpath)	{
 		*xpath = ctx.first_node;
@@ -906,7 +702,7 @@ int ROXML_INT roxml_validate_axes(node_t *root, node_t *candidat, node_t ***ans,
 
 	if(!valid) {
 		char * name  = roxml_get_name(candidat, intern_buff, INTERNAL_BUF_SIZE);
-		if(strcmp(name, axes) == 0)	{
+		if(name && strcmp(name, axes) == 0)	{
 			valid = 1;
 		}	
 		roxml_release(name);

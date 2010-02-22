@@ -26,49 +26,55 @@
 #ifndef ROXML_PARSE_ENGINE_H
 #define ROXML_PARSE_ENGINE_H
 
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-
-typedef int(*roxml_parse_func)(char *chunk, void * data);
-
-typedef struct _roxml_parser_item
-{
-	char *chunk;
-	int chunk_len;
-	roxml_parse_func func;
-	struct _roxml_parser_item *next;
-} roxml_parser_item_t;
-
 roxml_parser_item_t *roxml_append_parser_item(roxml_parser_item_t *head, char * key, roxml_parse_func func);
+void roxml_parser_free(roxml_parser_item_t *head);
 void roxml_parser_clear(roxml_parser_item_t *head);
-int roxml_parse_line(roxml_parser_item_t * head, char *line, roxml_parse_func func, void * ctx);
+int roxml_parse_line(roxml_parser_item_t * head, char *line, int len, void * ctx);
+roxml_parser_item_t * roxml_parser_prepare(roxml_parser_item_t *head);
 
-int _func_ignore(char * chunk, void * data);
-int _func_new_node(char * chunk, void * data);
-int _func_quote(char * chunk, void * data);
-int _func_dquote(char * chunk, void * data);
-int _func_open_parenthesys(char * chunk, void * data);
-int _func_close_parenthesys(char * chunk, void * data);
-int _func_open_brackets(char * chunk, void * data);
-int _func_close_brackets(char * chunk, void * data);
-int _func_condition_or(char * chunk, void * data);
-int _func_condition_and(char * chunk, void * data);
-int _func_xpath_or(char * chunk, void * data);
-int _func_operator_equal(char * chunk, void * data);
-int _func_operator_sup(char * chunk, void * data);
-int _func_operator_inf(char * chunk, void * data);
-int _func_operator_diff(char * chunk, void * data);
-int _func_number(char * chunk, void * data);
-int _func_position(char * chunk, void * data);
-int _func_first(char * chunk, void * data);
-int _func_last(char * chunk, void * data);
-int _func_operator_add(char * chunk, void * data);
-int _func_operator_subs(char * chunk, void * data);
-int _func_default_xpath(char * chunk, void * data);
+// xpath parser functions
+int _func_xpath_ignore(char * chunk, void * data);
+int _func_xpath_new_node(char * chunk, void * data);
+int _func_xpath_quote(char * chunk, void * data);
+int _func_xpath_dquote(char * chunk, void * data);
+int _func_xpath_open_parenthesys(char * chunk, void * data);
+int _func_xpath_close_parenthesys(char * chunk, void * data);
+int _func_xpath_open_brackets(char * chunk, void * data);
+int _func_xpath_close_brackets(char * chunk, void * data);
+int _func_xpath_condition_or(char * chunk, void * data);
+int _func_xpath_condition_and(char * chunk, void * data);
+int _func_xpath_path_or(char * chunk, void * data);
+int _func_xpath_operator_equal(char * chunk, void * data);
+int _func_xpath_operator_sup(char * chunk, void * data);
+int _func_xpath_operator_inf(char * chunk, void * data);
+int _func_xpath_operator_diff(char * chunk, void * data);
+int _func_xpath_number(char * chunk, void * data);
+int _func_xpath_position(char * chunk, void * data);
+int _func_xpath_first(char * chunk, void * data);
+int _func_xpath_last(char * chunk, void * data);
+int _func_xpath_operator_add(char * chunk, void * data);
+int _func_xpath_operator_subs(char * chunk, void * data);
+int _func_xpath_default(char * chunk, void * data);
 int _func_xpath_all(char * chunk, void * data);
 
+// load parser functions
+int _func_load_proc_state(char * chunk, void * data);
+int _func_load_quoted(char * chunk, void * data);
+int _func_load_open_cdata(char * chunk, void * data);
+int _func_load_open_comment(char * chunk, void * data);
+int _func_load_open_pi(char * chunk, void * data);
+int _func_load_open_spec_node(char * chunk, void * data);
+int _func_load_close_cdata(char * chunk, void * data);
+int _func_load_close_comment(char * chunk, void * data);
+int _func_load_close_pi(char * chunk, void * data);
+int _func_load_open_node(char * chunk, void * data);
+int _func_load_close_node(char * chunk, void * data);
+int _func_load_end_node(char * chunk, void * data);
+int _func_load_white(char * chunk, void * data);
+int _func_load_white(char * chunk, void * data);
+int _func_load_white(char * chunk, void * data);
+int _func_load_white(char * chunk, void * data);
+int _func_load_default(char * chunk, void * data);
 
 #endif /* ROXML_PARSE_ENGINE_H */
 

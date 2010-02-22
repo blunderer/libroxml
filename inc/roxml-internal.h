@@ -409,6 +409,16 @@ int ROXML_INT roxml_in_pool(node_t * root, node_t *n, int req_id);
  */
 node_t ** ROXML_INT roxml_exec_xpath(node_t *root, node_t *n, xpath_node_t *xpath, int index, int * count);
 
+/** \brief node creation during parsing
+ *
+ * \fn roxml_process_begin_node(roxml_load_ctx_t *context, int position);
+ * this function create a new node upon finding new opening sign. It closes previous node if necessary
+ * \param context the parsing context
+ * \param position the position in the file
+ * \return
+ */
+void ROXML_INT roxml_process_begin_node(roxml_load_ctx_t *context, int position);
+
 #ifdef __DEBUG
 extern unsigned int _nb_node;
 extern unsigned int _nb_attr;

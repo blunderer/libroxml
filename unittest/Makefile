@@ -6,12 +6,10 @@ OBJ2 = $(SRC2:.c=.o)
 SRC3 = roxml.mem.c ../src/roxml.c ../src/roxml-internal.c ../src/roxml-parse-engine.c
 OBJ3 = $(SRC3:.c=.o)
 
-CC = gcc
 RM = rm -f
 
-CFLAGS1 = -lefence -g -I../inc -DUNITTEST -DREENTRANT -DLINUX -Wall -Wextra -D__DEBUG -DIGNORE_EMPTY_TEXT_NODES
-#CFLAGS2 = -pg -I../inc -DREENTRANT -DLINUX -Wall -Wextra -DIGNORE_EMPTY_TEXT_NODES
-CFLAGS2 = -O3 -I../inc -DREENTRANT -DLINUX -Wall -Wextra -DIGNORE_EMPTY_TEXT_NODES
+CFLAGS1 = -pg -lefence -g -I../inc -DUNITTEST -DREENTRANT -DLINUX -Wall -Wextra -D__DEBUG -DIGNORE_EMPTY_TEXT_NODES
+CFLAGS2 = -O3 -pg -g -I../inc -DREENTRANT -DLINUX -Wall -Wextra -DIGNORE_EMPTY_TEXT_NODES
 TARGET1 = roxml.unitC
 TARGET2 = roxml.perf
 TARGET3 = roxml.mem
@@ -19,13 +17,13 @@ TARGET3 = roxml.mem
 all: $(TARGET1) $(TARGET2) $(TARGET3)
 
 $(TARGET1): $(OBJ1)
-	$(CC) -o $@ $^
+	$(CC) -o $@ $^ -pg
 
 $(TARGET2): $(OBJ2)
-	$(CC) -o $@ $^
+	$(CC) -o $@ $^ -pg
 
 $(TARGET3): $(OBJ3)
-	$(CC) -o $@ $^
+	$(CC) -o $@ $^ -pg
 
 roxml.perf.o: roxml.perf.c
 	$(CC) -c -o $@ $< $(CFLAGS2)

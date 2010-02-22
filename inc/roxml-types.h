@@ -23,6 +23,8 @@
 #ifndef ROXML_TYPES_H
 #define ROXML_TYPES_H
 
+typedef int(*roxml_parse_func)(char *chunk, void * data);
+
 /** \struct memory_cell_t
  *
  * \brief memory cell structure
@@ -160,6 +162,15 @@ typedef struct {
         xpath_node_t * new_node;
 	xpath_cond_t * new_cond;
 } roxml_xpath_ctx_t;
+
+typedef struct _roxml_parser_item
+{
+	int count;
+	char chunk[16];
+	int chunk_len;
+	roxml_parse_func func;
+	struct _roxml_parser_item *next;
+} roxml_parser_item_t;
 
 #endif /* ROXML_TYPES_H */
 
