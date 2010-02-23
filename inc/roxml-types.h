@@ -23,6 +23,14 @@
 #ifndef ROXML_TYPES_H
 #define ROXML_TYPES_H
 
+/** \typedef roxml_parse_func 
+ *
+ * \brief parser callback functions
+ * 
+ * This is the prototype for a parser callback function. It receive as argument
+ * the chunk that matched the key, and the context as a void. It should return the 
+ * number of handled bytes or 0 if doesn't want to handle this key
+ */
 typedef int(*roxml_parse_func)(char *chunk, void * data);
 
 /** \struct memory_cell_t
@@ -131,45 +139,64 @@ typedef struct node {
 	void *priv;			/*!< ref to xpath tok (internal use) */
 } node_t;
 
-typedef struct {
-	int pos;
-	int empty_text_node;
-	int state;
-	int previous_state;
-	int mode;
-	int inside_node_state;
-	int type;
-	void * src;
-	node_t *candidat_node;
-	node_t *candidat_txt;
-	node_t *candidat_arg;
-	node_t *candidat_val;
-	node_t *current_node;
+/** \struct _roxml_load_ctx
+ *
+ * \brief xml parsing context
+ * 
+ * obscure structure that contains all the xml
+ * parsing variables
+ */
+typedef struct _roxml_load_ctx {
+	int pos;				/*!< position in file */
+	int empty_text_node;			/*!< if text node is empty (only '\t' '\r' '\n' ' ' */
+	int state;				/*!< state (state machine main var) */
+	int previous_state;			/*!< previous state */
+	int mode;				/*!< mode quoted or normal */
+	int inside_node_state;			/*!< sub state for attributes*/
+	int type;				/*!< source type (file or buffer) */
+	void * src;				/*!< source (file or buffer) */
+	node_t *candidat_node;			/*!< node being processed */
+	node_t *candidat_txt;			/*!< text node being processed */
+	node_t *candidat_arg;			/*!< attr node being processed */
+	node_t *candidat_val;			/*!< attr value being processed */
+	node_t *current_node;			/*!< current node */
 } roxml_load_ctx_t;
 
-typedef struct {
-	int pos;
-	int is_first_node;
-	int wait_first_node;
-	int shorten_cond;
-	int nbpath;
-	int bracket;
-	int parenthesys;
-	int quoted;
-	int dquoted;
-	int context;
-	xpath_node_t * first_node;
-        xpath_node_t * new_node;
-	xpath_cond_t * new_cond;
+/** \struct _roxml_xpath_ctx
+ *
+ * \brief xpath parsing context
+ * 
+ * obscure structure that contains all the xapth
+ * parsing variables
+ */
+typedef struct _roxml_xpath_ctx {
+	int pos;				/*!< position in string */
+	int is_first_node;			/*!< is it the first node of xpath */
+	int wait_first_node;			/*!< are we waiting for the first node of a xpath */
+	int shorten_cond;			/*!< is the cond a short confition */
+	int nbpath;				/*!< number of xpath in this string */
+	int bracket;				/*!< are we inside two brackets */
+	int parenthesys;			/*!< are we inside two parenthesys */
+	int quoted;				/*!< are we quoted (') */
+	int dquoted;				/*!< are we double quoted (") */
+	int context;				/*!< is it an inside xpath*/
+	xpath_node_t * first_node;		/*!< the very first node of xpath string */
+        xpath_node_t * new_node;		/*!< current xpath node */
+	xpath_cond_t * new_cond;		/*!< current xpath cond */
 } roxml_xpath_ctx_t;
 
-typedef struct _roxml_parser_item
-{
-	int count;
-	char chunk[16];
-	int chunk_len;
-	roxml_parse_func func;
-	struct _roxml_parser_item *next;
+/** \struct _roxml_parser_item
+ *
+ * \brief the parser item struct
+ * 
+ * this struct contains the key and callback.
+ */
+typedef struct _roxml_parser_item {
+	int count;				/*!< number of parser item with non null key (only for head) */
+	int def_count;				/*!< total number of parser item (only for head) */
+	char chunk;				/*!< key to match */
+	roxml_parse_func func;			/*!< callback function */
+	struct _roxml_parser_item *next;		/*!< next item */
 } roxml_parser_item_t;
 
 #endif /* ROXML_TYPES_H */

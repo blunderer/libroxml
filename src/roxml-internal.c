@@ -675,6 +675,7 @@ int ROXML_INT roxml_validate_axes(node_t *root, node_t *candidat, node_t ***ans,
 		path_end = 1;
 	} else {
 		axes = xn->name;
+
 		if((axes == NULL) || (strcmp("node()", axes) == 0))  { 
 			valid = 1;
 		} else if(strcmp("*", axes) == 0)  { 

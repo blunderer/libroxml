@@ -8,8 +8,8 @@ OBJ3 = $(SRC3:.c=.o)
 
 RM = rm -f
 
-CFLAGS1 = -pg -lefence -g -I../inc -DUNITTEST -DREENTRANT -DLINUX -Wall -Wextra -D__DEBUG -DIGNORE_EMPTY_TEXT_NODES
-CFLAGS2 = -O3 -pg -g -I../inc -DREENTRANT -DLINUX -Wall -Wextra -DIGNORE_EMPTY_TEXT_NODES
+CFLAGS1 = -lefence -g -I../inc -DUNITTEST -DREENTRANT -DLINUX -Wall -Wextra -D__DEBUG -DIGNORE_EMPTY_TEXT_NODES
+CFLAGS2 = -O3 -I../inc -DREENTRANT -DLINUX -Wall -Wextra -DIGNORE_EMPTY_TEXT_NODES
 TARGET1 = roxml.unitC
 TARGET2 = roxml.perf
 TARGET3 = roxml.mem
@@ -17,13 +17,13 @@ TARGET3 = roxml.mem
 all: $(TARGET1) $(TARGET2) $(TARGET3)
 
 $(TARGET1): $(OBJ1)
-	$(CC) -o $@ $^ -pg
+	$(CC) -o $@ $^
 
 $(TARGET2): $(OBJ2)
-	$(CC) -o $@ $^ -pg
+	$(CC) -o $@ $^
 
 $(TARGET3): $(OBJ3)
-	$(CC) -o $@ $^ -pg
+	$(CC) -o $@ $^
 
 roxml.perf.o: roxml.perf.c
 	$(CC) -c -o $@ $< $(CFLAGS2)
