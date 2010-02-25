@@ -35,11 +35,11 @@ building applications which use %{name}.
 make
 
 %install
-rm -rf $RPM_BUILD_ROOT
-make DESTDIR=$RPM_BUILD_ROOT install
+rm -rf ${RPM_BUILD_ROOT}
+make DESTDIR=${RPM_BUILD_ROOT} install
 
 %clean
-rm -rf $RPM_BUILD_ROOT
+rm -rf ${RPM_BUILD_ROOT}
 
 %post -p /sbin/ldconfig
 
@@ -48,15 +48,14 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(-,root,root)
 %doc debian/changelog debian/README
-%{_prefix}/lib/lib*.so
-%{_prefix}/lib/lib*.a
+%{_prefix}/lib/libroxml.so
+%{_prefix}/lib/libroxml.a
+%{_prefix}/bin/roxml
 
 %files devel
 %defattr(-,root,root)
 %doc debian/changelog debian/README
-%{_prefix}/bin/*
-%{_prefix}/lib/lib*.so
-%{_prefix}/include/*
-%{_prefix}/lib/pkgconfig/*
+%{_prefix}/include/roxml.h
+%{_prefix}/lib/pkgconfig/libroxml*
 %{_prefix}/share/doc/libroxml/html/*
 
