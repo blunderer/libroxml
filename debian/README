@@ -1,18 +1,21 @@
 The Debian Package libroxml
 ----------------------------
 
-This library is minimum, easy-to-use, C implementation for xml file parsing.
+Why libroxml?
+Because XML parsing is always hard to reinvent
+Because very often, xml libraries are too big to fit with little application
 
-It also includes a mini shell to navigate thru a xml file as a demo.
+To be sure libroxml will stay easy to use, I'll limit the public API to 20 functions. This is quite enought for basic needs, and most of the time, we don't need more. Currently 19 functions are part of the public API and library binary is about 40Ko.
 
-Why libroxml? Because XML parsing is always hard to reinvent, and because very often xml lib are too big to fit with very little application
+libroxml allow you to easily:
+- load / unload document from files
+- load / unload document from buffer
+- navigate thru the xml tree using libroxml C/C++ API
+- read attributes and attributes' values for nodes
+- get text content of nodes
+- use XPath expressions
+- modify on the loaded XML tree
+- create XML from scratch
+- applying modification from the loaded XML tree to a file or buffer
 
-What can do libroxml? It allow you to easily:
-
-    * load / unload document from files
-    * load / unload document from buffer
-    * navigate thru the xml tree
-    * read attributes and attributes'values for nodes
-    * get content of nodes 
-
- -- blunderer <blunderer@blunderer.org>  Thu, 19 Feb 2009 14:14:13 +0100
+ -- blunderer <blunderer@blunderer.org>  Sun, 28 Feb 2010 19:41:43 +0100

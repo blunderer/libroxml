@@ -48,14 +48,20 @@ rm -rf ${RPM_BUILD_ROOT}
 %files
 %defattr(-,root,root)
 %doc debian/changelog debian/README
-%{_prefix}/lib/libroxml.so
-%{_prefix}/lib/libroxml.a
+%{_prefix}/lib/libroxml.so.0
 %{_prefix}/bin/roxml
+%{_prefix}/share/man/man1/roxml.1
 
 %files devel
 %defattr(-,root,root)
 %doc debian/changelog debian/README
+%{_prefix}/lib/libroxml.a
 %{_prefix}/include/roxml.h
-%{_prefix}/lib/pkgconfig/libroxml*
+%{_prefix}/lib/pkgconfig/libroxml.pc
 %{_prefix}/share/doc/libroxml/html/*
+%{_prefix}/share/man/man3/roxml*
+%{_prefix}/share/man/man3/ROXML*
+%{_prefix}/share/man/man3/node_t.3
+%{_prefix}/share/man/man3/RELEASE_ALL.3
+%{_prefix}/share/man/man3/RELEASE_LAST.3
 

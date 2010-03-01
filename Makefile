@@ -17,12 +17,12 @@ OBJ_LIB = $(SRC_LIB:%.c=$O/%.o)
 OBJ_BIN = $(SRC_BIN:%.c=$O/%.o)
 TARGETS = $(TARGET_SLIB) $(TARGET_LIB) $(TARGET_BIN)
 TARGET_SLIB = $O/libroxml.a
-TARGET_LIB = $O/libroxml.so
+TARGET_LIB = $O/libroxml.so.0
 TARGET_BIN = $O/roxml
 # options
 override CPPFLAGS += -Iinc/
 override CFLAGS += -g -O3 -Wall -Wextra -Wno-unused -Werror -Iinc/ -DIGNORE_EMPTY_TEXT_NODES
-override LDFLAGS += -lpthread
+override LDFLAGS += -Wl,-soname,libroxml.so.0 -lpthread
 
 # first rule (default)
 all:
@@ -55,7 +55,7 @@ $O/%.d: %.c | $O
 
 $O/%.o: %.c
 	$(call ECHO_DO, '  CC      $(notdir $@)', \
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) $< -o $@ )
+	$(CC) -fPIC -c $(CPPFLAGS) $(CFLAGS) $< -o $@ )
 
 $(TARGET_SLIB): $(OBJ_LIB)
 	$(call ECHO_DO, '  AR      $(notdir $@)', \
@@ -68,7 +68,7 @@ $(TARGET_LIB): $(OBJ_LIB)
 $(TARGET_BIN): $(OBJ_BIN)
 $(TARGET_BIN): | $(if $(filter -static, $(LDFLAGS)), $(TARGET_SLIB), $(TARGET_LIB))
 	$(call ECHO_DO, '  LD      $(notdir $@)', \
-	$(CC) $(LDFLAGS) $^ -L$O -lroxml -o $@ )
+	$(CC) $^ -L$O -lroxml -o $@ )
 
 .PHONY: all
 all: $(TARGET_SLIB) $(if $(filter -static, $(LDFLAGS)), , $(TARGET_LIB)) $(TARGET_BIN)
@@ -88,7 +88,7 @@ clean:
 .PHONY: mrproper
 mrproper: clean
 	$(call ECHO_DO, '  RM      docs', \
-	- rm -fr docs )
+	- rm -fr docs/html docs/latex docs/man )
 	$(call ECHO_DO, '  CLEAN   debian', \
 	- fakeroot $(MAKE) -f $(abspath debian/rules) clean )
 	$(call ECHO_DO, '  CLEAN   fuse.xml', \
@@ -100,15 +100,17 @@ install: $(TARGETS) doxy
 	mkdir -p $(DESTDIR)/usr/include
 	mkdir -p $(DESTDIR)/usr/lib/pkgconfig
 	mkdir -p $(DESTDIR)/usr/share/man/man3
+	mkdir -p $(DESTDIR)/usr/share/man/man1
 	mkdir -p $(DESTDIR)/usr/share/doc/libroxml/html
 	install -D $(TARGET_SLIB) $(DESTDIR)/usr/lib
 	install -D $(TARGET_LIB) $(DESTDIR)/usr/lib
 	install -D $(TARGET_BIN) $(DESTDIR)/usr/bin
 	install -D $(INC) $(DESTDIR)/usr/include
-	install -D libroxml.pc $(DESTDIR)/usr/lib/pkgconfig
 	install -D LGPL.txt $(DESTDIR)/usr/share/doc/libroxml/
+	install -D docs/roxml.1 $(DESTDIR)/usr/share/man/man1/
 	install -D docs/man/man3/* $(DESTDIR)/usr/share/man/man3/
 	install -D docs/html/* $(DESTDIR)/usr/share/doc/libroxml/html/
+	install -m644 libroxml.pc $(DESTDIR)/usr/lib/pkgconfig
 
 .PHONY: uninstall
 uninstall:

@@ -1,23 +1,25 @@
 Source: libroxml
 Priority: extra
-Maintainer: blunderer <blunderer@blunderer.org>
+Maintainer: Tristan Lelong <blunderer@blunderer.org>
 Build-Depends: debhelper (>= 7)
 Standards-Version: 3.7.3
 Section: libs
-Homepage: http://code.google.com/p/libroxml/
+Homepage: http://libroxml.googlecode.com
 
 Package: libroxml-dev
 Section: libdevel
 Architecture: any
-Depends: libroxml (= ${binary:Version})
-Description: development file for libroxml
+Depends: libroxml0 (= ${binary:Version})
+Description: libroxml development files
+ libroxml is a light but powerful XML parsing library with C API.
+ It provides XPath support and navigation funtions.
+ You can also use libroxml for XML creation/edition.
 
-Package: libroxml
+Package: libroxml0
 Section: libs
-Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: a light and powerfull xml parsing library
- libroxml is a very light, low fingerprint, fast, and powerfull
- library designed for parsing XML files. This is perfectly suitable 
- for little embeded systems but you also use it widely in various
- application for xml configuration file reading for example.
+Architecture: i386
+Depends: ${shlibs:Depends}
+Description: C XML parsing library
+ libroxml is a light but powerful XML parsing library with C API.
+ It provides XPath support and navigation funtions.
+ You can also use libroxml for XML creation/edition.

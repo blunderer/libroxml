@@ -1,4 +1,5 @@
-usr/include/*
-usr/lib/pkgconfig/*
-usr/share/doc/libroxml/html/*
+usr/lib/lib*.a
+usr/include/roxml.h
+/usr/lib/pkgconfig/libroxml.pc
 usr/share/man/man3/*
+usr/share/doc/libroxml/html/*
