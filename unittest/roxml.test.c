@@ -874,9 +874,21 @@ int test_get_attr(void)
 
 	attr1 = roxml_get_attr(node1, "toto", 0);
 	ASSERT_NULL(attr1)
+	roxml_close(root);
+
+	root = roxml_load_doc("roxml.test.xml.wrong");
+
+	char buf[256];
+	node0 = roxml_get_chld(root, NULL, 0);
+	node1 = roxml_get_chld(node0, NULL, 0);
+	attr0 = roxml_get_attr(node1, NULL, 0);
+	ASSERT_STRING_EQUAL(roxml_get_name(attr0, buf, 256), "name")
+	attr1 = roxml_get_attr(node1, NULL, 1);
+	ASSERT_STRING_EQUAL(roxml_get_name(attr1, buf, 256), "value")
+
+	roxml_close(root);
 
 	roxml_release(RELEASE_ALL);
-	roxml_close(root);
 
 	RETURN
 }

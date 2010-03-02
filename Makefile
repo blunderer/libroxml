@@ -15,9 +15,10 @@ DEPS = $(patsubst %.c, $O/%.d, $(SRC_LIB) $(SRC_BIN))
 OBJS = $(OBJ_LIB) $(OBJ_BIN)
 OBJ_LIB = $(SRC_LIB:%.c=$O/%.o)
 OBJ_BIN = $(SRC_BIN:%.c=$O/%.o)
-TARGETS = $(TARGET_SLIB) $(TARGET_LIB) $(TARGET_BIN)
+TARGETS = $(TARGET_SLIB) $(TARGET_LN) $(TARGET_LIB) $(TARGET_BIN)
 TARGET_SLIB = $O/libroxml.a
 TARGET_LIB = $O/libroxml.so.0
+TARGET_LN = $O/libroxml.so
 TARGET_BIN = $O/roxml
 # options
 override CPPFLAGS += -Iinc/
@@ -65,13 +66,17 @@ $(TARGET_LIB): $(OBJ_LIB)
 	$(call ECHO_DO, '  LD      $(notdir $@)', \
 	$(CC) -shared $(LDFLAGS) $^ -o $@ )
 
+$(TARGET_LN): $(TARGET_LIB)
+	$(call ECHO_DO, '  LN      $(notdir $@)', \
+	ln -fs $^ $@ )
+
 $(TARGET_BIN): $(OBJ_BIN)
 $(TARGET_BIN): | $(if $(filter -static, $(LDFLAGS)), $(TARGET_SLIB), $(TARGET_LIB))
 	$(call ECHO_DO, '  LD      $(notdir $@)', \
 	$(CC) $^ -L$O -lroxml -o $@ )
 
 .PHONY: all
-all: $(TARGET_SLIB) $(if $(filter -static, $(LDFLAGS)), , $(TARGET_LIB)) $(TARGET_BIN)
+all: $(TARGET_SLIB) $(if $(filter -static, $(LDFLAGS)), , $(TARGET_LN)) $(TARGET_BIN)
 
 .PHONY: doxy
 doxy: doxy.cfg man.cfg
@@ -84,6 +89,8 @@ doxy: doxy.cfg man.cfg
 clean:
 	$(call ECHO_DO, '  RM      deps objs libs bins', \
 	- rm -f $(DEPS) $(OBJS) $(TARGETS) )
+	$(call ECHO_DO, '  CLEAN   fuse.xml', \
+	- $(MAKE) -C $(abspath fuse.xml) clean )
 
 .PHONY: mrproper
 mrproper: clean
@@ -92,7 +99,12 @@ mrproper: clean
 	$(call ECHO_DO, '  CLEAN   debian', \
 	- fakeroot $(MAKE) -f $(abspath debian/rules) clean )
 	$(call ECHO_DO, '  CLEAN   fuse.xml', \
-	- $(MAKE) -C $(abspath fuse.xml) clean )
+	- $(MAKE) -C $(abspath fuse.xml) mrproper )
+
+.PHONY: fuse.xml
+fuse.xml: $(TARGET_LN)
+	$(call ECHO_DO, '  BUILD   fuse.xml', \
+	- $(MAKE) -C $(abspath fuse.xml) )
 
 .PHONY: install
 install: $(TARGETS) doxy
@@ -111,6 +123,7 @@ install: $(TARGETS) doxy
 	install -D docs/man/man3/* $(DESTDIR)/usr/share/man/man3/
 	install -D docs/html/* $(DESTDIR)/usr/share/doc/libroxml/html/
 	install -m644 libroxml.pc $(DESTDIR)/usr/lib/pkgconfig
+	cp -d $(TARGET_LN) $(DESTDIR)/usr/lib
 
 .PHONY: uninstall
 uninstall:
@@ -120,3 +133,10 @@ uninstall:
 	- rm -f $(DESTDIR)/usr/bin/$(TARGET_BIN)
 	- rm -f $(DESTDIR)/usr/include/$(INC)
 	- rm -fr $(DESTDIR)/usr/share/doc/libroxml
+	- rm -fr $(DESTDIR)/usr/share/man/man1/roxml.1
+	- rm -fr $(DESTDIR)/usr/share/man/man3/roxml*
+	- rm -fr $(DESTDIR)/usr/share/man/man3/ROXML*
+	- rm -fr $(DESTDIR)/usr/share/man/man3/node_t.3
+	- rm -fr $(DESTDIR)/usr/share/man/man3/RELEASE_ALL.3
+	- rm -fr $(DESTDIR)/usr/share/man/man3/RELEASE_LAST.3
+

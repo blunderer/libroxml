@@ -201,6 +201,7 @@ char * ROXML_API roxml_get_name(node_t *n, char * name, int size)
 	if(n == NULL)	{
 		if(name)	{
 			strcpy(name, "");
+			return name;
 		}
 		return NULL;
 	}
@@ -220,7 +221,10 @@ char * ROXML_API roxml_get_name(node_t *n, char * name, int size)
 			internal_ptr = n->src.buf + n->pos;
 		}
 		while(ROXML_WHITE(internal_ptr[offset])) { offset++; }
-		while(internal_ptr[offset] != '=') { 
+		while(count<INTERNAL_BUF_SIZE) { 
+			if(internal_ptr[offset] == '=') { break; }
+			if(internal_ptr[offset] == '/') { break; }
+			if(internal_ptr[offset] == '>') { break; }
 			tmp_name[count] = internal_ptr[offset];
 			offset++;
 			count++;
@@ -238,19 +242,22 @@ char * ROXML_API roxml_get_name(node_t *n, char * name, int size)
 			internal_ptr = n->src.buf + n->pos;
 		}
 		while((internal_ptr[offset] == '<')||(ROXML_WHITE(internal_ptr[offset]))) { offset++; }
-		while((internal_ptr[offset] != '>')&&(internal_ptr[offset] != '/')&&(!ROXML_WHITE(internal_ptr[offset]))) { 
+		while(count<INTERNAL_BUF_SIZE) { 
+			if(internal_ptr[offset] == '/') { break; }
+			if(internal_ptr[offset] == '>') { break; }
+			if(ROXML_WHITE(internal_ptr[offset])) { break; }
 			tmp_name[count] = internal_ptr[offset];
 			offset++;
 			count++;
 		}
 	} else if(n->type & ROXML_TXT_NODE) {
-		if(name) { strcpy(name, ""); }
+		if(name) { strcpy(name, ""); return name; }
 		return NULL;
 	} else if(n->type & ROXML_CMT_NODE) {
-		if(name) { strcpy(name, ""); }
+		if(name) { strcpy(name, ""); return name; }
 		return NULL;
 	} else if(n->type & ROXML_PI_NODE) {
-		if(name) { strcpy(name, ""); }
+		if(name) { strcpy(name, ""); return name; }
 		return NULL;
 	}
 

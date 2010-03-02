@@ -56,6 +56,7 @@ rm -rf ${RPM_BUILD_ROOT}
 %defattr(-,root,root)
 %doc debian/changelog debian/README
 %{_prefix}/lib/libroxml.a
+%{_prefix}/lib/libroxml.so
 %{_prefix}/include/roxml.h
 %{_prefix}/lib/pkgconfig/libroxml.pc
 %{_prefix}/share/doc/libroxml/html/*
