@@ -2,7 +2,7 @@ Source: libroxml
 Priority: extra
 Maintainer: Tristan Lelong <blunderer@blunderer.org>
 Build-Depends: debhelper (>= 7)
-Standards-Version: 3.7.3
+Standards-Version: 3.8.0
 Section: libs
 Homepage: http://libroxml.googlecode.com
 
