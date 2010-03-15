@@ -60,7 +60,7 @@
 #define ROXML_API
 
 #ifndef ROXML_INT
-/** \struct node_t
+/** \typedef node_t
  *
  * \brief node_t structure
  * 
@@ -195,24 +195,24 @@ int 	ROXML_API roxml_get_chld_nb		(node_t *n);
  * \param name a buffer pointer or NULL if has to be auto allocated
  * \param size the size of buffer pointed by name if not NULL
  * \return the name of the node (return our buffer pointer if it wasn't NULL)
- * \nsee roxml_parse_node
+ * \see roxml_parse_node
  */
 char*	ROXML_API roxml_get_name		(node_t *n, char * name, int size);
 
 /** \brief content getter function
  *
- * \fn char * ROXML_API roxml_get_content(node_t *n, char * name, int buf_size, int * size);
+ * \fn char * ROXML_API roxml_get_content(node_t *n, char * name, int bufsize, int * size);
  *
  * This function returns a pointer with text content of a node (chld are NOT included as text).;
  * if the returned pointer is NULL then the node was empty.
  * returned string should be roxml_release when not used anymore
  * \param n is one node of the tree
  * \param name is the buffer where result will be written or NULL for internal allocation
- * \param buf_size the size if the name buffer
+ * \param bufsize the size if the name buffer
  * \param size the actual size of result. if name was not NULL and size == buf_size, then maybe given buffer was too small
  * \return the content
  */
-char *	ROXML_API roxml_get_content		(node_t *n, char * name, int buf_size, int * size);
+char *	ROXML_API roxml_get_content		(node_t *n, char * name, int bufsize, int * size);
 
 /** \brief number of attribute getter function
  *

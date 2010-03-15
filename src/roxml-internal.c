@@ -31,6 +31,7 @@ unsigned int _nb_attr = 0;
 unsigned int _nb_text = 0;
 #endif
 
+/** \brief head of memory manager */
 memory_cell_t head_cell = {PTR_NONE, 0, NULL, 0, NULL, NULL};
 
 void * ROXML_INT roxml_malloc(int size, int num, int type)

@@ -25,10 +25,17 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <getopt.h>
 
-void print_usage (const char *progname)
+void print_help(void)
 {
-	fprintf (stderr, "usage: %s [-q] <filename> [/]<node1>/<node2>/<node3>/.../<nodeN>\n", progname) ;
+	fprintf (stderr, "LGPL command line XML parser\n<blunderer@blunderer.org>\n") ;
+}
+
+void print_usage(const char *progname)
+{
+	fprintf (stderr, "\nusage: %s [-q|-h] <filename> [/]<node1>/<node2>/<node3>/.../<nodeN>\n", progname);
+	fprintf (stderr, "-q|--quiet activate quiet mode\n-h|--help display this message\n");
 }
 
 int main(int argc, char ** argv)
@@ -40,23 +47,37 @@ int main(int argc, char ** argv)
 	node_t *cur;
 	node_t **ans;
 
-	while ((option = getopt (argc, argv, "q")) >= 0) {
+	struct option opts[3];
+	memset(opts, 0, sizeof(struct option)*3);
+
+	opts[0].name = "help";
+	opts[0].flag = NULL;
+	opts[0].val  = 'h';
+	opts[0].has_arg = 0;
+	opts[1].name = "quiet";
+	opts[1].flag = NULL;
+	opts[1].val  = 'q';
+	opts[1].has_arg = 0;
+
+	while ((option = getopt_long(argc, argv, "qh", opts, NULL)) >= 0) {
 		switch (option) {
 			case 'q' :
 				quiet = 1 ;
 				break ;
-			case 'h' :
-				print_usage (argv[0]) ;
-				return EXIT_FAILURE ;
-				break ;
-			default :
-				print_usage (argv[0]) ;
-				return EXIT_FAILURE ;
+			case 'h':
+				print_help();
+				print_usage(argv[0]);
+				return EXIT_FAILURE;
+				break;
+			default:
+				print_usage(argv[0]);
+				return EXIT_FAILURE;
 				break;
 		}
 	}
 	if(argc < optind + 2) {
-		print_usage (argv[0]) ;
+		fprintf(stderr,"wrong syntax\n");
+		print_usage(argv[0]);
 		return -1;
 	}
 

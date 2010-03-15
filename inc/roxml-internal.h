@@ -50,7 +50,7 @@ void	ROXML_INT roxml_free_node		(node_t *n);
 
 /** \brief internal function
  *
- * \fn node_t* ROXML_INT roxml_create_node(int pos, FILE *file, char * buf, int * type);
+ * \fn node_t* ROXML_INT roxml_create_node(int pos, void * src, int type);
  * This function allocate a new node 
  * \param pos is the beginning offset of the node in the file
  * \param src is the pointer to the buffer or file
@@ -83,9 +83,9 @@ void 	ROXML_INT roxml_close_node		(node_t *n, node_t *close);
  *
  * \fn node_t* ROXML_API roxml_load(node_t *current_node, FILE *file, char *buffer);
  * This function load a document and all the corresponding nodes
- * file and buffer \params are exclusive. You usualy want to load
+ * file and buffer params are exclusive. You usualy want to load
  * either a file OR a buffer
- * \param current_node, the XML root
+ * \param current_node the XML root
  * \param file file descriptor of document
  * \param buffer address of buffer that contains xml
  * \return the root node or NULL
@@ -344,7 +344,7 @@ void ROXML_INT roxml_set_type			(node_t * n, int type);
  *
  * \fn roxml_get_node_internal_position(node_t *n);
  * this function returns the absolute position of the node between siblings
- * \param the node
+ * \param n the node
  * \return the absolute position starting at 1
  */
 int ROXML_INT roxml_get_node_internal_position(node_t *n);
@@ -369,7 +369,7 @@ void ROXML_INT roxml_compute_and(node_t * root, node_t **node_set, int *count, i
  * \param node_set the node set containing the 2 pools
  * \param count number of node in the node set
  * \param req_id the id of the first group
- * \param glob the id of the second group
+ * \param glob_id the id of the second group
  * \return 
  */
 void ROXML_INT roxml_compute_or(node_t * root, node_t **node_set, int *count, int req_id, int glob_id); 

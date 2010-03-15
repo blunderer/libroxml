@@ -127,7 +127,7 @@ typedef struct node {
 		char *buf;		/*!< buffer address */
 		FILE *fil;		/*!< loaded document */
 		void *src;		/*!< xml src address */
-	} src;
+	} src;				/*!< xml tree source */
 	unsigned long pos;		/*!< offset of begining of opening node in file */
 	unsigned long end;		/*!< offset of begining of closing node in file */
 	struct node *sibl;		/*!< ref to brother */
