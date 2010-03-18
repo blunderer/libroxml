@@ -24,8 +24,8 @@ BINS = $(TARGET_SLIB) $(TARGET_LIB) $(TARGET_LN) $(TARGET_BIN)
 
 # options
 override CPPFLAGS += -Iinc/
-override CFLAGS += -g -O3 -Wall -Wextra -Wno-unused -Werror -Iinc/ -DIGNORE_EMPTY_TEXT_NODES
-override LDFLAGS += -Wl,-soname,libroxml.so.0 -lpthread
+override CFLAGS += -g -O3 -fPIC -Wall -Wextra -Wno-unused -Werror -Iinc/ -DIGNORE_EMPTY_TEXT_NODES
+override LDFLAGS += 
 
 # first rule (default)
 all:
@@ -69,7 +69,7 @@ $(TARGET_SLIB) : $(OBJ_LIB)
 
 $(TARGET_LIB) : $(OBJ_LIB)
 	$P '  LD      $(@F)'
-	$E $(CC) -shared $(LDFLAGS) $^ -o $@
+	$E $(CC) -shared -Wl,-soname,libroxml.so.0 $(LDFLAGS) $^ -o $@
 
 $(TARGET_LN): $(TARGET_LIB)
 	$P '  LN      $(notdir $@)'
