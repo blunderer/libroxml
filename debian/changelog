@@ -1,5 +1,5 @@
-libroxml (2.0) unstable; urgency=low
+libroxml (2.0-1) unstable; urgency=low
 
-  * Initial Release.
+  * Initial release (Closes: Bug#574668)
 
  -- blunderer <blunderer@blunderer.org>  Sun, 28 Feb 2010 19:41:43 +0100
