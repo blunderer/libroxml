@@ -51,11 +51,11 @@ endif
 
 # rules
 
-$O :
+$O/src :
 	$P '  MKDIR   $(@F)'
 	$E mkdir -p $@
 
-$O/%.d : %.c | $O
+$O/%.d : %.c | $O/src
 	$P '  DEP     $(@F)'
 	$E $(CC) -MM -MT '$@ $O/$*.o' $(CPPFLAGS) $< -MF $@ || rm -f $@
 
@@ -78,7 +78,7 @@ $(TARGET_LN): $(TARGET_LIB)
 $(TARGET_BIN): $(OBJ_BIN)
 $(TARGET_BIN): | $(if $(filter -static, $(LDFLAGS)), $(TARGET_SLIB), $(TARGET_LIB))
 	$P '  LD      $(@F)'
-	$E $(CC) $(LDFLAGS) $^ -L$O -lroxml -o $@
+	$E $(CC) $(LDFLAGS) $^ -L$O -lroxml -lpthread -o $@
 
 .PHONY : all
 all : $(TARGET_SLIB) $(if $(filter -static, $(LDFLAGS)), , $(TARGET_LN)) $(TARGET_BIN)
@@ -146,4 +146,3 @@ uninstall:
 	$E - rm -fr $(DESTDIR)/usr/share/man/man3/node_t.3
 	$E - rm -fr $(DESTDIR)/usr/share/man/man3/RELEASE_ALL.3
 	$E - rm -fr $(DESTDIR)/usr/share/man/man3/RELEASE_LAST.3
-

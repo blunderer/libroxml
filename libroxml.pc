@@ -4,7 +4,7 @@ libdir=${exec_prefix}/lib
 includedir=${prefix}/include
 
 Name: libroxml
-Description: light and powerfull read only XML parser
-Version: 1.3
+Description: light and powerful read only XML parser
+Version: 2.0.1
 Libs: -L${libdir} -lroxml
 Cflags: -I${prefix}/include

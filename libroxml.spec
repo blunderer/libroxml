@@ -2,7 +2,7 @@
 %define version 2.0.1
 %define release 1
 
-Summary: a light and powerfull xml parsing library
+Summary: a light and powerful xml parsing library
 Name: %{name}
 Version: %{version}
 Release: %{release}
@@ -14,10 +14,10 @@ Group: System Environment/Libraries
 Prefix: %{_prefix}
 
 %description
-libroxml is a very light, low fingerprint, fast, and powerfull
+libroxml is a very light, low fingerprint, fast, and powerful
 library designed for parsing XML files. This is perfectly suitable
-for little embeded systems but you also use it widely in various
-application for xml configuration file reading for example.
+for little embedded systems but you can also use it widely in various
+applications for xml configuration file reading for example.
 
 %package devel
 Summary: development file for libroxml
