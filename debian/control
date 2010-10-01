@@ -25,7 +25,7 @@ Description: Light C XML parsing library
  It can also be used for XML creation/edition.
 
 Package: libroxml-dbg
-Section: libs
+Section: debug
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libroxml0
 Description: Light C XML parsing library debug files
