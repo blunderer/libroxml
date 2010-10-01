@@ -24,7 +24,7 @@ Description: Light C XML parsing library
  It provides XPath support and navigation funtions.
  It can also be used for XML creation/edition.
 
-Package: libroxml0-dbg
+Package: libroxml-dbg
 Section: libs
 Architecture: i386
 Depends: ${shlibs:Depends}
