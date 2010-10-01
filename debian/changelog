@@ -2,4 +2,4 @@ libroxml (2.0.1-1) unstable; urgency=low
 
   * Initial release (Closes: Bug#574668)
 
- -- blunderer <blunderer@blunderer.org>  Sun, 28 Feb 2010 19:41:43 +0100
+ -- Tristan Lelong <blunderer@blunderer.org>  Sun, 28 Feb 2010 19:41:43 +0100
