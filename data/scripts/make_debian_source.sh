@@ -10,18 +10,26 @@ TOP_DIR=$(dirname $0)/../../
 REV=$(LANG=C svn info $TOP_DIR | grep Revision | awk '{print $2}')
 TMP_DIR=/tmp/build-libroxml-$(date +"%y%m%d%H%M%S")
 
+echo "Exporting from SVN at rev $REV"
 svn export -r $REV $TOP_DIR $TMP_DIR/libroxml-$VERSION > /dev/null
 
-cp -a $TMP_DIR/libroxml-$VERSION $TMP_DIR/libroxml
-
-tar zcf $TMP_DIR/libroxml-$VERSION.orig.tgz $TMP_DIR/libroxml-$VERSION 2> /dev/null
-
+echo "Cleaning repository"
 rm -fr $TMP_DIR/libroxml-$VERSION/unittest
 rm -fr $TMP_DIR/libroxml-$VERSION/data/scripts
 rm -fr $TMP_DIR/libroxml-$VERSION/libroxml.spec
 rm -fr $TMP_DIR/libroxml-$VERSION/TODO
 
-diff -Naur $TMP_DIR//libroxml $TMP_DIR/libroxml-$VERSION | gzip > $TMP_DIR/libroxml-$VERSION.diff.gz
-rm -fr $TMP_DIR//libroxml
+mv $TMP_DIR/libroxml-$VERSION/debian $TMP_DIR/
 
+echo "Generate original package"
+cd $TMP_DIR && tar zcf libroxml_$VERSION.orig.tar.gz libroxml-$VERSION> /dev/null
+
+mv $TMP_DIR/debian $TMP_DIR/libroxml-$VERSION/
+
+echo "Build package"
+cd $TMP_DIR/libroxml-$VERSION/ && dpkg-buildpackage
+
+echo "********************************************************************"
+echo "Your package is built in '$TMP_DIR'"
+echo "********************************************************************"
 
