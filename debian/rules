@@ -55,7 +55,7 @@ binary-arch: build install
 	dh_install
 	dh_installman
 	dh_link
-	dh_strip
+	dh_strip --dbg-package=libroxml-dbg
 	dh_compress
 	dh_fixperms
 	dh_installdeb

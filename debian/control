@@ -23,3 +23,13 @@ Description: Light C XML parsing library
  libroxml is a light but powerful XML parsing library with C API.
  It provides XPath support and navigation funtions.
  It can also be used for XML creation/edition.
+
+Package: libroxml0-dbg
+Section: libs
+Architecture: i386
+Depends: ${shlibs:Depends}
+Description: Light C XML parsing library debug files
+ libroxml is a light but powerful XML parsing library with C API.
+ It provides XPath support and navigation funtions.
+ It can also be used for XML creation/edition.
+
