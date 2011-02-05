@@ -169,11 +169,11 @@ node_t*	ROXML_API roxml_get_parent		(node_t *n);
  * This function returns a given chld of a node
  * \param n is one node of the tree
  * \param name is the name of the child to get
- * \param nb is the id of the chld to get
+ * \param nth is the id of the chld to get
  * \return the chld corresponding to name or id (if both are set, name is used)
  * \see roxml_get_chld_nb
  */
-node_t*	ROXML_API roxml_get_chld		(node_t *n, char * name, int nb);
+node_t*	ROXML_API roxml_get_chld		(node_t *n, char * name, int nth);
 
 /** \brief chlds number getter function
  *
@@ -231,10 +231,10 @@ int	ROXML_API roxml_get_attr_nb		(node_t *n);
  * User should roxml_release the returned buffer when no longer needed.
  * \param n is one node of the tree
  * \param name is the name of the child to get
- * \param nb the id of attribute to read
+ * \param nth the id of attribute to read
  * \return the attribute corresponding to name or id (if both are set, name is used)
  */
-node_t*	ROXML_API roxml_get_attr		(node_t *n, char * name, int nb);
+node_t*	ROXML_API roxml_get_attr		(node_t *n, char * name, int nth);
 
 /** \brief exec path function
  *
@@ -317,11 +317,11 @@ node_t * ROXML_API roxml_add_node		(node_t * parent, int position, int type, cha
  * \fn roxml_get_text(node_t *n, int nb);
  * this function return the text content of a node as a TEXT node
  * \param n the node that contains text
- * \param nb the nth text node to retrieve
+ * \param nth the nth text node to retrieve
  * \return the text node or NULL
  * \see roxml_get_text_nb
  */
-node_t * ROXML_API roxml_get_text		(node_t *n, int nb);
+node_t * ROXML_API roxml_get_text		(node_t *n, int nth);
 
 /** \brief text node number getter function
  *
