@@ -103,6 +103,7 @@ int _func_xpath_all(char * chunk, void * data);
 
 // load parser functions
 int _func_load_quoted(char * chunk, void * data);
+int _func_load_dquoted(char * chunk, void * data);
 int _func_load_open_spec_node(char * chunk, void * data);
 int _func_load_close_cdata(char * chunk, void * data);
 int _func_load_close_comment(char * chunk, void * data);

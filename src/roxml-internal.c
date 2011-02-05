@@ -132,7 +132,6 @@ void ROXML_INT roxml_process_begin_node(roxml_load_ctx_t *context, int position)
 node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 {
 	char int_buffer[ROXML_BULK_READ+1];
-	int int_abs_pos = 0;
 	int int_len = 0;
 	roxml_load_ctx_t context;
 	roxml_parser_item_t * parser = NULL;
@@ -145,7 +144,8 @@ node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 	parser = roxml_append_parser_item(parser, "<", _func_load_open_node);
 	parser = roxml_append_parser_item(parser, ">", _func_load_close_node);
 	parser = roxml_append_parser_item(parser, "/", _func_load_end_node);
-	parser = roxml_append_parser_item(parser, "\"", _func_load_quoted);
+	parser = roxml_append_parser_item(parser, "'", _func_load_quoted);
+	parser = roxml_append_parser_item(parser, "\"", _func_load_dquoted);
 	parser = roxml_append_parser_item(parser, "\t", _func_load_white);
 	parser = roxml_append_parser_item(parser, "\n", _func_load_white);
 	parser = roxml_append_parser_item(parser, "\r", _func_load_white);
@@ -160,15 +160,13 @@ node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 	if(file)	{ 
 		context.type = ROXML_FILE;
 		context.src = (void*)file;
+		context.pos = 0;
 		do {
 			int ret = 0;
 			int_len = fread(int_buffer, 1, ROXML_BULK_READ, file);
 			int_buffer[int_len] = '\0';
 
-			context.pos = int_abs_pos;
 			ret = roxml_parse_line(parser, int_buffer, int_len, &context);
-
-			int_abs_pos += ret;
 		} while(int_len == ROXML_BULK_READ);
 	} else	{
 		context.type = ROXML_BUFF;

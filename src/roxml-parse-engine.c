@@ -90,7 +90,6 @@ roxml_parser_item_t * roxml_parser_prepare(roxml_parser_item_t *head)
 
 int roxml_parse_line(roxml_parser_item_t * head, char *line, int len, void * ctx)
 {
-	int pos = 0;
 	int count = head->count;
 	int def_count = head->def_count;
 	char * line_end = line;
@@ -115,7 +114,7 @@ int roxml_parse_line(roxml_parser_item_t * head, char *line, int len, void * ctx
 			if(ret > 0) { chunk += ret; break; }
 		}
 	}
-	return pos;
+	return 0;
 }
 
 int _func_xpath_ignore(char * chunk, void * data)
@@ -736,6 +735,22 @@ int _func_load_quoted(char * chunk, void * data)
 	roxml_load_ctx_t *context = (roxml_load_ctx_t*)data;
 
 	if(context->mode == MODE_COMMENT_NONE) {
+		context->mode = MODE_COMMENT_QUOTE;
+	} else if(context->mode == MODE_COMMENT_QUOTE) {
+		context->mode = MODE_COMMENT_NONE;
+	}
+
+	return 0;
+}
+
+int _func_load_dquoted(char * chunk, void * data)
+{
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n",__func__,chunk[0]);
+#endif /* DEBUG_PARSING */
+	roxml_load_ctx_t *context = (roxml_load_ctx_t*)data;
+
+	if(context->mode == MODE_COMMENT_NONE) {
 		context->mode = MODE_COMMENT_DQUOTE;
 	} else if(context->mode == MODE_COMMENT_DQUOTE) {
 		context->mode = MODE_COMMENT_NONE;
@@ -974,10 +989,12 @@ int _func_load_white(char * chunk, void * data)
 			context->inside_node_state = STATE_INSIDE_ARG_BEG;
 		break;
 		case STATE_NODE_ATTR:
-			if(context->inside_node_state == STATE_INSIDE_VAL)   {
-				node_t * to_be_closed = roxml_create_node(context->pos, context->src, ROXML_ATTR_NODE | context->type);
-				roxml_close_node(context->candidat_val, to_be_closed);
-				context->inside_node_state = STATE_INSIDE_ARG_BEG;
+			if(context->mode == MODE_COMMENT_NONE) {
+				if(context->inside_node_state == STATE_INSIDE_VAL)   {
+					node_t * to_be_closed = roxml_create_node(context->pos, context->src, ROXML_ATTR_NODE | context->type);
+					roxml_close_node(context->candidat_val, to_be_closed);
+					context->inside_node_state = STATE_INSIDE_ARG_BEG;
+				}
 			}
 		break;
 	}
