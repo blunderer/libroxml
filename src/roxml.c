@@ -131,10 +131,6 @@ char * ROXML_API roxml_get_content(node_t *n, char * name, int bufsize, int *siz
 				int ret_len = 0;
 				fseek(ptr->src.fil, ptr->pos, SEEK_SET);
 				ret_len = fread(content+total, ptr->end - ptr->pos, 1, ptr->src.fil);
-				if(ret_len <= 0) { 
-					roxml_release(content);
-					return NULL; 
-				}
 			} else {
 				memcpy(content+total, ptr->src.buf+ptr->pos, ptr->end - ptr->pos);
 			}
@@ -149,10 +145,6 @@ char * ROXML_API roxml_get_content(node_t *n, char * name, int bufsize, int *siz
 			int ret_len = 0;
 			fseek(n->src.fil, n->pos, SEEK_SET);
 			ret_len = fread(content, n->end - n->pos, 1, n->src.fil);
-			if(ret_len <= 0) { 
-				roxml_release(content);
-				return NULL; 
-			}
 		} else {
 			memcpy(content, n->src.buf+n->pos, n->end - n->pos);
 		}
@@ -164,10 +156,6 @@ char * ROXML_API roxml_get_content(node_t *n, char * name, int bufsize, int *siz
 			int ret_len = 0;
 			fseek(n->src.fil, n->pos+4, SEEK_SET);
 			ret_len = fread(content, n->end - n->pos - 4, 1, n->src.fil);
-			if(ret_len <= 0) { 
-				roxml_release(content);
-				return NULL; 
-			}
 		} else {
 			memcpy(content, n->src.buf+n->pos + 4, n->end - n->pos - 4);
 		}
@@ -179,10 +167,6 @@ char * ROXML_API roxml_get_content(node_t *n, char * name, int bufsize, int *siz
 			int ret_len = 0;
 			fseek(n->src.fil, n->pos+2, SEEK_SET);
 			ret_len = fread(content, n->end - n->pos - 2, 1, n->src.fil);
-			if(ret_len <= 0) { 
-				roxml_release(content);
-				return NULL; 
-			}
 		} else {
 			memcpy(content, n->src.buf+n->pos + 2, n->end - n->pos - 2);
 		}
@@ -195,10 +179,6 @@ char * ROXML_API roxml_get_content(node_t *n, char * name, int bufsize, int *siz
 			int ret_len = 0;
 			fseek(ptr->src.fil, ptr->pos, SEEK_SET);
 			ret_len = fread(content, total, 1, ptr->src.fil);
-			if(ret_len <= 0) { 
-				roxml_release(content);
-				return NULL; 
-			}
 		} else {
 			memcpy(content, ptr->src.buf+ptr->pos, total);
 		}
@@ -237,7 +217,6 @@ char * ROXML_API roxml_get_name(node_t *n, char * name, int size)
 			fseek(n->src.fil, n->pos, SEEK_SET);
 			ret_len = fread(internal_buf, INTERNAL_BUF_SIZE, 1, n->src.fil);
 			internal_ptr = internal_buf;
-			if(ret_len <= 0) { return NULL; }
 		} else {
 			internal_ptr = n->src.buf + n->pos;
 		}
@@ -259,7 +238,6 @@ char * ROXML_API roxml_get_name(node_t *n, char * name, int size)
 			fseek(n->src.fil, n->pos, SEEK_SET);
 			ret_len = fread(internal_buf, INTERNAL_BUF_SIZE, 1, n->src.fil);
 			internal_ptr = internal_buf;
-			if(ret_len <= 0) { return NULL; }
 		} else {
 			internal_ptr = n->src.buf + n->pos;
 		}
