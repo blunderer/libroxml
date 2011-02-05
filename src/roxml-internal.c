@@ -1037,8 +1037,9 @@ void ROXML_INT roxml_write_node(node_t * n, FILE *f, char * buf, int human, int 
 			}
 			roxml_write_string(&buf, f, " ", offset, len);
 			roxml_write_string(&buf, f, arg, offset, len);
-			roxml_write_string(&buf, f, "=", offset, len);
+			roxml_write_string(&buf, f, "=\"", offset, len);
 			roxml_write_string(&buf, f, value, offset, len);
+			roxml_write_string(&buf, f, "\"", offset, len);
 			attr = attr->sibl;
 			roxml_release(value);
 		}
