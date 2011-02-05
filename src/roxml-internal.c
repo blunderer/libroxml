@@ -461,7 +461,6 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 			}
 			status = roxml_int_cmp(iarg1, iarg2, condition->op);
 		} else if(condition->func == ROXML_FUNC_LAST) {
-			int operand = 0;
 			status = 0;
 			iarg2 = roxml_get_chld_nb(candidat->prnt);
 			if(xn->name[0] == '*') {
@@ -470,12 +469,12 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 				iarg1 = roxml_get_node_position(candidat);
 			}
 			if(condition->op > 0) {
+				int operand = 0;
 				operand = atof(condition->arg2);
 				iarg2 = roxml_int_oper(iarg2, operand, condition->op);
 			}	
 			status = roxml_int_cmp(iarg1, iarg2, ROXML_OPERATOR_EQU);
 		} else if(condition->func == ROXML_FUNC_FIRST) {
-			int operand = 0;
 			status = 0;
 			iarg2 = 1;
 			if(xn->name[0] == '*') {
@@ -484,6 +483,7 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 				iarg1 = roxml_get_node_position(candidat);
 			}
 			if(condition->op > 0) {
+				int operand = 0;
 				operand = atof(condition->arg2);
 				iarg2 = roxml_int_oper(iarg2, operand, condition->op);
 			}
@@ -575,7 +575,6 @@ int ROXML_INT roxml_in_pool(node_t * root, node_t *n, int req_id)
 	xpath_tok_table_t * table = (xpath_tok_table_t*)root->priv;
 	pthread_mutex_lock(&table->mut);
 	if(n->priv) {
-		xpath_tok_t * prev = (xpath_tok_t*)n->priv;
 		xpath_tok_t * tok = (xpath_tok_t*)n->priv;
 		if(tok->id == req_id) {
 			pthread_mutex_unlock(&table->mut);
@@ -586,7 +585,6 @@ int ROXML_INT roxml_in_pool(node_t * root, node_t *n, int req_id)
 					pthread_mutex_unlock(&table->mut);
 					return 1;
 				}
-				prev = tok;
 				tok = tok->next;
 			}
 		}
@@ -716,8 +714,6 @@ int ROXML_INT roxml_validate_axes(node_t *root, node_t *candidat, node_t ***ans,
 
 	if((valid)&&(xn->xp_cond)) {
 		int status;
-		float iarg1;
-		float iarg2;
 		char * sarg1;
 		char * sarg2;
 		valid = 0;
@@ -732,6 +728,8 @@ int ROXML_INT roxml_validate_axes(node_t *root, node_t *candidat, node_t ***ans,
 			valid = (strcmp(sarg1, sarg2)==0);
 			roxml_release(sarg1);
 		} else if(condition->func == ROXML_FUNC_INTCOMP) {
+			float iarg1;
+			float iarg2;
 			char strval[ROXML_BASE_LEN];
 			iarg1 = atof(roxml_get_content(candidat, strval, ROXML_BASE_LEN, &status));
 			if(status >= ROXML_BASE_LEN) {
@@ -1255,10 +1253,8 @@ node_t ** roxml_exec_xpath(node_t *root, node_t *n, xpath_node_t *xpath, int ind
 	for(path_id = 0; path_id < index; path_id++)	{
 		xpath_node_t *cur_xpath = NULL;
 		xpath_node_t *next_xpath = NULL;
-		xpath_node_t *prev_xpath = NULL;
 		cur_xpath = &xpath[path_id];
 		if(path_id < index-1) { next_xpath = &xpath[path_id+1]; }
-		if(path_id > 0) { prev_xpath = &xpath[path_id+1]; }
 
 		if((cur_xpath->rel == ROXML_OPERATOR_AND)||((next_xpath) && (next_xpath->rel == ROXML_OPERATOR_AND))) {
 			int req_id = roxml_request_id(root);

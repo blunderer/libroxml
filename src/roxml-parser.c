@@ -93,7 +93,7 @@ int main(int argc, char ** argv)
 	{
 		char *c = NULL;
 		c = roxml_get_content(ans[j], NULL, 0, NULL);
-		if(strlen(c)==0) {
+		if(*c == '\0') {
 			int i = 0;
 			int nb_chld = roxml_get_chld_nb(ans[j]);
 			for(i = 0; i < nb_chld; i++)	{
