@@ -83,6 +83,7 @@ roxml_parser_item_t * roxml_parser_prepare(roxml_parser_item_t *head)
 		head = head->next;
 		count++;
 	}
+	roxml_parser_clear(head);
 
 	return item;
 }
