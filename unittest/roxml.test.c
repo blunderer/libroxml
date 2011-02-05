@@ -1652,6 +1652,35 @@ int test_spec_nodes(void)
 	RETURN /* close context macro */
 }
 
+int test_whitespaces_in_attr(void)
+{
+	INIT /* init context macro */
+
+	int nb_ans;
+	node_t *root = roxml_load_doc("roxml.test.xml.whitespaces");
+	node_t *node1 = roxml_get_chld(root, "node1", 0);
+	node_t *node2 = roxml_get_chld(root, "node2", 0);
+
+	// test content
+	nb_ans = roxml_get_attr_nb(node1);
+	ASSERT_EQUAL(nb_ans, 1)
+	nb_ans = roxml_get_attr_nb(node2);
+	ASSERT_EQUAL(nb_ans, 1)
+
+	node_t *attr1 = roxml_get_attr(node1, NULL, 0);
+	node_t *attr2 = roxml_get_attr(node2, NULL, 0);
+
+	char * content = roxml_get_content(attr1, NULL, 0, NULL);
+	ASSERT_STRING_EQUAL(content, "\"toto et titi\"");
+	content = roxml_get_content(attr2, NULL, 0, NULL);
+	ASSERT_STRING_EQUAL(content, "'toto et titi'");
+
+	roxml_release(RELEASE_ALL);
+	roxml_close(root);
+	
+	RETURN /* close context macro */
+}
+
 int test_write_tree(void)
 {
 	INIT /* init context macro */
@@ -1722,6 +1751,7 @@ int main(int argc, char ** argv)	{
 	TEST_FUNC(test_get_node_index)
 	TEST_FUNC(test_write_tree) 
 	TEST_FUNC(test_spec_nodes) 
+	TEST_FUNC(test_whitespaces_in_attr)
 
 	EXEC_UNITTEST /* exec tests depending on command line option see available options with --help */
 
