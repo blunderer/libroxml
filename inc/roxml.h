@@ -499,7 +499,7 @@ int roxml_get_type				(node_t *n);
 \verbatim
 <root>
  <!-- sample XML file -->
- <item id=42>
+ <item id="42">
   <price> 
    24 
   </price>
@@ -647,7 +647,7 @@ void ROXML_API roxml_del_node			(node_t * n);
 \verbatim
 <root>
  <!-- sample XML file -->
- <item id=42>
+ <item id="42">
   <price> 
    24 
   </price>
@@ -671,7 +671,7 @@ void ROXML_API roxml_del_node			(node_t * n);
  * \endcode
  * to generate the following xml bloc:
 \verbatim
-<root><!-- sample XML file --><item id=42><price>24</price></item></root>
+<root><!-- sample XML file --><item id="42"><price>24</price></item></root>
 \endverbatim
  */
 void ROXML_API roxml_commit_changes		(node_t *n, char * dest, char ** buffer, int human);
