@@ -101,15 +101,15 @@ void ROXML_API roxml_release(void * data)
 	if(head_cell.prev == &head_cell) { head_cell.prev = NULL; }
 }
 
-char * ROXML_API roxml_get_content(node_t *n, char * name, int bufsize, int *size)
+char * ROXML_API roxml_get_content(node_t *n, char * buffer, int bufsize, int *size)
 {
 	node_t * ptr;
 	int total = 0;
 	char * content = NULL;
 	
 	if(n == NULL)	{
-		if(name)	{
-			strcpy(name, "");
+		if(buffer)	{
+			strcpy(buffer, "");
 		}
 		return NULL;
 	}
@@ -183,8 +183,8 @@ char * ROXML_API roxml_get_content(node_t *n, char * name, int bufsize, int *siz
 			memcpy(content, ptr->src.buf+ptr->pos, total);
 		}
 	}
-	if(name)	{
-		strncpy(name, content, bufsize);
+	if(buffer)	{
+		strncpy(buffer, content, bufsize);
 	}
 	if(size) {
 		*size = total;
@@ -192,16 +192,16 @@ char * ROXML_API roxml_get_content(node_t *n, char * name, int bufsize, int *siz
 	return content;
 }
 
-char * ROXML_API roxml_get_name(node_t *n, char * name, int size)
+char * ROXML_API roxml_get_name(node_t *n, char * buffer, int size)
 {
 	int count = 0;
 	char tmp_name[INTERNAL_BUF_SIZE];
 	memset(tmp_name, 0, INTERNAL_BUF_SIZE*sizeof(char));
 
 	if(n == NULL)	{
-		if(name)	{
-			strcpy(name, "");
-			return name;
+		if(buffer)	{
+			strcpy(buffer, "");
+			return buffer;
 		}
 		return NULL;
 	}
@@ -251,23 +251,23 @@ char * ROXML_API roxml_get_name(node_t *n, char * name, int size)
 			count++;
 		}
 	} else if(n->type & ROXML_TXT_NODE) {
-		if(name) { strcpy(name, ""); return name; }
+		if(buffer) { strcpy(buffer, ""); return buffer; }
 		return NULL;
 	} else if(n->type & ROXML_CMT_NODE) {
-		if(name) { strcpy(name, ""); return name; }
+		if(buffer) { strcpy(buffer, ""); return buffer; }
 		return NULL;
 	} else if(n->type & ROXML_PI_NODE) {
-		if(name) { strcpy(name, ""); return name; }
+		if(buffer) { strcpy(buffer, ""); return buffer; }
 		return NULL;
 	}
 
-	if(name == NULL)	{
-		name = (char*)roxml_malloc(sizeof(char), strlen(tmp_name)+1, PTR_CHAR);
-		strcpy(name, tmp_name);
+	if(buffer == NULL)	{
+		buffer = (char*)roxml_malloc(sizeof(char), strlen(tmp_name)+1, PTR_CHAR);
+		strcpy(buffer, tmp_name);
 	} else	{
-		strncpy(name, tmp_name, size);
+		strncpy(buffer, tmp_name, size);
 	}
-	return name;
+	return buffer;
 }
 
 int ROXML_API roxml_get_text_nb(node_t *n)
