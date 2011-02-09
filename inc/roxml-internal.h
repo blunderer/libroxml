@@ -166,27 +166,27 @@ void ROXML_INT roxml_free_xcond			(xpath_cond_t *xcond);
  */
 void ROXML_INT roxml_free_xpath			(xpath_node_t *xpath, int nb); 
 
-/** \brief integer comparison function
+/** \brief  double comparison function
  *
- * \fn roxml_int_cmp(float a, float b, int op);
- * this function  compare to integer using one defined operator
+ * \fn roxml_double_cmp(double a, double b, int op);
+ * this function  compare two doubles using one defined operator
  * \param a first operand
  * \param b second operand
  * \param op the operator to use
  * \return 1 if comparison is ok, esle 0
  */
-int ROXML_INT roxml_int_cmp			(float a, float b, int op); 
+double ROXML_INT roxml_double_cmp			(double a, double b, int op); 
 
-/** \brief integer operation function
+/** \brief double operation function
  *
- * \fn roxml_int_oper(float a, float b, int op);
- * this function  compare to integer using one defined operator
+ * \fn roxml_double_oper(double a, double b, int op);
+ * this function  compare two doubles using one defined operator
  * \param a first operand
  * \param b second operand
  * \param op the operator to use
  * \return 1 if comparison is ok, esle 0
  */
-float ROXML_INT roxml_int_oper(float a, float b, int op);
+double ROXML_INT roxml_double_oper(double a, double b, int op);
 
 /** \brief predicat validation function
  *
