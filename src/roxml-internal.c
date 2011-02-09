@@ -416,7 +416,7 @@ double ROXML_INT roxml_double_oper(double a, double b, int op)
 	return 0;
 }
 
-double ROXML_INT roxml_double_cmp(double a, double b, int op)
+int ROXML_INT roxml_double_cmp(double a, double b, int op)
 {
 	if(op == ROXML_OPERATOR_DIFF) {
 		return (a!=b);
@@ -736,8 +736,8 @@ int ROXML_INT roxml_validate_axes(node_t *root, node_t *candidat, node_t ***ans,
 			valid = (strcmp(sarg1, sarg2)==0);
 			roxml_release(sarg1);
 		} else if(condition->func == ROXML_FUNC_INTCOMP) {
-			float iarg1;
-			float iarg2;
+			double iarg1;
+			double iarg2;
 			char strval[ROXML_BASE_LEN];
 			iarg1 = atof(roxml_get_content(candidat, strval, ROXML_BASE_LEN, &status));
 			if(status >= ROXML_BASE_LEN) {

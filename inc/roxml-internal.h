@@ -175,7 +175,7 @@ void ROXML_INT roxml_free_xpath			(xpath_node_t *xpath, int nb);
  * \param op the operator to use
  * \return 1 if comparison is ok, esle 0
  */
-double ROXML_INT roxml_double_cmp			(double a, double b, int op); 
+int ROXML_INT roxml_double_cmp			(double a, double b, int op); 
 
 /** \brief double operation function
  *
