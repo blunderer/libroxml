@@ -296,14 +296,15 @@ xpath_node_t * ROXML_INT roxml_set_axes(xpath_node_t *node, char *axes, int *off
 int ROXML_INT roxml_get_node_internal_position(node_t *n)
 {
 	int idx = 1;
-
+	node_t * prnt;
+	node_t * first;
 	if(n == NULL) { return 0; }
 
-	node_t *prnt = n->prnt;
+	prnt = n->prnt;
 	if(!prnt) {
 		return 1;
 	}
-	node_t * first = prnt->chld;
+	first = prnt->chld;
 
 	while((first)&&(first != n)) {
 		idx++;
@@ -316,6 +317,7 @@ int ROXML_INT roxml_get_node_internal_position(node_t *n)
 int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t ** xpath, int context)
 {
 	roxml_xpath_ctx_t ctx;
+	roxml_parser_item_t * parser = NULL;
 	ctx.pos = 0;
 	ctx.nbpath = 1;
 	ctx.bracket = 0;
@@ -331,7 +333,6 @@ int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t ** xpath, int context)
 	ctx.new_cond = NULL;
 	ctx.first_node->rel = ROXML_OPERATOR_OR;
 
-	roxml_parser_item_t * parser = NULL;
 	parser = roxml_append_parser_item(parser, " ", _func_xpath_ignore);
 	parser = roxml_append_parser_item(parser, "\t", _func_xpath_ignore);
 	parser = roxml_append_parser_item(parser, "\n", _func_xpath_ignore);
@@ -433,10 +434,11 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 {
 	int first = 1;
 	int valid = 0;
+	xpath_cond_t *condition;
 
 	if(xn == NULL) { return 1; }
 
-	xpath_cond_t *condition = xn->cond;
+	condition = xn->cond;
 
 	if(!condition)	{
 		return 1;
@@ -487,9 +489,9 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 			}
 			status = roxml_int_cmp(iarg1, iarg2, ROXML_OPERATOR_EQU);
 		} else if(condition->func == ROXML_FUNC_INTCOMP) {
-			status = 0;
 			char strval[ROXML_BASE_LEN];
 			node_t *val = roxml_get_attr(candidat, condition->arg1+1, 0);
+			status = 0;
 			if(val) {
 				iarg1 = atof(roxml_get_content(val, strval, ROXML_BASE_LEN, &status));
 				if(status >= ROXML_BASE_LEN) {
@@ -500,9 +502,9 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 				roxml_release(RELEASE_LAST);
 			}
 		} else if(condition->func == ROXML_FUNC_STRCOMP) {
-			status = 0;
 			char strval[ROXML_BASE_LEN];
 			node_t *val = roxml_get_attr(candidat, condition->arg1+1, 0);
+			status = 0;
 			if(val) {
 				sarg1 = roxml_get_content(val, strval, ROXML_BASE_LEN, &status);
 				if(status >= ROXML_BASE_LEN) {
@@ -513,14 +515,15 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 				roxml_release(sarg1);
 			}
 		} else if(condition->func == ROXML_FUNC_XPATH) {
-			status = 0;
 			int index = condition->func2;
 			int count = 0;
 			node_t *root = candidat;
+			node_t **node_set;
+			status = 0;
 
 			while(root->prnt) { root = root->prnt; }
 
-			node_t **node_set = roxml_exec_xpath(root, candidat, condition->xp, index, &count);
+			node_set = roxml_exec_xpath(root, candidat, condition->xp, index, &count);
 
 			roxml_release(node_set);
 
@@ -630,13 +633,16 @@ void roxml_del_from_pool(node_t * root, node_t *n, int req_id)
 
 int ROXML_INT roxml_add_to_pool(node_t *root, node_t *n, int req_id)
 {
+	xpath_tok_table_t * table;
+	xpath_tok_t * tok;
+	xpath_tok_t * last_tok = NULL;
+
 	if(req_id == 0) { return 1; }
-	xpath_tok_table_t * table = (xpath_tok_table_t*)root->priv;
+	table = (xpath_tok_table_t*)root->priv;
 
 
 	pthread_mutex_lock(&table->mut);
-	xpath_tok_t * tok = (xpath_tok_t*)n->priv;
-	xpath_tok_t * last_tok = NULL;
+	tok = (xpath_tok_t*)n->priv;
 
 	while(tok) {
 		if(tok->id == req_id) {
@@ -714,8 +720,8 @@ int ROXML_INT roxml_validate_axes(node_t *root, node_t *candidat, node_t ***ans,
 		int status;
 		char * sarg1;
 		char * sarg2;
-		valid = 0;
 		xpath_cond_t * condition = xn->xp_cond;
+		valid = 0;
 		if(condition->func == ROXML_FUNC_STRCOMP) {
 			char strval[ROXML_BASE_LEN];
 			sarg1 = roxml_get_content(candidat, strval, ROXML_BASE_LEN, &status);
@@ -922,10 +928,10 @@ void ROXML_INT roxml_check_node(xpath_node_t *xp, node_t *root, node_t *context,
 
 void ROXML_INT roxml_parent_node_at(node_t *parent, node_t * n, int position)
 {
+	int nb_child = 0;
+
 	if(n == NULL) { return; }
 	if(parent == NULL) { return; }
-
-	int nb_child = 0;
 	
 	n->prnt = parent;
 
@@ -1241,10 +1247,9 @@ node_t ** roxml_exec_xpath(node_t *root, node_t *n, xpath_node_t *xpath, int ind
 	int glob_id = 0;
 	int * req_ids = NULL;
 	
-	*count = 0;
-
 	node_t **node_set = roxml_malloc(sizeof(node_t*), max_answers, PTR_NODE_RESULT);
 
+	*count = 0;
 	req_ids = calloc(index, sizeof(int));
 	glob_id = roxml_request_id(root);
 

@@ -376,8 +376,8 @@ void ROXML_API roxml_close(node_t *n)
 int ROXML_API roxml_get_chld_nb(node_t *n)
 {
 	node_t *ptr = n;
-	if(ptr == NULL)	{ return -1; }
 	int nb = 0;
+	if(ptr == NULL)	{ return -1; }
 	if(ptr->chld)	{
 		ptr = ptr->chld;
 		nb++;
@@ -435,16 +435,18 @@ int ROXML_API roxml_get_node_position(node_t *n)
 {
 	int idx = 1;
 	char name[256];
+	node_t * prnt;
+	node_t * first;
 
 	if(n == NULL) { return 0; }
 	
 	roxml_get_name(n, name, 256);
 
-	node_t *prnt = n->prnt;
+	prnt = n->prnt;
 	if(!prnt) {
 		return 1;
 	}
-	node_t * first = prnt->chld;
+	first = prnt->chld;
 
 	while((first)&&(first != n)) {
 		char twin[256];
@@ -470,8 +472,8 @@ node_t * ROXML_API roxml_load_doc(char *filename)
 
 node_t * ROXML_API roxml_load_buf(char *buffer)
 {
-	if(buffer == NULL)	{ return NULL; }
 	node_t *current_node = NULL;
+	if(buffer == NULL)	{ return NULL; }
 	current_node = roxml_create_node(0, buffer, ROXML_STD_NODE | ROXML_BUFF);
 	current_node = roxml_parent_node(NULL, current_node);
 	return roxml_load(current_node, NULL, buffer);
@@ -481,9 +483,11 @@ node_t ** ROXML_API roxml_xpath(node_t *n, char * path, int *nb_ans)
 {
 	int index = 0;
 	int count = 0;
-	xpath_node_t *xpath = NULL;
-	node_t **node_set = NULL;
-	node_t *root = n;
+	xpath_node_t * xpath = NULL;
+	node_t ** node_set = NULL;
+	node_t * root = n;
+	char * full_path_to_find;
+	char * path_to_find;
 
 	if(n == NULL)	{ 
 		if(nb_ans) { *nb_ans = 0; }
@@ -492,8 +496,8 @@ node_t ** ROXML_API roxml_xpath(node_t *n, char * path, int *nb_ans)
 
 	while(root->prnt) { root = root->prnt; }
 
-	char * full_path_to_find = strdup(path);
-	char * path_to_find = full_path_to_find;
+	full_path_to_find = strdup(path);
+	path_to_find = full_path_to_find;
 
 	index = roxml_parse_xpath(path_to_find, &xpath, 0);
 
@@ -559,6 +563,7 @@ node_t * roxml_add_node(node_t * parent, int position, int type, char *name, cha
 	int content_pos = 0;
 	int end_content = 0;
 	char * buffer = NULL;
+	node_t * new_node;
 
 	if(parent && !(parent->type & ROXML_STD_NODE)) {
 		return NULL;
@@ -613,7 +618,7 @@ node_t * roxml_add_node(node_t * parent, int position, int type, char *name, cha
 		}
 	}
 
-	node_t *new_node = roxml_create_node(0, buffer, type | ROXML_PENDING | ROXML_BUFF);
+	new_node = roxml_create_node(0, buffer, type | ROXML_PENDING | ROXML_BUFF);
 	new_node->end = end_node;
 
 	if(content_l && name_l) {
