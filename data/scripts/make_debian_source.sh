@@ -1,6 +1,7 @@
 #!/bin/bash
 
 if [ $# -lt 1 ]; then
+	echo "usage: $0 rev_num"
 	echo "error: must specify a version number"
 	exit 1
 fi
