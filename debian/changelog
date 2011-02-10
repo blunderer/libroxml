@@ -1,3 +1,15 @@
+libroxml (2.0.2-1) unstable; urgency=low
+
+  * Bugfixes
+      parsing attributes with whitespace
+      add quotes around attributes values during write
+      windows build warnings
+  * Documentation update
+     add ewamples
+     more precise descriptions
+
+ -- Tristan Lelong <blunderer@blunderer.org>  Wed, 09 Feb 2011 18:33:00 +0100
+
 libroxml (2.0.1-1) unstable; urgency=low
 
   * Initial release (Closes: Bug#574668)
