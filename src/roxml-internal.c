@@ -188,7 +188,7 @@ node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 	table->id = ROXML_REQTABLE_ID;
 	table->ids[ROXML_REQTABLE_ID] = 1;
 	pthread_mutex_init(&table->mut, NULL);
-	root->priv = (void*)table;
+	current_node->priv = (void*)table;
 
 	return current_node;
 }
