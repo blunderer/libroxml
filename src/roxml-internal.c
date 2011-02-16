@@ -135,6 +135,7 @@ node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 	int int_len = 0;
 	roxml_load_ctx_t context;
 	roxml_parser_item_t * parser = NULL;
+	xpath_tok_table_t * table = (xpath_tok_table_t*)calloc(1, sizeof(xpath_tok_table_t));
 
 	memset(&context, 0, sizeof(roxml_load_ctx_t));
 	context.empty_text_node = 1;
@@ -183,6 +184,12 @@ node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 #endif /* IGNORE_EMPTY_TEXT_NODES */
 
 	while(current_node->prnt)	{ current_node = current_node->prnt; }
+
+	table->id = ROXML_REQTABLE_ID;
+	table->ids[ROXML_REQTABLE_ID] = 1;
+	pthread_mutex_init(&table->mut, NULL);
+	root->priv = (void*)table;
+
 	return current_node;
 }
 
@@ -554,15 +561,7 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 int ROXML_INT roxml_request_id(node_t *root)
 {
 	int i = 0;
-	xpath_tok_table_t * table = NULL;
-	if(root->priv == NULL) {
-		table = (xpath_tok_table_t*)calloc(1, sizeof(xpath_tok_table_t));
-		table->id = ROXML_REQTABLE_ID;
-		table->ids[ROXML_REQTABLE_ID] = 1;
-		pthread_mutex_init(&table->mut, NULL);
-		root->priv = (void*)table;
-	}
-	table = (xpath_tok_table_t*)root->priv;
+	xpath_tok_table_t * table = (xpath_tok_table_t*)root->priv;
 	pthread_mutex_lock(&table->mut);
 	for(i = 1; i < 255; i++) {
 		if(table->ids[i] == 0) {
