@@ -652,12 +652,12 @@ int test_create_node(void)
 	FILE * doc = (FILE *)0x42;
 	char * buf = (char *)0x44;
 
-	node_t * node = roxml_create_node(1, buf, ROXML_FILE | ROXML_STD_NODE);
-	node_t * cnode = roxml_create_node(1, doc, ROXML_FILE | ROXML_STD_NODE);
+	node_t * node = roxml_create_node(1, buf, ROXML_FILE | ROXML_ELM_NODE);
+	node_t * cnode = roxml_create_node(1, doc, ROXML_FILE | ROXML_ELM_NODE);
 	node_t * anode = roxml_create_node(1, doc, ROXML_FILE | ROXML_ATTR_NODE);
-	node_t * close = roxml_create_node(10, doc, ROXML_FILE | ROXML_STD_NODE);
+	node_t * close = roxml_create_node(10, doc, ROXML_FILE | ROXML_ELM_NODE);
 	roxml_close_node(node, close);
-	ASSERT_EQUAL(node->type, ROXML_FILE | ROXML_STD_NODE)
+	ASSERT_EQUAL(node->type, ROXML_FILE | ROXML_ELM_NODE)
 	ASSERT_EQUAL(node->src.buf, buf)
 	ASSERT_EQUAL(node->pos, 1)
 	ASSERT_EQUAL(node->end, 10)
@@ -1548,15 +1548,15 @@ int test_get_node_type(void)
 
 	int type;
 
-	node_t * cnode = roxml_create_node(1, NULL, ROXML_FILE | ROXML_STD_NODE);
+	node_t * cnode = roxml_create_node(1, NULL, ROXML_FILE | ROXML_ELM_NODE);
 	node_t * anode = roxml_create_node(1, NULL, ROXML_FILE | ROXML_ATTR_NODE);
 
 	type = roxml_get_type(cnode);
-	ASSERT_EQUAL(type & ROXML_STD_NODE, ROXML_STD_NODE)
+	ASSERT_EQUAL(type & ROXML_ELM_NODE, ROXML_ELM_NODE)
 	ASSERT_NOT_EQUAL(type & ROXML_ATTR_NODE, ROXML_ATTR_NODE)
 
 	type = roxml_get_type(anode);
-	ASSERT_NOT_EQUAL(type & ROXML_STD_NODE, ROXML_STD_NODE)
+	ASSERT_NOT_EQUAL(type & ROXML_ELM_NODE, ROXML_ELM_NODE)
 	ASSERT_EQUAL(type & ROXML_ATTR_NODE, ROXML_ATTR_NODE)
 
 	roxml_free_node(cnode);
@@ -1630,12 +1630,12 @@ int test_spec_nodes(void)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[2], NULL, 0), "node1")
 	node_set = roxml_xpath(root, "//node()", &nbans);
 	ASSERT_EQUAL(nbans, 7)
-	ASSERT_EQUAL(roxml_get_type(node_set[0]), ROXML_STD_NODE)
-	ASSERT_EQUAL(roxml_get_type(node_set[1]), ROXML_STD_NODE)
+	ASSERT_EQUAL(roxml_get_type(node_set[0]), ROXML_ELM_NODE)
+	ASSERT_EQUAL(roxml_get_type(node_set[1]), ROXML_ELM_NODE)
 	ASSERT_EQUAL(roxml_get_type(node_set[2]), ROXML_TXT_NODE)
 	ASSERT_EQUAL(roxml_get_type(node_set[3]), ROXML_CMT_NODE)
 	ASSERT_EQUAL(roxml_get_type(node_set[4]), ROXML_PI_NODE)
-	ASSERT_EQUAL(roxml_get_type(node_set[5]), ROXML_STD_NODE)
+	ASSERT_EQUAL(roxml_get_type(node_set[5]), ROXML_ELM_NODE)
 	ASSERT_EQUAL(roxml_get_type(node_set[6]), ROXML_CMT_NODE)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "!DOCTYPE")
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[1], NULL, 0), "node")
@@ -1699,15 +1699,15 @@ int test_write_tree(void)
 	roxml_commit_changes(root, "out.xml.copy", NULL, 1);
 	roxml_close(root);
 
-	root = roxml_add_node(NULL, 0, ROXML_STD_NODE, "xml", NULL);
+	root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
 	node = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "this is a test XML file");
 	node = roxml_add_node(root, 0, ROXML_PI_NODE, NULL, "value=\"2\"");
-	node = roxml_add_node(root, 0, ROXML_STD_NODE, "node1", "content1");
+	node = roxml_add_node(root, 0, ROXML_ELM_NODE, "node1", "content1");
 	roxml_add_node(root, 0, ROXML_ATTR_NODE, "attr1", "value1");
-	node_t *node2 = roxml_add_node(node, 0, ROXML_STD_NODE, "node2", "content2");
+	node_t *node2 = roxml_add_node(node, 0, ROXML_ELM_NODE, "node2", "content2");
 	roxml_add_node(node, 0, ROXML_TXT_NODE, NULL, "content1bis");
 	roxml_add_node(node2, 0, ROXML_TXT_NODE, NULL, "content2bis");
-	roxml_add_node(node, 0, ROXML_STD_NODE, "node3", "content3");
+	roxml_add_node(node, 0, ROXML_ELM_NODE, "node3", "content3");
 	
 	ASSERT_NOT_NULL(root)	// xml
 	ASSERT_NOT_NULL(root->attr) // attr1

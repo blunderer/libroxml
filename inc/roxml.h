@@ -114,10 +114,21 @@ typedef struct node node_t;
 /**
  * \def ROXML_STD_NODE
  * 
+ * \deprecated 
  * constant for standard nodes
+ *
+ * \see roxml_add_node
+ * 
+ */
+#define ROXML_STD_NODE	0x10 
+
+/**
+ * \def ROXML_ELM_NODE
+ * 
+ * constant for element nodes
  * \see roxml_add_node
  */
-#define ROXML_STD_NODE	0x10
+#define ROXML_ELM_NODE	0x10
 
 /**
  * \def ROXML_TXT_NODE
@@ -433,7 +444,7 @@ node_t ** ROXML_API roxml_xpath			(node_t *n, char * path, int *nb_ans);
 /** \brief node type function
  *
  * \fn roxml_get_type(node_t *n);
- * This function tells if a node is an \ref ROXML_ATTR_NODE, \ref ROXML_TXT_NODE, \ref ROXML_PI_NODE, \ref ROXML_CMT_NODE or \ref ROXML_STD_NODE.
+ * This function tells if a node is an \ref ROXML_ATTR_NODE, \ref ROXML_TXT_NODE, \ref ROXML_PI_NODE, \ref ROXML_CMT_NODE or \ref ROXML_ELM_NODE.
  * \param n is the node to test
  * \return the node type
  */
@@ -481,15 +492,15 @@ int roxml_get_type				(node_t *n);
  * only the RAM loaded tree
  * \param parent the parent node
  * \param position the position as a child of parent (0 for auto position at the end of children list)
- * \param type the type of node between \ref ROXML_ATTR_NODE, \ref ROXML_STD_NODE, \ref ROXML_TXT_NODE, \ref ROXML_PI_NODE, \ref ROXML_CMT_NODE
- * \param name the name of the node (for \ref ROXML_ATTR_NODE and \ref ROXML_STD_NODE only)
- * \param value the text content (for \ref ROXML_STD_NODE, \ref ROXML_TXT_NODE, \ref ROXML_CMT_NODE, \ref ROXML_PI_NODE) or the attribute value (\ref ROXML_ATTR_NODE)
+ * \param type the type of node between \ref ROXML_ATTR_NODE, \ref ROXML_ELM_NODE, \ref ROXML_TXT_NODE, \ref ROXML_PI_NODE, \ref ROXML_CMT_NODE
+ * \param name the name of the node (for \ref ROXML_ATTR_NODE and \ref ROXML_ELM_NODE only)
+ * \param value the text content (for \ref ROXML_ELM_NODE, \ref ROXML_TXT_NODE, \ref ROXML_CMT_NODE, \ref ROXML_PI_NODE) or the attribute value (\ref ROXML_ATTR_NODE)
  * \return the new node
  * \see roxml_commit_changes
  * \see roxml_del_node
  *
  * paramaters name and value depending on node type:
- * - \ref ROXML_STD_NODE take at least a node name. the paramter value is optional and represents the text content.
+ * - \ref ROXML_ELM_NODE take at least a node name. the paramter value is optional and represents the text content.
  * - \ref ROXML_TXT_NODE ignore the node name. the paramter value represents the text content.
  * - \ref ROXML_CMT_NODE ignore the node name. the paramter value represents the comment.
  * - \ref ROXML_PI_NODE ignore the node name. the paramter value represents the content of processing-instruction node.
@@ -512,11 +523,11 @@ int roxml_get_type				(node_t *n);
  *
  * int main(void)
  * {
- * 	node_t * root = roxml_add_node(NULL, 0, ROXML_STD_NODE, "xml", NULL);
+ * 	node_t * root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
  * 	node_t * tmp = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample XML file");
- * 	tmp = roxml_add_node(root, 0, ROXML_STD_NODE, "item", NULL);
+ * 	tmp = roxml_add_node(root, 0, ROXML_ELM_NODE, "item", NULL);
  * 	roxml_add_node(tmp, 0, ROXML_ATTR_NODE, "id", "42");
- * 	tmp = roxml_add_node(tmp, 0, ROXML_STD_NODE, "price", "24");
+ * 	tmp = roxml_add_node(tmp, 0, ROXML_ELM_NODE, "price", "24");
  * 	roxml_commit_changes(root, "/tmp/test.xml", NULL, 1);
  * 	return 0;
  * }
@@ -527,11 +538,11 @@ int roxml_get_type				(node_t *n);
  *
  * int main(void)
  * {
- * 	node_t * root = roxml_add_node(NULL, 0, ROXML_STD_NODE, "xml", NULL);
+ * 	node_t * root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
  * 	node_t * tmp = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample XML file");
- * 	tmp = roxml_add_node(root, 0, ROXML_STD_NODE, "item", NULL);
+ * 	tmp = roxml_add_node(root, 0, ROXML_ELM_NODE, "item", NULL);
  * 	roxml_add_node(tmp, 0, ROXML_ATTR_NODE, "id", "42");
- * 	tmp = roxml_add_node(tmp, 0, ROXML_STD_NODE, "price", NULL);
+ * 	tmp = roxml_add_node(tmp, 0, ROXML_ELM_NODE, "price", NULL);
  * 	tmp = roxml_add_node(tmp, 0, ROXML_TXT_NODE, NULL, "24");
  * 	roxml_commit_changes(root, "/tmp/test.xml", NULL, 1);
  * 	return 0;
@@ -634,11 +645,11 @@ void ROXML_API roxml_del_node			(node_t * n);
  *
  * int main(void)
  * {
- * 	node_t * root = roxml_add_node(NULL, 0, ROXML_STD_NODE, "xml", NULL);
+ * 	node_t * root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
  * 	node_t * tmp = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample XML file");
- * 	tmp = roxml_add_node(root, 0, ROXML_STD_NODE, "item", NULL);
+ * 	tmp = roxml_add_node(root, 0, ROXML_ELM_NODE, "item", NULL);
  * 	roxml_add_node(tmp, 0, ROXML_ATTR_NODE, "id", "42");
- * 	tmp = roxml_add_node(tmp, 0, ROXML_STD_NODE, "price", "24");
+ * 	tmp = roxml_add_node(tmp, 0, ROXML_ELM_NODE, "price", "24");
  * 	roxml_commit_changes(root, "/tmp/test.xml", NULL, 1);
  * 	return 0;
  * }
@@ -660,11 +671,11 @@ void ROXML_API roxml_del_node			(node_t * n);
  *
  * int main(void)
  * {
- * 	node_t * root = roxml_add_node(NULL, 0, ROXML_STD_NODE, "xml", NULL);
+ * 	node_t * root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
  * 	node_t * tmp = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample XML file");
- * 	tmp = roxml_add_node(root, 0, ROXML_STD_NODE, "item", NULL);
+ * 	tmp = roxml_add_node(root, 0, ROXML_ELM_NODE, "item", NULL);
  * 	roxml_add_node(tmp, 0, ROXML_ATTR_NODE, "id", "42");
- * 	tmp = roxml_add_node(tmp, 0, ROXML_STD_NODE, "price", "24");
+ * 	tmp = roxml_add_node(tmp, 0, ROXML_ELM_NODE, "price", "24");
  * 	roxml_commit_changes(root, "/tmp/test.xml", NULL, 0);
  * 	return 0;
  * }

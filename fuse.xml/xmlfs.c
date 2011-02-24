@@ -198,7 +198,7 @@ static int xmlfs_create(const char *path, mode_t mode, struct fuse_file_info *fi
 	DEBUG("%d results", nb);
 	if(nb > 0) {
 		DEBUG("parent is : '%s'\n",roxml_get_name(parent[0], NULL, 0));
-		roxml_add_node(parent[0], 0, ROXML_STD_NODE, filename, NULL);
+		roxml_add_node(parent[0], 0, ROXML_ELM_NODE, filename, NULL);
 		roxml_release(RELEASE_LAST);
 	} else {
 		DEBUG("zero results for %s", dirname)
