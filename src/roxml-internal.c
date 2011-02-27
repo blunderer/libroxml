@@ -331,6 +331,7 @@ int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t ** xpath, int context)
 	ctx.parenthesys = 0;
 	ctx.quoted = 0;
 	ctx.dquoted = 0;
+	ctx.content_quoted = 0;
 	ctx.is_first_node = 1;
 	ctx.wait_first_node = 1;
 	ctx.shorten_cond = 0;
@@ -344,6 +345,8 @@ int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t ** xpath, int context)
 	parser = roxml_append_parser_item(parser, "\t", _func_xpath_ignore);
 	parser = roxml_append_parser_item(parser, "\n", _func_xpath_ignore);
 	parser = roxml_append_parser_item(parser, "\r", _func_xpath_ignore);
+	parser = roxml_append_parser_item(parser, "\"", _func_xpath_dquote);
+	parser = roxml_append_parser_item(parser, "\'", _func_xpath_quote);
 	parser = roxml_append_parser_item(parser, "/", _func_xpath_new_node);
 	parser = roxml_append_parser_item(parser, "(", _func_xpath_open_parenthesys);
 	parser = roxml_append_parser_item(parser, ")", _func_xpath_close_parenthesys);

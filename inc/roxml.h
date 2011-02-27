@@ -316,7 +316,8 @@ char*	ROXML_API roxml_get_name		(node_t *n, char * buffer, int size);
  * \param n is one node of the tree
  * \param buffer is the buffer where result will be written or NULL for internal allocation
  * \param bufsize the size if using custom buffer
- * \param size the actual size of result. if buffer was not NULL and size == buf_size, then given buffer was too small
+ * \param size the actual size of copied result. returned size should be less that buffer size since roxml_get_content
+ * will add the \0. if buffer was not NULL and size >= buf_size, then given buffer was too small and node content was truncated
  * \return the text content
  * \see roxml_release
  */

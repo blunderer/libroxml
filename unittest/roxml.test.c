@@ -780,12 +780,12 @@ int test_get_content(void)
 
 	ASSERT_NULL(roxml_get_content(root->chld->attr, NULL, 0, NULL))
 
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->attr, NULL, 0, NULL), "\"name1\"")
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->attr->sibl, NULL, 0, NULL), "\"value1\"")
+	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->attr, NULL, 0, NULL), "name1")
+	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->attr->sibl, NULL, 0, NULL), "value1")
 	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->attr, NULL, 0, NULL), "name2")
 	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->attr->sibl, NULL, 0, NULL), "value2")
 	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->chld->sibl->attr, NULL, 0, NULL), "name4")
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->chld->sibl->attr->sibl, NULL, 0, NULL), "\"value4\"")
+	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->chld->sibl->attr->sibl, NULL, 0, NULL), "value4")
 
 	roxml_release(RELEASE_ALL);
 	roxml_close(root);
@@ -933,7 +933,7 @@ int test_parse_xpath(void)
 	ASSERT_EQUAL(ptr[0].next->cond->xp[0].axes, ROXML_ID_CHILD);
 	ASSERT_STRING_EQUAL(ptr[0].next->cond->xp[0].name, "title");
 	ASSERT_EQUAL(ptr[0].next->cond->xp[0].xp_cond->func, ROXML_FUNC_STRCOMP);
-	ASSERT_STRING_EQUAL(ptr[0].next->cond->xp[0].xp_cond->arg2, "\"toto\"");
+	ASSERT_STRING_EQUAL(ptr[0].next->cond->xp[0].xp_cond->arg2, "toto");
 	ASSERT_NOT_NULL(ptr[0].next->next);
 	ASSERT_STRING_EQUAL(ptr[0].next->next->name, "title");
 	ASSERT_NULL(ptr[0].next->next->next);
@@ -952,7 +952,7 @@ int test_parse_xpath(void)
 	ASSERT_EQUAL(ptr[0].next->cond->xp[0].axes, ROXML_ID_CHILD);
 	ASSERT_STRING_EQUAL(ptr[0].next->cond->xp[0].name, "title");
 	ASSERT_EQUAL(ptr[0].next->cond->xp[0].xp_cond->func, ROXML_FUNC_STRCOMP);
-	ASSERT_STRING_EQUAL(ptr[0].next->cond->xp[0].xp_cond->arg2, "\"toto\"");
+	ASSERT_STRING_EQUAL(ptr[0].next->cond->xp[0].xp_cond->arg2, "toto");
 	ASSERT_EQUAL(ptr[0].next->cond->xp[1].axes, ROXML_ID_CHILD);
 	ASSERT_EQUAL(ptr[0].next->cond->xp[1].rel, ROXML_OPERATOR_AND);
 	ASSERT_STRING_EQUAL(ptr[0].next->cond->xp[1].name, "price");
@@ -977,7 +977,7 @@ int test_parse_xpath(void)
 	ASSERT_EQUAL(ptr[0].next->cond->xp[0].axes, ROXML_ID_CHILD);
 	ASSERT_STRING_EQUAL(ptr[0].next->cond->xp[0].name, "title");
 	ASSERT_EQUAL(ptr[0].next->cond->xp[0].xp_cond->func, ROXML_FUNC_STRCOMP);
-	ASSERT_STRING_EQUAL(ptr[0].next->cond->xp[0].xp_cond->arg2, "\"toto\"");
+	ASSERT_STRING_EQUAL(ptr[0].next->cond->xp[0].xp_cond->arg2, "toto");
 	ASSERT_EQUAL(ptr[0].next->cond->xp[1].axes, ROXML_ID_ATTR);
 	ASSERT_STRING_EQUAL(ptr[0].next->cond->xp[1].name, "price");
 	ASSERT_EQUAL(ptr[0].next->cond->xp[1].xp_cond->func, ROXML_FUNC_INTCOMP);
@@ -1013,7 +1013,7 @@ int test_parse_xpath(void)
 	ASSERT_EQUAL(ptr[0].next->next->cond->xp[0].axes, ROXML_ID_CHILD);
 	ASSERT_STRING_EQUAL(ptr[0].next->next->cond->xp[0].name, "text()");
 	ASSERT_EQUAL(ptr[0].next->next->cond->xp[0].xp_cond->func, ROXML_FUNC_STRCOMP);
-	ASSERT_STRING_EQUAL(ptr[0].next->next->cond->xp[0].xp_cond->arg2, "\"toto\"");
+	ASSERT_STRING_EQUAL(ptr[0].next->next->cond->xp[0].xp_cond->arg2, "toto");
 	ASSERT_NULL(ptr[0].next->next->next);
 	roxml_free_xpath(ptr, ret);
 
@@ -1273,8 +1273,8 @@ int test_xpath(void)
 
 	node_set = roxml_xpath(node0, "descendant-or-self::node1/@*", &nbans);
 	ASSERT_EQUAL(nbans, 2)
-	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "\"name1\"")
-	ASSERT_STRING_EQUAL(roxml_get_content(node_set[1], NULL, 0, NULL), "\"value1\"")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "name1")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[1], NULL, 0, NULL), "value1")
 		
 	node_set = roxml_xpath(root, "//*[@name=\"name1\"]", &nbans);
 	ASSERT_EQUAL(nbans, 1)
@@ -1304,7 +1304,7 @@ int test_xpath(void)
 	node_set = roxml_xpath(root, "//@name", &nbans);
 	ASSERT_EQUAL(nbans, 3)
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "name4")
-	ASSERT_STRING_EQUAL(roxml_get_content(node_set[1], NULL, 0, NULL), "\"name1\"")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[1], NULL, 0, NULL), "name1")
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[2], NULL, 0, NULL), "name2")
 
 	node_set = roxml_xpath(node0, "node1/text()", &nbans);
@@ -1675,12 +1675,12 @@ int test_whitespaces_in_attr(void)
 	node_t *attr3 = roxml_get_attr(node3, NULL, 0);
 
 	char * content = roxml_get_content(attr1, NULL, 0, NULL);
-	ASSERT_STRING_EQUAL(content, "\"toto et titi\"");
+	ASSERT_STRING_EQUAL(content, "toto et titi");
 	content = roxml_get_content(attr2, NULL, 0, NULL);
-	ASSERT_STRING_EQUAL(content, "'toto et titi'");
+	ASSERT_STRING_EQUAL(content, "toto et titi");
 	content = roxml_get_content(attr3, NULL, 0, NULL);
 	ASSERT_NOT_NULL(content);
-	ASSERT_STRING_EQUAL(content, "'toto et titi'");
+	ASSERT_STRING_EQUAL(content, "toto et titi");
 
 	roxml_release(RELEASE_ALL);
 	roxml_close(root);

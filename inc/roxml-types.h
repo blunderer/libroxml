@@ -153,6 +153,7 @@ typedef struct _roxml_load_ctx {
 	int previous_state;			/*!< previous state */
 	int mode;				/*!< mode quoted or normal */
 	int inside_node_state;			/*!< sub state for attributes*/
+	int content_quoted;			/*!< content of attribute was quoted */
 	int type;				/*!< source type (file or buffer) */
 	void * src;				/*!< source (file or buffer) */
 	node_t *candidat_node;			/*!< node being processed */
@@ -180,6 +181,7 @@ typedef struct _roxml_xpath_ctx {
 	int quoted;				/*!< are we quoted (') */
 	int dquoted;				/*!< are we double quoted (") */
 	int context;				/*!< is it an inside xpath*/
+	int content_quoted;			/*!< content of val was quoted */
 	xpath_node_t * first_node;		/*!< the very first node of xpath string */
         xpath_node_t * new_node;		/*!< current xpath node */
 	xpath_cond_t * new_cond;		/*!< current xpath cond */
