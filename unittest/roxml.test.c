@@ -767,6 +767,11 @@ int test_get_chld_nb(void)
 int test_get_content(void)
 {
 	INIT
+	int len = 0;
+	char buf[4];
+	char buf2[6];
+	char buf3[7];
+	char buf4[16];
 	node_t *root = roxml_load_doc("roxml.test.xml");
 	
 	ASSERT_STRING_EQUAL(roxml_get_content(root->chld, NULL, 0, NULL), ""); // node0
@@ -786,6 +791,22 @@ int test_get_content(void)
 	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->attr->sibl, NULL, 0, NULL), "value2")
 	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->chld->sibl->attr, NULL, 0, NULL), "name4")
 	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->chld->sibl->attr->sibl, NULL, 0, NULL), "value4")
+
+	char * value = roxml_get_content(root->chld->chld->attr->sibl, NULL, 0, &len);
+	ASSERT_EQUAL(len, 7)
+	ASSERT_STRING_EQUAL(value, "value1")
+	value = roxml_get_content(root->chld->chld->attr->sibl, buf, 4, &len);
+	ASSERT_EQUAL(len, 4)
+	ASSERT_STRING_EQUAL(value, "val")
+	value = roxml_get_content(root->chld->chld->attr->sibl, buf2, 6, &len);
+	ASSERT_EQUAL(len, 6)
+	ASSERT_STRING_EQUAL(value, "value")
+	value = roxml_get_content(root->chld->chld->attr->sibl, buf3, 7, &len);
+	ASSERT_EQUAL(len, 7)
+	ASSERT_STRING_EQUAL(value, "value1")
+	value = roxml_get_content(root->chld->chld->attr->sibl, buf4, 16, &len);
+	ASSERT_EQUAL(len, 7)
+	ASSERT_STRING_EQUAL(value, "value1")
 
 	roxml_release(RELEASE_ALL);
 	roxml_close(root);

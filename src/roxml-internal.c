@@ -510,10 +510,10 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 				iarg1 = atof(roxml_get_content(val, strval, ROXML_BASE_LEN, &status));
 				if(status >= ROXML_BASE_LEN) {
 					iarg1 = atof(roxml_get_content(val, NULL, 0, &status));
+					roxml_release(RELEASE_LAST);
 				}
 				iarg2 = atof(condition->arg2);
 				status = roxml_double_cmp(iarg1, iarg2, condition->op);
-				roxml_release(RELEASE_LAST);
 			}
 		} else if(condition->func == ROXML_FUNC_STRCOMP) {
 			char strval[ROXML_BASE_LEN];
@@ -744,10 +744,10 @@ int ROXML_INT roxml_validate_axes(node_t *root, node_t *candidat, node_t ***ans,
 			iarg1 = atof(roxml_get_content(candidat, strval, ROXML_BASE_LEN, &status));
 			if(status >= ROXML_BASE_LEN) {
 				iarg1 = atof(roxml_get_content(candidat, NULL, 0, &status));
+				roxml_release(RELEASE_LAST);
 			}
 			iarg2 = atof(condition->arg2);
 			valid = roxml_double_cmp(iarg1, iarg2, condition->op);
-			roxml_release(RELEASE_LAST);
 		}
 	}
 

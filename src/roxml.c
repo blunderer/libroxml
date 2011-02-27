@@ -105,11 +105,15 @@ char * ROXML_API roxml_get_content(node_t *n, char * buffer, int bufsize, int *s
 {
 	node_t * ptr;
 	int total = 0;
-	char * content = NULL;
+	char * content = buffer;
 	
 	if(n == NULL)	{
+		if(size) {
+			*size = 0;
+		}
 		if(buffer)	{
 			strcpy(buffer, "");
+			return buffer;
 		}
 		return NULL;
 	}
@@ -121,73 +125,120 @@ char * ROXML_API roxml_get_content(node_t *n, char * buffer, int bufsize, int *s
 			ptr = ptr->sibl;
 		}
 		
-		content = roxml_malloc(sizeof(char), total+1, PTR_CHAR);
+		if(content == NULL) {
+			content = roxml_malloc(sizeof(char), total+1, PTR_CHAR);
+			bufsize = total+1;
+		}
 		if(content == NULL) { return NULL; }
 
 		total = 0;
 		ptr = n->text;
 		while(ptr)	{
+			int ret_len = 0;
+			int read_size = ptr->end - ptr->pos;
 			if(ptr->type & ROXML_FILE) {
-				int ret_len = 0;
+				if(total+read_size > bufsize-1) {
+					read_size = bufsize - total - 1;
+				}
 				fseek(ptr->src.fil, ptr->pos, SEEK_SET);
-				ret_len = fread(content+total, ptr->end - ptr->pos, 1, ptr->src.fil);
+				ret_len = fread(content+total, 1, read_size, ptr->src.fil);
 			} else {
-				memcpy(content+total, ptr->src.buf+ptr->pos, ptr->end - ptr->pos);
+				memcpy(content+total, ptr->src.buf+ptr->pos, read_size);
+				ret_len = read_size;
 			}
-			total += ptr->end - ptr->pos;
+			total += ret_len;
 			ptr = ptr->sibl;
 		}
 	} else if(n->type & ROXML_TXT_NODE)	{
+		int ret_len = 0;
+		int read_size = 0;
 		total = n->end - n->pos;
-		content = roxml_malloc(sizeof(char), total+1, PTR_CHAR);
+		if(content == NULL) {
+			content = roxml_malloc(sizeof(char), total+1, PTR_CHAR);
+			bufsize = total+1;
+		}
 		if(content == NULL) { return NULL; }
+		read_size = total;
+		if(read_size > bufsize-1) {
+			read_size = bufsize-1;
+		}
 		if(n->type & ROXML_FILE) {
-			int ret_len = 0;
 			fseek(n->src.fil, n->pos, SEEK_SET);
-			ret_len = fread(content, n->end - n->pos, 1, n->src.fil);
+			ret_len = fread(content, 1, read_size, n->src.fil);
 		} else {
-			memcpy(content, n->src.buf+n->pos, n->end - n->pos);
+			memcpy(content, n->src.buf+n->pos, read_size);
+			ret_len = read_size;
 		}
+		total = ret_len;
 	} else if(n->type & ROXML_CMT_NODE)	{
+		int ret_len = 0;
+		int read_size = 0;
 		total = n->end - n->pos - 4;
-		content = roxml_malloc(sizeof(char), total+1, PTR_CHAR);
+		if(content == NULL) {
+			content = roxml_malloc(sizeof(char), total+1, PTR_CHAR);
+			bufsize = total+1;
+		}
 		if(content == NULL) { return NULL; }
+		read_size = total;
+		if(read_size > bufsize-1) {
+			read_size = bufsize-1;
+		}
 		if(n->type & ROXML_FILE) {
-			int ret_len = 0;
 			fseek(n->src.fil, n->pos+4, SEEK_SET);
-			ret_len = fread(content, n->end - n->pos - 4, 1, n->src.fil);
+			ret_len = fread(content, 1, read_size, n->src.fil);
 		} else {
-			memcpy(content, n->src.buf+n->pos + 4, n->end - n->pos - 4);
+			memcpy(content, n->src.buf+n->pos + 4, read_size);
+			ret_len = read_size;
 		}
+		total = ret_len;
 	} else if(n->type & ROXML_PI_NODE)	{
+		int ret_len = 0;
+		int read_size = 0;
 		total = n->end - n->pos - 2;
-		content = roxml_malloc(sizeof(char), total+2, PTR_CHAR);
-		if(content == NULL) { return NULL; }
-		if(n->type & ROXML_FILE) {
-			int ret_len = 0;
-			fseek(n->src.fil, n->pos+2, SEEK_SET);
-			ret_len = fread(content, n->end - n->pos - 2, 1, n->src.fil);
-		} else {
-			memcpy(content, n->src.buf+n->pos + 2, n->end - n->pos - 2);
+		if(content == NULL) {
+			content = roxml_malloc(sizeof(char), total+2, PTR_CHAR);
+			bufsize = total+2;
 		}
+		if(content == NULL) { return NULL; }
+		read_size = total;
+		if(read_size > bufsize-1) {
+			read_size = bufsize-1;
+		}
+		if(n->type & ROXML_FILE) {
+			fseek(n->src.fil, n->pos+2, SEEK_SET);
+			ret_len = fread(content, 1, read_size, n->src.fil);
+		} else {
+			memcpy(content, n->src.buf+n->pos + 2, read_size);
+			ret_len = read_size;
+		}
+		total = ret_len;
 	} else if(n->type & ROXML_ATTR_NODE)	{
+		int ret_len = 0;
+		int read_size = 0;
 		node_t *ptr = n->text;
 		total = ptr->end - ptr->pos;
-		content = roxml_malloc(sizeof(char), total+1, PTR_CHAR);
-		if(content == NULL) { return NULL; }
-		if(ptr->type & ROXML_FILE) {
-			int ret_len = 0;
-			fseek(ptr->src.fil, ptr->pos, SEEK_SET);
-			ret_len = fread(content, total, 1, ptr->src.fil);
-		} else {
-			memcpy(content, ptr->src.buf+ptr->pos, total);
+		if(content == NULL) {
+			content = roxml_malloc(sizeof(char), total+1, PTR_CHAR);
+			bufsize = total+1;
 		}
+		if(content == NULL) { return NULL; }
+		read_size = total;
+		if(read_size > bufsize-1) {
+			read_size = bufsize-1;
+		}
+		if(ptr->type & ROXML_FILE) {
+			fseek(ptr->src.fil, ptr->pos, SEEK_SET);
+			ret_len = fread(content, 1, read_size, ptr->src.fil);
+		} else {
+			memcpy(content, ptr->src.buf+ptr->pos, read_size);
+			ret_len = read_size;
+		}
+		total = ret_len;
 	}
-	if(buffer)	{
-		strncpy(buffer, content, bufsize);
-	}
+
+	content[total] = '\0';
 	if(size) {
-		*size = total;
+		*size = total+1;
 	}
 	return content;
 }
