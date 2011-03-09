@@ -47,6 +47,7 @@
  * \section list-func List of function by category?
  * there are several groups of functions : 
  * \subsection manage-xml Manage xml source
+ * \ref roxml_load_fd \n
  * \ref roxml_load_doc \n
  * \ref roxml_load_buf \n
  * \ref roxml_close \n
@@ -202,6 +203,7 @@ typedef struct node node_t;
  * \param buffer the XML buffer to load
  * \return the root node or NULL
  * \see roxml_close
+ * \see roxml_load_fd
  * \see roxml_load_doc
  */
 node_t*	ROXML_API roxml_load_buf		(char *buffer);
@@ -213,9 +215,22 @@ node_t*	ROXML_API roxml_load_buf		(char *buffer);
  * \param filename the XML document to load
  * \return the root node or NULL
  * \see roxml_close
+ * \see roxml_load_fd
  * \see roxml_load_buf
  */
 node_t*	ROXML_API roxml_load_doc		(char *filename);
+
+/** \brief load function for file descriptors
+ *
+ * \fn node_t* ROXML_API roxml_load_fd(int *fd);
+ * This function load a document by parsing all the corresponding nodes
+ * \param filename the XML document to load
+ * \return the root node or NULL
+ * \see roxml_close
+ * \see roxml_load_doc
+ * \see roxml_load_buf
+ */
+node_t*	ROXML_API roxml_load_fd			(int fd);
 
 /** \brief unload function
  *

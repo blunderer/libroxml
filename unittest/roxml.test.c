@@ -17,6 +17,23 @@ int test_load_doc(void)
 	RETURN /* close context macro */
 }
 
+int test_load_fd(void)
+{
+	INIT /* init context macro */
+
+	int fd = open("roxml.test.xml", O_RDONLY);
+	node_t *root = roxml_load_fd(fd);
+	ASSERT_NOT_NULL(root);
+	
+	roxml_close(root);
+
+	fd = open("empty.test.xml", O_RDONLY);
+	root = roxml_load_fd(fd);
+	ASSERT_NULL(root);
+	
+	RETURN /* close context macro */
+}
+
 int test_tree_on_doc(void)
 {
 	INIT /* init context macro */
@@ -1790,6 +1807,7 @@ int main(int argc, char ** argv)	{
 	INIT /* init context macro */
 
 	TEST_FUNC(test_load_doc) 
+	TEST_FUNC(test_load_fd)
 	TEST_FUNC(test_tree_on_doc) 
 	TEST_FUNC(test_names_on_doc) 
 	TEST_FUNC(test_load_buf) 

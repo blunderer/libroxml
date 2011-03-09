@@ -562,6 +562,22 @@ int ROXML_API roxml_get_node_position(node_t *n)
 	return idx;
 }
 
+node_t * ROXML_API roxml_load_fd(int fd)
+{
+	FILE * file = NULL;
+	node_t *current_node = NULL;
+	if(fd < 0)	{
+		return NULL;
+	}
+	file = fdopen(fd, "r");
+	if(file == NULL)	{
+		return NULL;
+	}
+	current_node = roxml_create_node(0, file, ROXML_ELM_NODE | ROXML_FILE);
+	current_node = roxml_parent_node(NULL, current_node);
+	return roxml_load(current_node,  file, NULL);
+}
+
 node_t * ROXML_API roxml_load_doc(char *filename)
 {
 	node_t *current_node = NULL;
