@@ -1,0 +1,1 @@
+<?xml version=1.0><node0><node1 name="name1" value="value1">text1</node1><node2 name=name2 value=value2><node3>text2</node3><node4 name=name4 value="value4"/><node5>text3<node6>text5</node6>text4</node5></node2><node7>"<node8></node8>"</node7></node0>
