@@ -245,6 +245,24 @@ node_t*	ROXML_API roxml_load_fd			(int fd);
  */
 void 	ROXML_API roxml_close			(node_t *n);
 
+/** \brief next sibling getter function
+ *
+ * \fn node_t* ROXML_API roxml_get_next_sibling(node_t *n);
+ * This function returns the next sibling of a given node
+ * \param n is one node of the tree
+ * \return the next sibling node
+ */
+node_t*	ROXML_API roxml_get_next_sibling	(node_t *n);
+
+/** \brief prev sibling getter function
+ *
+ * \fn node_t* ROXML_API roxml_get_prev_sibling(node_t *n);
+ * This function returns the prev sibling of a given node
+ * \param n is one node of the tree
+ * \return the prev sibling node
+ */
+node_t*	ROXML_API roxml_get_prev_sibling	(node_t *n);
+
 /** \brief parent getter function
  *
  * \fn node_t* ROXML_API roxml_get_parent(node_t *n);

@@ -784,6 +784,60 @@ int test_get_chld(void)
 	RETURN
 }
 
+int test_get_sibl(void)
+{
+	INIT
+	node_t *root = roxml_load_doc("roxml.test.xml");
+
+	ASSERT_STRING_EQUAL(roxml_get_name(root, NULL, 0), "documentRoot")
+
+	node_t * node0 = roxml_get_chld(root, NULL, 0);
+	node_t * node1 = roxml_get_chld(node0, NULL, 0);
+	node_t * node2 = roxml_get_chld(node0, NULL, 1);
+	node_t * node3 = roxml_get_chld(node2, NULL, 0);
+	node_t * node4 = roxml_get_chld(node2, NULL, 1);
+	node_t * node5 = roxml_get_chld(node2, NULL, 2);
+	node_t * node6 = roxml_get_chld(node5, NULL, 0);
+	node_t * node7 = roxml_get_chld(node0, NULL, 2);
+
+	ASSERT_NULL(roxml_get_prev_sibling(node0));
+	ASSERT_NULL(roxml_get_next_sibling(node0));
+
+	ASSERT_NULL(roxml_get_prev_sibling(node1));
+	ASSERT_NOT_NULL(roxml_get_next_sibling(node1));
+	ASSERT_EQUAL(node2, roxml_get_next_sibling(node1));
+
+	ASSERT_NOT_NULL(roxml_get_prev_sibling(node2));
+	ASSERT_NOT_NULL(roxml_get_next_sibling(node2));
+	ASSERT_EQUAL(node1, roxml_get_prev_sibling(node2));
+	ASSERT_EQUAL(node7, roxml_get_next_sibling(node2));
+
+	ASSERT_NULL(roxml_get_prev_sibling(node3));
+	ASSERT_NOT_NULL(roxml_get_next_sibling(node3));
+	ASSERT_EQUAL(node4, roxml_get_next_sibling(node3));
+
+	ASSERT_NOT_NULL(roxml_get_prev_sibling(node4));
+	ASSERT_NOT_NULL(roxml_get_next_sibling(node4));
+	ASSERT_EQUAL(node3, roxml_get_prev_sibling(node4));
+	ASSERT_EQUAL(node5, roxml_get_next_sibling(node4));
+
+	ASSERT_NOT_NULL(roxml_get_prev_sibling(node5));
+	ASSERT_NULL(roxml_get_next_sibling(node5));
+	ASSERT_EQUAL(node4, roxml_get_prev_sibling(node5));
+
+	ASSERT_NULL(roxml_get_prev_sibling(node6));
+	ASSERT_NULL(roxml_get_next_sibling(node6));
+
+	ASSERT_NOT_NULL(roxml_get_prev_sibling(node7));
+	ASSERT_NULL(roxml_get_next_sibling(node7));
+	ASSERT_EQUAL(node2, roxml_get_prev_sibling(node7));
+
+	roxml_release(RELEASE_ALL);
+	roxml_close(root);
+
+	RETURN
+}
+
 int test_get_chld_nb(void)
 {
 	INIT
@@ -1823,6 +1877,7 @@ int main(int argc, char ** argv)	{
 	TEST_FUNC(test_create_node)
 	TEST_FUNC(test_get_root)
 	TEST_FUNC(test_get_chld)
+	TEST_FUNC(test_get_sibl)
 	TEST_FUNC(test_get_chld_nb)
 	TEST_FUNC(test_get_content)
 	TEST_FUNC(test_get_attr_nb)

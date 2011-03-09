@@ -497,6 +497,27 @@ node_t * ROXML_API roxml_get_chld(node_t *n, char * name, int nth)
 	return ptr;
 }
 
+node_t * ROXML_API roxml_get_prev_sibling(node_t *n)
+{
+	node_t * prev = NULL;
+	if(n)	{
+		prev = n->prnt;
+		if(n->prnt) {
+			prev = prev->chld;
+			while(prev && prev->sibl != n) prev = prev->sibl;
+		}
+	}
+	return prev;
+}
+
+node_t * ROXML_API roxml_get_next_sibling(node_t *n)
+{
+	if(n)	{
+		return n->sibl;
+	}
+	return NULL;
+}
+
 node_t * ROXML_API roxml_get_parent(node_t *n)
 {
 	if(n) {
