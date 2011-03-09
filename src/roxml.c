@@ -320,7 +320,7 @@ char * ROXML_API roxml_get_name(node_t *n, char * buffer, int size)
 		buffer = (char*)roxml_malloc(sizeof(char), strlen(tmp_name)+1, PTR_CHAR);
 		strcpy(buffer, tmp_name);
 	} else	{
-		if(strlen(tmp_name) < size) {
+		if(strlen(tmp_name) < (unsigned int)size) {
 			size = strlen(tmp_name);
 		}
 		strncpy(buffer, tmp_name, size);
