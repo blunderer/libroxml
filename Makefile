@@ -22,10 +22,18 @@ TARGET_LN = $O/libroxml.so
 TARGET_BIN = $O/roxml
 BINS = $(TARGET_SLIB) $(TARGET_LIB) $(TARGET_LN) $(TARGET_BIN)
 
+OS=$(shell uname)
+
 # options
 override CPPFLAGS += -Iinc/
 override CFLAGS += -g -O3 -fPIC -Wall -Wextra -Wno-unused -Werror -Iinc/ -DIGNORE_EMPTY_TEXT_NODES
 override LDFLAGS += 
+
+ifeq ("$(OS)", "Darwin")
+	override LINKERFLAG += ""
+else
+	override LINKERFLAG += -Wl,-soname,libroxml.so.0
+endif
 
 # first rule (default)
 all:
@@ -69,7 +77,7 @@ $(TARGET_SLIB) : $(OBJ_LIB)
 
 $(TARGET_LIB) : $(OBJ_LIB)
 	$P '  LD      $(@F)'
-	$E $(CC) -shared -Wl,-soname,libroxml.so.0 $(LDFLAGS) $^ -o $@
+	$E $(CC) -shared $(LINKERFLAG) $(LDFLAGS) $^ -o $@
 
 $(TARGET_LN): $(TARGET_LIB)
 	$P '  LN      $(notdir $@)'
