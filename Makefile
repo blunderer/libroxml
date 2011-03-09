@@ -31,8 +31,12 @@ override LDFLAGS +=
 
 ifeq ("$(OS)", "Darwin")
 	override LINKERFLAG += ""
+	DEBIAN_RULES=Makefile
+	FAKEROOT=
 else
 	override LINKERFLAG += -Wl,-soname,libroxml.so.0
+	DEBIAN_RULES=debian/rules
+	FAKEROOT="fakeroot"
 endif
 
 # first rule (default)
@@ -109,7 +113,7 @@ mrproper : clean
 	$P '  RM      docs'
 	$E - rm -fr docs/man docs/html docs/latex
 	$P '  CLEAN   debian'
-	$E - fakeroot $(MAKE) -f $(abspath debian/rules) clean >/dev/null
+	$E - $(FAKEROOT) $(MAKE) -f $(abspath $(DEBIAN_RULES)) clean >/dev/null
 	$P '  CLEAN   fuse.xml'
 	$E - $(MAKE) -C $(abspath fuse.xml) mrproper >/dev/null
 
