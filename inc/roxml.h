@@ -239,6 +239,15 @@ void 	ROXML_API roxml_close			(node_t *n);
  */
 node_t*	ROXML_API roxml_get_parent		(node_t *n);
 
+/** \brief root getter function
+ *
+ * \fn node_t* ROXML_API roxml_get_root(node_t *n);
+ * This function returns the root of a tree containing the given node
+ * \param n is one node of the tree
+ * \return the root node
+ */
+node_t*	ROXML_API roxml_get_root		(node_t *n);
+
 /** \brief chld getter function
  *
  * \fn node_t* ROXML_API roxml_get_chld(node_t *n, char * name, int nth);

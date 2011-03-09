@@ -685,6 +685,41 @@ int test_create_node(void)
 	RETURN
 }
 
+int test_get_root(void)
+{
+	INIT
+	node_t *root = roxml_load_doc("roxml.test.xml");
+
+	ASSERT_STRING_EQUAL(roxml_get_name(root, NULL, 0), "documentRoot")
+
+	node_t * node0 = roxml_get_chld(root, NULL, 0);
+	ASSERT_STRING_EQUAL(roxml_get_name(node0, NULL, 0), "node0")
+	node_t * node1 = roxml_get_chld(node0, NULL, 0);
+
+	roxml_release(RELEASE_ALL);
+	roxml_close(root);
+
+	root = roxml_load_doc("roxml.test.xml.invalid");
+
+	ASSERT_STRING_EQUAL(roxml_get_name(root, NULL, 0), "documentRoot")
+
+	node0 = roxml_get_chld(root, NULL, 0);
+	ASSERT_STRING_EQUAL(roxml_get_name(node0, NULL, 0), "?xml")
+	node1 = roxml_get_chld(node0, NULL, 0);
+
+	roxml_release(RELEASE_ALL);
+	roxml_close(root);
+
+	root = roxml_load_doc("roxml.test.xml.valid");
+
+	ASSERT_STRING_EQUAL(roxml_get_name(root, NULL, 0), "node0")
+
+	roxml_release(RELEASE_ALL);
+	roxml_close(root);
+
+	RETURN
+}
+
 int test_get_chld(void)
 {
 	INIT
@@ -1768,6 +1803,7 @@ int main(int argc, char ** argv)	{
 	TEST_FUNC(test_names_on_human_buf) 
 	TEST_FUNC(test_malloc_release) 
 	TEST_FUNC(test_create_node)
+	TEST_FUNC(test_get_root)
 	TEST_FUNC(test_get_chld)
 	TEST_FUNC(test_get_chld_nb)
 	TEST_FUNC(test_get_content)

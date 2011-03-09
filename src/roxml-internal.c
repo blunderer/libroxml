@@ -183,14 +183,12 @@ node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 	}
 #endif /* IGNORE_EMPTY_TEXT_NODES */
 
-	while(current_node->prnt)	{ current_node = current_node->prnt; }
-
 	table->id = ROXML_REQTABLE_ID;
 	table->ids[ROXML_REQTABLE_ID] = 1;
 	pthread_mutex_init(&table->mut, NULL);
 	current_node->priv = (void*)table;
 
-	return current_node;
+	return roxml_get_root(current_node);
 }
 
 void ROXML_INT roxml_set_type(node_t * n, int type)

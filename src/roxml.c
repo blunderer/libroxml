@@ -509,6 +509,24 @@ node_t * ROXML_API roxml_get_parent(node_t *n)
 	return NULL;
 }
 
+node_t * ROXML_API roxml_get_root(node_t *n)
+{
+	node_t * root = NULL;
+	if(n)	{
+		root = n;
+		while(root->prnt) root = root->prnt;
+		if(root->chld) {
+			char root_name[16];
+			if(strcmp(roxml_get_name(root->chld, root_name, 16), "?xml") == 0) {
+				if(root->chld->chld && root->chld->chld->sibl == NULL) {
+					root = root->chld->chld;
+				}
+			}
+		}
+	}
+	return root;
+}
+
 int ROXML_API roxml_get_type(node_t *n)
 {
 	if(n) {
@@ -580,7 +598,7 @@ node_t ** ROXML_API roxml_xpath(node_t *n, char * path, int *nb_ans)
 		return NULL; 
 	}
 
-	while(root->prnt) { root = root->prnt; }
+	root = roxml_get_root(n);
 
 	full_path_to_find = strdup(path);
 	path_to_find = full_path_to_find;
