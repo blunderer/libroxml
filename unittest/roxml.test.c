@@ -734,6 +734,13 @@ int test_get_root(void)
 	roxml_release(RELEASE_ALL);
 	roxml_close(root);
 
+	root = roxml_load_doc("roxml.test.xml.valid.comment");
+
+	ASSERT_STRING_EQUAL(roxml_get_name(root, NULL, 0), "node0")
+
+	roxml_release(RELEASE_ALL);
+	roxml_close(root);
+
 	RETURN
 }
 
