@@ -51,6 +51,22 @@ void * ROXML_INT roxml_malloc(int size, int num, int type)
 	return cell->ptr;
 }
 
+int ROXML_INT roxml_read(int pos, int size, char * buffer, node_t * node)
+{
+	int ret_len = 0;
+
+	if(size > 0 && buffer) {
+		if(node->type & ROXML_FILE) {
+			fseek(node->src.fil, pos, SEEK_SET);
+			ret_len = fread(buffer, 1, size, node->src.fil);
+		} else {
+			memcpy(buffer, node->src.buf+pos, size);
+			ret_len = size;
+		}
+	}
+	return ret_len;
+}
+
 node_t * ROXML_INT roxml_create_node(int pos, void *src, int type)
 {
 	node_t *n = (node_t*)calloc(1, sizeof(node_t));

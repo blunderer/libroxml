@@ -126,6 +126,19 @@ void ROXML_INT roxml_parent_node_at		(node_t *parent, node_t * n, int position);
  */
 void * ROXML_INT roxml_malloc			(int size, int num, int type);
 
+/** \brief read xml doc function
+ *
+ * \fn roxml_read(int pos, int size, char * buffer, node_t * node)
+ * this function read inside a xml doc (file or buffer) and fill the given buffer
+ * \param pos the pos in the xml document
+ * \param size the size of the data to read
+ * \param buffer the destination buffer
+ * \param node the node that belong to the tree we want to read to
+ * \return the number of bytes read
+ */
+int ROXML_INT roxml_read(int pos, int size, char * buffer, node_t * node);
+
+
 /** \brief axes setter function
  *
  * \fn roxml_set_axes(xpath_node_t *node, char *axes, int *offset);

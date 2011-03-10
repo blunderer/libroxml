@@ -136,16 +136,12 @@ char * ROXML_API roxml_get_content(node_t *n, char * buffer, int bufsize, int *s
 		while(ptr)	{
 			int ret_len = 0;
 			int read_size = ptr->end - ptr->pos;
-			if(ptr->type & ROXML_FILE) {
-				if(total+read_size > bufsize-1) {
-					read_size = bufsize - total - 1;
-				}
-				fseek(ptr->src.fil, ptr->pos, SEEK_SET);
-				ret_len = fread(content+total, 1, read_size, ptr->src.fil);
-			} else {
-				memcpy(content+total, ptr->src.buf+ptr->pos, read_size);
-				ret_len = read_size;
+
+			if(total+read_size > bufsize-1) {
+				read_size = bufsize - total - 1;
 			}
+			ret_len += roxml_read(ptr->pos, read_size, content+total, ptr);
+
 			total += ret_len;
 			ptr = ptr->sibl;
 		}
@@ -162,14 +158,7 @@ char * ROXML_API roxml_get_content(node_t *n, char * buffer, int bufsize, int *s
 		if(read_size > bufsize-1) {
 			read_size = bufsize-1;
 		}
-		if(n->type & ROXML_FILE) {
-			fseek(n->src.fil, n->pos, SEEK_SET);
-			ret_len = fread(content, 1, read_size, n->src.fil);
-		} else {
-			memcpy(content, n->src.buf+n->pos, read_size);
-			ret_len = read_size;
-		}
-		total = ret_len;
+		total = roxml_read(n->pos, read_size, content, n);
 	} else if(n->type & ROXML_CMT_NODE)	{
 		int ret_len = 0;
 		int read_size = 0;
@@ -183,14 +172,7 @@ char * ROXML_API roxml_get_content(node_t *n, char * buffer, int bufsize, int *s
 		if(read_size > bufsize-1) {
 			read_size = bufsize-1;
 		}
-		if(n->type & ROXML_FILE) {
-			fseek(n->src.fil, n->pos+4, SEEK_SET);
-			ret_len = fread(content, 1, read_size, n->src.fil);
-		} else {
-			memcpy(content, n->src.buf+n->pos + 4, read_size);
-			ret_len = read_size;
-		}
-		total = ret_len;
+		total = roxml_read(n->pos+4, read_size, content, n);
 	} else if(n->type & ROXML_PI_NODE)	{
 		int ret_len = 0;
 		int read_size = 0;
@@ -204,14 +186,7 @@ char * ROXML_API roxml_get_content(node_t *n, char * buffer, int bufsize, int *s
 		if(read_size > bufsize-1) {
 			read_size = bufsize-1;
 		}
-		if(n->type & ROXML_FILE) {
-			fseek(n->src.fil, n->pos+2, SEEK_SET);
-			ret_len = fread(content, 1, read_size, n->src.fil);
-		} else {
-			memcpy(content, n->src.buf+n->pos + 2, read_size);
-			ret_len = read_size;
-		}
-		total = ret_len;
+		total = roxml_read(n->pos+2, read_size, content, n);
 	} else if(n->type & ROXML_ATTR_NODE)	{
 		int ret_len = 0;
 		int read_size = 0;
@@ -226,14 +201,7 @@ char * ROXML_API roxml_get_content(node_t *n, char * buffer, int bufsize, int *s
 		if(read_size > bufsize-1) {
 			read_size = bufsize-1;
 		}
-		if(ptr->type & ROXML_FILE) {
-			fseek(ptr->src.fil, ptr->pos, SEEK_SET);
-			ret_len = fread(content, 1, read_size, ptr->src.fil);
-		} else {
-			memcpy(content, ptr->src.buf+ptr->pos, read_size);
-			ret_len = read_size;
-		}
-		total = ret_len;
+		total = roxml_read(ptr->pos, read_size, content, ptr);
 	}
 
 	content[total] = '\0';
@@ -265,16 +233,13 @@ char * ROXML_API roxml_get_name(node_t *n, char * buffer, int size)
 		strcpy(tmp_name, "documentRoot");
 	} else if(n->type & ROXML_ATTR_NODE)	{
 		int offset = 0;
+		int ret_len = 0;
 		char *internal_ptr;
 		char internal_buf[INTERNAL_BUF_SIZE];
-		if(n->type & ROXML_FILE) {
-			int ret_len = 0;
-			fseek(n->src.fil, n->pos, SEEK_SET);
-			ret_len = fread(internal_buf, INTERNAL_BUF_SIZE, 1, n->src.fil);
-			internal_ptr = internal_buf;
-		} else {
-			internal_ptr = n->src.buf + n->pos;
-		}
+
+		ret_len += roxml_read(n->pos, INTERNAL_BUF_SIZE, internal_buf, n);
+		internal_ptr = internal_buf;
+
 		while(ROXML_WHITE(internal_ptr[offset])) { offset++; }
 		while(count<INTERNAL_BUF_SIZE) { 
 			if(internal_ptr[offset] == '=') { break; }
@@ -286,16 +251,13 @@ char * ROXML_API roxml_get_name(node_t *n, char * buffer, int size)
 		}
 	} else if(n->type & ROXML_ELM_NODE)	{
 		int offset = 0;
+		int ret_len = 0;
 		char *internal_ptr;
 		char internal_buf[INTERNAL_BUF_SIZE];
-		if(n->type & ROXML_FILE) {
-			int ret_len = 0;
-			fseek(n->src.fil, n->pos, SEEK_SET);
-			ret_len = fread(internal_buf, INTERNAL_BUF_SIZE, 1, n->src.fil);
-			internal_ptr = internal_buf;
-		} else {
-			internal_ptr = n->src.buf + n->pos;
-		}
+
+		ret_len += roxml_read(n->pos, INTERNAL_BUF_SIZE, internal_buf, n);
+		internal_ptr = internal_buf;
+
 		while((internal_ptr[offset] == '<')||(ROXML_WHITE(internal_ptr[offset]))) { offset++; }
 		while(count<INTERNAL_BUF_SIZE) { 
 			if(internal_ptr[offset] == '/') { break; }
