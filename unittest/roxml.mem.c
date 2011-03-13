@@ -56,7 +56,7 @@ int main(int argc, char ** argv)
 	printf("\ttotal node:\t\t\t %u\n",_nb_node);
 	printf("\ttotal attr:\t\t\t %u\n",_nb_attr);
 	printf("\ttotal text:\t\t\t %u\n",_nb_text);
-	printf("\tram tree:\t\t\t %lu bytes\n",sizeof(node_t)*(_nb_node+_nb_attr+_nb_text));
+	printf("\tram tree:\t\t\t %lu bytes\n",(long unsigned int)sizeof(node_t)*(_nb_node+_nb_attr+_nb_text));
 	printf("\tram total:\t\t\t %d bytes\n",ram);
 	printf("\tram ratio:\t\t\t %f\n",(float)(sizeof(node_t)*(_nb_node+_nb_attr+_nb_text))/(float)len);
 
