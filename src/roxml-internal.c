@@ -106,6 +106,7 @@ void ROXML_INT roxml_free_node(node_t *n)
 		if(tok->id == ROXML_REQTABLE_ID) {
 			xpath_tok_table_t * table = (xpath_tok_table_t*)n->priv;
 			tok = table->next;
+			pthread_mutex_destroy(&table->mut);
 			free(table);
 		}
 		while(tok) {
