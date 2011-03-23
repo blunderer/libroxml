@@ -24,8 +24,12 @@
 #include "roxml.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+
+#ifdef _WIN32
+
+#else
 #include <unistd.h>
-#include <getopt.h>
+#endif
 
 void print_help(void)
 {
@@ -40,26 +44,35 @@ void print_usage(const char *progname)
 
 int main(int argc, char ** argv)
 {
-	int option ;
+	int optind;
 	int quiet = 0 ;
 	int j ,max;
 	node_t *root;
 	node_t *cur;
 	node_t **ans;
 
-	struct option opts[3];
-	memset(opts, 0, sizeof(struct option)*3);
-
-	opts[0].name = "help";
-	opts[0].flag = NULL;
-	opts[0].val  = 'h';
-	opts[0].has_arg = 0;
-	opts[1].name = "quiet";
-	opts[1].flag = NULL;
-	opts[1].val  = 'q';
-	opts[1].has_arg = 0;
-
-	while ((option = getopt_long(argc, argv, "qh", opts, NULL)) >= 0) {
+	for(optind = 1; optind < argc; optind++) {
+		int option = 0;
+		if(argv[optind][0] == '-') {
+			/* this is an option */
+			if(argv[optind][1] == '-') {
+				/* long option */
+				if(strcmp(argv[optind], "--help") == 0) {
+					option = 'h';
+				} else if(strcmp(argv[optind], "--quiet") == 0) {
+					option = 'q';
+				}
+			} else {
+				/* short option */
+				if(strcmp(argv[optind], "-h") == 0) {
+					option = 'h';
+				} else if(strcmp(argv[optind], "-q") == 0) {
+					option = 'q';
+				}
+			}
+		} else {
+			break;
+		}
 		switch (option) {
 			case 'q' :
 				quiet = 1 ;
@@ -75,6 +88,7 @@ int main(int argc, char ** argv)
 				break;
 		}
 	}
+
 	if(argc < optind + 2) {
 		fprintf(stderr,"wrong syntax\n");
 		print_usage(argv[0]);
