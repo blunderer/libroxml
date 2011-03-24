@@ -25,12 +25,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#ifdef _WIN32
-
-#else
-#include <unistd.h>
-#endif
-
 void print_help(void)
 {
 	fprintf (stderr, "LGPL command line XML parser\n<blunderer@blunderer.org>\n") ;
@@ -112,7 +106,7 @@ int main(int argc, char ** argv)
 				int i = 0;
 				int nb_chld = roxml_get_chld_nb(ans[j]);
 				for(i = 0; i < nb_chld; i++)	{
-					c = roxml_get_name(ans[j], NULL, 0);
+					c = roxml_get_name(roxml_get_chld(ans[j], NULL, i), NULL, 0);
 					if (! quiet)	{
 						fprintf(stdout,"ans[%d]: ", j);
 					}
