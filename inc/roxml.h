@@ -83,7 +83,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#ifdef _WIN32
+#include "roxml_win32_native.h"
+#else
 #include <pthread.h>
+#endif
 
 /**
  * \def ROXML_API

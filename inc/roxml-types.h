@@ -23,6 +23,10 @@
 #ifndef ROXML_TYPES_H
 #define ROXML_TYPES_H
 
+#ifdef _WIN32
+#include "roxml_win32_native.h"
+#endif
+
 /** \typedef roxml_parse_func 
  *
  * \brief parser callback functions
