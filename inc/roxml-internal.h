@@ -34,7 +34,6 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <string.h>
-#include <pthread.h>
 
 #include "roxml-defines.h"
 #include "roxml-types.h"
