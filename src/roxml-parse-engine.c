@@ -66,6 +66,7 @@ void roxml_parser_clear(roxml_parser_item_t *head)
 roxml_parser_item_t * roxml_parser_prepare(roxml_parser_item_t *head)
 {
 	roxml_parser_item_t *item = head;
+	roxml_parser_item_t *table = NULL;
 	int count = 0;
 
 	head->count = 0;
@@ -76,16 +77,18 @@ roxml_parser_item_t * roxml_parser_prepare(roxml_parser_item_t *head)
 		item = item->next;
 	}
 
-	item = (roxml_parser_item_t*)malloc(sizeof(roxml_parser_item_t)*(head->def_count));
+	table = (roxml_parser_item_t*)malloc(sizeof(roxml_parser_item_t)*(head->def_count));
 
-	while(head) {
-		memcpy(&item[count], head, sizeof(roxml_parser_item_t));
-		head = head->next;
+	item = head;
+
+	while(item) {
+		memcpy(&table[count], item, sizeof(roxml_parser_item_t));
+		item = item->next;
 		count++;
 	}
 	roxml_parser_clear(head);
 
-	return item;
+	return table;
 }
 
 int roxml_parse_line(roxml_parser_item_t * head, char *line, int len, void * ctx)
