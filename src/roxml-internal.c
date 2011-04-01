@@ -60,8 +60,11 @@ int ROXML_INT roxml_read(int pos, int size, char * buffer, node_t * node)
 			fseek(node->src.fil, pos, SEEK_SET);
 			ret_len = fread(buffer, 1, size, node->src.fil);
 		} else {
-			memcpy(buffer, node->src.buf+pos, size);
-			ret_len = size;
+			do {
+				buffer[ret_len] = *(node->src.buf+pos+ret_len);
+				ret_len++;
+				size--;
+			} while((buffer[ret_len-1]) && (size));
 		}
 	}
 	return ret_len;
