@@ -422,6 +422,15 @@ int ROXML_INT roxml_in_pool(node_t * root, node_t *n, int req_id);
  */
 node_t ** ROXML_INT roxml_exec_xpath(node_t *root, node_t *n, xpath_node_t *xpath, int index, int * count);
 
+/** \brief separator tester
+ *
+ * \fn roxml_is_separator(char sep);
+ * This function tells if a char is a string separator
+ * \param sep char to test
+ * \return 1 if the char was a separator else 0
+ */
+int ROXML_INT roxml_is_separator(char sep);
+
 /** \brief node creation during parsing
  *
  * \fn roxml_process_begin_node(roxml_load_ctx_t *context, int position);

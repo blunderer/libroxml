@@ -1121,6 +1121,29 @@ int test_parse_xpath(void)
 	ASSERT_NULL(ptr[0].next->next->next);
 	roxml_free_xpath(ptr, ret);
 
+	strcpy(mypath, "/node/item[child::bande = \"toto\" and @oral < 12]/title");
+	ret = roxml_parse_xpath(mypath, &ptr, 0);	
+	ASSERT_EQUAL(ret, 1)
+	ASSERT_STRING_EQUAL(ptr[0].name, "node");
+	ASSERT_NOT_NULL(ptr[0].next);
+	ASSERT_STRING_EQUAL(ptr[0].next->name, "item");
+	ASSERT_NOT_NULL(ptr[0].next->cond);
+	ASSERT_EQUAL(ptr[0].next->cond->func, ROXML_FUNC_XPATH);
+	ASSERT_NOT_NULL(ptr[0].next->cond->xp);
+	ASSERT_EQUAL(ptr[0].next->cond->func2, 2);
+	ASSERT_EQUAL(ptr[0].next->cond->xp[0].axes, ROXML_ID_CHILD);
+	ASSERT_STRING_EQUAL(ptr[0].next->cond->xp[0].name, "bande");
+	ASSERT_EQUAL(ptr[0].next->cond->xp[0].xp_cond->func, ROXML_FUNC_STRCOMP);
+	ASSERT_STRING_EQUAL(ptr[0].next->cond->xp[0].xp_cond->arg2, "toto");
+	ASSERT_EQUAL(ptr[0].next->cond->xp[1].axes, ROXML_ID_ATTR);
+	ASSERT_STRING_EQUAL(ptr[0].next->cond->xp[1].name, "oral");
+	ASSERT_EQUAL(ptr[0].next->cond->xp[1].xp_cond->func, ROXML_FUNC_INTCOMP);
+	ASSERT_STRING_EQUAL(ptr[0].next->cond->xp[1].xp_cond->arg2, "12");
+	ASSERT_NOT_NULL(ptr[0].next->next);
+	ASSERT_STRING_EQUAL(ptr[0].next->next->name, "title");
+	ASSERT_NULL(ptr[0].next->next->next);
+	roxml_free_xpath(ptr, ret);
+
 	strcpy(mypath, "/node/item[child::desc[@price < 12]]/title[text() = \"toto\"]");
 	ret = roxml_parse_xpath(mypath, &ptr, 0);	
 	ASSERT_EQUAL(ret, 1)

@@ -131,6 +131,19 @@ void ROXML_INT roxml_del_tree(node_t *n)
 	roxml_free_node(n);
 }
 
+int ROXML_INT roxml_is_separator(char sep)
+{
+	int i = 0;
+	char separators[32] = "@'()[]{}=+\t\n\" &|";
+	while(separators[i] != 0) {
+		if(sep == separators[i]) {
+			return 1;
+		}
+		i++;
+	}
+	return 0;
+}
+
 void ROXML_INT roxml_process_begin_node(roxml_load_ctx_t *context, int position)
 {
 	if(context->candidat_txt)	{
