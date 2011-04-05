@@ -134,7 +134,7 @@ void ROXML_INT roxml_del_tree(node_t *n)
 int ROXML_INT roxml_is_separator(char sep)
 {
 	int i = 0;
-	char separators[32] = "@'()[]{}=+\t\n\" &|";
+	char separators[32] = "\t\n ";
 	while(separators[i] != 0) {
 		if(sep == separators[i]) {
 			return 1;

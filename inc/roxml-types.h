@@ -186,7 +186,6 @@ typedef struct _roxml_xpath_ctx {
 	int dquoted;				/*!< are we double quoted (") */
 	int context;				/*!< is it an inside xpath*/
 	int content_quoted;			/*!< content of val was quoted */
-	int content_string;			/*!< content is inside a string */
 	xpath_node_t * first_node;		/*!< the very first node of xpath string */
         xpath_node_t * new_node;		/*!< current xpath node */
 	xpath_cond_t * new_cond;		/*!< current xpath cond */
