@@ -24,7 +24,7 @@
 
 #include "roxml-internal.h"
 
-#define DEBUG_PARSING
+//#define DEBUG_PARSING
 
 roxml_parser_item_t *roxml_append_parser_item(roxml_parser_item_t *head, char * key, roxml_parse_func func)
 {
