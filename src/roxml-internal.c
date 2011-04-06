@@ -216,12 +216,14 @@ node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 	}
 #endif /* IGNORE_EMPTY_TEXT_NODES */
 
+	current_node = roxml_get_root(current_node);
+
 	table->id = ROXML_REQTABLE_ID;
 	table->ids[ROXML_REQTABLE_ID] = 1;
 	pthread_mutex_init(&table->mut, NULL);
 	current_node->priv = (void*)table;
 
-	return roxml_get_root(current_node);
+	return current_node;
 }
 
 void ROXML_INT roxml_set_type(node_t * n, int type)
@@ -595,6 +597,7 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 int ROXML_INT roxml_request_id(node_t *root)
 {
 	int i = 0;
+
 	xpath_tok_table_t * table = (xpath_tok_table_t*)root->priv;
 	pthread_mutex_lock(&table->mut);
 	for(i = 1; i < 255; i++) {
