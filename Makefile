@@ -6,6 +6,10 @@ endif
 ifeq '$V' ''
 V = 0
 endif
+# D (Debug) is 0 (optimize) or 1 (build debug version)
+ifeq '$D' ''
+D = 0
+endif
 
 # files
 INC = inc/roxml.h
@@ -24,9 +28,20 @@ BINS = $(TARGET_SLIB) $(TARGET_LIB) $(TARGET_LN) $(TARGET_BIN)
 
 OS=$(shell uname)
 
+# specific, modifiable flags
+# set D=1 on command line to produce debuggable binary
+ifeq ("$(OPTIM)", "")
+ifeq '$D' '0'
+OPTIM = -O3
+else
+OPTIM = -g -O0
+endif
+endif
+DEFINES = -DIGNORE_EMPTY_TEXT_NODES
+
 # options
 override CPPFLAGS += -Iinc/
-override CFLAGS += -g -O3 -fPIC -Wall -Wextra -Wno-unused -Werror -Iinc/ -DIGNORE_EMPTY_TEXT_NODES
+override CFLAGS += $(OPTIM) -fPIC -Wall -Wextra -Wno-unused -Werror -Iinc/ $(DEFINES)
 override LDFLAGS += 
 
 ifeq ("$(OS)", "Darwin")
@@ -158,3 +173,16 @@ uninstall:
 	$E - rm -fr $(DESTDIR)/usr/share/man/man3/node_t.3
 	$E - rm -fr $(DESTDIR)/usr/share/man/man3/RELEASE_ALL.3
 	$E - rm -fr $(DESTDIR)/usr/share/man/man3/RELEASE_LAST.3
+
+.PHONY: help
+help:
+	@echo
+	@echo make [D=1] [V=1] [O=path] [OPTIM=optimize-options]
+	@echo "   D=1: build debug version (default: D=0)"
+	@echo "   V=1: verbose output (default: V=0)"
+	@echo "   O=path: build binary in path (default: O=.)"
+	@echo "   OPTIM=opt: force optimization options (default: OPTIM=-O3 if D=0, OPTIM=\"-g -O0\" if D=1)"
+	@echo
+	@echo "The default options build the binaries in the current directory, optimized for speed (-O3)"
+	@echo
+
