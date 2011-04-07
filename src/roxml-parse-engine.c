@@ -110,11 +110,13 @@ int roxml_parse_line(roxml_parser_item_t * head, char *line, int len, void * ctx
 			if(chunk[0] == head[i].chunk) { 
 				int ret = head[i].func(chunk, ctx);
 				if(ret > 0) { chunk += ret; break; }
+				else if(ret < 0) { return -1; }
 			}
 		}
 		for(; i >= count && i < def_count; i++) {
 			int ret = head[i].func(chunk, ctx);
-			if(ret > 0) { chunk += ret; break; }
+			if(ret > 0) { chunk += ret; break; } 
+			else if(ret < 0) { return -1; }
 		}
 	}
 	return 0;
@@ -255,10 +257,14 @@ int _func_xpath_close_brackets(char * chunk, void * data)
 		ctx->bracket = (ctx->bracket+1)%2;
 		chunk[0] = '\0';
 
-		if(ctx->new_cond->func == ROXML_FUNC_XPATH) {
-			xpath_node_t *xp;
-			ctx->new_cond->func2 = roxml_parse_xpath(ctx->new_cond->arg1, &xp, 1);
-			ctx->new_cond->xp = xp;
+		if(ctx->new_cond) {
+			if(ctx->new_cond->func == ROXML_FUNC_XPATH) {
+				xpath_node_t *xp;
+				ctx->new_cond->func2 = roxml_parse_xpath(ctx->new_cond->arg1, &xp, 1);
+				ctx->new_cond->xp = xp;
+			}
+		} else {
+			return -1;
 		}
 	}
 	cur++;

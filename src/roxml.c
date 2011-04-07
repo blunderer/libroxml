@@ -616,18 +616,19 @@ node_t ** ROXML_API roxml_xpath(node_t *n, char * path, int *nb_ans)
 
 	index = roxml_parse_xpath(path_to_find, &xpath, 0);
 
-	node_set = roxml_exec_xpath(root, n, xpath, index, &count);
+	if(index >= 0) {
+		node_set = roxml_exec_xpath(root, n, xpath, index, &count);
 
-	roxml_free_xpath(xpath, index);
-	free(full_path_to_find);
+		roxml_free_xpath(xpath, index);
+		free(full_path_to_find);
 
+		if(count == 0)	{
+			roxml_release(node_set);
+			node_set = NULL;
+		}
+	}
 	if(nb_ans)	{
 		*nb_ans = count;
-	}
-
-	if(count == 0)	{
-		roxml_release(node_set);
-		return NULL;
 	}
 
 	return node_set;

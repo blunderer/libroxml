@@ -164,6 +164,7 @@ void ROXML_INT roxml_process_begin_node(roxml_load_ctx_t *context, int position)
 
 node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 {
+	int error = 0;
 	char int_buffer[ROXML_BULK_READ+1];
 	int int_len = 0;
 	roxml_load_ctx_t context;
@@ -201,11 +202,19 @@ node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 			int_buffer[int_len] = '\0';
 
 			ret = roxml_parse_line(parser, int_buffer, int_len, &context);
+			if(ret < 0) {
+				error = 1;
+				break;
+			}
 		} while(int_len == ROXML_BULK_READ);
 	} else	{
+		int ret = 0;
 		context.type = ROXML_BUFF;
 		context.src = (void*)buffer;
-		roxml_parse_line(parser, buffer, 0, &context);
+		ret = roxml_parse_line(parser, buffer, 0, &context);
+		if(ret < 0) {
+			error = 1;
+		}
 	}
 
 	roxml_parser_free(parser);
@@ -216,12 +225,17 @@ node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 	}
 #endif /* IGNORE_EMPTY_TEXT_NODES */
 
-	current_node = roxml_get_root(current_node);
+	if(!error) {
+		current_node = roxml_get_root(current_node);
 
-	table->id = ROXML_REQTABLE_ID;
-	table->ids[ROXML_REQTABLE_ID] = 1;
-	pthread_mutex_init(&table->mut, NULL);
-	current_node->priv = (void*)table;
+		table->id = ROXML_REQTABLE_ID;
+		table->ids[ROXML_REQTABLE_ID] = 1;
+		pthread_mutex_init(&table->mut, NULL);
+		current_node->priv = (void*)table;
+	} else {
+		roxml_close(current_node);
+		return NULL;
+	}
 
 	return current_node;
 }
@@ -356,6 +370,8 @@ int ROXML_INT roxml_get_node_internal_position(node_t *n)
 
 int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t ** xpath, int context)
 {
+	int ret = 0;
+	int error = 0;
 	roxml_xpath_ctx_t ctx;
 	roxml_parser_item_t * parser = NULL;
 	ctx.pos = 0;
@@ -410,13 +426,18 @@ int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t ** xpath, int context)
 	parser = roxml_append_parser_item(parser, NULL, _func_xpath_default);
 
 	parser = roxml_parser_prepare(parser);
-	roxml_parse_line(parser, path, 0, &ctx);
+	ret = roxml_parse_line(parser, path, 0, &ctx);
 	roxml_parser_free(parser);
 
-	if(xpath)	{
-		*xpath = ctx.first_node;
+	if(ret >= 0) {
+		if(xpath)	{
+			*xpath = ctx.first_node;
+		}
+		return ctx.nbpath;
 	}
-	return ctx.nbpath;
+
+	roxml_free_xpath(ctx.first_node, ctx.nbpath);
+	return -1;
 }
 
 void ROXML_INT roxml_free_xcond(xpath_cond_t *xcond)
