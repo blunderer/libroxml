@@ -1,3 +1,20 @@
+libroxml (2.0.3-1) unstable; urgency=low
+
+  * Bugfixes
+      correct various potential memory leaks (valgrind says it's ok now)
+      correct race condition in xpath requests
+      correct bug on attributes parsing
+      fix roxml behaviour on children with no text content
+
+  * add roxml_get_{root,prev_sibling,next_sibling} functions
+  * improve internal read functions
+  * rename ROXML_STD_NODE by ROXML_ELM_NODE
+  * enable native window compilation (no need for pthreadVC.dll)
+  * enable OSX compilation
+  * add CMakeLists.txt for linux/window compilation
+
+ -- Tristan Lelong <blunderer@blunderer.org>  Tue, 12 Apr 2011 18:03:00 +0100
+
 libroxml (2.0.2-1) unstable; urgency=low
 
   * Bugfixes
