@@ -53,7 +53,10 @@
  * \ref roxml_close \n
  * 
  * \subsection navigate-xml Navigate into xml tree
+ * \ref roxml_get_root \n
  * \ref roxml_get_parent \n
+ * \ref roxml_get_prev_sibling \n
+ * \ref roxml_get_next_sibling \n
  * \ref roxml_get_chld \n
  * \ref roxml_get_chld_nb \n
  * \ref roxml_get_attr \n
@@ -227,7 +230,7 @@ node_t*	ROXML_API roxml_load_doc		(char *filename);
 
 /** \brief load function for file descriptors
  *
- * \fn node_t* ROXML_API roxml_load_fd(int *fd);
+ * \fn node_t* ROXML_API roxml_load_fd(int fd);
  * This function load a document by parsing all the corresponding nodes
  * \param filename the XML document to load
  * \return the root node or NULL
