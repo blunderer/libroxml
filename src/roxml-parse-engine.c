@@ -914,6 +914,7 @@ int _func_load_open_spec_node(char * chunk, void * data)
 		} else {
 			roxml_process_begin_node(context, context->pos-1);
 			context->state = STATE_NODE_SINGLE;
+			context->previous_state = STATE_NODE_SINGLE;
 		}
 	}
 
@@ -969,14 +970,12 @@ int _func_load_close_pi(char * chunk, void * data)
 	roxml_load_ctx_t *context = (roxml_load_ctx_t*)data;
 
 	if(context->state == STATE_NODE_BEG)     {
-		if(chunk[1] == ' ') {
-			cur = 2;
-			context->state = STATE_NODE_PI;
-			context->previous_state = STATE_NODE_PI;
-			roxml_process_begin_node(context, context->pos-1);
-			roxml_set_type(context->candidat_node, ROXML_PI_NODE);
-			while((chunk[cur] != '?')&&(chunk[cur] != '\0')) { cur++; }
-		}
+		cur = 1;
+		context->state = STATE_NODE_PI;
+		context->previous_state = STATE_NODE_PI;
+		roxml_process_begin_node(context, context->pos-1);
+		roxml_set_type(context->candidat_node, ROXML_PI_NODE);
+	//	while((chunk[cur] != '?')&&(chunk[cur] != '\0')) { cur++; }
 	} else if(context->state == STATE_NODE_PI)     {
 		if(context->mode == MODE_COMMENT_NONE) {
 			cur = 1;
@@ -1037,6 +1036,9 @@ int _func_load_white(char * chunk, void * data)
 	roxml_load_ctx_t *context = (roxml_load_ctx_t*)data;
 
 	switch(context->state) {
+		case STATE_NODE_SINGLE:
+			context->state = context->previous_state;
+		break;
 		case STATE_NODE_NAME:
 			context->state = STATE_NODE_ATTR;
 			context->inside_node_state = STATE_INSIDE_ARG_BEG;
@@ -1071,6 +1073,9 @@ int _func_load_default(char * chunk, void * data)
 #endif /* DEBUG_PARSING */
 
 	switch(context->state) {
+		case STATE_NODE_SINGLE:
+			context->state = context->previous_state;
+		break;
 		case STATE_NODE_BEG:
 			roxml_process_begin_node(context, context->pos-1);
 			context->state = STATE_NODE_NAME;

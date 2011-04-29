@@ -721,7 +721,7 @@ int test_get_root(void)
 	ASSERT_STRING_EQUAL(roxml_get_name(root, NULL, 0), "documentRoot")
 
 	node0 = roxml_get_chld(root, NULL, 0);
-	ASSERT_STRING_EQUAL(roxml_get_name(node0, NULL, 0), "?xml")
+	ASSERT_STRING_EQUAL(roxml_get_content(node0, NULL, 0, NULL), "xml version=\"1.0\"? encoding=\"fr_FR\"")
 	node1 = roxml_get_chld(node0, NULL, 0);
 
 	roxml_release(RELEASE_ALL);
