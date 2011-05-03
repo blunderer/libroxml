@@ -1057,7 +1057,7 @@ void ROXML_INT roxml_print_space(FILE *f, char ** buf, int * offset, int * len, 
 	int i = 0;
 	if(*buf) {
 		int pos = *offset + lvl;
-		if(pos >= *len) { *buf = realloc(*buf, *len+ROXML_LONG_LEN); }
+		if(pos >= *len) { *buf = realloc(*buf, *len+ROXML_LONG_LEN); memset(*buf+*len, 0, ROXML_LONG_LEN); }
 		for(; i < lvl; i++) {
 			strcat(*buf, " ");
 		}
@@ -1073,7 +1073,8 @@ void ROXML_INT roxml_print_space(FILE *f, char ** buf, int * offset, int * len, 
 void ROXML_INT roxml_write_string(char ** buf, FILE * f, char * str, int *offset, int * len)
 {
 	int pos = *offset + strlen(str);
-	if((pos >= *len)&&(*buf)) { *buf = realloc(*buf, *len+ROXML_LONG_LEN); }
+
+	if((pos >= *len)&&(*buf)) { *buf = realloc(*buf, *len+ROXML_LONG_LEN); memset(*buf+*len, 0, ROXML_LONG_LEN);}
 	if(f) { fprintf(f, "%s", str); }
 	if(*buf) { strcat(*buf+(*offset), str); }
 	*offset = pos;

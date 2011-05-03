@@ -689,6 +689,7 @@ void ROXML_API roxml_del_node			(node_t * n);
  * \param dest the path to a file to write tree to
  * \param buffer the adress of a buffer where tre will be written
  * \param human 0 for one-line tree, or 1 for human format (using tabs, newlines...)
+ * \return the number of bytes written to file or buffer 
  * 
  * One should do:
  * \code
@@ -736,7 +737,7 @@ void ROXML_API roxml_del_node			(node_t * n);
 <root><!-- sample XML file --><item id="42"><price>24</price></item></root>
 \endverbatim
  */
-void ROXML_API roxml_commit_changes		(node_t *n, char * dest, char ** buffer, int human);
+int ROXML_API roxml_commit_changes		(node_t *n, char * dest, char ** buffer, int human);
 
 
 #endif /* ROXML_H */

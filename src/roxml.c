@@ -651,7 +651,7 @@ void ROXML_API roxml_del_node(node_t * n)
 	roxml_free_node(n);
 }
 
-void ROXML_API roxml_commit_changes(node_t *n, char * dest, char ** buffer, int human)
+int ROXML_API roxml_commit_changes(node_t *n, char * dest, char ** buffer, int human)
 {
 	int size = 0;
 	int len = ROXML_LONG_LEN;
@@ -664,6 +664,7 @@ void ROXML_API roxml_commit_changes(node_t *n, char * dest, char ** buffer, int 
 		}
 		if(buffer) {
 			buf = (char*)malloc(ROXML_LONG_LEN);
+			memset(buf, 0, ROXML_LONG_LEN);
 			*buffer = buf;
 		}
 		roxml_write_node(n, fout, buf, human, -1, &size, &len);
@@ -671,6 +672,15 @@ void ROXML_API roxml_commit_changes(node_t *n, char * dest, char ** buffer, int 
 			fclose(fout);
 		}
 	}
+
+	if(buffer) {
+		char * ptr = NULL;
+		len -= ROXML_LONG_LEN;
+		ptr = *buffer + len;
+		len += strlen(ptr);
+	}
+
+	return len;
 }
 
 node_t * roxml_add_node(node_t * parent, int position, int type, char *name, char *value) 
