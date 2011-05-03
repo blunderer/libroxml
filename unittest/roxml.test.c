@@ -1893,6 +1893,7 @@ int test_whitespaces_in_attr(void)
 
 int test_write_tree(void)
 {
+	char * buffer;
 	INIT /* init context macro */
 
 	node_t *root = roxml_load_doc("roxml.test.xml");
@@ -1927,6 +1928,21 @@ int test_write_tree(void)
 
 	roxml_commit_changes(root, "out.xml", NULL, 1);
 	roxml_commit_changes(root, "out.xml.human", NULL, 0);
+	int len = roxml_commit_changes(root, NULL, &buffer, 0);
+
+	FILE * fout = fopen("out.buf.xml", "w");
+	fwrite(buffer, 1, len, fout);
+	fclose(fout);
+	free(buffer);
+
+	printf("==================================\n");
+
+	len = roxml_commit_changes(root, NULL, &buffer, 1);
+	fout = fopen("out.buf.xml.human", "w");
+	fwrite(buffer, 1, len, fout);
+	fclose(fout);
+	free(buffer);
+
 	roxml_close(root);
 	
 	RETURN /* close context macro */
