@@ -1055,9 +1055,13 @@ void ROXML_INT roxml_parent_node_at(node_t *parent, node_t * n, int position)
 void ROXML_INT roxml_print_space(FILE *f, char ** buf, int * offset, int * len, int lvl)
 {
 	int i = 0;
-	if(*buf) {
+	if(buf && *buf) {
 		int pos = *offset + lvl;
-		if(pos >= *len) { *buf = realloc(*buf, *len+ROXML_LONG_LEN); memset(*buf+*len, 0, ROXML_LONG_LEN); }
+		if(pos >= *len) { 
+			*buf = realloc(*buf, *len+ROXML_LONG_LEN); 
+			memset(*buf+*len, 0, ROXML_LONG_LEN); 
+			len += ROXML_LONG_LEN;
+		}
 		for(; i < lvl; i++) {
 			strcat(*buf, " ");
 		}
@@ -1074,24 +1078,28 @@ void ROXML_INT roxml_write_string(char ** buf, FILE * f, char * str, int *offset
 {
 	int pos = *offset + strlen(str);
 
-	if((pos >= *len)&&(*buf)) { *buf = realloc(*buf, *len+ROXML_LONG_LEN); memset(*buf+*len, 0, ROXML_LONG_LEN);}
+	if((pos >= *len) && (buf) && (*buf)) { 
+		*buf = realloc(*buf, *len+ROXML_LONG_LEN); 
+		memset(*buf+*len, 0, ROXML_LONG_LEN);
+		*len += ROXML_LONG_LEN;
+	}
 	if(f) { fprintf(f, "%s", str); }
-	if(*buf) { strcat(*buf+(*offset), str); }
+	if(buf && *buf) { strcat(*buf+(*offset), str); }
 	*offset = pos;
 }
 
-void ROXML_INT roxml_write_node(node_t * n, FILE *f, char * buf, int human, int lvl, int *offset, int *len)
+void ROXML_INT roxml_write_node(node_t * n, FILE *f, char ** buf, int human, int lvl, int *offset, int *len)
 {
 	char name[ROXML_BASE_LEN];
 	roxml_get_name(n, name, ROXML_BASE_LEN);
 	if(human) {
-		roxml_print_space(f, &buf, offset, len, lvl);
+		roxml_print_space(f, buf, offset, len, lvl);
 	}
 	if(roxml_get_type(n) == ROXML_ELM_NODE) {
 		node_t *attr = n->attr;
 		if(n->prnt) {
-			roxml_write_string(&buf, f, "<", offset, len);
-			roxml_write_string(&buf, f, name, offset, len);
+			roxml_write_string(buf, f, "<", offset, len);
+			roxml_write_string(buf, f, name, offset, len);
 		}
 		while(attr)	{
 			int status = 0;
@@ -1103,11 +1111,11 @@ void ROXML_INT roxml_write_node(node_t * n, FILE *f, char * buf, int human, int 
 			if(status >= ROXML_BASE_LEN) {
 				value = roxml_get_content(attr, NULL, 0, &status);
 			}
-			roxml_write_string(&buf, f, " ", offset, len);
-			roxml_write_string(&buf, f, arg, offset, len);
-			roxml_write_string(&buf, f, "=\"", offset, len);
-			roxml_write_string(&buf, f, value, offset, len);
-			roxml_write_string(&buf, f, "\"", offset, len);
+			roxml_write_string(buf, f, " ", offset, len);
+			roxml_write_string(buf, f, arg, offset, len);
+			roxml_write_string(buf, f, "=\"", offset, len);
+			roxml_write_string(buf, f, value, offset, len);
+			roxml_write_string(buf, f, "\"", offset, len);
 			attr = attr->sibl;
 			roxml_release(value);
 		}
@@ -1115,9 +1123,9 @@ void ROXML_INT roxml_write_node(node_t * n, FILE *f, char * buf, int human, int 
 			node_t *chld = n->chld;
 			node_t *text = n->text;
 			if(n->prnt) {
-				roxml_write_string(&buf, f, ">", offset, len);
+				roxml_write_string(buf, f, ">", offset, len);
 				if(human) {
-					roxml_write_string(&buf, f, "\n", offset, len);
+					roxml_write_string(buf, f, "\n", offset, len);
 				}
 			}
 			while(chld || text)	{
@@ -1126,15 +1134,15 @@ void ROXML_INT roxml_write_node(node_t * n, FILE *f, char * buf, int human, int 
 					char *value;
 					int status;
 					if(human) {
-						roxml_print_space(f, &buf, offset, len, lvl+1);
+						roxml_print_space(f, buf, offset, len, lvl+1);
 					}
 					value = roxml_get_content(text, val, ROXML_LONG_LEN, &status);
 					if(status >= ROXML_LONG_LEN) {
 						value = roxml_get_content(text, NULL, 0, &status);
 					}
-					roxml_write_string(&buf, f, value, offset, len);
+					roxml_write_string(buf, f, value, offset, len);
 					if(human) {
-						roxml_write_string(&buf, f, "\n", offset, len);
+						roxml_write_string(buf, f, "\n", offset, len);
 					}
 					text = text->sibl;
 					roxml_release(value);
@@ -1146,50 +1154,50 @@ void ROXML_INT roxml_write_node(node_t * n, FILE *f, char * buf, int human, int 
 			}
 			if(n->prnt) {
 				if(human) {
-					roxml_print_space(f, &buf, offset, len, lvl);
+					roxml_print_space(f, buf, offset, len, lvl);
 				}
-				roxml_write_string(&buf, f, "</", offset, len);
-				roxml_write_string(&buf, f, name, offset, len);
-				roxml_write_string(&buf, f, ">", offset, len);
+				roxml_write_string(buf, f, "</", offset, len);
+				roxml_write_string(buf, f, name, offset, len);
+				roxml_write_string(buf, f, ">", offset, len);
 				if(human) {
-					roxml_write_string(&buf, f, "\n", offset, len);
+					roxml_write_string(buf, f, "\n", offset, len);
 				}
 			}
 		} else {
-			roxml_write_string(&buf, f, "/>", offset, len);
+			roxml_write_string(buf, f, "/>", offset, len);
 			if(human) {
-				roxml_write_string(&buf, f, "\n", offset, len);
+				roxml_write_string(buf, f, "\n", offset, len);
 			}
 		}
 	} else if(roxml_get_type(n) == ROXML_CMT_NODE) {
 		char *value;
 		int status;
 		char val[ROXML_LONG_LEN];
-		roxml_write_string(&buf, f, "<!--", offset, len);
+		roxml_write_string(buf, f, "<!--", offset, len);
 		value = roxml_get_content(n, val, ROXML_LONG_LEN, &status);
 		if(status >= ROXML_LONG_LEN) {
 			value = roxml_get_content(n, NULL, 0, &status);
 		}
-		roxml_write_string(&buf, f, value, offset, len);
+		roxml_write_string(buf, f, value, offset, len);
 		roxml_release(value);
-		roxml_write_string(&buf, f, "-->", offset, len);
+		roxml_write_string(buf, f, "-->", offset, len);
 		if(human) {
-			roxml_write_string(&buf, f, "\n", offset, len);
+			roxml_write_string(buf, f, "\n", offset, len);
 		}
 	} else if(roxml_get_type(n) == ROXML_PI_NODE) {
 		char *value;
 		int status;
 		char val[ROXML_LONG_LEN];
-		roxml_write_string(&buf, f, "<?", offset, len);
+		roxml_write_string(buf, f, "<?", offset, len);
 		value = roxml_get_content(n, val, ROXML_LONG_LEN, &status);
 		if(status >= ROXML_LONG_LEN) {
 			value = roxml_get_content(n, NULL, 0, &status);
 		}
-		roxml_write_string(&buf, f, value, offset, len);
+		roxml_write_string(buf, f, value, offset, len);
 		roxml_release(value);
-		roxml_write_string(&buf, f, "?>", offset, len);
+		roxml_write_string(buf, f, "?>", offset, len);
 		if(human) {
-			roxml_write_string(&buf, f, "\n", offset, len);
+			roxml_write_string(buf, f, "\n", offset, len);
 		}
 	}
 }

@@ -654,30 +654,31 @@ void ROXML_API roxml_del_node(node_t * n)
 int ROXML_API roxml_commit_changes(node_t *n, char * dest, char ** buffer, int human)
 {
 	int size = 0;
-	int len = ROXML_LONG_LEN;
+	int len = 0;
 	FILE *fout = NULL;
-	char * buf = NULL;
 
 	if(n) {
+		len = ROXML_LONG_LEN;
 		if(dest) { 
 			fout = fopen(dest, "w");
 		}
 		if(buffer) {
-			buf = (char*)malloc(ROXML_LONG_LEN);
-			memset(buf, 0, ROXML_LONG_LEN);
-			*buffer = buf;
+			*buffer = (char*)malloc(ROXML_LONG_LEN);
+			memset(*buffer, 0, ROXML_LONG_LEN);
 		}
-		roxml_write_node(n, fout, buf, human, 0, &size, &len);
+		roxml_write_node(n, fout, buffer, human, 0, &size, &len);
+		if(buffer) {
+			char * ptr = NULL;
+			len -= ROXML_LONG_LEN;
+			ptr = *buffer + len;
+			len += strlen(ptr);
+		} else {
+			len = ftell(fout);	
+		}
+
 		if(fout) {
 			fclose(fout);
 		}
-	}
-
-	if(buffer) {
-		char * ptr = NULL;
-		len -= ROXML_LONG_LEN;
-		ptr = *buffer + len;
-		len += strlen(ptr);
 	}
 
 	return len;

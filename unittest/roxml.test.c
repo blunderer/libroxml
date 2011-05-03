@@ -1926,17 +1926,27 @@ int test_write_tree(void)
 	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld->sibl) // node3
 	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld->sibl->text) // content3
 
-	roxml_commit_changes(root, "out.xml", NULL, 1);
-	roxml_commit_changes(root, "out.xml.human", NULL, 0);
-	int len = roxml_commit_changes(root, NULL, &buffer, 0);
+	FILE * fout = NULL;
+	int len = roxml_commit_changes(NULL, "out.xml", NULL, 1);
+	ASSERT_EQUAL(len, 0)
 
-	FILE * fout = fopen("out.buf.xml", "w");
+	len = roxml_commit_changes(root, "out.xml", NULL, 0);
+	ASSERT_EQUAL(len, 162)
+
+	len = roxml_commit_changes(root, "out.xml.human", NULL, 1);
+	ASSERT_EQUAL(len, 202)
+
+	len = roxml_commit_changes(root, NULL, &buffer, 0);
+	ASSERT_EQUAL(len, 162)
+
+	fout = fopen("out.buf.xml", "w");
 	fwrite(buffer, 1, len, fout);
 	fclose(fout);
 	free(buffer);
 
-	len = roxml_commit_changes(root, NULL, &buffer, 1);
 	fout = fopen("out.buf.xml.human", "w");
+	len = roxml_commit_changes(root, NULL, &buffer, 1);
+	ASSERT_EQUAL(len, 202)
 	fwrite(buffer, 1, len, fout);
 	fclose(fout);
 	free(buffer);
