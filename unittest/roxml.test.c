@@ -1935,8 +1935,6 @@ int test_write_tree(void)
 	fclose(fout);
 	free(buffer);
 
-	printf("==================================\n");
-
 	len = roxml_commit_changes(root, NULL, &buffer, 1);
 	fout = fopen("out.buf.xml.human", "w");
 	fwrite(buffer, 1, len, fout);
