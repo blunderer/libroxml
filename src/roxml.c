@@ -667,7 +667,7 @@ int ROXML_API roxml_commit_changes(node_t *n, char * dest, char ** buffer, int h
 			memset(buf, 0, ROXML_LONG_LEN);
 			*buffer = buf;
 		}
-		roxml_write_node(n, fout, buf, human, -1, &size, &len);
+		roxml_write_node(n, fout, buf, human, 0, &size, &len);
 		if(fout) {
 			fclose(fout);
 		}
