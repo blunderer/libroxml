@@ -687,7 +687,7 @@ void ROXML_API roxml_del_node			(node_t * n);
  * and a pointer to it will be stored into 'buffer'. 
  * \param n the root node of the tree to write
  * \param dest the path to a file to write tree to
- * \param buffer the adress of a buffer where tre will be written
+ * \param buffer the adress of a buffer where tre will be written this buffer have to be freed after use
  * \param human 0 for one-line tree, or 1 for human format (using tabs, newlines...)
  * \return the number of bytes written to file or buffer 
  * 
@@ -729,6 +729,35 @@ void ROXML_API roxml_del_node			(node_t * n);
  * 	roxml_add_node(tmp, 0, ROXML_ATTR_NODE, "id", "42");
  * 	tmp = roxml_add_node(tmp, 0, ROXML_ELM_NODE, "price", "24");
  * 	roxml_commit_changes(root, "/tmp/test.xml", NULL, 0);
+ * 	return 0;
+ * }
+ * \endcode
+ * to generate the following xml bloc:
+\verbatim
+<root><!-- sample XML file --><item id="42"><price>24</price></item></root>
+\endverbatim
+ * the buffer variant works more or less the same way
+ * \code
+ * #include <stdio.h>
+ * #include <roxml.h>
+ *
+ * int main(void)
+ * {
+ *	int len = 0;
+ *	char * buffer = NULL;
+ *	FILE * file_out;
+ * 	node_t * root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
+ * 	node_t * tmp = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample XML file");
+ * 	tmp = roxml_add_node(root, 0, ROXML_ELM_NODE, "item", NULL);
+ * 	roxml_add_node(tmp, 0, ROXML_ATTR_NODE, "id", "42");
+ * 	tmp = roxml_add_node(tmp, 0, ROXML_ELM_NODE, "price", "24");
+ *
+ * 	len = roxml_commit_changes(root, NULL, &buffer, 0);
+ *
+ *	file_out = fopen("/tmp/test.xml", "w");
+ *      fwrite(buffer, 1, len, file_out);
+ *      fclose(file_out);
+ *
  * 	return 0;
  * }
  * \endcode
