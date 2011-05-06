@@ -706,9 +706,9 @@ node_t * roxml_add_node(node_t * parent, int position, int type, char *name, cha
 
 	if(type & ROXML_ATTR_NODE) {
 		if(!name || !value) { return NULL; }
-		buffer = (char*)malloc(sizeof(char)*(name_l+content_l+2));
-		sprintf(buffer,"%s=%s",name, value);
-		content_pos = name_l+1;
+		buffer = (char*)malloc(sizeof(char)*(name_l+content_l+4));
+		sprintf(buffer,"%s=\"%s\"",name, value);
+		content_pos = name_l+2;
 		end_node = name_l + 1;
 		end_content = name_l + content_l + 2;
 	} else if(type & ROXML_CMT_NODE) {
@@ -750,7 +750,7 @@ node_t * roxml_add_node(node_t * parent, int position, int type, char *name, cha
 	new_node = roxml_create_node(0, buffer, type | ROXML_PENDING | ROXML_BUFF);
 	new_node->end = end_node;
 
-	if(content_l && name_l) {
+	if(value && name) {
 		node_t *new_txt = roxml_create_node(content_pos, buffer, ROXML_TXT_NODE | ROXML_PENDING | ROXML_BUFF);
 		roxml_parent_node(new_node, new_txt);
 		new_txt->end = end_content;
