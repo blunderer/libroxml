@@ -166,7 +166,6 @@ node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 {
 	int error = 0;
 	char int_buffer[ROXML_BULK_READ+1];
-	int int_len = 0;
 	roxml_load_ctx_t context;
 	roxml_parser_item_t * parser = NULL;
 	xpath_tok_table_t * table = (xpath_tok_table_t*)calloc(1, sizeof(xpath_tok_table_t));
@@ -193,6 +192,7 @@ node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 	parser = roxml_parser_prepare(parser);
 
 	if(file)	{ 
+		int int_len = 0;
 		context.type = ROXML_FILE;
 		context.src = (void*)file;
 		context.pos = 0;
@@ -371,7 +371,6 @@ int ROXML_INT roxml_get_node_internal_position(node_t *n)
 int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t ** xpath, int context)
 {
 	int ret = 0;
-	int error = 0;
 	roxml_xpath_ctx_t ctx;
 	roxml_parser_item_t * parser = NULL;
 	ctx.pos = 0;

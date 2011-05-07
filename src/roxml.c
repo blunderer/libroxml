@@ -146,7 +146,6 @@ char * ROXML_API roxml_get_content(node_t *n, char * buffer, int bufsize, int *s
 			ptr = ptr->sibl;
 		}
 	} else if(n->type & ROXML_TXT_NODE)	{
-		int ret_len = 0;
 		int read_size = 0;
 		total = n->end - n->pos;
 		if(content == NULL) {
@@ -160,7 +159,6 @@ char * ROXML_API roxml_get_content(node_t *n, char * buffer, int bufsize, int *s
 		}
 		total = roxml_read(n->pos, read_size, content, n);
 	} else if(n->type & ROXML_CMT_NODE)	{
-		int ret_len = 0;
 		int read_size = 0;
 		total = n->end - n->pos - 4;
 		if(content == NULL) {
@@ -174,7 +172,6 @@ char * ROXML_API roxml_get_content(node_t *n, char * buffer, int bufsize, int *s
 		}
 		total = roxml_read(n->pos+4, read_size, content, n);
 	} else if(n->type & ROXML_PI_NODE)	{
-		int ret_len = 0;
 		int read_size = 0;
 		total = n->end - n->pos - 2;
 		if(content == NULL) {
@@ -188,7 +185,6 @@ char * ROXML_API roxml_get_content(node_t *n, char * buffer, int bufsize, int *s
 		}
 		total = roxml_read(n->pos+2, read_size, content, n);
 	} else if(n->type & ROXML_ATTR_NODE)	{
-		int ret_len = 0;
 		int read_size = 0;
 		node_t *ptr = n->text;
 		total = ptr->end - ptr->pos;
@@ -233,11 +229,10 @@ char * ROXML_API roxml_get_name(node_t *n, char * buffer, int size)
 		strcpy(tmp_name, "documentRoot");
 	} else if(n->type & ROXML_ATTR_NODE)	{
 		int offset = 0;
-		int ret_len = 0;
 		char *internal_ptr;
 		char internal_buf[INTERNAL_BUF_SIZE];
 
-		ret_len += roxml_read(n->pos, INTERNAL_BUF_SIZE, internal_buf, n);
+		roxml_read(n->pos, INTERNAL_BUF_SIZE, internal_buf, n);
 		internal_ptr = internal_buf;
 
 		while(ROXML_WHITE(internal_ptr[offset])) { offset++; }
@@ -251,11 +246,10 @@ char * ROXML_API roxml_get_name(node_t *n, char * buffer, int size)
 		}
 	} else if(n->type & ROXML_ELM_NODE)	{
 		int offset = 0;
-		int ret_len = 0;
 		char *internal_ptr;
 		char internal_buf[INTERNAL_BUF_SIZE];
 
-		ret_len += roxml_read(n->pos, INTERNAL_BUF_SIZE, internal_buf, n);
+		roxml_read(n->pos, INTERNAL_BUF_SIZE, internal_buf, n);
 		internal_ptr = internal_buf;
 
 		while((internal_ptr[offset] == '<')||(ROXML_WHITE(internal_ptr[offset]))) { offset++; }
