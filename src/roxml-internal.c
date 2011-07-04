@@ -1075,12 +1075,14 @@ void ROXML_INT roxml_print_space(FILE *f, char ** buf, int * offset, int * len, 
 
 void ROXML_INT roxml_write_string(char ** buf, FILE * f, char * str, int *offset, int * len)
 {
-	int pos = *offset + strlen(str);
+	int min_len = strlen(str);
+	int pos = *offset + min_len;
+	int appended_space = ROXML_LONG_LEN*((int)(min_len/ROXML_LONG_LEN)+1);
 
 	if((pos >= *len) && (buf) && (*buf)) { 
-		*buf = realloc(*buf, *len+ROXML_LONG_LEN); 
-		memset(*buf+*len, 0, ROXML_LONG_LEN);
-		*len += ROXML_LONG_LEN;
+		*buf = realloc(*buf, *len+appended_space); 
+		memset(*buf+*len, 0, appended_space);
+		*len += appended_space;
 	}
 	if(f) { fprintf(f, "%s", str); }
 	if(buf && *buf) { strcat(*buf+(*offset), str); }
