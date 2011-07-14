@@ -153,8 +153,8 @@ install: $(TARGETS) doxy
 	$E install -D $(INC) $(DESTDIR)/usr/include
 	$E install -D LGPL.txt $(DESTDIR)/usr/share/doc/libroxml/
 	$E install -D docs/roxml.1 $(DESTDIR)/usr/share/man/man1/
-	$E install -D docs/man/man3/* $(DESTDIR)/usr/share/man/man3/
-	$E install -D docs/html/* $(DESTDIR)/usr/share/doc/libroxml/html/
+	$E [ ! -d docs/man/man3 ] || install -D docs/man/man3/* $(DESTDIR)/usr/share/man/man3/
+	$E [ ! -d docs/html ] || install -D docs/html/* $(DESTDIR)/usr/share/doc/libroxml/html/
 	$E install -m644 libroxml.pc $(DESTDIR)/usr/lib/pkgconfig
 	$E cp -d $(TARGET_LN) $(DESTDIR)/usr/lib
 
