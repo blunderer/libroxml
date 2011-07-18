@@ -8,7 +8,7 @@ Version: %{version}
 Release: %{release}
 Source: http://libroxml.googlecode.com/files/libroxml-%{version}.tar.gz
 Vendor: blunderer
-URL:  http://code.google.com/p/libroxml/
+URL:  http://www.libroxml.net
 License: LGPL
 Group: System Environment/Libraries
 Prefix: %{_prefix}

@@ -1,10 +1,10 @@
 Source: libroxml
 Priority: extra
-Maintainer: Tristan Lelong <blunderer@blunderer.org>
+Maintainer: Tristan Lelong <tristan.lelong@libroxml.net>
 Build-Depends: debhelper (>= 7), doxygen
 Standards-Version: 3.9.1
 Section: libs
-Homepage: http://libroxml.googlecode.com
+Homepage: http://www.libroxml.net
 
 Package: libroxml-dev
 Section: libdevel

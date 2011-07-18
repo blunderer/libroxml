@@ -23,63 +23,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-/** \mainpage libroxml homepage
- *
- * \section intro_sec Introduction
- * This library is minimum, easy-to-use, C implementation for xml file parsing
- * It includes a mini shell to navigate thru a xml file as a demo.
- *
- * \section why_sec Why libroxml?
- * Because XML parsing is always hard to reinvent, and because very often xml lib are 
- * too big to fit with very little application
- *
- * \section what_sec What can do libroxml?
- * It allow you to easily:
- * - load / unload document
- * - navigate thru an xml tree
- * - read attributes and attributes' values for nodes
- * - get content of nodes
- * - create/modify xml trees and save then to a file or buffer
- *
- * \section how_sec How does it work?
- * You can refer to \ref roxml.h for documentation on all API functions
- *
- * \section list-func List of function by category?
- * there are several groups of functions : 
- * \subsection manage-xml Manage xml source
- * \ref roxml_load_fd \n
- * \ref roxml_load_doc \n
- * \ref roxml_load_buf \n
- * \ref roxml_close \n
- * 
- * \subsection navigate-xml Navigate into xml tree
- * \ref roxml_get_root \n
- * \ref roxml_get_parent \n
- * \ref roxml_get_prev_sibling \n
- * \ref roxml_get_next_sibling \n
- * \ref roxml_get_chld \n
- * \ref roxml_get_chld_nb \n
- * \ref roxml_get_attr \n
- * \ref roxml_get_attr_nb \n
- * \ref roxml_get_text \n
- * \ref roxml_get_text_nb \n
- * \ref roxml_xpath \n
- *
- * \subsection acess-xml Access xml content
- * \ref roxml_get_type \n
- * \ref roxml_get_node_position \n
- * \ref roxml_get_name \n
- * \ref roxml_get_content \n
- *
- * \subsection modify-xml Modify xml tree
- * \ref roxml_add_node \n
- * \ref roxml_del_node \n
- * \ref roxml_commit_changes \n
- *
- * \subsection other-xml Libroxml specifics
- * \ref roxml_release \n
- */
-
 #ifndef ROXML_H
 #define ROXML_H
 
@@ -435,60 +378,7 @@ node_t*	ROXML_API roxml_get_attr		(node_t *n, char * name, int nth);
  * \param nb_ans the number of results
  * \return the node table or NULL 
  *
- * handled xpath are
- *\verbatim
-===Relative xpath:===
- * _"n0"_
-
- ===Absolute xpath:===
- * _"/n0"_
-
- ===Special nodes:===
- * _"`*`"_
- * _"node()"_
- * _"text()"_
- * _"comment()"_
- * _"processing-instruction()"_
-
- ===Conditions:===
- * Attribute string value: _"/n0`[`@a=value]"_
- * Attribute int value: _"/n0`[`@a=value]"_
- * Attribute int value: _"/n0`[`@a!=value]"_
- * Attribute int value: _"/n0`[`@a<value]"_
- * Attribute int value: _"/n0`[`@a>value]"_
- * Attribute int value: _"/n0`[`@a<=value]"_
- * Attribute int value: _"/n0`[`@a>=value]"_
- * Node position: _"/n0`[`first()]"_
- * Node position: _"/n0`[`first()+2]"_
- * Node position: _"/n0`[`last()]"_
- * Node position: _"/n0`[`last()-3]"_
- * Node position: _"/n0`[`position() = 0]"_
- * Node position: _"/n0`[`position() != 0]"_
- * Node position: _"/n0`[`position() > 1]"_
- * Node position: _"/n0`[`position() < 2]"_
- * Node position: _"/n0`[`position() >= 1]"_
- * Node position: _"/n0`[`position() <= 2]"_
- * Node position: _"/n0`[`2]"_
- * Other xpath: _"/n0`[`n1/@attr]"_
-
- ===Shorten xpath for:===
- * Children: _"/n0/n1/n2"_
- * Attributes: _"/n0/n1/@a"_
- * Descendent or self::node(): _"/n0//n5"_
- * Parent: _"/n0/n1/../n1"_
- * Self: _"/n0/n1/."_
-
- ===Full xpath for:===
- * Nodes: _"/n0/n1/child::a"_
- * Attributes: _"/n0/n1/attribute::a"_
- * Descendent or self: _"/n0/descendant-or-self::n5"_
- * Parent: _"/child::n0/child::n1/parent::/n1"_
- * Self: _"/child::n0/child::n1/self::"_
- * Preceding: _"preceding::n1"_
- * Following: _"following::n1"_
- * Ancestor: _"ancestor::n2"_
- * Ancestor-or-self: _"ancestor-or-self::n2"_
-\endverbatim
+ * handled xpath are described in \ref xpath
  */
 node_t ** ROXML_API roxml_xpath			(node_t *n, char * path, int *nb_ans);
 

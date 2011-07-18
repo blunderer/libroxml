@@ -13,7 +13,7 @@ libroxml (2.0.3-1) unstable; urgency=low
   * enable OSX compilation
   * add CMakeLists.txt for linux/window compilation
 
- -- Tristan Lelong <blunderer@blunderer.org>  Tue, 12 Apr 2011 18:03:00 +0100
+ -- Tristan Lelong <tristan.lelong@libroxml.net>  Tue, 12 Apr 2011 18:03:00 +0100
 
 libroxml (2.0.2-1) unstable; urgency=low
 
@@ -25,10 +25,10 @@ libroxml (2.0.2-1) unstable; urgency=low
      add ewamples
      more precise descriptions
 
- -- Tristan Lelong <blunderer@blunderer.org>  Wed, 09 Feb 2011 18:33:00 +0100
+ -- Tristan Lelong <tristan.lelong@libroxml.net>  Wed, 09 Feb 2011 18:33:00 +0100
 
 libroxml (2.0.1-1) unstable; urgency=low
 
   * Initial release (Closes: Bug#574668)
 
- -- Tristan Lelong <blunderer@blunderer.org>  Sun, 05 Oct 2010 17:35:43 +0100
+ -- Tristan Lelong <tristan.lelong@libroxml.net>  Sun, 05 Oct 2010 17:35:43 +0100

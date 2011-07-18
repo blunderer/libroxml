@@ -5,8 +5,6 @@ Why libroxml?
 Because XML parsing is always hard to reinvent
 Because very often, xml libraries are too big to fit with little application
 
-To be sure libroxml will stay easy to use, I'll limit the public API to 20 functions. This is quite enought for basic needs, and most of the time, we don't need more. Currently 19 functions are part of the public API and library binary is about 40Ko.
-
 libroxml allow you to easily:
 - load / unload document from files
 - load / unload document from buffer
@@ -18,4 +16,4 @@ libroxml allow you to easily:
 - create XML from scratch
 - applying modification from the loaded XML tree to a file or buffer
 
- -- blunderer <blunderer@blunderer.org>  Sun, 28 Feb 2010 19:41:43 +0100
+ -- Tristan Lelong <tristan.lelong@libroxml.net>  Sun, 28 Feb 2010 19:41:43 +0100

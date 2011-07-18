@@ -1,11 +1,11 @@
-This package was debianized by blunderer <blunderer@blunderer.org> on
+This package was debianized by Tristan Lelong <tristan.lelong@libroxml.net> on
 Sun, 28 Feb 2010 19:41:43 +0100.
 
 It was downloaded from <http://libroxml.googlecode.com>
 
 Upstream Author:
 
-    Tristan Lelong <blunderer@blunderer.org
+    Tristan Lelong <tristan.lelong@libroxml.net
 
 Copyright:
 
@@ -30,6 +30,6 @@ License:
 On Debian systems, the complete text of the GNU Lesser General
 Public License can be found in `/usr/share/common-licenses/GPL'.
 
-The Debian packaging is (C) 2010, blunderer <blunderer@blunderer.org> and
+The Debian packaging is (C) 2010, Tristan Lelong <tristan.lelong@libroxml.net> and
 is licensed under the LGPL, see above.
 
