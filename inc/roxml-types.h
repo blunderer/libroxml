@@ -25,6 +25,8 @@
 
 #ifdef _WIN32
 #include "roxml_win32_native.h"
+#else
+#include <pthread.h>
 #endif
 
 /** \typedef roxml_parse_func 
