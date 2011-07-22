@@ -1,1 +1,1 @@
-<!DOCTYPE test "node"> <node> <!--this is a comment--> <? value="2" ?> <node1> <![CDATA[ <node2></node2> ]]> </node1> <!-- <toto/> --> </node>
+<!DOCTYPE test "node"> <node> <!--this is a comment--> <?test value="2"?> <node1> <![CDATA[ <node2></node2> ]]> </node1> <!-- <toto/> --> </node>

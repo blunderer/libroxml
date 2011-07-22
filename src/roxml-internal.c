@@ -1190,11 +1190,17 @@ void ROXML_INT roxml_write_node(node_t * n, FILE *f, char ** buf, int human, int
 		int status;
 		char val[ROXML_LONG_LEN];
 		roxml_write_string(buf, f, "<?", offset, len);
+		value = roxml_get_name(n, val, ROXML_LONG_LEN);
+		roxml_write_string(buf, f, value, offset, len);
+
 		value = roxml_get_content(n, val, ROXML_LONG_LEN, &status);
 		if(status >= ROXML_LONG_LEN) {
 			value = roxml_get_content(n, NULL, 0, &status);
 		}
-		roxml_write_string(buf, f, value, offset, len);
+		if(status > 1) {
+			roxml_write_string(buf, f, " ", offset, len);
+			roxml_write_string(buf, f, value, offset, len);
+		}
 		roxml_release(value);
 		roxml_write_string(buf, f, "?>", offset, len);
 		if(human) {

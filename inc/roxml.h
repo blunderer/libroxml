@@ -430,11 +430,14 @@ int roxml_get_type				(node_t *n);
  *
  * \fn roxml_add_node(node_t * parent, int position, int type, char *name, char *value);
  * this function add a new node to the tree. This will not update de buffer or file,
- * only the RAM loaded tree
+ * only the RAM loaded tree. One should call \ref roxml_commit_changes to save modifications.
+ * If the parent node is an ROXML_ELM_NODE, then, new node will be added as a child. Else
+ * the node will be added as a sibling of the parent node. In the later case, position parameter describes
+ * the position in the sibling list, instead of position in the children list.
  * \param parent the parent node
- * \param position the position as a child of parent (0 for auto position at the end of children list)
+ * \param position the position as a child of parent 1 is the first child, 0 for auto position at the end of children list...
  * \param type the type of node between \ref ROXML_ATTR_NODE, \ref ROXML_ELM_NODE, \ref ROXML_TXT_NODE, \ref ROXML_PI_NODE, \ref ROXML_CMT_NODE
- * \param name the name of the node (for \ref ROXML_ATTR_NODE and \ref ROXML_ELM_NODE only)
+ * \param name the name of the node (for \ref ROXML_ATTR_NODE and \ref ROXML_ELM_NODE and \ref ROXML_PI_NODE only)
  * \param value the text content (for \ref ROXML_ELM_NODE, \ref ROXML_TXT_NODE, \ref ROXML_CMT_NODE, \ref ROXML_PI_NODE) or the attribute value (\ref ROXML_ATTR_NODE)
  * \return the new node
  * \see roxml_commit_changes
@@ -444,7 +447,7 @@ int roxml_get_type				(node_t *n);
  * - \ref ROXML_ELM_NODE take at least a node name. the paramter value is optional and represents the text content.
  * - \ref ROXML_TXT_NODE ignore the node name. the paramter value represents the text content.
  * - \ref ROXML_CMT_NODE ignore the node name. the paramter value represents the comment.
- * - \ref ROXML_PI_NODE ignore the node name. the paramter value represents the content of processing-instruction node.
+ * - \ref ROXML_PI_NODE take the node name as process-instruction target. the paramter value represents the content of processing-instruction.
  * - \ref ROXML_ATTR_NODE take an attribute name. and the attribute value as given by parameter value.
  * 
  * some examples to obtain this xml result file
@@ -486,6 +489,34 @@ int roxml_get_type				(node_t *n);
  * 	tmp = roxml_add_node(tmp, 0, ROXML_ELM_NODE, "price", NULL);
  * 	tmp = roxml_add_node(tmp, 0, ROXML_TXT_NODE, NULL, "24");
  * 	roxml_commit_changes(root, "/tmp/test.xml", NULL, 1);
+ * 	return 0;
+ * }
+ * \endcode
+ *
+ * If you need a valid XML doc, just start by adding a corresponding process-instruction.
+ * Example, to obtain this xml file:
+ * \verbatim
+<?xml version="1.0" encoding="UTF-8"?>
+<!--sample file-->
+<doc>
+ basic content
+ <item/>
+ <item/>
+ <item/>
+</doc>
+ * \code
+ * #include <roxml.h>
+ *
+ * int main(void)
+ * {
+ *	node_t * root = roxml_add_node(NULL, 0, ROXML_PI_NODE, "xml", "version=\"1.0\" encoding=\"UTF-8\"");
+ *	node_t * node = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample file");
+ *	node = roxml_add_node(root, 0, ROXML_ELM_NODE, "doc", "basic content");
+ *	roxml_add_node(node, 0, ROXML_ELM_NODE, "item", NULL);
+ *	roxml_add_node(node, 0, ROXML_ELM_NODE, "item", NULL);
+ *	roxml_add_node(node, 0, ROXML_ELM_NODE, "item", NULL);
+ * 	roxml_commit_changes(root, "/tmp/test.xml", NULL, 1);
+ *
  * 	return 0;
  * }
  * \endcode

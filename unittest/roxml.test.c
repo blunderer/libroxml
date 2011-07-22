@@ -721,7 +721,7 @@ int test_get_root(void)
 	ASSERT_STRING_EQUAL(roxml_get_name(root, NULL, 0), "documentRoot")
 
 	node0 = roxml_get_chld(root, NULL, 0);
-	ASSERT_STRING_EQUAL(roxml_get_content(node0, NULL, 0, NULL), "xml version=\"1.0\"? encoding=\"fr_FR\"")
+	ASSERT_STRING_EQUAL(roxml_get_content(node0, NULL, 0, NULL), "version=\"1.0\"? encoding=\"fr_FR\"")
 	node1 = roxml_get_chld(node0, NULL, 0);
 
 	roxml_release(RELEASE_ALL);
@@ -1813,8 +1813,10 @@ int test_spec_nodes(void)
 	// test content
 	char * content = roxml_get_content(root->chld->sibl->chld, NULL, 0, NULL);
 	ASSERT_STRING_EQUAL(content, "this is a comment")
+	content = roxml_get_name(root->chld->sibl->chld->sibl, NULL, 0);
+	ASSERT_STRING_EQUAL(content, "test")
 	content = roxml_get_content(root->chld->sibl->chld->sibl, NULL, 0, NULL);
-	ASSERT_STRING_EQUAL(content, " value=\"2\" ")
+	ASSERT_STRING_EQUAL(content, "value=\"2\"")
 	content = roxml_get_content(root->chld->sibl->chld->sibl->sibl, NULL, 0, NULL);
 	ASSERT_STRING_EQUAL(content, " <![CDATA[ <node2></node2> ]]> ")
 
@@ -1825,7 +1827,7 @@ int test_spec_nodes(void)
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[1], NULL, 0, NULL), " <toto/> ")
 	node_set = roxml_xpath(root, "//processing-instruction()", &nbans);
 	ASSERT_EQUAL(nbans, 1)
-	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), " value=\"2\" ")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "value=\"2\"")
 	node_set = roxml_xpath(root, "//*", &nbans);
 	ASSERT_EQUAL(nbans, 3)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "!DOCTYPE")
@@ -1845,7 +1847,7 @@ int test_spec_nodes(void)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[5], NULL, 0), "node1")
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[2], NULL, 0, NULL), " <![CDATA[ <node2></node2> ]]> ")
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[3], NULL, 0, NULL), "this is a comment")
-	ASSERT_STRING_EQUAL(roxml_get_content(node_set[4], NULL, 0, NULL), " value=\"2\" ")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[4], NULL, 0, NULL), "value=\"2\"")
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[5], NULL, 0, NULL), " <![CDATA[ <node2></node2> ]]> ")
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[6], NULL, 0, NULL), " <toto/> ")
 
@@ -1893,19 +1895,35 @@ int test_whitespaces_in_attr(void)
 
 int test_write_tree(void)
 {
+	int len;
 	char * buffer;
 	INIT /* init context macro */
 
 	node_t *root = roxml_load_doc("roxml.test.xml");
 	node_t *node = roxml_add_node(root, 1, ROXML_CMT_NODE, NULL, "this is a test XML file");
 	node = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "this was a test XML file");
-	node = roxml_add_node(root, 2, ROXML_PI_NODE, NULL, "value=\"2\"");
-	roxml_commit_changes(root, "out.xml.copy", NULL, 1);
+	len = roxml_commit_changes(root, "out.xml.copy", NULL, 1);
+
+	ASSERT_EQUAL(len, 386) 
+
+	roxml_close(root);
+
+	root = roxml_load_doc("roxml.test.xml.specnodes");
+	node = roxml_add_node(root, 1, ROXML_CMT_NODE, NULL, "this is a test XML file");
+	node = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "this was a test XML file");
+	node = roxml_add_node(root, 0, ROXML_PI_NODE, "test", "value=\"2\"");
+	node = roxml_add_node(root, 0, ROXML_PI_NODE, "test", "1");
+	node = roxml_add_node(root, 0, ROXML_PI_NODE, "test", "");
+	node = roxml_add_node(root, 0, ROXML_PI_NODE, "test", NULL);
+	len = roxml_commit_changes(root, "out.xml.spec.copy", NULL, 1);
+
+	ASSERT_EQUAL(len, 270) 
+
 	roxml_close(root);
 
 	root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
 	node = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "this is a test XML file");
-	node = roxml_add_node(root, 0, ROXML_PI_NODE, NULL, "value=\"2\"");
+	node = roxml_add_node(root, 0, ROXML_PI_NODE, "test", "value=\"2\"");
 	node = roxml_add_node(root, 0, ROXML_ELM_NODE, "node1", "content1");
 	roxml_add_node(root, 0, ROXML_ATTR_NODE, "attr1", "value1");
 	node_t *node2 = roxml_add_node(node, 0, ROXML_ELM_NODE, "node2", "content2");
@@ -1927,17 +1945,17 @@ int test_write_tree(void)
 	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld->sibl->text) // content3
 
 	FILE * fout = NULL;
-	int len = roxml_commit_changes(NULL, "out.xml", NULL, 1);
+	len = roxml_commit_changes(NULL, "out.xml", NULL, 1);
 	ASSERT_EQUAL(len, 0)
 
 	len = roxml_commit_changes(root, "out.xml", NULL, 0);
-	ASSERT_EQUAL(len, 162)
+	ASSERT_EQUAL(len, 165)
 
 	len = roxml_commit_changes(root, "out.xml.human", NULL, 1);
-	ASSERT_EQUAL(len, 202)
+	ASSERT_EQUAL(len, 205)
 
 	len = roxml_commit_changes(root, NULL, &buffer, 0);
-	ASSERT_EQUAL(len, 162)
+	ASSERT_EQUAL(len, 165)
 
 	fout = fopen("out.buf.xml", "w");
 	fwrite(buffer, 1, len, fout);
@@ -1946,10 +1964,22 @@ int test_write_tree(void)
 
 	fout = fopen("out.buf.xml.human", "w");
 	len = roxml_commit_changes(root, NULL, &buffer, 1);
-	ASSERT_EQUAL(len, 202)
+	ASSERT_EQUAL(len, 205)
 	fwrite(buffer, 1, len, fout);
 	fclose(fout);
 	free(buffer);
+
+	roxml_close(root);
+	
+	root = roxml_add_node(NULL, 0, ROXML_PI_NODE, "xml", "version=\"1.0\"");
+	node = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample file");
+	node = roxml_add_node(root, 0, ROXML_ELM_NODE, "doc", "basic content");
+	roxml_add_node(node, 0, ROXML_ELM_NODE, "item", NULL);
+	roxml_add_node(node, 0, ROXML_ELM_NODE, "item", NULL);
+	roxml_add_node(node, 0, ROXML_ELM_NODE, "item", NULL);
+
+	len = roxml_commit_changes(root, "out.xml.valid.human", NULL, 1);
+	ASSERT_EQUAL(len, 96)
 
 	roxml_close(root);
 	
