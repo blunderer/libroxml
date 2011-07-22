@@ -130,7 +130,7 @@ mrproper : clean
 	$P '  RM      docs'
 	$E - rm -fr docs/man docs/html docs/latex
 	$P '  CLEAN   debian'
-	$E - $(FAKEROOT) $(MAKE) -f $(abspath $(DEBIAN_RULES)) clean >/dev/null
+	$E - $(FAKEROOT) $(MAKE) -f $(abspath $(DEBIAN_RULES)) clean &>/dev/null
 	$P '  CLEAN   fuse.xml'
 	$E - $(MAKE) -C $(abspath fuse.xml) mrproper >/dev/null
 

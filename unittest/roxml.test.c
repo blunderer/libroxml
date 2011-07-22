@@ -42,125 +42,104 @@ int test_tree_on_doc(void)
 	
 	ASSERT_NOT_NULL(root);
 
-	ASSERT_NOT_NULL(root->chld); // node0
-	ASSERT_NOT_NULL(root->chld->chld);	// node1
-	ASSERT_NOT_NULL(root->chld->chld->sibl);	// node2
-	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl);	// node7
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld);	//node3
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl);	//node4
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl);	//node5
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld);	//node6
-	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->chld);	//node8
-	ASSERT_NULL(root->chld->chld->sibl->sibl->chld->chld);
-	ASSERT_NULL(root->chld->chld->sibl->sibl->chld->sibl);
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->sibl);
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->chld);
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->chld);
-	ASSERT_NULL(root->chld->chld->sibl->chld->chld);
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->sibl);
-	ASSERT_NULL(root->chld->chld->sibl->sibl->sibl);
-	ASSERT_NULL(root->chld->chld->chld);
-	ASSERT_NULL(root->sibl);
+#ifdef IGNORE_EMPTY_TEXT_NODES
+	node_t * node0 = root->chld;
+	node_t * node1 = node0->chld;
+	node_t * text1 = node1->chld;
+	node_t * node2 = node1->sibl;
+	node_t * node3 = node2->chld;
+	node_t * text2 = node3->chld;
+	node_t * node4 = node3->sibl;
+	node_t * node5 = node4->sibl;
+	node_t * text3 = node5->chld;
+	node_t * node6 = text3->sibl;
+	node_t * text4 = node6->sibl;
+	node_t * text5 = node6->chld;
+	node_t * node7 = node2->sibl;
+	node_t * text8 = node7->chld;
+	node_t * node8 = text8->sibl;
+	node_t * text9 = node8->sibl;
 
-	// node0
-	ASSERT_NULL(root->chld->attr)
+#else /* !IGNORE_EMPTY_TEXT_NODES */
 
-	// node1
-	ASSERT_NOT_NULL(root->chld->chld->attr)
-	ASSERT_NOT_NULL(root->chld->chld->attr->sibl)
-	ASSERT_NULL(root->chld->chld->attr->sibl->sibl)
+	node_t * node0 = root->chld;
+	node_t * text0_0 = node0->chld;
+	node_t * node1 = text0_0->sibl;
+	node_t * text0_1 = node1->sibl;
+	node_t * text1 = node1->chld;
+	node_t * node2 = text0_1->sibl;
+	node_t * text0_2 = node2->sibl;
+	node_t * text2_0 = node2->chld;
+	node_t * node3 = text2_0->sibl;
+	node_t * text2_1 = node3->sibl;
+	node_t * node4 = text2_1->sibl;
+	node_t * text2_2 = node4->sibl;
+	node_t * node5 = text2_2->sibl;
+	node_t * text2_3 = node5->sibl;
+	node_t * text2 = node3->chld;
+	node_t * text3 = node5->chld;
+	node_t * node6 = text3->sibl;
+	node_t * text4 = node6->sibl;
+	node_t * text5 = node6->chld;
+	node_t * node7 = text0_2->sibl;
+	node_t * text0_3 = node7->sibl;
+	node_t * text8 = node7->chld;
+	node_t * node8 = text8->sibl;
+	node_t * text8_0 = node8->chld;
+	node_t * text9 = node8->sibl;
+#endif /* !IGNORE_EMPTY_TEXT_NODES */
 
-	// node2
-	ASSERT_NOT_NULL(root->chld->chld->sibl->attr)
-	ASSERT_NOT_NULL(root->chld->chld->sibl->attr->sibl)
-	ASSERT_NULL(root->chld->chld->sibl->attr->sibl->sibl)
+	ASSERT_NOT_NULL(node0);
+	ASSERT_NOT_NULL(node1);
+	ASSERT_NOT_NULL(node2);
+	ASSERT_NOT_NULL(node3);
+	ASSERT_NOT_NULL(node4);
+	ASSERT_NOT_NULL(node5);
+	ASSERT_NOT_NULL(node6);
+	ASSERT_NOT_NULL(node7);
+	ASSERT_NOT_NULL(node8);
 
-	// node3
-	ASSERT_NULL(root->chld->chld->sibl->chld->attr)
-
-	// node4
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->attr)
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->attr->sibl)
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->attr->sibl->sibl)
-
-	// node5
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->attr)
-
-	// node6
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->attr)
-
-	// node7
-	ASSERT_NULL(root->chld->chld->sibl->sibl->attr)
+	ASSERT_NOT_NULL(text1);
+	ASSERT_NOT_NULL(text2);
+	ASSERT_NOT_NULL(text3);
+	ASSERT_NOT_NULL(text4);
+	ASSERT_NOT_NULL(text5);
+	ASSERT_NOT_NULL(text8);
+	ASSERT_NOT_NULL(text9);
+	
+	ASSERT_NULL(node0->sibl);
+	ASSERT_NULL(text1->sibl);
+	ASSERT_NULL(text2->sibl);
+	ASSERT_NULL(node4->chld);
+	ASSERT_NULL(text5->sibl);
+	ASSERT_NULL(text4->sibl);
+	ASSERT_NULL(text9->sibl);
 
 #ifdef IGNORE_EMPTY_TEXT_NODES
-	// node0
-	ASSERT_NULL(root->chld->text)
-
-	// node1
-	ASSERT_NOT_NULL(root->chld->chld->text)
-	ASSERT_NULL(root->chld->chld->text->sibl)
-
-	// node2
-	ASSERT_NULL(root->chld->chld->sibl->text)
-
-	// node3
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->text)
-	ASSERT_NULL(root->chld->chld->sibl->chld->text->sibl)
-
-	// node4
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->text)
-
-	// node5
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->text)
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->text->sibl)
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->text->sibl->sibl)
-
-	// node6
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->text)
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->text->sibl)
-
-	// node7
-	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->text)
-	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->text->sibl)
-	ASSERT_NULL(root->chld->chld->sibl->sibl->text->sibl->sibl)
+	ASSERT_NULL(node7->sibl);
+	ASSERT_NULL(node5->sibl);
+	ASSERT_NULL(node8->chld);
 #else /* !IGNORE_EMPTY_TEXT_NODES */
-	ASSERT_NOT_NULL(root->chld->text)
-	ASSERT_NOT_NULL(root->chld->text->sibl)
-	ASSERT_NOT_NULL(root->chld->text->sibl->sibl)
-	ASSERT_NOT_NULL(root->chld->text->sibl->sibl->sibl)
-	ASSERT_NULL(root->chld->text->sibl->sibl->sibl->sibl)
-
-	// node1
-	ASSERT_NOT_NULL(root->chld->chld->text)
-	ASSERT_NULL(root->chld->chld->text->sibl)
-
-	// node2
-	ASSERT_NOT_NULL(root->chld->chld->sibl->text)
-	ASSERT_NOT_NULL(root->chld->chld->sibl->text->sibl)
-	ASSERT_NOT_NULL(root->chld->chld->sibl->text->sibl->sibl)
-	ASSERT_NOT_NULL(root->chld->chld->sibl->text->sibl->sibl->sibl)
-	ASSERT_NULL(root->chld->chld->sibl->text->sibl->sibl->sibl->sibl)
-
-	// node3
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->text)
-	ASSERT_NULL(root->chld->chld->sibl->chld->text->sibl)
-
-	// node4
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->text)
-
-	// node5
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->text)
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->text->sibl)
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->text->sibl->sibl)
-
-	// node6
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->text)
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->text->sibl)
-
-	// node7
-	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->text)
-	ASSERT_NULL(root->chld->chld->sibl->sibl->text->sibl)
+	ASSERT_NULL(text0_3->sibl);
+	ASSERT_NULL(text8_0->sibl);
+	ASSERT_NULL(text2_3->sibl);
 #endif /* !IGNORE_EMPTY_TEXT_NODES */
+
+	ASSERT_NULL(node0->attr)
+	ASSERT_NOT_NULL(node1->attr)
+	ASSERT_NOT_NULL(node1->attr->sibl)
+	ASSERT_NULL(node1->attr->sibl->sibl)
+	ASSERT_NOT_NULL(node2->attr)
+	ASSERT_NOT_NULL(node2->attr->sibl)
+	ASSERT_NULL(node2->attr->sibl->sibl)
+	ASSERT_NULL(node3->attr)
+	ASSERT_NOT_NULL(node4->attr)
+	ASSERT_NOT_NULL(node4->attr->sibl)
+	ASSERT_NULL(node4->attr->sibl->sibl)
+	ASSERT_NULL(node5->attr)
+	ASSERT_NULL(node6->attr)
+	ASSERT_NULL(node7->attr)
+	ASSERT_NULL(node8->attr)
 
 	roxml_close(root);
 
@@ -173,26 +152,74 @@ int test_names_on_doc(void)
 
 	char string[128];
 	node_t *root = roxml_load_doc("roxml.test.xml");
+
+#ifdef IGNORE_EMPTY_TEXT_NODES
+	node_t * node0 = root->chld;
+	node_t * node1 = node0->chld;
+	node_t * text1 = node1->chld;
+	node_t * node2 = node1->sibl;
+	node_t * node3 = node2->chld;
+	node_t * text2 = node3->chld;
+	node_t * node4 = node3->sibl;
+	node_t * node5 = node4->sibl;
+	node_t * text3 = node5->chld;
+	node_t * node6 = text3->sibl;
+	node_t * text4 = node6->sibl;
+	node_t * text5 = node6->chld;
+	node_t * node7 = node2->sibl;
+	node_t * text8 = node7->chld;
+	node_t * node8 = text8->sibl;
+	node_t * text9 = node8->sibl;
+
+#else /* !IGNORE_EMPTY_TEXT_NODES */
+
+	node_t * node0 = root->chld;
+	node_t * text0_0 = node0->chld;
+	node_t * node1 = text0_0->sibl;
+	node_t * text0_1 = node1->sibl;
+	node_t * text1 = node1->chld;
+	node_t * node2 = text0_1->sibl;
+	node_t * text0_2 = node2->sibl;
+	node_t * text2_0 = node2->chld;
+	node_t * node3 = text2_0->sibl;
+	node_t * text2_1 = node3->sibl;
+	node_t * node4 = text2_1->sibl;
+	node_t * text2_2 = node4->sibl;
+	node_t * node5 = text2_2->sibl;
+	node_t * text2_3 = node5->sibl;
+	node_t * text2 = node3->chld;
+	node_t * text3 = node5->chld;
+	node_t * node6 = text3->sibl;
+	node_t * text4 = node6->sibl;
+	node_t * text5 = node6->chld;
+	node_t * node7 = text0_2->sibl;
+	node_t * text0_3 = node7->sibl;
+	node_t * text8 = node7->chld;
+	node_t * node8 = text8->sibl;
+	node_t * text8_0 = node8->chld;
+	node_t * text9 = node8->sibl;
+#endif /* !IGNORE_EMPTY_TEXT_NODES */
 	
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld, NULL, 0), "node0"); // node0
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld, NULL, 0), "node1");	// node1
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl, NULL, 0), "node2");	// node2
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->sibl, NULL, 0), "node7");	// node7
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld, NULL, 0), "node3");	//node3
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl, NULL, 0), "node4");	//node4
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl->sibl, NULL, 0), "node5");	//node5
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl->sibl->chld, NULL, 0), "node6");	//node6
+	ASSERT_STRING_EQUAL(roxml_get_name(node0, NULL, 0), "node0");
+	ASSERT_STRING_EQUAL(roxml_get_name(node1, NULL, 0), "node1");
+	ASSERT_STRING_EQUAL(roxml_get_name(node2, NULL, 0), "node2");
+	ASSERT_STRING_EQUAL(roxml_get_name(node3, NULL, 0), "node3");
+	ASSERT_STRING_EQUAL(roxml_get_name(node4, NULL, 0), "node4");
+	ASSERT_STRING_EQUAL(roxml_get_name(node5, NULL, 0), "node5");
+	ASSERT_STRING_EQUAL(roxml_get_name(node6, NULL, 0), "node6");
+	ASSERT_STRING_EQUAL(roxml_get_name(node7, NULL, 0), "node7");
+	ASSERT_STRING_EQUAL(roxml_get_name(node8, NULL, 0), "node8");
 
-	ASSERT_NULL(roxml_get_name(root->chld->attr, NULL, 0))
+	ASSERT_NULL(roxml_get_name(node0->attr, NULL, 0))
 
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->attr, NULL, 0), "name")
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->attr->sibl, NULL, 0), "value")
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->attr, NULL, 0), "name")
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->attr->sibl, NULL, 0), "value")
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl->attr, NULL, 0), "name")
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl->attr->sibl, NULL, 0), "value")
+	ASSERT_STRING_EQUAL(roxml_get_name(node1->attr, NULL, 0), "name")
+	ASSERT_STRING_EQUAL(roxml_get_name(node1->attr->sibl, NULL, 0), "value")
+	ASSERT_STRING_EQUAL(roxml_get_name(node2->attr, NULL, 0), "name")
+	ASSERT_STRING_EQUAL(roxml_get_name(node2->attr->sibl, NULL, 0), "value")
+	ASSERT_STRING_EQUAL(roxml_get_name(node4->attr, NULL, 0), "name")
+	ASSERT_STRING_EQUAL(roxml_get_name(node4->attr->sibl, NULL, 0), "value")
 
-	ASSERT_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl->attr->sibl, string, 128), string)
+	ASSERT_EQUAL(roxml_get_name(node4->attr->sibl, string, 128), string)
 	ASSERT_STRING_EQUAL(string, "value")
 
 	roxml_release(RELEASE_ALL);
@@ -251,55 +278,104 @@ int test_tree_on_buf(void)
 	
 	ASSERT_NOT_NULL(root);
 
-	ASSERT_NOT_NULL(root->chld); // node0
-	ASSERT_NOT_NULL(root->chld->chld);	// node1
-	ASSERT_NOT_NULL(root->chld->chld->sibl);	// node2
-	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl);	// node7
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld);	//node3
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl);	//node4
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl);	//node5
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld);	//node6
-	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->chld);
-	ASSERT_NULL(root->chld->chld->sibl->sibl->chld->chld);
-	ASSERT_NULL(root->chld->chld->sibl->sibl->chld->sibl);
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->sibl);
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->chld);
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->chld);
-	ASSERT_NULL(root->chld->chld->sibl->chld->chld);
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->sibl);
-	ASSERT_NULL(root->chld->chld->sibl->sibl->sibl);
-	ASSERT_NULL(root->chld->chld->chld);
-	ASSERT_NULL(root->sibl);
+#ifdef IGNORE_EMPTY_TEXT_NODES
+	node_t * node0 = root->chld;
+	node_t * node1 = node0->chld;
+	node_t * text1 = node1->chld;
+	node_t * node2 = node1->sibl;
+	node_t * node3 = node2->chld;
+	node_t * text2 = node3->chld;
+	node_t * node4 = node3->sibl;
+	node_t * node5 = node4->sibl;
+	node_t * text3 = node5->chld;
+	node_t * node6 = text3->sibl;
+	node_t * text4 = node6->sibl;
+	node_t * text5 = node6->chld;
+	node_t * node7 = node2->sibl;
+	node_t * text8 = node7->chld;
+	node_t * node8 = text8->sibl;
+	node_t * text9 = node8->sibl;
 
-	// node0
-	ASSERT_NULL(root->chld->attr)
+#else /* !IGNORE_EMPTY_TEXT_NODES */
 
-	// node1
-	ASSERT_NOT_NULL(root->chld->chld->attr)
-	ASSERT_NOT_NULL(root->chld->chld->attr->sibl)
-	ASSERT_NULL(root->chld->chld->attr->sibl->sibl)
+	node_t * node0 = root->chld;
+	node_t * text0_0 = node0->chld;
+	node_t * node1 = text0_0->sibl;
+	node_t * text0_1 = node1->sibl;
+	node_t * text1 = node1->chld;
+	node_t * node2 = text0_1->sibl;
+	node_t * text0_2 = node2->sibl;
+	node_t * text2_0 = node2->chld;
+	node_t * node3 = text2_0->sibl;
+	node_t * text2_1 = node3->sibl;
+	node_t * node4 = text2_1->sibl;
+	node_t * text2_2 = node4->sibl;
+	node_t * node5 = text2_2->sibl;
+	node_t * text2_3 = node5->sibl;
+	node_t * text2 = node3->chld;
+	node_t * text3 = node5->chld;
+	node_t * node6 = text3->sibl;
+	node_t * text4 = node6->sibl;
+	node_t * text5 = node6->chld;
+	node_t * node7 = text0_2->sibl;
+	node_t * text0_3 = node7->sibl;
+	node_t * text8 = node7->chld;
+	node_t * node8 = text8->sibl;
+	node_t * text8_0 = node8->chld;
+	node_t * text9 = node8->sibl;
+#endif /* !IGNORE_EMPTY_TEXT_NODES */
 
-	// node2
-	ASSERT_NOT_NULL(root->chld->chld->sibl->attr)
-	ASSERT_NOT_NULL(root->chld->chld->sibl->attr->sibl)
-	ASSERT_NULL(root->chld->chld->sibl->attr->sibl->sibl)
+	ASSERT_NOT_NULL(node0);
+	ASSERT_NOT_NULL(node1);
+	ASSERT_NOT_NULL(node2);
+	ASSERT_NOT_NULL(node3);
+	ASSERT_NOT_NULL(node4);
+	ASSERT_NOT_NULL(node5);
+	ASSERT_NOT_NULL(node6);
+	ASSERT_NOT_NULL(node7);
+	ASSERT_NOT_NULL(node8);
 
-	// node3
-	ASSERT_NULL(root->chld->chld->sibl->chld->attr)
+	ASSERT_NOT_NULL(text1);
+	ASSERT_NOT_NULL(text2);
+	ASSERT_NOT_NULL(text3);
+	ASSERT_NOT_NULL(text4);
+	ASSERT_NOT_NULL(text5);
+	ASSERT_NOT_NULL(text8);
+	ASSERT_NOT_NULL(text9);
+	
+	ASSERT_NULL(node0->sibl);
+	ASSERT_NULL(text1->sibl);
+	ASSERT_NULL(text2->sibl);
+	ASSERT_NULL(node4->chld);
+	ASSERT_NULL(text5->sibl);
+	ASSERT_NULL(text4->sibl);
+	ASSERT_NULL(text9->sibl);
 
-	// node4
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->attr)
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->attr->sibl)
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->attr->sibl->sibl)
+#ifdef IGNORE_EMPTY_TEXT_NODES
+	ASSERT_NULL(node7->sibl);
+	ASSERT_NULL(node5->sibl);
+	ASSERT_NULL(node8->chld);
+#else /* !IGNORE_EMPTY_TEXT_NODES */
+	ASSERT_NULL(text0_3->sibl);
+	ASSERT_NULL(text8_0->sibl);
+	ASSERT_NULL(text2_3->sibl);
+#endif /* !IGNORE_EMPTY_TEXT_NODES */
 
-	// node5
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->attr)
-
-	// node6
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->attr)
-
-	// node7
-	ASSERT_NULL(root->chld->chld->sibl->sibl->attr)
+	ASSERT_NULL(node0->attr)
+	ASSERT_NOT_NULL(node1->attr)
+	ASSERT_NOT_NULL(node1->attr->sibl)
+	ASSERT_NULL(node1->attr->sibl->sibl)
+	ASSERT_NOT_NULL(node2->attr)
+	ASSERT_NOT_NULL(node2->attr->sibl)
+	ASSERT_NULL(node2->attr->sibl->sibl)
+	ASSERT_NULL(node3->attr)
+	ASSERT_NOT_NULL(node4->attr)
+	ASSERT_NOT_NULL(node4->attr->sibl)
+	ASSERT_NULL(node4->attr->sibl->sibl)
+	ASSERT_NULL(node5->attr)
+	ASSERT_NULL(node6->attr)
+	ASSERT_NULL(node7->attr)
+	ASSERT_NULL(node8->attr)
 
 	roxml_close(root);
 
@@ -325,25 +401,73 @@ int test_names_on_buf(void)
 
 	node_t *root = roxml_load_buf(buf);
 	
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld, NULL, 0), "node0"); // node0
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld, NULL, 0), "node1");	// node1
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl, NULL, 0), "node2");	// node2
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->sibl, NULL, 0), "node7");	// node7
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld, NULL, 0), "node3");	//node3
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl, NULL, 0), "node4");	//node4
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl->sibl, NULL, 0), "node5");	//node5
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl->sibl->chld, NULL, 0), "node6");	//node6
+#ifdef IGNORE_EMPTY_TEXT_NODES
+	node_t * node0 = root->chld;
+	node_t * node1 = node0->chld;
+	node_t * text1 = node1->chld;
+	node_t * node2 = node1->sibl;
+	node_t * node3 = node2->chld;
+	node_t * text2 = node3->chld;
+	node_t * node4 = node3->sibl;
+	node_t * node5 = node4->sibl;
+	node_t * text3 = node5->chld;
+	node_t * node6 = text3->sibl;
+	node_t * text4 = node6->sibl;
+	node_t * text5 = node6->chld;
+	node_t * node7 = node2->sibl;
+	node_t * text8 = node7->chld;
+	node_t * node8 = text8->sibl;
+	node_t * text9 = node8->sibl;
 
-	ASSERT_NULL(roxml_get_name(root->chld->attr, NULL, 0))
+#else /* !IGNORE_EMPTY_TEXT_NODES */
 
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->attr, NULL, 0), "name")
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->attr->sibl, NULL, 0), "value")
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->attr, NULL, 0), "name")
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->attr->sibl, NULL, 0), "value")
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl->attr, NULL, 0), "name")
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl->attr->sibl, NULL, 0), "value")
+	node_t * node0 = root->chld;
+	node_t * text0_0 = node0->chld;
+	node_t * node1 = text0_0->sibl;
+	node_t * text0_1 = node1->sibl;
+	node_t * text1 = node1->chld;
+	node_t * node2 = text0_1->sibl;
+	node_t * text0_2 = node2->sibl;
+	node_t * text2_0 = node2->chld;
+	node_t * node3 = text2_0->sibl;
+	node_t * text2_1 = node3->sibl;
+	node_t * node4 = text2_1->sibl;
+	node_t * text2_2 = node4->sibl;
+	node_t * node5 = text2_2->sibl;
+	node_t * text2_3 = node5->sibl;
+	node_t * text2 = node3->chld;
+	node_t * text3 = node5->chld;
+	node_t * node6 = text3->sibl;
+	node_t * text4 = node6->sibl;
+	node_t * text5 = node6->chld;
+	node_t * node7 = text0_2->sibl;
+	node_t * text0_3 = node7->sibl;
+	node_t * text8 = node7->chld;
+	node_t * node8 = text8->sibl;
+	node_t * text8_0 = node8->chld;
+	node_t * text9 = node8->sibl;
+#endif /* !IGNORE_EMPTY_TEXT_NODES */
+	
+	ASSERT_STRING_EQUAL(roxml_get_name(node0, NULL, 0), "node0");
+	ASSERT_STRING_EQUAL(roxml_get_name(node1, NULL, 0), "node1");
+	ASSERT_STRING_EQUAL(roxml_get_name(node2, NULL, 0), "node2");
+	ASSERT_STRING_EQUAL(roxml_get_name(node3, NULL, 0), "node3");
+	ASSERT_STRING_EQUAL(roxml_get_name(node4, NULL, 0), "node4");
+	ASSERT_STRING_EQUAL(roxml_get_name(node5, NULL, 0), "node5");
+	ASSERT_STRING_EQUAL(roxml_get_name(node6, NULL, 0), "node6");
+	ASSERT_STRING_EQUAL(roxml_get_name(node7, NULL, 0), "node7");
+	ASSERT_STRING_EQUAL(roxml_get_name(node8, NULL, 0), "node8");
 
-	ASSERT_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl->attr->sibl, string, 128), string)
+	ASSERT_NULL(roxml_get_name(node0->attr, NULL, 0))
+
+	ASSERT_STRING_EQUAL(roxml_get_name(node1->attr, NULL, 0), "name")
+	ASSERT_STRING_EQUAL(roxml_get_name(node1->attr->sibl, NULL, 0), "value")
+	ASSERT_STRING_EQUAL(roxml_get_name(node2->attr, NULL, 0), "name")
+	ASSERT_STRING_EQUAL(roxml_get_name(node2->attr->sibl, NULL, 0), "value")
+	ASSERT_STRING_EQUAL(roxml_get_name(node4->attr, NULL, 0), "name")
+	ASSERT_STRING_EQUAL(roxml_get_name(node4->attr->sibl, NULL, 0), "value")
+
+	ASSERT_EQUAL(roxml_get_name(node4->attr->sibl, string, 128), string)
 	ASSERT_STRING_EQUAL(string, "value")
 
 	roxml_release(RELEASE_ALL);
@@ -375,55 +499,104 @@ int test_tree_on_human_doc(void)
 	
 	ASSERT_NOT_NULL(root);
 
-	ASSERT_NOT_NULL(root->chld); // node0
-	ASSERT_NOT_NULL(root->chld->chld);	// node1
-	ASSERT_NOT_NULL(root->chld->chld->sibl);	// node2
-	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl);	// node7
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld);	//node3
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl);	//node4
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl);	//node5
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld);	//node6
-	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->chld);
-	ASSERT_NULL(root->chld->chld->sibl->sibl->chld->chld);
-	ASSERT_NULL(root->chld->chld->sibl->sibl->chld->sibl);
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->sibl);
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->chld);
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->chld);
-	ASSERT_NULL(root->chld->chld->sibl->chld->chld);
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->sibl);
-	ASSERT_NULL(root->chld->chld->sibl->sibl->sibl);
-	ASSERT_NULL(root->chld->chld->chld);
-	ASSERT_NULL(root->sibl);
+#ifdef IGNORE_EMPTY_TEXT_NODES
+	node_t * node0 = root->chld;
+	node_t * node1 = node0->chld;
+	node_t * text1 = node1->chld;
+	node_t * node2 = node1->sibl;
+	node_t * node3 = node2->chld;
+	node_t * text2 = node3->chld;
+	node_t * node4 = node3->sibl;
+	node_t * node5 = node4->sibl;
+	node_t * text3 = node5->chld;
+	node_t * node6 = text3->sibl;
+	node_t * text4 = node6->sibl;
+	node_t * text5 = node6->chld;
+	node_t * node7 = node2->sibl;
+	node_t * text8 = node7->chld;
+	node_t * node8 = text8->sibl;
+	node_t * text9 = node8->sibl;
 
-	// node0
-	ASSERT_NULL(root->chld->attr)
+#else /* !IGNORE_EMPTY_TEXT_NODES */
 
-	// node1
-	ASSERT_NOT_NULL(root->chld->chld->attr)
-	ASSERT_NOT_NULL(root->chld->chld->attr->sibl)
-	ASSERT_NULL(root->chld->chld->attr->sibl->sibl)
+	node_t * node0 = root->chld;
+	node_t * text0_0 = node0->chld;
+	node_t * node1 = text0_0->sibl;
+	node_t * text0_1 = node1->sibl;
+	node_t * text1 = node1->chld;
+	node_t * node2 = text0_1->sibl;
+	node_t * text0_2 = node2->sibl;
+	node_t * text2_0 = node2->chld;
+	node_t * node3 = text2_0->sibl;
+	node_t * text2_1 = node3->sibl;
+	node_t * node4 = text2_1->sibl;
+	node_t * text2_2 = node4->sibl;
+	node_t * node5 = text2_2->sibl;
+	node_t * text2_3 = node5->sibl;
+	node_t * text2 = node3->chld;
+	node_t * text3 = node5->chld;
+	node_t * node6 = text3->sibl;
+	node_t * text4 = node6->sibl;
+	node_t * text5 = node6->chld;
+	node_t * node7 = text0_2->sibl;
+	node_t * text0_3 = node7->sibl;
+	node_t * text8 = node7->chld;
+	node_t * node8 = text8->sibl;
+	node_t * text8_0 = node8->chld;
+	node_t * text9 = node8->sibl;
+#endif /* !IGNORE_EMPTY_TEXT_NODES */
 
-	// node2
-	ASSERT_NOT_NULL(root->chld->chld->sibl->attr)
-	ASSERT_NOT_NULL(root->chld->chld->sibl->attr->sibl)
-	ASSERT_NULL(root->chld->chld->sibl->attr->sibl->sibl)
+	ASSERT_NOT_NULL(node0);
+	ASSERT_NOT_NULL(node1);
+	ASSERT_NOT_NULL(node2);
+	ASSERT_NOT_NULL(node3);
+	ASSERT_NOT_NULL(node4);
+	ASSERT_NOT_NULL(node5);
+	ASSERT_NOT_NULL(node6);
+	ASSERT_NOT_NULL(node7);
+	ASSERT_NOT_NULL(node8);
 
-	// node3
-	ASSERT_NULL(root->chld->chld->sibl->chld->attr)
+	ASSERT_NOT_NULL(text1);
+	ASSERT_NOT_NULL(text2);
+	ASSERT_NOT_NULL(text3);
+	ASSERT_NOT_NULL(text4);
+	ASSERT_NOT_NULL(text5);
+	ASSERT_NOT_NULL(text8);
+	ASSERT_NOT_NULL(text9);
+	
+	ASSERT_NULL(node0->sibl);
+	ASSERT_NULL(text1->sibl);
+	ASSERT_NULL(text2->sibl);
+	ASSERT_NULL(node4->chld);
+	ASSERT_NULL(text5->sibl);
+	ASSERT_NULL(text4->sibl);
+	ASSERT_NULL(text9->sibl);
 
-	// node4
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->attr)
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->attr->sibl)
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->attr->sibl->sibl)
+#ifdef IGNORE_EMPTY_TEXT_NODES
+	ASSERT_NULL(node7->sibl);
+	ASSERT_NULL(node5->sibl);
+	ASSERT_NULL(node8->chld);
+#else /* !IGNORE_EMPTY_TEXT_NODES */
+	ASSERT_NULL(text0_3->sibl);
+	ASSERT_NULL(text8_0->sibl);
+	ASSERT_NULL(text2_3->sibl);
+#endif /* !IGNORE_EMPTY_TEXT_NODES */
 
-	// node5
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->attr)
-
-	// node6
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->attr)
-
-	// node7
-	ASSERT_NULL(root->chld->chld->sibl->sibl->attr)
+	ASSERT_NULL(node0->attr)
+	ASSERT_NOT_NULL(node1->attr)
+	ASSERT_NOT_NULL(node1->attr->sibl)
+	ASSERT_NULL(node1->attr->sibl->sibl)
+	ASSERT_NOT_NULL(node2->attr)
+	ASSERT_NOT_NULL(node2->attr->sibl)
+	ASSERT_NULL(node2->attr->sibl->sibl)
+	ASSERT_NULL(node3->attr)
+	ASSERT_NOT_NULL(node4->attr)
+	ASSERT_NOT_NULL(node4->attr->sibl)
+	ASSERT_NULL(node4->attr->sibl->sibl)
+	ASSERT_NULL(node5->attr)
+	ASSERT_NULL(node6->attr)
+	ASSERT_NULL(node7->attr)
+	ASSERT_NULL(node8->attr)
 
 	roxml_close(root);
 
@@ -436,26 +609,74 @@ int test_names_on_human_doc(void)
 
 	char string[128];
 	node_t *root = roxml_load_doc("roxml.test.xml.human");
+
+#ifdef IGNORE_EMPTY_TEXT_NODES
+	node_t * node0 = root->chld;
+	node_t * node1 = node0->chld;
+	node_t * text1 = node1->chld;
+	node_t * node2 = node1->sibl;
+	node_t * node3 = node2->chld;
+	node_t * text2 = node3->chld;
+	node_t * node4 = node3->sibl;
+	node_t * node5 = node4->sibl;
+	node_t * text3 = node5->chld;
+	node_t * node6 = text3->sibl;
+	node_t * text4 = node6->sibl;
+	node_t * text5 = node6->chld;
+	node_t * node7 = node2->sibl;
+	node_t * text8 = node7->chld;
+	node_t * node8 = text8->sibl;
+	node_t * text9 = node8->sibl;
+
+#else /* !IGNORE_EMPTY_TEXT_NODES */
+
+	node_t * node0 = root->chld;
+	node_t * text0_0 = node0->chld;
+	node_t * node1 = text0_0->sibl;
+	node_t * text0_1 = node1->sibl;
+	node_t * text1 = node1->chld;
+	node_t * node2 = text0_1->sibl;
+	node_t * text0_2 = node2->sibl;
+	node_t * text2_0 = node2->chld;
+	node_t * node3 = text2_0->sibl;
+	node_t * text2_1 = node3->sibl;
+	node_t * node4 = text2_1->sibl;
+	node_t * text2_2 = node4->sibl;
+	node_t * node5 = text2_2->sibl;
+	node_t * text2_3 = node5->sibl;
+	node_t * text2 = node3->chld;
+	node_t * text3 = node5->chld;
+	node_t * node6 = text3->sibl;
+	node_t * text4 = node6->sibl;
+	node_t * text5 = node6->chld;
+	node_t * node7 = text0_2->sibl;
+	node_t * text0_3 = node7->sibl;
+	node_t * text8 = node7->chld;
+	node_t * node8 = text8->sibl;
+	node_t * text8_0 = node8->chld;
+	node_t * text9 = node8->sibl;
+#endif /* !IGNORE_EMPTY_TEXT_NODES */
 	
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld, NULL, 0), "node0"); // node0
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld, NULL, 0), "node1");	// node1
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl, NULL, 0), "node2");	// node2
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->sibl, NULL, 0), "node7");	// node7
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld, NULL, 0), "node3");	//node3
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl, NULL, 0), "node4");	//node4
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl->sibl, NULL, 0), "node5");	//node5
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl->sibl->chld, NULL, 0), "node6");	//node6
+	ASSERT_STRING_EQUAL(roxml_get_name(node0, NULL, 0), "node0");
+	ASSERT_STRING_EQUAL(roxml_get_name(node1, NULL, 0), "node1");
+	ASSERT_STRING_EQUAL(roxml_get_name(node2, NULL, 0), "node2");
+	ASSERT_STRING_EQUAL(roxml_get_name(node3, NULL, 0), "node3");
+	ASSERT_STRING_EQUAL(roxml_get_name(node4, NULL, 0), "node4");
+	ASSERT_STRING_EQUAL(roxml_get_name(node5, NULL, 0), "node5");
+	ASSERT_STRING_EQUAL(roxml_get_name(node6, NULL, 0), "node6");
+	ASSERT_STRING_EQUAL(roxml_get_name(node7, NULL, 0), "node7");
+	ASSERT_STRING_EQUAL(roxml_get_name(node8, NULL, 0), "node8");
 
-	ASSERT_NULL(roxml_get_name(root->chld->attr, NULL, 0))
+	ASSERT_NULL(roxml_get_name(node0->attr, NULL, 0))
 
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->attr, NULL, 0), "name")
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->attr->sibl, NULL, 0), "value")
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->attr, NULL, 0), "name")
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->attr->sibl, NULL, 0), "value")
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl->attr, NULL, 0), "name")
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl->attr->sibl, NULL, 0), "value")
+	ASSERT_STRING_EQUAL(roxml_get_name(node1->attr, NULL, 0), "name")
+	ASSERT_STRING_EQUAL(roxml_get_name(node1->attr->sibl, NULL, 0), "value")
+	ASSERT_STRING_EQUAL(roxml_get_name(node2->attr, NULL, 0), "name")
+	ASSERT_STRING_EQUAL(roxml_get_name(node2->attr->sibl, NULL, 0), "value")
+	ASSERT_STRING_EQUAL(roxml_get_name(node4->attr, NULL, 0), "name")
+	ASSERT_STRING_EQUAL(roxml_get_name(node4->attr->sibl, NULL, 0), "value")
 
-	ASSERT_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl->attr->sibl, string, 128), string)
+	ASSERT_EQUAL(roxml_get_name(node4->attr->sibl, string, 128), string)
 	ASSERT_STRING_EQUAL(string, "value")
 
 	roxml_release(RELEASE_ALL);
@@ -508,59 +729,108 @@ int test_tree_on_human_buf(void)
 	}
 
 	node_t *root = roxml_load_buf(buf);
-	
+
 	ASSERT_NOT_NULL(root);
 
-	ASSERT_NOT_NULL(root->chld); // node0
-	ASSERT_NOT_NULL(root->chld->chld);	// node1
-	ASSERT_NOT_NULL(root->chld->chld->sibl);	// node2
-	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl);	// node7
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld);	//node3
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl);	//node4
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl);	//node5
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld);	//node6
-	ASSERT_NOT_NULL(root->chld->chld->sibl->sibl->chld);
-	ASSERT_NULL(root->chld->chld->sibl->sibl->chld->chld);
-	ASSERT_NULL(root->chld->chld->sibl->sibl->chld->sibl);
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->sibl);
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->chld);
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->chld);
-	ASSERT_NULL(root->chld->chld->sibl->chld->chld);
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->sibl);
-	ASSERT_NULL(root->chld->chld->sibl->sibl->sibl);
-	ASSERT_NULL(root->chld->chld->chld);
-	ASSERT_NULL(root->sibl);
+#ifdef IGNORE_EMPTY_TEXT_NODES
+	node_t * node0 = root->chld;
+	node_t * node1 = node0->chld;
+	node_t * text1 = node1->chld;
+	node_t * node2 = node1->sibl;
+	node_t * node3 = node2->chld;
+	node_t * text2 = node3->chld;
+	node_t * node4 = node3->sibl;
+	node_t * node5 = node4->sibl;
+	node_t * text3 = node5->chld;
+	node_t * node6 = text3->sibl;
+	node_t * text4 = node6->sibl;
+	node_t * text5 = node6->chld;
+	node_t * node7 = node2->sibl;
+	node_t * text8 = node7->chld;
+	node_t * node8 = text8->sibl;
+	node_t * text9 = node8->sibl;
 
-	// node0
-	ASSERT_NULL(root->chld->attr)
+#else /* !IGNORE_EMPTY_TEXT_NODES */
 
-	// node1
-	ASSERT_NOT_NULL(root->chld->chld->attr)
-	ASSERT_NOT_NULL(root->chld->chld->attr->sibl)
-	ASSERT_NULL(root->chld->chld->attr->sibl->sibl)
+	node_t * node0 = root->chld;
+	node_t * text0_0 = node0->chld;
+	node_t * node1 = text0_0->sibl;
+	node_t * text0_1 = node1->sibl;
+	node_t * text1 = node1->chld;
+	node_t * node2 = text0_1->sibl;
+	node_t * text0_2 = node2->sibl;
+	node_t * text2_0 = node2->chld;
+	node_t * node3 = text2_0->sibl;
+	node_t * text2_1 = node3->sibl;
+	node_t * node4 = text2_1->sibl;
+	node_t * text2_2 = node4->sibl;
+	node_t * node5 = text2_2->sibl;
+	node_t * text2_3 = node5->sibl;
+	node_t * text2 = node3->chld;
+	node_t * text3 = node5->chld;
+	node_t * node6 = text3->sibl;
+	node_t * text4 = node6->sibl;
+	node_t * text5 = node6->chld;
+	node_t * node7 = text0_2->sibl;
+	node_t * text0_3 = node7->sibl;
+	node_t * text8 = node7->chld;
+	node_t * node8 = text8->sibl;
+	node_t * text8_0 = node8->chld;
+	node_t * text9 = node8->sibl;
+#endif /* !IGNORE_EMPTY_TEXT_NODES */
 
-	// node2
-	ASSERT_NOT_NULL(root->chld->chld->sibl->attr)
-	ASSERT_NOT_NULL(root->chld->chld->sibl->attr->sibl)
-	ASSERT_NULL(root->chld->chld->sibl->attr->sibl->sibl)
+	ASSERT_NOT_NULL(node0);
+	ASSERT_NOT_NULL(node1);
+	ASSERT_NOT_NULL(node2);
+	ASSERT_NOT_NULL(node3);
+	ASSERT_NOT_NULL(node4);
+	ASSERT_NOT_NULL(node5);
+	ASSERT_NOT_NULL(node6);
+	ASSERT_NOT_NULL(node7);
+	ASSERT_NOT_NULL(node8);
 
-	// node3
-	ASSERT_NULL(root->chld->chld->sibl->chld->attr)
+	ASSERT_NOT_NULL(text1);
+	ASSERT_NOT_NULL(text2);
+	ASSERT_NOT_NULL(text3);
+	ASSERT_NOT_NULL(text4);
+	ASSERT_NOT_NULL(text5);
+	ASSERT_NOT_NULL(text8);
+	ASSERT_NOT_NULL(text9);
+	
+	ASSERT_NULL(node0->sibl);
+	ASSERT_NULL(text1->sibl);
+	ASSERT_NULL(text2->sibl);
+	ASSERT_NULL(node4->chld);
+	ASSERT_NULL(text5->sibl);
+	ASSERT_NULL(text4->sibl);
+	ASSERT_NULL(text9->sibl);
 
-	// node4
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->attr)
-	ASSERT_NOT_NULL(root->chld->chld->sibl->chld->sibl->attr->sibl)
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->attr->sibl->sibl)
+#ifdef IGNORE_EMPTY_TEXT_NODES
+	ASSERT_NULL(node7->sibl);
+	ASSERT_NULL(node5->sibl);
+	ASSERT_NULL(node8->chld);
+#else /* !IGNORE_EMPTY_TEXT_NODES */
+	ASSERT_NULL(text0_3->sibl);
+	ASSERT_NULL(text8_0->sibl);
+	ASSERT_NULL(text2_3->sibl);
+#endif /* !IGNORE_EMPTY_TEXT_NODES */
 
-	// node5
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->attr)
-
-	// node6
-	ASSERT_NULL(root->chld->chld->sibl->chld->sibl->sibl->chld->attr)
-
-	// node7
-	ASSERT_NULL(root->chld->chld->sibl->sibl->attr)
-
+	ASSERT_NULL(node0->attr)
+	ASSERT_NOT_NULL(node1->attr)
+	ASSERT_NOT_NULL(node1->attr->sibl)
+	ASSERT_NULL(node1->attr->sibl->sibl)
+	ASSERT_NOT_NULL(node2->attr)
+	ASSERT_NOT_NULL(node2->attr->sibl)
+	ASSERT_NULL(node2->attr->sibl->sibl)
+	ASSERT_NULL(node3->attr)
+	ASSERT_NOT_NULL(node4->attr)
+	ASSERT_NOT_NULL(node4->attr->sibl)
+	ASSERT_NULL(node4->attr->sibl->sibl)
+	ASSERT_NULL(node5->attr)
+	ASSERT_NULL(node6->attr)
+	ASSERT_NULL(node7->attr)
+	ASSERT_NULL(node8->attr)
+	
 	roxml_close(root);
 
 	RETURN /* close context macro */
@@ -585,25 +855,73 @@ int test_names_on_human_buf(void)
 
 	node_t *root = roxml_load_buf(buf);
 	
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld, NULL, 0), "node0"); // node0
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld, NULL, 0), "node1");	// node1
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl, NULL, 0), "node2");	// node2
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->sibl, NULL, 0), "node7");	// node7
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld, NULL, 0), "node3");	//node3
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl, NULL, 0), "node4");	//node4
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl->sibl, NULL, 0), "node5");	//node5
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl->sibl->chld, NULL, 0), "node6");	//node6
+#ifdef IGNORE_EMPTY_TEXT_NODES
+	node_t * node0 = root->chld;
+	node_t * node1 = node0->chld;
+	node_t * text1 = node1->chld;
+	node_t * node2 = node1->sibl;
+	node_t * node3 = node2->chld;
+	node_t * text2 = node3->chld;
+	node_t * node4 = node3->sibl;
+	node_t * node5 = node4->sibl;
+	node_t * text3 = node5->chld;
+	node_t * node6 = text3->sibl;
+	node_t * text4 = node6->sibl;
+	node_t * text5 = node6->chld;
+	node_t * node7 = node2->sibl;
+	node_t * text8 = node7->chld;
+	node_t * node8 = text8->sibl;
+	node_t * text9 = node8->sibl;
 
-	ASSERT_NULL(roxml_get_name(root->chld->attr, NULL, 0))
+#else /* !IGNORE_EMPTY_TEXT_NODES */
 
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->attr, NULL, 0), "name")
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->attr->sibl, NULL, 0), "value")
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->attr, NULL, 0), "name")
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->attr->sibl, NULL, 0), "value")
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl->attr, NULL, 0), "name")
-	ASSERT_STRING_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl->attr->sibl, NULL, 0), "value")
+	node_t * node0 = root->chld;
+	node_t * text0_0 = node0->chld;
+	node_t * node1 = text0_0->sibl;
+	node_t * text0_1 = node1->sibl;
+	node_t * text1 = node1->chld;
+	node_t * node2 = text0_1->sibl;
+	node_t * text0_2 = node2->sibl;
+	node_t * text2_0 = node2->chld;
+	node_t * node3 = text2_0->sibl;
+	node_t * text2_1 = node3->sibl;
+	node_t * node4 = text2_1->sibl;
+	node_t * text2_2 = node4->sibl;
+	node_t * node5 = text2_2->sibl;
+	node_t * text2_3 = node5->sibl;
+	node_t * text2 = node3->chld;
+	node_t * text3 = node5->chld;
+	node_t * node6 = text3->sibl;
+	node_t * text4 = node6->sibl;
+	node_t * text5 = node6->chld;
+	node_t * node7 = text0_2->sibl;
+	node_t * text0_3 = node7->sibl;
+	node_t * text8 = node7->chld;
+	node_t * node8 = text8->sibl;
+	node_t * text8_0 = node8->chld;
+	node_t * text9 = node8->sibl;
+#endif /* !IGNORE_EMPTY_TEXT_NODES */
+	
+	ASSERT_STRING_EQUAL(roxml_get_name(node0, NULL, 0), "node0");
+	ASSERT_STRING_EQUAL(roxml_get_name(node1, NULL, 0), "node1");
+	ASSERT_STRING_EQUAL(roxml_get_name(node2, NULL, 0), "node2");
+	ASSERT_STRING_EQUAL(roxml_get_name(node3, NULL, 0), "node3");
+	ASSERT_STRING_EQUAL(roxml_get_name(node4, NULL, 0), "node4");
+	ASSERT_STRING_EQUAL(roxml_get_name(node5, NULL, 0), "node5");
+	ASSERT_STRING_EQUAL(roxml_get_name(node6, NULL, 0), "node6");
+	ASSERT_STRING_EQUAL(roxml_get_name(node7, NULL, 0), "node7");
+	ASSERT_STRING_EQUAL(roxml_get_name(node8, NULL, 0), "node8");
 
-	ASSERT_EQUAL(roxml_get_name(root->chld->chld->sibl->chld->sibl->attr->sibl, string, 128), string)
+	ASSERT_NULL(roxml_get_name(node0->attr, NULL, 0))
+
+	ASSERT_STRING_EQUAL(roxml_get_name(node1->attr, NULL, 0), "name")
+	ASSERT_STRING_EQUAL(roxml_get_name(node1->attr->sibl, NULL, 0), "value")
+	ASSERT_STRING_EQUAL(roxml_get_name(node2->attr, NULL, 0), "name")
+	ASSERT_STRING_EQUAL(roxml_get_name(node2->attr->sibl, NULL, 0), "value")
+	ASSERT_STRING_EQUAL(roxml_get_name(node4->attr, NULL, 0), "name")
+	ASSERT_STRING_EQUAL(roxml_get_name(node4->attr->sibl, NULL, 0), "value")
+
+	ASSERT_EQUAL(roxml_get_name(node4->attr->sibl, string, 128), string)
 	ASSERT_STRING_EQUAL(string, "value")
 
 	roxml_release(RELEASE_ALL);
@@ -721,7 +1039,7 @@ int test_get_root(void)
 	ASSERT_STRING_EQUAL(roxml_get_name(root, NULL, 0), "documentRoot")
 
 	node0 = roxml_get_chld(root, NULL, 0);
-	ASSERT_STRING_EQUAL(roxml_get_content(node0, NULL, 0, NULL), "version=\"1.0\"? encoding=\"fr_FR\"")
+	ASSERT_STRING_EQUAL(roxml_get_content(node0, NULL, 0, NULL), "text1")
 	node1 = roxml_get_chld(node0, NULL, 0);
 
 	roxml_release(RELEASE_ALL);
@@ -886,38 +1204,85 @@ int test_get_content(void)
 	char buf3[7];
 	char buf4[16];
 	node_t *root = roxml_load_doc("roxml.test.xml");
+
+#ifdef IGNORE_EMPTY_TEXT_NODES
+	node_t * node0 = root->chld;
+	node_t * node1 = node0->chld;
+	node_t * text1 = node1->chld;
+	node_t * node2 = node1->sibl;
+	node_t * node3 = node2->chld;
+	node_t * text2 = node3->chld;
+	node_t * node4 = node3->sibl;
+	node_t * node5 = node4->sibl;
+	node_t * text3 = node5->chld;
+	node_t * node6 = text3->sibl;
+	node_t * text4 = node6->sibl;
+	node_t * text5 = node6->chld;
+	node_t * node7 = node2->sibl;
+	node_t * text8 = node7->chld;
+	node_t * node8 = text8->sibl;
+	node_t * text9 = node8->sibl;
+
+#else /* !IGNORE_EMPTY_TEXT_NODES */
+
+	node_t * node0 = root->chld;
+	node_t * text0_0 = node0->chld;
+	node_t * node1 = text0_0->sibl;
+	node_t * text0_1 = node1->sibl;
+	node_t * text1 = node1->chld;
+	node_t * node2 = text0_1->sibl;
+	node_t * text0_2 = node2->sibl;
+	node_t * text2_0 = node2->chld;
+	node_t * node3 = text2_0->sibl;
+	node_t * text2_1 = node3->sibl;
+	node_t * node4 = text2_1->sibl;
+	node_t * text2_2 = node4->sibl;
+	node_t * node5 = text2_2->sibl;
+	node_t * text2_3 = node5->sibl;
+	node_t * text2 = node3->chld;
+	node_t * text3 = node5->chld;
+	node_t * node6 = text3->sibl;
+	node_t * text4 = node6->sibl;
+	node_t * text5 = node6->chld;
+	node_t * node7 = text0_2->sibl;
+	node_t * text0_3 = node7->sibl;
+	node_t * text8 = node7->chld;
+	node_t * node8 = text8->sibl;
+	node_t * text8_0 = node8->chld;
+	node_t * text9 = node8->sibl;
+#endif /* !IGNORE_EMPTY_TEXT_NODES */
 	
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld, NULL, 0, NULL), ""); // node0
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld, NULL, 0, NULL), "text1");	// node1
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl, NULL, 0, NULL), "");	// node2
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->sibl, NULL, 0, NULL), "\"\"");	// node7
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->chld, NULL, 0, NULL), "text2");	//node3
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->chld->sibl, NULL, 0, NULL), "");	//node4
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->chld->sibl->sibl, NULL, 0, NULL), "text3text4");	//node5
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->chld->sibl->sibl->chld, NULL, 0, NULL), "text5");	//node6
+	ASSERT_STRING_EQUAL(roxml_get_content(node0, NULL, 0, NULL), ""); // node0
+	ASSERT_STRING_EQUAL(roxml_get_content(node1, NULL, 0, NULL), "text1");	// node1
+	ASSERT_STRING_EQUAL(roxml_get_content(node2, NULL, 0, NULL), "");	// node2
+	ASSERT_STRING_EQUAL(roxml_get_content(node7, NULL, 0, NULL), "\"\"");	// node7
+	ASSERT_STRING_EQUAL(roxml_get_content(node3, NULL, 0, NULL), "text2");	//node3
+	ASSERT_STRING_EQUAL(roxml_get_content(node4, NULL, 0, NULL), "");	//node4
+	ASSERT_STRING_EQUAL(roxml_get_content(node5, NULL, 0, NULL), "text3text4");	//node5
+	ASSERT_STRING_EQUAL(roxml_get_content(node6, NULL, 0, NULL), "text5");	//node6
 
-	ASSERT_NULL(roxml_get_content(root->chld->attr, NULL, 0, NULL))
+	ASSERT_NULL(roxml_get_content(node0->attr, NULL, 0, NULL))
 
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->attr, NULL, 0, NULL), "name1")
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->attr->sibl, NULL, 0, NULL), "value1")
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->attr, NULL, 0, NULL), "name2")
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->attr->sibl, NULL, 0, NULL), "value2")
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->chld->sibl->attr, NULL, 0, NULL), "name4")
-	ASSERT_STRING_EQUAL(roxml_get_content(root->chld->chld->sibl->chld->sibl->attr->sibl, NULL, 0, NULL), "value4")
+	ASSERT_STRING_EQUAL(roxml_get_content(node1->attr, NULL, 0, NULL), "name1")
+	ASSERT_STRING_EQUAL(roxml_get_content(node1->attr->sibl, NULL, 0, NULL), "value1")
+	ASSERT_STRING_EQUAL(roxml_get_content(node2->attr, NULL, 0, NULL), "name2")
+	ASSERT_STRING_EQUAL(roxml_get_content(node2->attr->sibl, NULL, 0, NULL), "value2")
+	ASSERT_STRING_EQUAL(roxml_get_content(node4->attr, NULL, 0, NULL), "name4")
+	ASSERT_STRING_EQUAL(roxml_get_content(node4->attr->sibl, NULL, 0, NULL), "value4")
 
-	char * value = roxml_get_content(root->chld->chld->attr->sibl, NULL, 0, &len);
+	char * value = roxml_get_content(node1->attr->sibl, NULL, 0, &len);
 	ASSERT_EQUAL(len, 7)
 	ASSERT_STRING_EQUAL(value, "value1")
-	value = roxml_get_content(root->chld->chld->attr->sibl, buf, 4, &len);
+	value = roxml_get_content(node1->attr->sibl, buf, 4, &len);
 	ASSERT_EQUAL(len, 4)
 	ASSERT_STRING_EQUAL(value, "val")
-	value = roxml_get_content(root->chld->chld->attr->sibl, buf2, 6, &len);
+	value = roxml_get_content(node1->attr->sibl, buf2, 6, &len);
 	ASSERT_EQUAL(len, 6)
 	ASSERT_STRING_EQUAL(value, "value")
-	value = roxml_get_content(root->chld->chld->attr->sibl, buf3, 7, &len);
+	value = roxml_get_content(node1->attr->sibl, buf3, 7, &len);
 	ASSERT_EQUAL(len, 7)
 	ASSERT_STRING_EQUAL(value, "value1")
-	value = roxml_get_content(root->chld->chld->attr->sibl, buf4, 16, &len);
+	value = roxml_get_content(node1->attr->sibl, buf4, 16, &len);
 	ASSERT_EQUAL(len, 7)
 	ASSERT_STRING_EQUAL(value, "value1")
 
@@ -1805,8 +2170,8 @@ int test_spec_nodes(void)
 	ASSERT_NOT_NULL(root->chld->sibl->chld) // comment
 	ASSERT_NOT_NULL(root->chld->sibl->chld->sibl) // pi
 	ASSERT_NOT_NULL(root->chld->sibl->chld->sibl->sibl) // node1
-	ASSERT_NOT_NULL(root->chld->sibl->chld->sibl->sibl->text) // text
-	ASSERT_NULL(root->chld->sibl->chld->sibl->sibl->chld) // node2
+	ASSERT_NOT_NULL(root->chld->sibl->chld->sibl->sibl->chld) // text
+	ASSERT_NULL(root->chld->sibl->chld->sibl->sibl->chld->sibl) // node2
 	ASSERT_EQUAL(root->chld->sibl->chld->type, ROXML_CMT_NODE | ROXML_FILE) // comment
 	ASSERT_EQUAL(root->chld->sibl->chld->sibl->type, ROXML_PI_NODE | ROXML_FILE) // pi
 
@@ -1925,9 +2290,10 @@ int test_write_tree(void)
 	node = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "this is a test XML file");
 	node = roxml_add_node(root, 0, ROXML_PI_NODE, "test", "value=\"2\"");
 	node = roxml_add_node(root, 0, ROXML_ELM_NODE, "node1", "content1");
+	roxml_add_node(node, 0, ROXML_TXT_NODE, NULL, "content1bis");
 	roxml_add_node(root, 0, ROXML_ATTR_NODE, "attr1", "value1");
 	node_t *node2 = roxml_add_node(node, 0, ROXML_ELM_NODE, "node2", "content2");
-	roxml_add_node(node, 0, ROXML_TXT_NODE, NULL, "content1bis");
+	roxml_add_node(node, 0, ROXML_TXT_NODE, NULL, "content1ter");
 	roxml_add_node(node2, 0, ROXML_TXT_NODE, NULL, "content2bis");
 	roxml_add_node(node, 0, ROXML_ELM_NODE, "node3", "content3");
 	
@@ -1936,26 +2302,27 @@ int test_write_tree(void)
 	ASSERT_NOT_NULL(root->chld) // cmt
 	ASSERT_NOT_NULL(root->chld->sibl) // pi
 	ASSERT_NOT_NULL(root->chld->sibl->sibl) // node1
-	ASSERT_NOT_NULL(root->chld->sibl->sibl->text) // content1
-	ASSERT_NOT_NULL(root->chld->sibl->sibl->text->sibl) // content1bis
-	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld) // node2
-	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld->text) // content2
-	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld->text->sibl) // content2bis
-	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld->sibl) // node3
-	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld->sibl->text) // content3
+	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld) // content1
+	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld->sibl) // content1bis
+	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld->sibl->sibl) // node2
+	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld->sibl->sibl->chld) // content2
+	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld->sibl->sibl->sibl) // content1ter
+	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld->sibl->sibl->chld->sibl) // content2bis
+	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld->sibl->sibl->sibl->sibl) // node3
+	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld->sibl->sibl->sibl->sibl->chld) // content3
 
 	FILE * fout = NULL;
 	len = roxml_commit_changes(NULL, "out.xml", NULL, 1);
 	ASSERT_EQUAL(len, 0)
 
 	len = roxml_commit_changes(root, "out.xml", NULL, 0);
-	ASSERT_EQUAL(len, 165)
+	ASSERT_EQUAL(len, 176)
 
 	len = roxml_commit_changes(root, "out.xml.human", NULL, 1);
-	ASSERT_EQUAL(len, 205)
+	ASSERT_EQUAL(len, 219)
 
 	len = roxml_commit_changes(root, NULL, &buffer, 0);
-	ASSERT_EQUAL(len, 165)
+	ASSERT_EQUAL(len, 176)
 
 	fout = fopen("out.buf.xml", "w");
 	fwrite(buffer, 1, len, fout);
@@ -1964,7 +2331,8 @@ int test_write_tree(void)
 
 	fout = fopen("out.buf.xml.human", "w");
 	len = roxml_commit_changes(root, NULL, &buffer, 1);
-	ASSERT_EQUAL(len, 205)
+	ASSERT_EQUAL(len, 219)
+
 	fwrite(buffer, 1, len, fout);
 	fclose(fout);
 	free(buffer);

@@ -107,6 +107,14 @@ typedef struct node node_t;
 #define ROXML_PI_NODE	0x80
 
 /**
+ * \def ROXML_ALL_NODE
+ * 
+ * constant for all types of nodes
+ * \see roxml_add_node
+ */
+#define ROXML_ALL_NODE	(ROXML_PI_NODE | ROXML_CMT_NODE | ROXML_TXT_NODE | ROXML_ATTR_NODE | ROXML_ELM_NODE)
+
+/**
  * \def RELEASE_ALL
  * 
  * when used with roxml_release, release all allocated memory by current thread
@@ -227,10 +235,166 @@ node_t*	ROXML_API roxml_get_parent		(node_t *n);
  *
  * \fn node_t* ROXML_API roxml_get_root(node_t *n);
  * This function returns the root of a tree containing the given node
+ * The root is defined as a virtual node that contains all first rank nodes if document is
+ * not a valid xml document:
+ * \verbatim
+<data1>
+ <item/>
+ <item/>
+</data1>
+<data2>
+ <item/>
+ <item/>
+</data2>
+\endverbatim
+ * will be processed sucessfully and the root node will have 2 children: data1 and data2
+ *
+ * if document was:
+ * \verbatim
+<?xml version="1.0">
+<doc>
+ <data1>
+  <item/>
+  <item/>
+ </data1>
+ <data2>
+  <item/>
+  <item/>
+ </data2>
+</doc>
+\endverbatim
+ * In this case, the node "doc" will be the root, and will contain 2 children: data1 and data2
+ *
+ * For a document to be valid following requierement must be met:
+ * <ul>
+ * <li>the first node is a processing instruction starting with the string "xml".</li>
+ * <li>there is only one ELM node in without any parent (but there may be several process-instruction or comments)</li>
+ * </ul>
  * \param n is one node of the tree
  * \return the root node
  */
 node_t*	ROXML_API roxml_get_root		(node_t *n);
+
+/** \brief comment getter function
+ *
+ * \fn node_t* ROXML_API roxml_get_cmt(node_t *n, int nth);
+ * This function returns the nth comment of a node
+ *
+ * \param n is one node of the tree
+ * \param nth is the id of the cmt to get
+ * \return the comment corresponding to id
+ * \see roxml_get_cmt_nb
+ * \see roxml_get_nodes
+ *
+ * example:
+ * given the following xml file
+ * \verbatim
+<xml>
+ <item1/>
+ <!--comment1-->
+ <!--comment2-->
+ <item2/>
+ <item3/>
+</xml>
+\endverbatim
+ * \code
+ * #include <stdio.h>
+ * #include <roxml.h>
+ * 
+ * int main(void)
+ * {
+ * 	node_t * root = roxml_load_doc("/tmp/doc.xml");
+ * 	node_t * xml =  roxml_get_chld(root, NULL,  0);
+ * 	node_t * cmt1 = roxml_get_cmt(xml, 0);
+ * 	node_t * cmt2 = roxml_get_cmt(xml, 1);
+ * 
+ * 	// here cmt1 is the "comment1" node
+ * 	if(strcmp(roxml_get_content(cmt1, NULL, 0, NULL), "comment1") == 0) {
+ * 		printf("got the first comment\n");
+ * 	}
+ * 	// and cmt2 is the "comment2" node
+ * 	if(strcmp(roxml_get_content(cmt2, NULL, 0, NULL), "comment2") == 0) {
+ * 		printf("got the second comment\n");
+ * 	}
+ * 
+ * 	roxml_close(root);
+ * 	return 0;
+ * }
+ * 
+ * \endcode
+ */
+node_t*	ROXML_API roxml_get_cmt		(node_t *n, int nth);
+
+/** \brief comments number getter function
+ *
+ * \fn int ROXML_API roxml_get_cmt_nb(node_t *n);
+ * This function return the number of comments for a given node
+ * \param n is one node of the tree
+ * \return the number of comments
+ * \see roxml_get_cmt_nb
+ * \see roxml_get_nodes
+ */
+int 	ROXML_API roxml_get_cmt_nb		(node_t *n);
+
+/** \brief text node getter function
+ *
+ * \fn node_t* ROXML_API roxml_get_txt(node_t *n, int nth);
+ * This function returns the nth text node of a node
+ *
+ * \param n is one node of the tree
+ * \param nth is the id of the txt to get
+ * \return the text node corresponding to id
+ * \see roxml_get_txt_nb
+ * \see roxml_get_nodes
+ *
+ * example:
+ * given the following xml file
+ * \verbatim
+<xml>
+ <item1/>
+ hello
+ <item2/>
+ world
+ <item3/>
+</xml>
+\endverbatim
+ * \code
+ * #include <stdio.h>
+ * #include <roxml.h>
+ * 
+ * int main(void)
+ * {
+ * 	node_t * root = roxml_load_doc("/tmp/doc.xml");
+ * 	node_t * xml =  roxml_get_chld(root, NULL,  0);
+ * 	node_t * txt1 = roxml_get_txt(xml, 0);
+ * 	node_t * txt2 = roxml_get_txt(xml, 1);
+ * 
+ * 	// here txt1 is the "hello" node
+ * 	if(strcmp(roxml_get_content(txt1, NULL, 0, NULL), "hello") == 0) {
+ * 		printf("got the first text node\n");
+ * 	}
+ * 	// and txt2 is the "world" node
+ * 	if(strcmp(roxml_get_content(txt2, NULL, 0, NULL), "world") == 0) {
+ * 		printf("got the second text node\n");
+ * 	}
+ * 
+ * 	roxml_close(root);
+ * 	return 0;
+ * }
+ * \endcode
+ */
+node_t*	ROXML_API roxml_get_txt		(node_t *n, int nth);
+
+/** \brief texts node number getter function
+ *
+ * \fn int ROXML_API roxml_get_txt_nb(node_t *n);
+ * This function return the number of text nodes for a given node
+ * \param n is one node of the tree
+ * \return the number of text nodes 
+ * \see roxml_get_txt
+ * \see roxml_get_nodes_nb
+ */
+int 	ROXML_API roxml_get_txt_nb		(node_t *n);
 
 /** \brief chld getter function
  *
@@ -284,6 +448,67 @@ node_t*	ROXML_API roxml_get_chld		(node_t *n, char * name, int nth);
  */
 int 	ROXML_API roxml_get_chld_nb		(node_t *n);
 
+/** \brief process-instruction getter function
+ *
+ * \fn node_t* ROXML_API roxml_get_pi(node_t *n, int nth);
+ * This function returns the nth process-instruction of a node.
+ *
+ * \param n is one node of the tree
+ * \param nth is the id of the pi to get
+ * \return the process-instruction corresponding to id
+ * \see roxml_get_pi_nb
+ * \see roxml_get_nodes
+ *
+ * example:
+ * given the following xml file
+ * \verbatim
+<xml>
+ <item1/>
+ <?value="2"?>
+ <?param="3"?>
+ <item2/>
+ <item3/>
+</xml>
+\endverbatim
+ * \code
+ * #include <stdio.h>
+ * #include <roxml.h>
+ * 
+ * int main(void)
+ * {
+ * 	node_t * root = roxml_load_doc("/tmp/doc.xml");
+ * 	node_t * xml =  roxml_get_chld(root, NULL,  0);
+ * 	node_t * pi1 = roxml_get_pi(xml, 0);
+ * 	node_t * pi2 = roxml_get_pi(xml, 1);
+ * 
+ * 	// here pi1 is the <?value="2"?> node
+ * 	if(strcmp(roxml_get_content(pi1, NULL, 0, NULL), "value=\"2\"") == 0) {
+ * 		printf("got the first process-instruction\n");
+ * 	}
+ * 	// and pi2 is the <?param="3"?> node
+ * 	if(strcmp(roxml_get_content(pi2, NULL, 0, NULL), "param=\"3\"") == 0) {
+ * 		printf("got the second process-instruction\n");
+ * 	}
+ * 
+ * 	roxml_close(root);
+ * 	return 0;
+ * }
+ * 
+ * \endcode
+ */
+node_t*	ROXML_API roxml_get_pi		(node_t *n, int nth);
+
+/** \brief process-instruction number getter function
+ *
+ * \fn int ROXML_API roxml_get_pi_nb(node_t *n);
+ * This function return the number of process-instruction in a given node
+ * \param n is one node of the tree
+ * \return  the number of process-instructions 
+ * \see roxml_get_pi
+ * \see roxml_get_nodes_nb
+ */
+int 	ROXML_API roxml_get_pi_nb		(node_t *n);
+
 /** \brief name getter function
  *
  * \fn char* ROXML_API roxml_get_name(node_t *n, char * buffer, int size);
@@ -315,6 +540,89 @@ char*	ROXML_API roxml_get_name		(node_t *n, char * buffer, int size);
  * \see roxml_release
  */
 char *	ROXML_API roxml_get_content		(node_t *n, char * buffer, int bufsize, int * size);
+
+/** \brief number of nodes getter function
+ *
+ * \fn int ROXML_API roxml_get_nodes_nb(node_t *n, int type);
+ * 
+ * This function returns the number of nodes contained in a given node
+ * all other roxml_get_*_nb are wrapper to this
+ * \param n is one node of the tree
+ * \param type is the bitmask of node types we want to consider
+ * \return the number of nodes
+ * \see roxml_get_attr_nb
+ * \see roxml_get_elm_nb
+ * \see roxml_get_txt_nb
+ * \see roxml_get_cmt_nb
+ * \see roxml_get_pi_nb
+ *
+ * example:
+ * given the following xml file
+ * \verbatim
+<xml>
+ <!-- comment -->
+ <?value="2"?>
+ <product id="42" class="item"/>
+ <product id="43" class="item"/>
+</xml>
+\endverbatim
+ * \code
+ * #include <stdio.h>
+ * #include <roxml.h>
+ *
+ * int main(void)
+ * {
+ * 	node_t * root = roxml_load_doc("/tmp/doc.xml");
+ *
+ *	int all_nodes_1 = roxml_get_nodes_nb(root, ROXML_ELM_NODE | ROXML_CMT_NODE | ROXML_PI_NODE | ROXML_TXT_NODE | ROXML_ATTR_NODE);
+ *	int all_nodes_2 = roxml_get_nodes_nb(root, ROXML_ALL_NODES);
+ *
+ * 	// here all_nodes_1 == all_nodes_2
+ * 	if(all_nodes_1 == all_nodes_2) {
+ * 		printf("%d Nodes are contained in root\n", all_nodes_1);
+ * 	}
+ *
+ *	// let's count elm node (== children)
+ *	int elm_nodes = roxml_get_nodes_nb(root, ROXML_ELM_NODE);
+ *	// here elm_nodes == 2
+ *	if(elm_nodes == 2) {
+ *		printf("%d ELM Nodes are contained in root\n", all_nodes_1);
+ *	}
+ *
+ *	// we can also count all node except elm nodes, doing:
+ *	int almost_all_nodes = roxml_get_nodes_nb(root, ROXML_ALL_NODES & ~ROXML_ELM_NODE);
+ *	// here almost_all_nodes = 2 since we have one comment node and one processing-instruction node
+ *	if(almost_all_nodes == 2) {
+ *		printf("%d non ELM Nodes are contained in root\n", all_nodes_1);
+ *	}
+ *
+ * 	roxml_close(root);
+ * 	return 0;
+ * }
+ * \endcode
+ */
+int	ROXML_API roxml_get_nodes_nb		(node_t *n, int type);
+
+/** \brief nodes getter function
+ *
+ * \fn char* ROXML_API roxml_get_nodes(node_t *n, int type, char * name, int nth);
+ * This function get the nth node contained in a node, or the first node named name.
+ * All other roxml_get_* are wrapper to this function.
+ * When asking for several node type (let say ROXML_ALL_NODE), all ROXML_ATTR_NODE will be 
+ * placed first, then, all other nodes will come mixed, depending on xml document order.
+ * 
+ * \param n is one node of the tree
+ * \param type is the bitmask of node types we want to consider
+ * \param name is the name of the child to get. This parameter is only relevant for node with types: ROXML_ELM_NODE, ROXML_ATTR_NODE
+ * \param nth the id of attribute to read
+ * \return the node corresponding to name or id (if both are set, name is used)
+ * \see roxml_get_attr
+ * \see roxml_get_elm
+ * \see roxml_get_txt
+ * \see roxml_get_cmt
+ * \see roxml_get_pi
+ */
+node_t*	ROXML_API roxml_get_nodes		(node_t *n, int type, char * name, int nth);
 
 /** \brief number of attribute getter function
  *

@@ -875,7 +875,6 @@ int _func_load_close_node(char * chunk, void * data)
 	context->state = STATE_NODE_CONTENT;
 	context->previous_state = STATE_NODE_CONTENT;
 	context->candidat_txt = roxml_create_node(context->pos+1, context->src, ROXML_TXT_NODE | context->type);
-	context->candidat_txt = roxml_parent_node(context->current_node, context->candidat_txt);
 #ifdef IGNORE_EMPTY_TEXT_NODES
 	while(chunk[cur] != '\0') { 
 		if(chunk[cur] == '<') { break; }

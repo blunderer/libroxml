@@ -137,9 +137,8 @@ typedef struct node {
 	struct node *sibl;		/*!< ref to brother */
 	struct node *chld;		/*!< ref to chld */
 	struct node *prnt;		/*!< ref to parent */
-	struct node *attr;		/*!< ref to attributes */
-	struct node *text;		/*!< ref to content */
-	struct node *next;		/*!< ref to next (internal use) */
+	struct node *attr;		/*!< ref to attribute */
+	struct node *next;		/*!< ref to last chld (internal use) */
 	void *priv;			/*!< ref to xpath tok (internal use) */
 } node_t;
 
