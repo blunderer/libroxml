@@ -1,3 +1,23 @@
+libroxml (2.1.0-1) unstable; urgency=low
+  * Bugfixes
+      fix syntax for process-instructions: now contains the target application
+(name) and the process-instruction itself (content)
+      fix write of text node insode roxml_commit_changes that could be wrongly
+placed  inside XML document
+      fix commit change to large buffers
+      fix get content on empty attributes
+      fix doxygen installation if not available
+  * Update documentation
+  * Text nodes are now handled as child nodes with comment and
+    process-instructions (save about 10% memory for a tree)
+  * roxml_add_node allow you to create valid XML documents
+  * Add some API functions
+      roxml_get_pi() and roxml_get_pi_nb() to get process instruction nodes
+      roxml_get_cmt() and roxml_get_cmt_nb() to get all comment nodes
+      roxml_get_nodes() and roxml_get_nodes_nb() to get all wanted nodes
+
+ -- Tristan Lelong <tristan.lelong@libroxml.net>  Sun, 24 Jul 2011 23:13:00 +0100
+
 libroxml (2.0.3-1) unstable; urgency=low
 
   * Bugfixes
