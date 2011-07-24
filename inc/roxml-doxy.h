@@ -47,7 +47,7 @@
  *
  * You can download source packages:
  * <ul>
- * <li>Lastest version is 2.0.3: <a href="http://code.google.com/p/libroxml/downloads/detail?name=libroxml-2.0.3.tar.gz">download now</a></li>
+ * <li>Lastest version is 2.1.0: <a href="http://code.google.com/p/libroxml/downloads/detail?name=libroxml-2.1.0.tar.gz">download now</a></li>
  * <li>Go to the download section if you need older libroxml revision: http://code.google.com/p/libroxml/downloads/list</li>
  * </ul>
  * 
@@ -59,29 +59,29 @@
  *
  * libroxml allow you to easily:
  * <ul>
- * <li> load / unload XML document from buffer or files.</li>
+ * <li> load / unload XML document from buffers or files.</li>
  * <li> navigate thru an xml tree using simple getter API.</li>
  * <li> use xpath syntax to access some nodes in the XML tree.</li>
  * <li> read nodes contents (text, attributes, comments ...)</li>
- * <li> create/modify xml trees and save then to a file or buffer.</li>
+ * <li> create/modify xml trees and save them to a file or buffer.</li>
  *</ul>
  *
- * \note libroxml work with both strict XML documents but also with xml like formatted documents (without any <?xml> definition...)
- * \warning libroxml do not handle DOCTYPE nodes and won't be able to parse any XML document that contains some.
+ * \note libroxml work with both strict XML documents but also with xml like formatted documents (without any <?xml?> definition...)
+ * \warning libroxml do not handle DOCTYPE nodes. However, it will nicely ignore them during parsing and will still return the xml tree.
  *
  * \section what_end </why libroxml>
- * \section how_sec <how does it works>
+ * \section how_sec <how does it work>
  * You can refer to \ref public-api for documentation on all functions
  *
  * there are several groups of functions in public API: 
  * <ul>
  * <li> Load and close XML data from different sources.</li>
  * <li> Get nodes and navigate into the loaded xml tree.</li>
- * <li> Get the xmll content of nodes, attributes...</li>
+ * <li> Get the xml content of nodes, attributes...</li>
  * <li> Create and delete nodes, export tree.</li>
  * <li> Some libroxml specific functions for memory handling</li>
  * </ul>
- * \section how_end </how does it works>
+ * \section how_end </how does it work>
  */
 
 /** \page public-api public API
@@ -117,8 +117,14 @@
  * <li>\ref roxml_get_chld_nb</li>
  * <li>\ref roxml_get_attr</li>
  * <li>\ref roxml_get_attr_nb</li>
- * <li>\ref roxml_get_text</li>
- * <li>\ref roxml_get_text_nb</li>
+ * <li>\ref roxml_get_txt</li>
+ * <li>\ref roxml_get_txt_nb</li>
+ * <li>\ref roxml_get_pi</li>
+ * <li>\ref roxml_get_pi_nb</li>
+ * <li>\ref roxml_get_cmt</li>
+ * <li>\ref roxml_get_cmt_nb</li>
+ * <li>\ref roxml_get_nodes</li>
+ * <li>\ref roxml_get_nodes_nb</li>
  * <li>\ref roxml_xpath</li>
  * </ul>
  * </td>

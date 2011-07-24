@@ -117,7 +117,7 @@ typedef struct node node_t;
 /**
  * \def RELEASE_ALL
  * 
- * when used with roxml_release, release all allocated memory by current thread
+ * when used with roxml_release, release all memory allocated by current thread
  * \see roxml_release
  */
 #define RELEASE_ALL	(void*)-1
@@ -132,7 +132,6 @@ typedef struct node node_t;
  * \code
  * #include <stdio.h>
  * #include <roxml.h>
- *
  * int main(void)
  * {
  *	int len;
@@ -265,10 +264,10 @@ node_t*	ROXML_API roxml_get_parent		(node_t *n);
 \endverbatim
  * In this case, the node "doc" will be the root, and will contain 2 children: data1 and data2
  *
- * For a document to be valid following requierement must be met:
+ * For a document to be valid, following conditions must be met:
  * <ul>
- * <li>the first node is a processing instruction starting with the string "xml".</li>
- * <li>there is only one ELM node in without any parent (but there may be several process-instruction or comments)</li>
+ * <li>the first node is a processing instruction with the string "xml" as target application.</li>
+ * <li>there is only one ELM node containing all document (but there may be several process-instructions or comments)</li>
  * </ul>
  * \param n is one node of the tree
  * \return the root node
@@ -335,66 +334,6 @@ node_t*	ROXML_API roxml_get_cmt		(node_t *n, int nth);
  * \see roxml_get_nodes
  */
 int 	ROXML_API roxml_get_cmt_nb		(node_t *n);
-
-/** \brief text node getter function
- *
- * \fn node_t* ROXML_API roxml_get_txt(node_t *n, int nth);
- * This function returns the nth text node of a node
- *
- * \param n is one node of the tree
- * \param nth is the id of the txt to get
- * \return the text node corresponding to id
- * \see roxml_get_txt_nb
- * \see roxml_get_nodes
- *
- * example:
- * given the following xml file
- * \verbatim
-<xml>
- <item1/>
- hello
- <item2/>
- world
- <item3/>
-</xml>
-\endverbatim
- * \code
- * #include <stdio.h>
- * #include <roxml.h>
- * 
- * int main(void)
- * {
- * 	node_t * root = roxml_load_doc("/tmp/doc.xml");
- * 	node_t * xml =  roxml_get_chld(root, NULL,  0);
- * 	node_t * txt1 = roxml_get_txt(xml, 0);
- * 	node_t * txt2 = roxml_get_txt(xml, 1);
- * 
- * 	// here txt1 is the "hello" node
- * 	if(strcmp(roxml_get_content(txt1, NULL, 0, NULL), "hello") == 0) {
- * 		printf("got the first text node\n");
- * 	}
- * 	// and txt2 is the "world" node
- * 	if(strcmp(roxml_get_content(txt2, NULL, 0, NULL), "world") == 0) {
- * 		printf("got the second text node\n");
- * 	}
- * 
- * 	roxml_close(root);
- * 	return 0;
- * }
- * \endcode
- */
-node_t*	ROXML_API roxml_get_txt		(node_t *n, int nth);
-
-/** \brief texts node number getter function
- *
- * \fn int ROXML_API roxml_get_txt_nb(node_t *n);
- * This function return the number of text nodes for a given node
- * \param n is one node of the tree
- * \return the number of text nodes 
- * \see roxml_get_txt
- * \see roxml_get_nodes_nb
- */
-int 	ROXML_API roxml_get_txt_nb		(node_t *n);
 
 /** \brief chld getter function
  *
@@ -464,8 +403,8 @@ int 	ROXML_API roxml_get_chld_nb		(node_t *n);
  * \verbatim
 <xml>
  <item1/>
- <?value="2"?>
- <?param="3"?>
+ <?test value="2"?>
+ <?test param="3"?>
  <item2/>
  <item3/>
 </xml>
@@ -515,6 +454,14 @@ int 	ROXML_API roxml_get_pi_nb		(node_t *n);
  * This function return the name of the node or fill the current buffer with it if not NULL.
  * if name is NULL, the function will allocate a buffer that user should free using
  * roxml_release when no longer needed.
+ * depending on node type it will return:
+ * <ul>
+ * <li>\ref ROXML_ELM_NODE: returns the node name</li>
+ * <li>\ref ROXML_ATTR_NODE: returns the attribute name</li>
+ * <li>\ref ROXML_PI_NODE: returns the process-instruction targeted application</li>
+ * <li>\ref ROXML_TXT_NODE: returns NULL (or empty string if you provided a buffer in buffer param)</li>
+ * <li>\ref ROXML_CMT_NODE: returns NULL (or empty string if you provided a buffer in buffer param)</li>
+ * </ul>
  * Be carreful as if your buffer is too short for the returned string, it will be truncated
  * \param n is one node of the tree
  * \param buffer a buffer pointer or NULL if has to be auto allocated
@@ -528,8 +475,16 @@ char*	ROXML_API roxml_get_name		(node_t *n, char * buffer, int size);
  *
  * \fn char * ROXML_API roxml_get_content(node_t *n, char * buffer, int bufsize, int * size);
  *
- * This function returns a pointer with the concatenation of text content of a node (children are NOT included as text).;
- * if the returned pointer is NULL then the node was empty.
+ * This function returns the content of a node.;
+ * if the returned pointer is NULL then the node either has no content or this function is irrelevant for this kind of node.
+ * depending on node type it will return:
+ * <ul>
+ * <li>\ref ROXML_ELM_NODE: returns the concatenation of all direct text node children</li>
+ * <li>\ref ROXML_ATTR_NODE: returns the attribute value</li>
+ * <li>\ref ROXML_PI_NODE: returns the process-instruction instruction</li>
+ * <li>\ref ROXML_TXT_NODE: returns the text content of the node</li>
+ * <li>\ref ROXML_CMT_NODE: returns the text content of the comment</li>
+ * </ul>
  * returned string should be freed using roxml_release when not used anymore
  * \param n is one node of the tree
  * \param buffer is the buffer where result will be written or NULL for internal allocation
@@ -545,7 +500,7 @@ char *	ROXML_API roxml_get_content		(node_t *n, char * buffer, int bufsize, int 
  *
  * \fn int ROXML_API roxml_get_nodes_nb(node_t *n, int type);
  * 
- * This function returns the number of nodes contained in a given node
+ * This function returns the number of nodes matching type flag contained in a given node
  * all other roxml_get_*_nb are wrapper to this
  * \param n is one node of the tree
  * \param type is the bitmask of node types we want to consider
@@ -583,17 +538,18 @@ char *	ROXML_API roxml_get_content		(node_t *n, char * buffer, int bufsize, int 
  * 	}
  *
  *	// let's count elm node (== children)
- *	int elm_nodes = roxml_get_nodes_nb(root, ROXML_ELM_NODE);
- *	// here elm_nodes == 2
- *	if(elm_nodes == 2) {
- *		printf("%d ELM Nodes are contained in root\n", all_nodes_1);
+ *	int elm_nodes1 = roxml_get_nodes_nb(root, ROXML_ELM_NODE);
+ *	int elm_nodes2 = roxml_get_chld_nb(root);
+ *	// here elm_nodes1 == elm_nodes2 == 2
+ *	if(elm_nodes1 == elm_nodes2) {
+ *		printf("%d ELM Nodes are contained in root\n", elm_nodes_1);
  *	}
  *
  *	// we can also count all node except elm nodes, doing:
  *	int almost_all_nodes = roxml_get_nodes_nb(root, ROXML_ALL_NODES & ~ROXML_ELM_NODE);
  *	// here almost_all_nodes = 2 since we have one comment node and one processing-instruction node
  *	if(almost_all_nodes == 2) {
- *		printf("%d non ELM Nodes are contained in root\n", all_nodes_1);
+ *		printf("%d non ELM Nodes are contained in root\n", almost_all_nodes_1);
  *	}
  *
  * 	roxml_close(root);
@@ -606,14 +562,14 @@ int	ROXML_API roxml_get_nodes_nb		(node_t *n, int type);
 /** \brief nodes getter function
  *
  * \fn char* ROXML_API roxml_get_nodes(node_t *n, int type, char * name, int nth);
- * This function get the nth node contained in a node, or the first node named name.
+ * This function get the nth node matching type contained in a node, or the first node named name.
  * All other roxml_get_* are wrapper to this function.
  * When asking for several node type (let say ROXML_ALL_NODE), all ROXML_ATTR_NODE will be 
  * placed first, then, all other nodes will come mixed, depending on xml document order.
  * 
  * \param n is one node of the tree
  * \param type is the bitmask of node types we want to consider
- * \param name is the name of the child to get. This parameter is only relevant for node with types: ROXML_ELM_NODE, ROXML_ATTR_NODE
+ * \param name is the name of the child to get. This parameter is only relevant for node with types: \ref ROXML_ELM_NODE, \ref ROXML_ATTR_NODE, \ref ROXML_PI_NODE
  * \param nth the id of attribute to read
  * \return the node corresponding to name or id (if both are set, name is used)
  * \see roxml_get_attr
@@ -663,7 +619,7 @@ int	ROXML_API roxml_get_attr_nb		(node_t *n);
  *
  * 	node_t * attr_by_name = roxml_get_attr(item2, "id", 0);
  * 	node_t * attr_by_nth = roxml_get_attr(item2, NULL, 0);
-
+ *
  * 	// here attr_by_name == attr_by_nth
  * 	if(attr_by_name == attr_by_nth) {
  * 		printf("Nodes are equal\n");
@@ -680,7 +636,7 @@ node_t*	ROXML_API roxml_get_attr		(node_t *n, char * name, int nth);
  *
  * \fn roxml_xpath(node_t *n, char * path, int *nb_ans);
  * This function return a node set (table of nodes) corresponding to a given xpath.
- * resulting node table should be roxml_release when not used anymore
+ * resulting node set should be roxml_release when not used anymore (but not individual nodes)
  * \param n is one node of the tree 
  * \param path the xpath to use
  * \param nb_ans the number of results
@@ -715,12 +671,12 @@ int ROXML_API roxml_get_node_position		(node_t *n);
  * just like free would but for memory allocated with roxml_malloc. 
  * Freeing a NULL pointer won't do
  * anything. roxml_release also allow you to remove all 
- * previously allocated datas by using RELEASE_ALL as argument.
- * You can also safely use RELEASE_LAST argument that will release the 
- * previously allocated var within the current thread (making this
+ * previously allocated memory by using \ref RELEASE_ALL as argument.
+ * You can also safely use \ref RELEASE_LAST argument that will release the 
+ * previously allocated varable within the current thread (making this
  * function thread safe).
- * if using roxml_release on a variable non roxml_mallocated, nothing will happen
- * \param data the pointer to delete or NULL or RELEASE_ALL or RELEASE_LAST
+ * if using roxml_release on a variable non roxml_mallocated, nothing will happen (ie variable won't be freed)
+ * \param data the pointer to delete or NULL or \ref RELEASE_ALL or \ref RELEASE_LAST
  * \return void
  */
 void ROXML_API roxml_release			(void * data);
@@ -728,7 +684,7 @@ void ROXML_API roxml_release			(void * data);
 /** \brief node type getter function
  *
  * \fn roxml_get_type(node_t *n);
- * this function return the node type : ROXML_ARG ROXML_VAL
+ * this function return the node type : \ref ROXML_ATTR_NODE \ref ROXML_PI_NODE \ref ROXML_CMT_NODE \ref ROXML_TXT_NODE \ref ROXML_ELM_NODE
  * \param n the node to return type for
  * \return the node type
  */
@@ -745,17 +701,17 @@ int roxml_get_type				(node_t *n);
  * \param parent the parent node
  * \param position the position as a child of parent 1 is the first child, 0 for auto position at the end of children list...
  * \param type the type of node between \ref ROXML_ATTR_NODE, \ref ROXML_ELM_NODE, \ref ROXML_TXT_NODE, \ref ROXML_PI_NODE, \ref ROXML_CMT_NODE
- * \param name the name of the node (for \ref ROXML_ATTR_NODE and \ref ROXML_ELM_NODE and \ref ROXML_PI_NODE only)
- * \param value the text content (for \ref ROXML_ELM_NODE, \ref ROXML_TXT_NODE, \ref ROXML_CMT_NODE, \ref ROXML_PI_NODE) or the attribute value (\ref ROXML_ATTR_NODE)
- * \return the new node
+ * \param name the name of the node (mandatory for \ref ROXML_ATTR_NODE and \ref ROXML_ELM_NODE and \ref ROXML_PI_NODE only)
+ * \param value the text content (mandatory for \ref ROXML_TXT_NODE, \ref ROXML_CMT_NODE, \ref ROXML_ATTR_NODE optional for \ref ROXML_ELM_NODE, \ref ROXML_PI_NODE). The text content for an attribute is the attribute value
+ * \return the newly created node
  * \see roxml_commit_changes
  * \see roxml_del_node
  *
  * paramaters name and value depending on node type:
- * - \ref ROXML_ELM_NODE take at least a node name. the paramter value is optional and represents the text content.
- * - \ref ROXML_TXT_NODE ignore the node name. the paramter value represents the text content.
- * - \ref ROXML_CMT_NODE ignore the node name. the paramter value represents the comment.
- * - \ref ROXML_PI_NODE take the node name as process-instruction target. the paramter value represents the content of processing-instruction.
+ * - \ref ROXML_ELM_NODE take at least a node name. the parameter value is optional and represents the text content.
+ * - \ref ROXML_TXT_NODE ignore the node name. the parameter value represents the text content.
+ * - \ref ROXML_CMT_NODE ignore the node name. the parameter value represents the comment.
+ * - \ref ROXML_PI_NODE take the node name as process-instruction target. the parameter value represents the content of processing-instruction.
  * - \ref ROXML_ATTR_NODE take an attribute name. and the attribute value as given by parameter value.
  * 
  * some examples to obtain this xml result file
@@ -833,13 +789,13 @@ node_t * ROXML_API roxml_add_node		(node_t * parent, int position, int type, cha
 
 /** \brief text content getter function
  *
- * \fn roxml_get_text(node_t *n, int nth);
- * this function return the text content of a node as a TEXT nodes
+ * \fn roxml_get_txt(node_t *n, int nth);
+ * this function return the text content of a node as a ROXML_TXT_NODE
  * the content of the text node can be read using the roxml_get_content function
  * \param n the node that contains text
  * \param nth the nth text node to retrieve
  * \return the text node or NULL
- * \see roxml_get_text_nb
+ * \see roxml_get_txt_nb
  * \see roxml_get_content
  *
  * example:
@@ -863,17 +819,17 @@ node_t * ROXML_API roxml_add_node		(node_t * parent, int position, int type, cha
  *	node_t * root = roxml_load_doc("/tmp/doc.xml");
  *	node_t * item = roxml_get_chld(root, NULL, 0);
  *
- *	node_t * text = roxml_get_text(item, 0);
+ *	node_t * text = roxml_get_txt(item, 0);
  *	char * text_content = roxml_get_content(text, NULL, 0, &len);
  *	// HERE text_content is equal to "This is"
  *	printf("text_content = '%s'\n", text_content);
  *
- *	text = roxml_get_text(item, 1);
+ *	text = roxml_get_txt(item, 1);
  *	text_content = roxml_get_content(text, NULL, 0, &len);
  *	// HERE text_content is equal to "an example"
  *	printf("text_content = '%s'\n", text_content);
  *
- *	text = roxml_get_text(item, 2);
+ *	text = roxml_get_txt(item, 2);
  *	text_content = roxml_get_content(text, NULL, 0, &len);
  *	// HERE text_content is equal to "of text nodes"
  *	printf("text_content = '%s'\n", text_content);
@@ -883,18 +839,18 @@ node_t * ROXML_API roxml_add_node		(node_t * parent, int position, int type, cha
  * }
  * \endcode
  */
-node_t * ROXML_API roxml_get_text		(node_t *n, int nth);
+node_t * ROXML_API roxml_get_txt		(node_t *n, int nth);
 
 /** \brief text node number getter function
  *
- * \fn roxml_get_text_nb(node_t *n);
+ * \fn roxml_get_txt_nb(node_t *n);
  * this function return the number of text nodes in 
  * a standard node
  * \param n the node to search into
  * \return the number of text node
- * \see roxml_get_text
+ * \see roxml_get_txt
  */
-int ROXML_API roxml_get_text_nb			(node_t *n);
+int ROXML_API roxml_get_txt_nb			(node_t *n);
 
 /** \brief node deletion function
  *
@@ -903,20 +859,22 @@ int ROXML_API roxml_get_text_nb			(node_t *n);
  * from the file or buffer until the roxml_commit_changes is called.
  * \param n the node to delete
  * \return 
+ * \see roxml_add_node
+ * \see roxml_commit_changes
  */
 void ROXML_API roxml_del_node			(node_t * n);
 
 /** \brief sync function
  *
  * \fn roxml_commit_changes(node_t *n, char * dest, char ** buffer, int human);
- * this function sync changes to the given buffer or file in human or one-line format 
+ * this function sync changes from the RAM tree to the given buffer or file in human or one-line format 
  * The tree will be processed starting with the root node 'n' and following with all its children.
  * The tree will be dumped to a file if 'dest' is not null and contains a valid path.
- * The tree will be dumped to a buffer if 'buffer' is not null the buffer is allocated by the library
- * and a pointer to it will be stored into 'buffer'. 
+ * The tree will be dumped to a buffer if 'buffer' is not null. the buffer is allocated by the library
+ * and a pointer to it will be stored into 'buffer'. The allocated buffer can be freed usinf free()
  * \param n the root node of the tree to write
  * \param dest the path to a file to write tree to
- * \param buffer the adress of a buffer where tre will be written this buffer have to be freed after use
+ * \param buffer the adress of a buffer where the tree will be written. This buffer have to be freed after use
  * \param human 0 for one-line tree, or 1 for human format (using tabs, newlines...)
  * \return the number of bytes written to file or buffer 
  * 

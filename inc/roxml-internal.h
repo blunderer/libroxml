@@ -42,7 +42,7 @@
 /** \brief internal function
  *
  * \fn void ROXML_INT roxml_free_node(node_t *n);
- * This function delete a node 
+ * This function delete a node without handling its tree
  * \param n is one node of the tree
  * \return void
  */
