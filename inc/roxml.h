@@ -182,7 +182,7 @@ node_t*	ROXML_API roxml_load_doc		(char *filename);
  *
  * \fn node_t* ROXML_API roxml_load_fd(int fd);
  * This function load a document by parsing all the corresponding nodes
- * \param filename the XML document to load
+ * \param fd the opened fiel descriptor to XML document to load
  * \return the root node or NULL
  * \see roxml_close
  * \see roxml_load_doc
@@ -506,7 +506,7 @@ char *	ROXML_API roxml_get_content		(node_t *n, char * buffer, int bufsize, int 
  * \param type is the bitmask of node types we want to consider
  * \return the number of nodes
  * \see roxml_get_attr_nb
- * \see roxml_get_elm_nb
+ * \see roxml_get_chld_nb
  * \see roxml_get_txt_nb
  * \see roxml_get_cmt_nb
  * \see roxml_get_pi_nb
@@ -573,7 +573,7 @@ int	ROXML_API roxml_get_nodes_nb		(node_t *n, int type);
  * \param nth the id of attribute to read
  * \return the node corresponding to name or id (if both are set, name is used)
  * \see roxml_get_attr
- * \see roxml_get_elm
+ * \see roxml_get_chld
  * \see roxml_get_txt
  * \see roxml_get_cmt
  * \see roxml_get_pi
@@ -695,7 +695,7 @@ int roxml_get_type				(node_t *n);
  * \fn roxml_add_node(node_t * parent, int position, int type, char *name, char *value);
  * this function add a new node to the tree. This will not update de buffer or file,
  * only the RAM loaded tree. One should call \ref roxml_commit_changes to save modifications.
- * If the parent node is an ROXML_ELM_NODE, then, new node will be added as a child. Else
+ * If the parent node is an \ref ROXML_ELM_NODE, then, new node will be added as a child. Else
  * the node will be added as a sibling of the parent node. In the later case, position parameter describes
  * the position in the sibling list, instead of position in the children list.
  * \param parent the parent node
@@ -768,6 +768,7 @@ int roxml_get_type				(node_t *n);
  <item/>
  <item/>
 </doc>
+\endverbatim
  * \code
  * #include <roxml.h>
  *
@@ -787,15 +788,16 @@ int roxml_get_type				(node_t *n);
  */
 node_t * ROXML_API roxml_add_node		(node_t * parent, int position, int type, char *name, char *value);
 
-/** \brief text content getter function
+/** \brief text node getter function
  *
  * \fn roxml_get_txt(node_t *n, int nth);
- * this function return the text content of a node as a ROXML_TXT_NODE
+ * this function return the text content of a node as a \ref ROXML_TXT_NODE
  * the content of the text node can be read using the roxml_get_content function
  * \param n the node that contains text
  * \param nth the nth text node to retrieve
  * \return the text node or NULL
  * \see roxml_get_txt_nb
+ * \see roxml_get_nodes
  * \see roxml_get_content
  *
  * example:
@@ -839,7 +841,7 @@ node_t * ROXML_API roxml_add_node		(node_t * parent, int position, int type, cha
  * }
  * \endcode
  */
-node_t * ROXML_API roxml_get_txt		(node_t *n, int nth);
+node_t * ROXML_API roxml_get_txt		(node_t * n, int nth);
 
 /** \brief text node number getter function
  *
