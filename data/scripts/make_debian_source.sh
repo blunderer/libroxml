@@ -2,6 +2,7 @@
 
 if [ $# -lt 1 ]; then
 	echo "usage: $0 rev_num"
+	echo "usage: $0 local rev_num"
 	echo "error: must specify a version number"
 	exit 1
 fi
@@ -11,8 +12,17 @@ TOP_DIR=$(dirname $0)/../../
 REV=$(LANG=C svn info $TOP_DIR | grep Revision | awk '{print $2}')
 TMP_DIR=/tmp/build-libroxml-$(date +"%y%m%d%H%M%S")
 
-echo "Exporting from SVN at rev $REV"
-svn export -r $REV $TOP_DIR $TMP_DIR/libroxml-$VERSION > /dev/null
+mkdir -p $TMP_DIR
+
+if [ "$VERSION" = "local" ]; then
+	echo "Exporting from local"
+	VERSION=$2
+	cp -r $TOP_DIR $TMP_DIR/libroxml-$VERSION > /dev/null
+	find $TMP_DIR/libroxml-$VERSION -name ".svn" -exec rm -fr {} \;
+else
+	echo "Exporting from SVN at rev $REV"
+	svn export -r $REV $TOP_DIR $TMP_DIR/libroxml-$VERSION > /dev/null
+fi
 
 echo "Cleaning repository"
 rm -fr $TMP_DIR/libroxml-$VERSION/unittest

@@ -1,9 +1,7 @@
 libroxml (2.1.0-1) unstable; urgency=low
   * Bugfixes
-      fix syntax for process-instructions: now contains the target application
-(name) and the process-instruction itself (content)
-      fix write of text node insode roxml_commit_changes that could be wrongly
-placed  inside XML document
+      fix syntax for process-instructions
+      fix write of text node insode roxml_commit_changes
       fix commit change to large buffers
       fix get content on empty attributes
       fix doxygen installation if not available

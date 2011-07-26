@@ -681,15 +681,6 @@ int ROXML_API roxml_get_node_position		(node_t *n);
  */
 void ROXML_API roxml_release			(void * data);
 
-/** \brief node type getter function
- *
- * \fn roxml_get_type(node_t *n);
- * this function return the node type : \ref ROXML_ATTR_NODE \ref ROXML_PI_NODE \ref ROXML_CMT_NODE \ref ROXML_TXT_NODE \ref ROXML_ELM_NODE
- * \param n the node to return type for
- * \return the node type
- */
-int roxml_get_type				(node_t *n);
-
 /** \brief add a node to the tree
  *
  * \fn roxml_add_node(node_t * parent, int position, int type, char *name, char *value);
@@ -781,7 +772,6 @@ int roxml_get_type				(node_t *n);
  *	roxml_add_node(node, 0, ROXML_ELM_NODE, "item", NULL);
  *	roxml_add_node(node, 0, ROXML_ELM_NODE, "item", NULL);
  * 	roxml_commit_changes(root, "/tmp/test.xml", NULL, 1);
- *
  * 	return 0;
  * }
  * \endcode
@@ -946,7 +936,6 @@ void ROXML_API roxml_del_node			(node_t * n);
  *	file_out = fopen("/tmp/test.xml", "w");
  *      fwrite(buffer, 1, len, file_out);
  *      fclose(file_out);
- *
  * 	return 0;
  * }
  * \endcode

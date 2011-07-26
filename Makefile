@@ -114,8 +114,8 @@ all : $(TARGET_SLIB) $(if $(filter -static, $(LDFLAGS)), , $(TARGET_LN)) $(TARGE
 doxy : doxy.cfg man.cfg
 	$P '  DOXYGEN'
 	$E - doxygen doxy.cfg &>/dev/null
-	$E - cp data/icons/roxml.png docs/html
-	$E - cp data/icons/libroxml-ex.png docs/html
+	$E - cp data/icons/roxml.png docs/html/
+	$E - cp data/icons/libroxml-ex.png docs/html/
 	$P '  MAN'
 	$E - doxygen man.cfg &>/dev/null
 	$E - chmod -R a+rw docs

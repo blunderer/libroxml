@@ -153,7 +153,7 @@ typedef struct node {
  */
 typedef struct _roxml_load_ctx {
 	int pos;				/*!< position in file */
-	int empty_text_node;			/*!< if text node is empty (only '\t' '\r' '\n' ' ' */
+	int empty_text_node;			/*!< if text node is empty (only contains tabs, spaces, carriage return and line feed */
 	int state;				/*!< state (state machine main var) */
 	int previous_state;			/*!< previous state */
 	int mode;				/*!< mode quoted or normal */
