@@ -2321,6 +2321,9 @@ int test_write_tree(void)
 	len = roxml_commit_changes(root, "out.xml.human", NULL, 1);
 	ASSERT_EQUAL(len, 219)
 
+	len = roxml_commit_changes(node2, "out.xml.human.sub", NULL, 1);
+	ASSERT_EQUAL(len, 40)
+
 	len = roxml_commit_changes(root, NULL, &buffer, 0);
 	ASSERT_EQUAL(len, 176)
 

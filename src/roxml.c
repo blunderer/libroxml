@@ -684,10 +684,19 @@ int ROXML_API roxml_commit_changes(node_t *n, char * dest, char ** buffer, int h
 			*buffer = (char*)malloc(ROXML_LONG_LEN);
 			memset(*buffer, 0, ROXML_LONG_LEN);
 		}
-		while(n) {
+
+		if((n->prnt == NULL)||(n->prnt && n->prnt->prnt == NULL)) {
+			if(n->prnt) {
+				n = n->prnt->chld;
+			}
+			while(n) {
+				roxml_write_node(n, fout, buffer, human, 0, &size, &len);
+				n = n->sibl;
+			}
+		} else {
 			roxml_write_node(n, fout, buffer, human, 0, &size, &len);
-			n = n->sibl;
 		}
+
 		if(buffer) {
 			char * ptr = NULL;
 			len -= ROXML_LONG_LEN;

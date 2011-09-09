@@ -860,7 +860,7 @@ void ROXML_API roxml_del_node			(node_t * n);
  *
  * \fn roxml_commit_changes(node_t *n, char * dest, char ** buffer, int human);
  * this function sync changes from the RAM tree to the given buffer or file in human or one-line format 
- * The tree will be processed starting with the root node 'n' and following with all its children.
+ * The tree will be processed starting with the root node 'n' and following with all its children or if n is the root, all its siblings and children.
  * The tree will be dumped to a file if 'dest' is not null and contains a valid path.
  * The tree will be dumped to a buffer if 'buffer' is not null. the buffer is allocated by the library
  * and a pointer to it will be stored into 'buffer'. The allocated buffer can be freed usinf free()
