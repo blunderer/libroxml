@@ -93,7 +93,7 @@ typedef struct _xpath_node {
 	struct _xpath_node *next;	/*!< next xpath pointer */
 } xpath_node_t;
 
-/** \struct xpath_tok_t
+/** \struct xpath_tok_table_t
  *
  * \brief xpath token structure
  * 
@@ -144,7 +144,7 @@ typedef struct node {
 	void *priv;			/*!< ref to xpath tok (internal use) */
 } node_t;
 
-/** \struct _roxml_load_ctx
+/** \struct roxml_load_ctx_t
  *
  * \brief xml parsing context
  * 
@@ -168,8 +168,7 @@ typedef struct _roxml_load_ctx {
 	node_t *current_node;			/*!< current node */
 } roxml_load_ctx_t;
 
-/** \struct _roxml_xpath_ctx
- *
+/** \struct roxml_xpath_ctx_t
  * \brief xpath parsing context
  * 
  * obscure structure that contains all the xapth
@@ -179,7 +178,7 @@ typedef struct _roxml_xpath_ctx {
 	int pos;				/*!< position in string */
 	int is_first_node;			/*!< is it the first node of xpath */
 	int wait_first_node;			/*!< are we waiting for the first node of a xpath */
-	int shorten_cond;			/*!< is the cond a short confition */
+	int shorten_cond;			/*!< is the cond a short condition */
 	int nbpath;				/*!< number of xpath in this string */
 	int bracket;				/*!< are we inside two brackets */
 	int parenthesys;			/*!< are we inside two parenthesys */
@@ -192,7 +191,7 @@ typedef struct _roxml_xpath_ctx {
 	xpath_cond_t * new_cond;		/*!< current xpath cond */
 } roxml_xpath_ctx_t;
 
-/** \struct _roxml_parser_item
+/** \struct roxml_parser_item_t
  *
  * \brief the parser item struct
  * 
