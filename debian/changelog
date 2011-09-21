@@ -3,7 +3,7 @@ libroxml (2.1.1-1) unstable; urgency=low
       fix roxml_commit_change() when trying to export a subtree
       fix some doc and debianization errors
       fix doxygen error in documentation
-      fix error in xpath request handling for valid xml document when a predicat contains another xpath
+      fix error in xpath request handling
   * Update licence text: LGPL v2.1
 
  -- Tristan Lelong <tristan.lelong@libroxml.net>  Tue, 20 Sep 2011 15:08:00 +0100
