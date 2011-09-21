@@ -584,11 +584,9 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 		} else if(condition->func == ROXML_FUNC_XPATH) {
 			int index = condition->func2;
 			int count = 0;
-			node_t *root = candidat;
+			node_t *root = roxml_get_root(candidat);
 			node_t **node_set;
 			status = 0;
-
-			while(root->prnt) { root = root->prnt; }
 
 			node_set = roxml_exec_xpath(root, candidat, condition->xp, index, &count);
 
