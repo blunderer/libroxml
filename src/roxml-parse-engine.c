@@ -312,7 +312,7 @@ int _func_xpath_condition_or(char * chunk, void * data)
 			}
 	}
 	}
-	ctx->shorten_cond = 0;
+	if (cur) ctx->shorten_cond = 0;
 	return cur;
 }
 
@@ -356,7 +356,7 @@ int _func_xpath_condition_and(char * chunk, void * data)
 			}
 		}
 	}
-	ctx->shorten_cond = 0;
+	if (cur) ctx->shorten_cond = 0;
 	return cur;
 }
 
@@ -629,7 +629,7 @@ int _func_xpath_position(char * chunk, void * data)
 			ctx->new_cond->func = func;
 		}
 	}
-	ctx->shorten_cond = 0;
+	if (cur) ctx->shorten_cond = 0;
 	return cur;
 }
 
@@ -648,7 +648,7 @@ int _func_xpath_first(char * chunk, void * data)
 			else { ctx->new_cond->func = func; }
 		}
 	}
-	ctx->shorten_cond = 0;
+	if (cur) ctx->shorten_cond = 0;
 	return cur;
 }
 
@@ -667,7 +667,7 @@ int _func_xpath_last(char * chunk, void * data)
 			else { ctx->new_cond->func = func; }
 		}
 	}
-	ctx->shorten_cond = 0;
+	if (cur) ctx->shorten_cond = 0;
 	return cur;
 }
 
