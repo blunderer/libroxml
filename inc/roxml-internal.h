@@ -201,6 +201,17 @@ int ROXML_INT roxml_double_cmp			(double a, double b, int op);
  */
 double ROXML_INT roxml_double_oper(double a, double b, int op);
 
+/** \brief  string comparison function
+ *
+ * \fn roxml_string_cmp(char *sa, char *sb, int op);
+ * this function compare two strings using one defined operator
+ * \param sa first operand
+ * \param sb second operand
+ * \param op the operator to use
+ * \return 1 if comparison is ok, else 0
+ */
+int ROXML_INT roxml_string_cmp			(char *sa, char *sb, int op); 
+
 /** \brief predicat validation function
  *
  * \fn roxml_validate_predicat(xpath_node_t *xn, node_t *candidat);

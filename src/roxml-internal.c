@@ -497,6 +497,28 @@ int ROXML_INT roxml_double_cmp(double a, double b, int op)
 	return 0;
 }
 
+int ROXML_INT roxml_string_cmp(char *sa, char *sb, int op)
+{
+	int result;
+	
+	result = strcmp(sa, sb);
+
+	if(op == ROXML_OPERATOR_DIFF) {
+		return (result != 0);
+	} else if(op == ROXML_OPERATOR_EINF) {
+		return (result <= 0);
+	} else if(op == ROXML_OPERATOR_INF) {
+		return (result < 0);
+	} else if(op == ROXML_OPERATOR_ESUP) {
+		return (result >= 0);
+	} else if(op == ROXML_OPERATOR_SUP) {
+		return (result > 0);
+	} else if(op == ROXML_OPERATOR_EQU) {
+		return (result == 0);
+	}
+	return 0;
+}
+
 int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 {
 	int first = 1;
@@ -517,7 +539,7 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 		double iarg2;
 		char * sarg1;
 		char * sarg2;
-
+		
 		if(condition->func == ROXML_FUNC_POS) {
 			status = 0;
 			iarg2 = atof(condition->arg2);
@@ -578,7 +600,7 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 					sarg1 = roxml_get_content(val, NULL, 0, &status);
 				}
 				sarg2 = condition->arg2;
-				status = (strcmp(sarg1, sarg2)==0);
+				status = roxml_string_cmp(sarg1, sarg2, condition->op);
 				roxml_release(sarg1);
 			}
 		} else if(condition->func == ROXML_FUNC_XPATH) {
@@ -787,7 +809,7 @@ int ROXML_INT roxml_validate_axes(node_t *root, node_t *candidat, node_t ***ans,
 				sarg1 = roxml_get_content(candidat, NULL, 0, &status);
 			}
 			sarg2 = condition->arg2;
-			valid = (strcmp(sarg1, sarg2)==0);
+			valid = roxml_string_cmp(sarg1, sarg2, condition->op);
 			roxml_release(sarg1);
 		} else if(condition->func == ROXML_FUNC_INTCOMP) {
 			double iarg1;
