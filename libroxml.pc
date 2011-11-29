@@ -5,6 +5,6 @@ includedir=${prefix}/include
 
 Name: libroxml
 Description: light and powerful XML parser
-Version: 2.1.0
+Version: 2.1.2
 Libs: -L${libdir} -lroxml
 Cflags: -I${prefix}/include

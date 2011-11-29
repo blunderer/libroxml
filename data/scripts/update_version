@@ -1,0 +1,33 @@
+#!/bin/sh
+
+if [ ! -f data/scripts/update_version ]; then
+	echo "this script must be run from project root"
+	exit 1
+fi
+
+PREV_VERS=$(sed -n "s,\(Version: \)\(.*\),\2,p" libroxml.pc)
+
+echo -n "previous version (detected=$PREV_VERS): "
+read ANS
+[ -z "$ANS" ] && PREV_VERS=$ANS
+echo -n "new version: "
+read ANS
+if [ -z "$ANS" ]; then
+	echo "version number is empty, abort."
+	exit 1
+fi
+VERSION=$ANS
+
+# update version number in required files:
+# debian/rules 'version=VERSION'
+sed -i "s,\(version=\).*,\1$VERSION," debian/rules
+
+# libroxml.pc 'Version: VERSION'
+sed -i "s,\(Version: \).*,\1$VERSION," libroxml.pc
+
+# libroxml.spec 'version VERSION'
+sed -i "s,\(version \).*,\1$VERSION," libroxml.spec
+
+# debian/changelog
+vi debian/changelog
+

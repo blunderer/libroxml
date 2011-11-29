@@ -29,6 +29,7 @@ rm -fr $TMP_DIR/libroxml-$VERSION/unittest
 rm -fr $TMP_DIR/libroxml-$VERSION/data/scripts
 rm -fr $TMP_DIR/libroxml-$VERSION/libroxml.spec
 rm -fr $TMP_DIR/libroxml-$VERSION/TODO
+make -C $TMP_DIR/libroxml-$VERSION/ mrproper
 
 mv $TMP_DIR/libroxml-$VERSION/debian $TMP_DIR/
 

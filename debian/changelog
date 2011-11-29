@@ -1,3 +1,10 @@
+libroxml (2.1.2-1) unstable; urgency=low
+  * Bugfixes
+      fix string compare in xpath fail
+      fix Xpath shorten condition detection failure
+
+ -- Tristan Lelong <tristan.lelong@libroxml.net>  Tue, 29 Nov 2011 19:13:00 +0100
+
 libroxml (2.1.1-1) unstable; urgency=low
   * Bugfixes
       fix roxml_commit_change() when trying to export a subtree

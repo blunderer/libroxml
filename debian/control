@@ -11,25 +11,51 @@ Section: libdevel
 Architecture: any
 Depends: libroxml0 (= ${binary:Version}), ${misc:Depends}
 Description: libroxml development files
- libroxml is a light but powerful XML parsing library with C API.
- It provides XPath support and navigation funtions.
- It can also be used for XML creation/edition.
+ Because XML parsing is always hard to reinvent 
+ Because very often, xml libraries are too big to fit with little application 
+ libroxml allow you to easily: 
+   - load / unload document from files 
+   - load / unload document from buffer 
+   - navigate thru the xml tree using libroxml C/C++ API 
+   - read attributes and attributes' values for nodes 
+   - get text content of nodes 
+   - use XPath expressions 
+   - modify the loaded XML tree 
+   - create XML from scratch 
+   - apply modification from the loaded XML tree to a file or buffer 
 
 Package: libroxml0
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Light C XML parsing library
- libroxml is a light but powerful XML parsing library with C API.
- It provides XPath support and navigation funtions.
- It can also be used for XML creation/edition.
+ Because XML parsing is always hard to reinvent 
+ Because very often, xml libraries are too big to fit with little application 
+ libroxml allow you to easily: 
+   - load / unload document from files 
+   - load / unload document from buffer 
+   - navigate thru the xml tree using libroxml C/C++ API 
+   - read attributes and attributes' values for nodes 
+   - get text content of nodes 
+   - use XPath expressions 
+   - modify the loaded XML tree 
+   - create XML from scratch 
+   - apply modification from the loaded XML tree to a file or buffer 
 
 Package: libroxml-dbg
 Section: debug
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, libroxml0
 Description: Light C XML parsing library debug files
- libroxml is a light but powerful XML parsing library with C API.
- It provides XPath support and navigation funtions.
- It can also be used for XML creation/edition.
-
+ Because XML parsing is always hard to reinvent 
+ Because very often, xml libraries are too big to fit with little application 
+ libroxml allow you to easily: 
+   - load / unload document from files 
+   - load / unload document from buffer 
+   - navigate thru the xml tree using libroxml C/C++ API 
+   - read attributes and attributes' values for nodes 
+   - get text content of nodes 
+   - use XPath expressions 
+   - modify the loaded XML tree 
+   - create XML from scratch 
+   - apply modification from the loaded XML tree to a file or buffer 

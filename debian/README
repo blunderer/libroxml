@@ -1,19 +1,16 @@
 The Debian Package libroxml
 ----------------------------
 
-Why libroxml?
-Because XML parsing is always hard to reinvent
-Because very often, xml libraries are too big to fit with little application
+You may find more information on libroxml at:
+	http://www.libroxml.net
 
-libroxml allow you to easily:
-- load / unload document from files
-- load / unload document from buffer
-- navigate thru the xml tree using libroxml C/C++ API
-- read attributes and attributes' values for nodes
-- get text content of nodes
-- use XPath expressions
-- modify on the loaded XML tree
-- create XML from scratch
-- applying modification from the loaded XML tree to a file or buffer
+This package contains the libroxml library and roxml binary:
+* libroxml
+	a light C XML library originally designed for embedded systems.
+	
+* roxml
+	binary used to execute xpath request on XML document from shell.
 
- -- Tristan Lelong <tristan.lelong@libroxml.net>  Sun, 28 Feb 2010 19:41:43 +0100
+Report any issue with this package to: 
+	Tristan Lelong <tristan.lelong@libroxml.net>
+

@@ -5,11 +5,11 @@ It was downloaded from <http://libroxml.googlecode.com>
 
 Upstream Author:
 
-    Tristan Lelong <tristan.lelong@libroxml.net
+    Tristan Lelong <tristan.lelong@libroxml.net>
 
 Copyright:
 
-    <Copyright (C) 2010 Tristan Lelong>
+    <Copyright (C) 2011 Tristan Lelong>
 
 License:
 
@@ -28,8 +28,7 @@ License:
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 
 On Debian systems, the complete text of the GNU Lesser General
-Public License can be found in `/usr/share/common-licenses/GPL'.
+Public License can be found in `/usr/share/common-licenses/LGPL-2.1'
 
-The Debian packaging is (C) 2010, Tristan Lelong <tristan.lelong@libroxml.net> and
-is licensed under the LGPL, see above.
+The Debian packaging is (C) 2011, Tristan Lelong <tristan.lelong@libroxml.net> and is licensed under the LGPL, see above.
 

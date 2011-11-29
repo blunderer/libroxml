@@ -153,7 +153,6 @@ install: $(TARGETS) doxy
 	$E install -D $(TARGET_LIB) $(DESTDIR)/usr/lib
 	$E install -D $(TARGET_BIN) $(DESTDIR)/usr/bin
 	$E install -D $(INC) $(DESTDIR)/usr/include
-	$E install -D LGPL.txt $(DESTDIR)/usr/share/doc/libroxml/
 	$E install -D docs/roxml.1 $(DESTDIR)/usr/share/man/man1/
 	$E [ ! -d docs/man/man3 ] || install -D docs/man/man3/* $(DESTDIR)/usr/share/man/man3/
 	$E [ ! -d docs/html ] || install -D docs/html/* $(DESTDIR)/usr/share/doc/libroxml/html/
