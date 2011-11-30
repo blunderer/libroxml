@@ -28,6 +28,18 @@ sed -i "s,\(Version: \).*,\1$VERSION," libroxml.pc
 # libroxml.spec 'version VERSION'
 sed -i "s,\(version \).*,\1$VERSION," libroxml.spec
 
+# doxy.cfg 'PROJECT_NUMBER         = VERSION'
+sed -i "s,\(PROJECT_NUMBER.*= \).*,\1$VERSION," doxy.cfg
+
+# man.cfg 'PROJECT_NUMBER         = VERSION'
+sed -i "s,\(PROJECT_NUMBER.*= \).*,\1$VERSION," man.cfg
+
+# inc/roxml-doxy.h 'Lastest version is VERSION'
+sed -i "s,\(Lastest version is \)[0-9]*\.[0-9]*\.[0-9]*\(:.*\),\1$VERSION\2," inc/roxml-doxy.h
+
+# inc/roxml-doxy.h 'libroxml-VERSION.tar.gz'
+sed -i "s,\(libroxml-\)[0-9]*\.[0-9]*\.[0-9]*\(.tar.gz\),\1$VERSION\2," inc/roxml-doxy.h
+
 # debian/changelog
 vi debian/changelog
 
