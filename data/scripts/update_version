@@ -18,6 +18,8 @@ if [ -z "$ANS" ]; then
 fi
 VERSION=$ANS
 
+DATE=$(LANG=C date +"%a, %d %b %Y %X %z")
+
 # update version number in required files:
 # debian/rules 'version=VERSION'
 sed -i "s,\(version=\).*,\1$VERSION," debian/rules
@@ -41,5 +43,12 @@ sed -i "s,\(Lastest version is \)[0-9]*\.[0-9]*\.[0-9]*\(:.*\),\1$VERSION\2," in
 sed -i "s,\(libroxml-\)[0-9]*\.[0-9]*\.[0-9]*\(.tar.gz\),\1$VERSION\2," inc/roxml-doxy.h
 
 # debian/changelog
+echo "libroxml ($VERSION-1) unstable; urgency=low" > .debian.changelog
+echo "" >> .debian.changelog
+echo " -- Name <mail@libroxml.net>  $DATE" >> .debian.changelog
+echo "" >> .debian.changelog
+cat debian/changelog >> .debian.changelog
+mv .debian.changelog debian/changelog
+
 vi debian/changelog
 
