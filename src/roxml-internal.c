@@ -1084,7 +1084,7 @@ void ROXML_INT roxml_print_space(FILE *f, char ** buf, int * offset, int * len, 
 		if(pos >= *len) { 
 			*buf = realloc(*buf, *len+ROXML_LONG_LEN); 
 			memset(*buf+*len, 0, ROXML_LONG_LEN); 
-			len += ROXML_LONG_LEN;
+			*len += ROXML_LONG_LEN;
 		}
 		for(; i < lvl; i++) {
 			strcat(*buf, " ");
