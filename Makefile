@@ -100,7 +100,7 @@ $(TARGET_LIB) : $(OBJ_LIB)
 
 $(TARGET_LN): $(TARGET_LIB)
 	$P '  LN      $(notdir $@)'
-	$E - ln -fs $^ $@
+	$E - ln -fs $(shell basename $^) $@
 
 $(TARGET_BIN): $(OBJ_BIN)
 $(TARGET_BIN): | $(if $(filter -static, $(LDFLAGS)), $(TARGET_SLIB), $(TARGET_LIB))
