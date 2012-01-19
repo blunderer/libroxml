@@ -99,6 +99,10 @@ void ROXML_INT roxml_close_node(node_t *n, node_t *close)
 
 void ROXML_INT roxml_free_node(node_t *n)
 {
+	if(!n) {
+		return;
+	}
+
 	if(n->type & ROXML_PENDING) {
 		if(n->pos == 0) {
 			free(n->src.buf);
