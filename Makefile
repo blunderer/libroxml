@@ -15,13 +15,16 @@ endif
 INC = inc/roxml.h
 SRC_LIB = src/roxml.c src/roxml-internal.c src/roxml-parse-engine.c
 SRC_BIN = src/roxml-parser.c
+SRC_PY = src/roxml-python.c
 DEPS = $(patsubst %.c, $O/%.d, $(SRC_LIB) $(SRC_BIN))
 OBJS = $(OBJ_LIB) $(OBJ_BIN)
 OBJ_LIB = $(SRC_LIB:%.c=$O/%.o)
 OBJ_BIN = $(SRC_BIN:%.c=$O/%.o)
+OBJ_PY = $(SRC_PY:%.c=$O/%.o)
 TARGETS = $(TARGET_SLIB) $(TARGET_LN) $(TARGET_LIB) $(TARGET_BIN)
 TARGET_SLIB = $O/libroxml.a
 TARGET_LIB = $O/libroxml.so.0
+TARGET_PYLIB = $O/pyroxml.so
 TARGET_LN = $O/libroxml.so
 TARGET_BIN = $O/roxml
 BINS = $(TARGET_SLIB) $(TARGET_LIB) $(TARGET_LN) $(TARGET_BIN)
@@ -100,7 +103,7 @@ $(TARGET_LIB) : $(OBJ_LIB)
 
 $(TARGET_LN): $(TARGET_LIB)
 	$P '  LN      $(notdir $@)'
-	$E - ln -fs $(shell basename $^) $@
+	$E - ln -fs $(<F) $@
 
 $(TARGET_BIN): $(OBJ_BIN)
 $(TARGET_BIN): | $(if $(filter -static, $(LDFLAGS)), $(TARGET_SLIB), $(TARGET_LIB))
@@ -108,7 +111,7 @@ $(TARGET_BIN): | $(if $(filter -static, $(LDFLAGS)), $(TARGET_SLIB), $(TARGET_LI
 	$E $(CC) $(LDFLAGS) $^ -L$O -lroxml -lpthread -o $@
 
 .PHONY : all
-all : $(TARGET_SLIB) $(if $(filter -static, $(LDFLAGS)), , $(TARGET_LN)) $(TARGET_BIN)
+all : $(TARGET_SLIB) $(if $(filter -static, $(LDFLAGS)), , $(TARGET_LN)) $(TARGET_BIN) $(PY_LIB)
 
 .PHONY : doxy
 doxy : doxy.cfg man.cfg
@@ -123,16 +126,21 @@ doxy : doxy.cfg man.cfg
 .PHONY: clean
 clean:
 	$P '  RM      deps objs bins'
-	$E - rm -f $(DEPS) $(OBJS) $(BINS) 
+	$E rm -f $(DEPS) $(OBJS) $(BINS) 
 
 .PHONY : mrproper
 mrproper : clean
 	$P '  RM      docs'
-	$E - rm -fr docs/man docs/html docs/latex
+	$E rm -fr docs/man docs/html docs/latex
 	$P '  CLEAN   debian'
 	$E - $(FAKEROOT) $(MAKE) -f $(abspath $(DEBIAN_RULES)) clean &>/dev/null
 	$P '  CLEAN   fuse.xml'
 	$E - $(MAKE) -C $(abspath fuse.xml) mrproper >/dev/null
+
+.PHONY: $(TARGET_PYLIB)
+$(TARGET_PYLIB): $(TARGET_LIB) $(OBJ_PY)
+	$P '  CC $@'
+	$E $(CC) $(LDFLAGS) -shared $^ -L$O -lroxml -o $@
 
 .PHONY: fuse.xml
 fuse.xml: $(TARGET_LN)
@@ -162,18 +170,18 @@ install: $(TARGETS) doxy
 .PHONY: uninstall
 uninstall:
 	$P '  UNINSTALL'
-	$E - rm -f $(DESTDIR)/usr/lib/pkgconfig/libroxml.pc
-	$E - rm -f $(DESTDIR)/usr/lib/$(TARGET_SLIB)
-	$E - rm -f $(DESTDIR)/usr/lib/$(TARGET_LIB)
-	$E - rm -f $(DESTDIR)/usr/bin/$(TARGET_BIN)
-	$E - rm -f $(DESTDIR)/usr/include/$(INC)
-	$E - rm -fr $(DESTDIR)/usr/share/doc/libroxml
-	$E - rm -fr $(DESTDIR)/usr/share/man/man1/roxml.1
-	$E - rm -fr $(DESTDIR)/usr/share/man/man3/roxml*
-	$E - rm -fr $(DESTDIR)/usr/share/man/man3/ROXML*
-	$E - rm -fr $(DESTDIR)/usr/share/man/man3/node_t.3
-	$E - rm -fr $(DESTDIR)/usr/share/man/man3/RELEASE_ALL.3
-	$E - rm -fr $(DESTDIR)/usr/share/man/man3/RELEASE_LAST.3
+	$E rm -f $(DESTDIR)/usr/lib/pkgconfig/libroxml.pc
+	$E rm -f $(DESTDIR)/usr/lib/$(TARGET_SLIB)
+	$E rm -f $(DESTDIR)/usr/lib/$(TARGET_LIB)
+	$E rm -f $(DESTDIR)/usr/bin/$(TARGET_BIN)
+	$E rm -f $(DESTDIR)/usr/include/$(INC)
+	$E rm -fr $(DESTDIR)/usr/share/doc/libroxml
+	$E rm -fr $(DESTDIR)/usr/share/man/man1/roxml.1
+	$E rm -fr $(DESTDIR)/usr/share/man/man3/roxml*
+	$E rm -fr $(DESTDIR)/usr/share/man/man3/ROXML*
+	$E rm -fr $(DESTDIR)/usr/share/man/man3/node_t.3
+	$E rm -fr $(DESTDIR)/usr/share/man/man3/RELEASE_ALL.3
+	$E rm -fr $(DESTDIR)/usr/share/man/man3/RELEASE_LAST.3
 
 .PHONY: help
 help:
