@@ -191,6 +191,7 @@ node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 	parser = roxml_append_parser_item(parser, "]", _func_load_close_cdata);
 	parser = roxml_append_parser_item(parser, "-", _func_load_close_comment);
 	parser = roxml_append_parser_item(parser, "?", _func_load_close_pi);
+	parser = roxml_append_parser_item(parser, ":", _func_load_colon);
 	parser = roxml_append_parser_item(parser, NULL, _func_load_default);
 
 	parser = roxml_parser_prepare(parser);
@@ -236,12 +237,31 @@ node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 		table->ids[ROXML_REQTABLE_ID] = 1;
 		pthread_mutex_init(&table->mut, NULL);
 		current_node->priv = (void*)table;
+		current_node->ns = context.namespaces;
 	} else {
 		roxml_close(current_node);
 		return NULL;
 	}
 
 	return current_node;
+}
+
+node_t * ROXML_INT roxml_lookup_nsdef(node_t * nsdef, char * ns)
+{
+	int len = 0;
+	char namespace[MAX_NS_LEN];
+
+	for(len = 0; ns[len] != '\0' && ns[len] != ':'; len++) {
+		namespace[len] = ns[len];
+	}
+	namespace[len] = '\0';
+
+	while(nsdef) {
+		if(strncmp(ns, (char*)nsdef->priv, len) == 0) {
+			break;
+		}
+	}
+	return nsdef;
 }
 
 void ROXML_INT roxml_set_type(node_t * n, int type)
@@ -1285,6 +1305,9 @@ node_t * roxml_parent_node(node_t *parent, node_t *n)
 {
 	n->prnt = parent;
 	if(parent)	{
+		if(parent->ns) {
+			n->ns = parent->ns;
+		}
 		if(roxml_get_type(n) == ROXML_ATTR_NODE)	{
 			if(parent->attr) {
 				parent = parent->attr;

@@ -452,6 +452,17 @@ int ROXML_INT roxml_is_separator(char sep);
  */
 void ROXML_INT roxml_process_begin_node(roxml_load_ctx_t *context, int position);
 
+/** \brief name space lookup in list
+ *
+ * \fn roxml_lookup_nsdef(node_t * ns, char * ns);
+ * this function look for requested name space in nsdef list
+ * \param the nsdef list
+ * \param the namespace to find
+ * \return the nsdef node or NULL
+ */
+node_t * ROXML_INT roxml_lookup_nsdef(node_t * nsdef, char * ns);
+
+
 #ifdef __DEBUG
 extern unsigned int _nb_node;
 extern unsigned int _nb_attr;

@@ -1062,6 +1062,36 @@ int _func_load_white(char * chunk, void * data)
 	return cur;
 }
 
+int _func_load_colon(char * chunk, void * data)
+{
+	int cur = 1;
+	roxml_load_ctx_t *context = (roxml_load_ctx_t*)data;
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n",__func__,chunk[0]);
+#endif /* DEBUG_PARSING */
+
+	if(context->state == STATE_NODE_NAME) {
+		context->state = STATE_NODE_BEG;
+		context->candidat_node->ns = roxml_lookup_nsdef(context->namespaces, context->curr_name);
+		context->ns = 1;
+	} else if(context->state == STATE_NODE_ATTR) {
+		if(context->inside_node_state == STATE_INSIDE_ARG) {
+			context->inside_node_state = STATE_INSIDE_ARG_BEG;
+			if(strncmp(context->curr_name, "xmlns", 5) == 0) {
+				context->candidat_arg->type |= ROXML_NS_NODE;
+				context->nsdef = 1;
+			} else {
+				context->candidat_arg->ns = roxml_lookup_nsdef(context->namespaces, context->curr_name);
+				context->ns = 1;
+			}
+				
+		}
+	}
+
+	context->pos += cur;
+	return cur;
+}
+
 int _func_load_default(char * chunk, void * data)
 {
 	node_t * to_be_closed;
@@ -1076,16 +1106,34 @@ int _func_load_default(char * chunk, void * data)
 			context->state = context->previous_state;
 		break;
 		case STATE_NODE_BEG:
-			roxml_process_begin_node(context, context->pos-1);
+			if(context->ns == 0) {
+				roxml_process_begin_node(context, context->pos-1);
+			}
+			context->ns = 0;
 			context->state = STATE_NODE_NAME;
-			while(!ROXML_WHITE(chunk[cur])&&(chunk[cur] != '>')&&(chunk[cur] != '/')&&(chunk[cur] != '\0')) { cur++; }
+			context->curr_name = chunk;
+			while(!ROXML_WHITE(chunk[cur])&&(chunk[cur] != '>')&&(chunk[cur] != '/')&&(chunk[cur] != ':')&&(chunk[cur] != '\0')) { cur++; }
+			context->curr_name_len = cur;
 		break;
 		case STATE_NODE_ATTR:
 			if(context->inside_node_state == STATE_INSIDE_ARG_BEG)  {
-				context->candidat_arg = roxml_create_node(context->pos-1, context->src, ROXML_ATTR_NODE | context->type);
-				context->candidat_arg = roxml_parent_node(context->candidat_node, context->candidat_arg);
+				if(context->nsdef) {
+					context->candidat_arg->ns = context->namespaces;
+					context->namespaces = context->candidat_arg;
+				} else if(context->ns == 0) {
+					context->candidat_arg = roxml_create_node(context->pos-1, context->src, ROXML_ATTR_NODE | context->type);
+					context->candidat_arg = roxml_parent_node(context->candidat_node, context->candidat_arg);
+				}
+				context->ns = 0;
 				context->inside_node_state = STATE_INSIDE_ARG;
-				while((chunk[cur] != '=')&&(chunk[cur] != '>')&&(chunk[cur] != '\0')) { cur++; }
+				context->curr_name = chunk;
+				while((chunk[cur] != '=')&&(chunk[cur] != '>')&&(chunk[cur] != ':')&&(chunk[cur] != '\0')) { cur++; }
+				context->curr_name_len = cur;
+				if(context->nsdef) {
+					context->candidat_arg->priv = calloc(1, sizeof(char)*(1+context->curr_name_len));
+					memcpy(context->candidat_arg->priv, context->curr_name, context->curr_name_len);
+					context->nsdef = 0;
+				}
 			} else if(context->inside_node_state == STATE_INSIDE_VAL_BEG)  {
 				if(context->mode != MODE_COMMENT_NONE)     {
 					context->content_quoted = 1;

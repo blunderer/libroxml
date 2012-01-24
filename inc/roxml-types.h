@@ -128,7 +128,7 @@ typedef struct _xpath_tok {
  * tree links
  */
 typedef struct node {
-	unsigned char type;		/*!< document or buffer / attribute or value */
+	unsigned short type;		/*!< document or buffer / attribute or value */
 	union {
 		char *buf;		/*!< buffer address */
 		FILE *fil;		/*!< loaded document */
@@ -141,7 +141,8 @@ typedef struct node {
 	struct node *prnt;		/*!< ref to parent */
 	struct node *attr;		/*!< ref to attribute */
 	struct node *next;		/*!< ref to last chld (internal use) */
-	void *priv;			/*!< ref to xpath tok (internal use) */
+	struct node *ns;		/*!< ref to namespace definition */
+	void *priv;			/*!< ref to xpath tok (internal use) or alias for namespaces */
 } node_t;
 
 /** \struct roxml_load_ctx_t
@@ -160,12 +161,17 @@ typedef struct _roxml_load_ctx {
 	int inside_node_state;			/*!< sub state for attributes*/
 	int content_quoted;			/*!< content of attribute was quoted */
 	int type;				/*!< source type (file or buffer) */
+	int nsdef;				/*!< indicate if this is a nsdef */
+	int ns;					/*!< indicate if a ns is used for this node */
 	void * src;				/*!< source (file or buffer) */
 	node_t *candidat_node;			/*!< node being processed */
 	node_t *candidat_txt;			/*!< text node being processed */
 	node_t *candidat_arg;			/*!< attr node being processed */
 	node_t *candidat_val;			/*!< attr value being processed */
 	node_t *current_node;			/*!< current node */
+	node_t *namespaces;			/*!< available namespaces */
+	char * curr_name;			/*!< current node name (attr or elm) */
+	int curr_name_len;			/*!< current node name (attr or elm) lenght */
 } roxml_load_ctx_t;
 
 /** \struct roxml_xpath_ctx_t

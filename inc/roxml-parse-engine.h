@@ -112,6 +112,7 @@ int _func_load_open_node(char * chunk, void * data);
 int _func_load_close_node(char * chunk, void * data);
 int _func_load_end_node(char * chunk, void * data);
 int _func_load_white(char * chunk, void * data);
+int _func_load_colon(char * chunk, void * data);
 int _func_load_default(char * chunk, void * data);
 
 #endif /* ROXML_PARSE_ENGINE_H */

@@ -106,6 +106,13 @@
 #define ROXML_REQTABLE_ID	0
 
 /**
+ * \def MAX_NS_LEN
+ * 
+ * constant for namespace lenght
+ */
+#define MAX_NS_LEN		128
+
+/**
  * \def INTERNAL_BUF_SIZE
  * 
  * constant for internal buffer size

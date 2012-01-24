@@ -61,7 +61,7 @@ typedef struct node node_t;
  * constant for attribute nodes
  * \see roxml_add_node
  */
-#define ROXML_ATTR_NODE	0x08
+#define ROXML_ATTR_NODE	0x008
 
 /**
  * \def ROXML_STD_NODE
@@ -72,7 +72,7 @@ typedef struct node node_t;
  * \see roxml_add_node
  * 
  */
-#define ROXML_STD_NODE	0x10 
+#define ROXML_STD_NODE	0x010 
 
 /**
  * \def ROXML_ELM_NODE
@@ -80,7 +80,7 @@ typedef struct node node_t;
  * constant for element nodes
  * \see roxml_add_node
  */
-#define ROXML_ELM_NODE	0x10
+#define ROXML_ELM_NODE	0x010
 
 /**
  * \def ROXML_TXT_NODE
@@ -88,7 +88,7 @@ typedef struct node node_t;
  * constant for text nodes
  * \see roxml_add_node
  */
-#define ROXML_TXT_NODE	0x20
+#define ROXML_TXT_NODE	0x020
 
 /**
  * \def ROXML_CMT_NODE
@@ -96,7 +96,7 @@ typedef struct node node_t;
  * constant for comment nodes
  * \see roxml_add_node
  */
-#define ROXML_CMT_NODE	0x40
+#define ROXML_CMT_NODE	0x040
 
 /**
  * \def ROXML_PI_NODE
@@ -104,7 +104,15 @@ typedef struct node node_t;
  * constant for processing_intruction nodes
  * \see roxml_add_node
  */
-#define ROXML_PI_NODE	0x80
+#define ROXML_PI_NODE	0x080
+
+/**
+ * \def ROXML_NS_NODE
+ * 
+ * constant for processing_intruction nodes
+ * \see roxml_add_node
+ */
+#define ROXML_NS_NODE	0x100
 
 /**
  * \def ROXML_ALL_NODE
