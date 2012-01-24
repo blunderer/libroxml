@@ -1,0 +1,10 @@
+<root xmlns:test="www.test.org">
+ <test:node1/>
+ <node2 test:value="2"/>
+ <node3/>
+ <node4 value="3"/>
+ <test:node5 value="4"/>
+ <test:node6>
+  <node7/>
+ </test:node5>
+</root>
