@@ -2470,6 +2470,63 @@ int test_whitespaces_in_attr(void)
 	RETURN /* close context macro */
 }
 
+int test_namespaces(void)
+{
+	INIT /* init context macro */
+
+	node_t *node1 = NULL;
+	node_t *node2 = NULL;
+	node_t *node3 = NULL;
+	node_t *node4 = NULL;
+	node_t *node5 = NULL;
+	node_t *node6 = NULL;
+	node_t *node7 = NULL;
+	node_t *node8 = NULL;
+	node_t *root = roxml_load_doc("roxml.test.xml");
+
+	ASSERT_NULL(root->ns);
+
+	roxml_close(root);
+
+	root = roxml_load_doc("roxml.test.xml.ns");
+
+	ASSERT_NOT_NULL(root->ns);
+
+	node1 = root->chld->chld;
+	node2 = root->chld->chld->sibl;
+	node3 = root->chld->chld->sibl->sibl;
+	node4 = root->chld->chld->sibl->sibl->sibl;
+	node5 = root->chld->chld->sibl->sibl->sibl->sibl;
+	node6 = root->chld->chld->sibl->sibl->sibl->sibl;
+	node7 = root->chld->chld->sibl->sibl->sibl->sibl->sibl;
+	node8 = root->chld->chld->sibl->sibl->sibl->sibl->sibl->chld;
+
+	/* check ns def */
+	ASSERT_NOT_NULL(root->chld);
+	ASSERT_NOT_NULL(root->chld->attr);
+	ASSERT_STRING_EQUAL((char*)root->chld->attr->priv, "test");
+
+	ASSERT_NOT_NULL(node1->ns); /* node1 */
+	ASSERT_NOT_NULL(node2->attr->ns); /* node2 */
+	ASSERT_NULL(node3->ns); /* node3 */
+	ASSERT_NULL(node4->attr->ns); /* node4 */
+	ASSERT_NOT_NULL(node5->ns); /* node5 */
+	ASSERT_NOT_NULL(node6->attr->ns); /* node6 */
+	ASSERT_NOT_NULL(node7->ns); /* node7 */
+	ASSERT_NOT_NULL(node8->ns); /* node8 */
+
+	ASSERT_EQUAL(root->chld->attr, node1->ns);
+	ASSERT_EQUAL(root->chld->attr, node2->attr->ns);
+	ASSERT_EQUAL(root->chld->attr, node5->ns);
+	ASSERT_EQUAL(root->chld->attr, node6->attr->ns);
+	ASSERT_EQUAL(root->chld->attr, node7->ns);
+	ASSERT_EQUAL(root->chld->attr, node8->ns);
+
+	roxml_close(root);
+
+	RETURN /* close context macro */
+}
+
 int test_write_tree(void)
 {
 	int len;
@@ -2602,6 +2659,7 @@ int main(int argc, char ** argv)	{
 	TEST_FUNC(test_write_tree) 
 	TEST_FUNC(test_spec_nodes) 
 	TEST_FUNC(test_whitespaces_in_attr)
+	TEST_FUNC(test_namespaces)
 
 	EXEC_UNITTEST /* exec tests depending on command line option see available options with --help */
 
