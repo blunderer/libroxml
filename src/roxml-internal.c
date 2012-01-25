@@ -108,18 +108,24 @@ void ROXML_INT roxml_free_node(node_t *n)
 			free(n->src.buf);
 		}
 	}
+
 	if(n->priv) {
-		xpath_tok_t * tok = (xpath_tok_t*)n->priv;
-		if(tok->id == ROXML_REQTABLE_ID) {
+		unsigned char id = *(unsigned char*)n->priv;
+
+		if(id == ROXML_REQTABLE_ID) {
+			xpath_tok_t * tok = (xpath_tok_t*)n->priv;
 			xpath_tok_table_t * table = (xpath_tok_table_t*)n->priv;
 			tok = table->next;
 			pthread_mutex_destroy(&table->mut);
 			free(table);
-		}
-		while(tok) {
-			xpath_tok_t * to_delete = tok;
-			tok = tok->next;
-			free(to_delete);
+			while(tok) {
+				xpath_tok_t * to_delete = tok;
+				tok = tok->next;
+				free(to_delete);
+			}
+		} else if(id == ROXML_NS_ID) {
+			roxml_ns_t * ns = (roxml_ns_t*)n->priv;
+			free(ns);
 		}
 	}
 	free(n);
@@ -130,6 +136,7 @@ void ROXML_INT roxml_del_tree(node_t *n)
 	if(n == NULL)	{ return; }
 	roxml_del_tree(n->chld);
 	roxml_del_tree(n->sibl);
+	roxml_del_tree(n->attr);
 	roxml_free_node(n);
 }
 
@@ -156,10 +163,10 @@ void ROXML_INT roxml_process_unaliased_ns(roxml_load_ctx_t *context)
 			context->candidat_node->ns = NULL;
 			context->candidat_arg->ns = NULL;
 		} else {
-			char * nsdef = NULL; (char*)context->candidat_arg->priv;
-			context->candidat_arg->priv = calloc(1, 1);
-			nsdef = (char*)context->candidat_arg->priv;
-			nsdef[0] = 0;
+			roxml_ns_t * ns = calloc(1, sizeof(roxml_ns_t)+1);
+			ns->id = ROXML_NS_ID;
+			ns->alias = (char*)ns + sizeof(roxml_ns_t);
+			context->candidat_arg->priv = ns;
 			context->candidat_arg->ns = context->namespaces;
 			context->namespaces = context->candidat_arg;
 			context->candidat_node->ns = context->namespaces;
@@ -278,7 +285,7 @@ node_t * ROXML_INT roxml_lookup_nsdef(node_t * nsdef, char * ns)
 	namespace[len] = '\0';
 
 	while(nsdef) {
-		if(strncmp(ns, (char*)nsdef->priv, len) == 0) {
+		if(strncmp(ns, ((roxml_ns_t*)nsdef->priv)->alias, len) == 0) {
 			break;
 		}
 	}
@@ -685,7 +692,7 @@ int ROXML_INT roxml_request_id(node_t *root)
 
 	xpath_tok_table_t * table = (xpath_tok_table_t*)root->priv;
 	pthread_mutex_lock(&table->mut);
-	for(i = 1; i < 255; i++) {
+	for(i = ROXML_XPATH_FIRST_ID; i < 255; i++) {
 		if(table->ids[i] == 0) {
 			table->ids[i]++;
 			pthread_mutex_unlock(&table->mut);

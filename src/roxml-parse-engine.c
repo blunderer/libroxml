@@ -1135,8 +1135,11 @@ int _func_load_default(char * chunk, void * data)
 				while((chunk[cur] != '=')&&(chunk[cur] != '>')&&(chunk[cur] != ':')&&(chunk[cur] != '\0')) { cur++; }
 				context->curr_name_len = cur;
 				if(context->nsdef) {
-					context->candidat_arg->priv = calloc(1, sizeof(char)*(1+context->curr_name_len));
-					memcpy(context->candidat_arg->priv, context->curr_name, context->curr_name_len);
+					roxml_ns_t * ns = calloc(1, sizeof(roxml_ns_t)+(1+context->curr_name_len));
+					ns->id = ROXML_NS_ID;
+					ns->alias = (char*)ns + sizeof(roxml_ns_t);
+					memcpy(ns->alias, context->curr_name, context->curr_name_len);
+					context->candidat_arg->priv = ns;
 					context->nsdef = 0;
 				}
 			} else if(context->inside_node_state == STATE_INSIDE_VAL_BEG)  {

@@ -2470,7 +2470,7 @@ int test_whitespaces_in_attr(void)
 	RETURN /* close context macro */
 }
 
-int test_namespaces(void)
+int test_parse_namespaces(void)
 {
 	INIT /* init context macro */
 
@@ -2518,9 +2518,9 @@ int test_namespaces(void)
 	/* check ns def */
 	ASSERT_NOT_NULL(root->chld);
 	ASSERT_NOT_NULL(root->chld->attr);
-	ASSERT_STRING_EQUAL((char*)root->chld->attr->priv, "test");
+	ASSERT_STRING_EQUAL(((roxml_ns_t*)root->chld->attr->priv)->alias, "test");
 	ASSERT_NOT_NULL(node10->attr);
-	ASSERT_STRING_EQUAL((char*)node10->attr->priv, "");
+	ASSERT_STRING_EQUAL(((roxml_ns_t*)node10->attr->priv)->alias, "");
 
 	ASSERT_NOT_NULL(root->ns);
 	ASSERT_NOT_NULL(root->ns->ns);
@@ -2555,9 +2555,9 @@ int test_namespaces(void)
 	ASSERT_EQUAL(root->chld->attr, node7->ns);
 	ASSERT_EQUAL(node10->attr, node10->ns);
 	ASSERT_EQUAL(node10->attr, node11->ns);
+	ASSERT_EQUAL(node10->attr, node15->ns);
 	ASSERT_EQUAL(node12->attr, node12->ns);
 	ASSERT_EQUAL(node12->attr, node13->ns);
-	ASSERT_EQUAL(node10->attr, node15->ns);
 
 	ASSERT_EQUAL(root->chld->attr->type & ROXML_NS_NODE, ROXML_NS_NODE);
 	ASSERT_EQUAL(node8->attr->type & ROXML_NS_NODE, ROXML_NS_NODE);
@@ -2572,6 +2572,7 @@ int test_namespaces(void)
 	ASSERT_STRING_EQUAL("", roxml_get_name(node12->attr, NULL, 0));
 	ASSERT_STRING_EQUAL("http://www.default2.org", roxml_get_content(node12->attr, NULL, 0, NULL));
 
+	roxml_release(RELEASE_ALL);
 	roxml_close(root);
 
 	RETURN /* close context macro */
@@ -2709,7 +2710,7 @@ int main(int argc, char ** argv)	{
 	TEST_FUNC(test_write_tree) 
 	TEST_FUNC(test_spec_nodes) 
 	TEST_FUNC(test_whitespaces_in_attr)
-	TEST_FUNC(test_namespaces)
+	TEST_FUNC(test_parse_namespaces)
 
 	EXEC_UNITTEST /* exec tests depending on command line option see available options with --help */
 

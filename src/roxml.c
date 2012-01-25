@@ -240,9 +240,9 @@ char * ROXML_API roxml_get_name(node_t *n, char * buffer, int size)
 	if(n->prnt == NULL)	{
 		strcpy(tmp_name, "documentRoot");
 	} else if(n->type & ROXML_NS_NODE)	{
-		char * ns = (char*)n->priv;
+		roxml_ns_t * ns = (roxml_ns_t*)n->priv;
 		if(ns) {
-			strcpy(tmp_name, ns);
+			strcpy(tmp_name, ns->alias);
 		} else {
 			tmp_name[0] ='\0';
 		}

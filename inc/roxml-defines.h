@@ -104,6 +104,8 @@
 #define ROXML_DESC_O_SELF	2
 
 #define ROXML_REQTABLE_ID	0
+#define ROXML_NS_ID		1
+#define ROXML_XPATH_FIRST_ID	16	
 
 /**
  * \def MAX_NS_LEN

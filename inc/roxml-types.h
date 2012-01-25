@@ -115,9 +115,21 @@ typedef struct _xpath_tok_table {
  * xpath id
  */
 typedef struct _xpath_tok {
-	unsigned char id;		/*!< token id */
+	unsigned char id;		/*!< token id starts at ROXML_XPATH_FIRST_ID */
 	struct _xpath_tok *next;	/*!< next xpath token */
 } xpath_tok_t;
+
+/** \struct roxml_ns_t
+ *
+ * \brief namespace structure
+ * 
+ * This is the structure for a namespace. It contains the
+ * namespace alias
+ */
+typedef struct _roxml_ns {
+	unsigned char id;		/*!< priv id == ROXML_NS_ID */
+	char * alias;			/*!< ns alias */
+} roxml_ns_t;
 
 /** \struct node_t
  *
