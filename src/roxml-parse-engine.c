@@ -849,6 +849,7 @@ int _func_load_close_node(char * chunk, void * data)
 				}
 				context->current_node = roxml_parent_node(context->current_node, context->candidat_node);
 				context->inside_node_state = STATE_INSIDE_ARG_BEG;
+				roxml_process_unaliased_ns(context);
 			} else {
 				context->pos++;
 				return 1;
@@ -858,6 +859,7 @@ int _func_load_close_node(char * chunk, void * data)
 			context->empty_text_node = 1;
 			context->current_node = roxml_parent_node(context->current_node, context->candidat_node);
 			if(context->current_node->prnt != NULL) { context->current_node = context->current_node->prnt; } 
+			roxml_process_unaliased_ns(context);
 		break;
 		case STATE_NODE_END:
 			context->empty_text_node = 1;
@@ -1054,6 +1056,7 @@ int _func_load_white(char * chunk, void * data)
 					}
 					roxml_close_node(context->candidat_val, to_be_closed);
 					context->inside_node_state = STATE_INSIDE_ARG_BEG;
+					roxml_process_unaliased_ns(context);
 				}
 			}
 		break;
@@ -1073,15 +1076,17 @@ int _func_load_colon(char * chunk, void * data)
 	if(context->state == STATE_NODE_NAME) {
 		context->state = STATE_NODE_BEG;
 		context->candidat_node->ns = roxml_lookup_nsdef(context->namespaces, context->curr_name);
+		context->candidat_node->pos += context->curr_name_len+2;
 		context->ns = 1;
 	} else if(context->state == STATE_NODE_ATTR) {
 		if(context->inside_node_state == STATE_INSIDE_ARG) {
 			context->inside_node_state = STATE_INSIDE_ARG_BEG;
-			if(strncmp(context->curr_name, "xmlns", 5) == 0) {
+			if((context->curr_name_len==5)&&(strncmp(context->curr_name, "xmlns", 5) == 0)) {
 				context->candidat_arg->type |= ROXML_NS_NODE;
 				context->nsdef = 1;
 			} else {
 				context->candidat_arg->ns = roxml_lookup_nsdef(context->namespaces, context->curr_name);
+				context->candidat_arg->pos += context->curr_name_len+2;
 				context->ns = 1;
 			}
 				
@@ -1147,6 +1152,9 @@ int _func_load_default(char * chunk, void * data)
 				context->inside_node_state = STATE_INSIDE_VAL_BEG;
 				to_be_closed = roxml_create_node(context->pos, context->src, ROXML_ATTR_NODE | context->type);
 				roxml_close_node(context->candidat_arg, to_be_closed);
+				if((context->curr_name_len==5)&&(strncmp(context->curr_name, "xmlns", 5) == 0)) {
+					context->nsdef = 1;
+				}
 			}
 		break;
 	}

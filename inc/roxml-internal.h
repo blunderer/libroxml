@@ -452,6 +452,16 @@ int ROXML_INT roxml_is_separator(char sep);
  */
 void ROXML_INT roxml_process_begin_node(roxml_load_ctx_t *context, int position);
 
+/** \brief namespace without alias name creation during parsing
+ *
+ * \fn roxml_process_unaliased_ns(roxml_load_ctx_t *context);
+ * this function create a new namespace without alias (default ns or remove ns)
+ * \param context the parsing context
+ * \return
+ */
+void ROXML_INT roxml_process_unaliased_ns(roxml_load_ctx_t *context);
+
+
 /** \brief name space lookup in list
  *
  * \fn roxml_lookup_nsdef(node_t * ns, char * ns);

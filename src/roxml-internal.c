@@ -146,6 +146,27 @@ int ROXML_INT roxml_is_separator(char sep)
 	return 0;
 }
 
+void ROXML_INT roxml_process_unaliased_ns(roxml_load_ctx_t *context)
+{
+	if(context->nsdef) {
+		context->nsdef = 0;
+		context->candidat_arg->type |= ROXML_NS_NODE;
+
+		if(context->candidat_val->pos == context->candidat_val->end) {
+			context->candidat_node->ns = NULL;
+			context->candidat_arg->ns = NULL;
+		} else {
+			char * nsdef = NULL; (char*)context->candidat_arg->priv;
+			context->candidat_arg->priv = calloc(1, 1);
+			nsdef = (char*)context->candidat_arg->priv;
+			nsdef[0] = 0;
+			context->candidat_arg->ns = context->namespaces;
+			context->namespaces = context->candidat_arg;
+			context->candidat_node->ns = context->namespaces;
+		}
+	}
+}
+
 void ROXML_INT roxml_process_begin_node(roxml_load_ctx_t *context, int position)
 {
 	if(context->candidat_txt)	{

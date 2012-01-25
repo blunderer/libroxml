@@ -239,6 +239,13 @@ char * ROXML_API roxml_get_name(node_t *n, char * buffer, int size)
 
 	if(n->prnt == NULL)	{
 		strcpy(tmp_name, "documentRoot");
+	} else if(n->type & ROXML_NS_NODE)	{
+		char * ns = (char*)n->priv;
+		if(ns) {
+			strcpy(tmp_name, ns);
+		} else {
+			tmp_name[0] ='\0';
+		}
 	} else if(n->type & ROXML_ATTR_NODE)	{
 		int offset = 0;
 		char *internal_ptr;
@@ -363,7 +370,12 @@ node_t * ROXML_API roxml_get_nodes(node_t *n, int type, char * name, int nth)
 	
 	if(name == NULL)	{
 		int count = 0;
-		if(n->attr && (type & ROXML_ATTR_NODE)) {
+		if(n->ns && (type & ROXML_NS_NODE)) {
+			ptr = n->ns;
+			if(nth == 0)	{
+				return ptr;
+			}
+		} else if(n->attr && (type & ROXML_ATTR_NODE)) {
 			ptr = n->attr;
 			if(nth == 0)	{
 				return ptr;
@@ -416,6 +428,11 @@ node_t * ROXML_API roxml_get_nodes(node_t *n, int type, char * name, int nth)
 		}
 	}
 	return ptr;
+}
+
+node_t * ROXML_API roxml_get_ns(node_t *n)
+{
+	return roxml_get_nodes(n, ROXML_NS_NODE, NULL, 0);
 }
 
 int ROXML_API roxml_get_pi_nb(node_t *n)

@@ -282,6 +282,59 @@ node_t*	ROXML_API roxml_get_parent		(node_t *n);
  */
 node_t*	ROXML_API roxml_get_root		(node_t *n);
 
+/** \brief namespace getter function
+ *
+ * \fn node_t* ROXML_API roxml_get_ns(node_t *n);
+ * This function returns the namespace of a node
+ *
+ * \param n is one node of the tree
+ * \return the namespace or NULL if none are set for this node
+ * \see roxml_add_node
+ * \see roxml_get_nodes
+ *
+ * example:
+ * given the following xml file
+ * \verbatim
+<xml xmlns:test="http://www.test.org">
+ <test:item1 test:value1="3"/>
+</xml>
+\endverbatim
+ * \code
+ * #include <stdio.h>
+ * #include <roxml.h>
+ * 
+ * int main(void)
+ * {
+ * 	node_t * root = roxml_load_doc("/tmp/doc.xml");
+ * 	node_t * xml =  roxml_get_chld(root, NULL,  0);
+ *	node_t * nsdef = roxml_get_attr(xml, NULL, 0);
+ * 	node_t * node1 = roxml_get_chld(xml, NULL, 0);
+ * 	node_t * attr1 = roxml_get_attr(node1, NULL, 0);
+ * 	node_t * node1_ns = roxml_get_ns(node1);
+ * 	node_t * attr1_ns = roxml_get_ns(attr1);
+ *
+ * 	// here node1_ns and attr1_ns are the "test:" namespace
+ * 	if(node1_ns == nsdef) {
+ * 		printf("got the correct namespace node for elem\n");
+ *	}
+ * 	if(attr1_ns == nsdef) {
+ * 		printf("got the correct namespace node for attr\n");
+ *	}
+ * 	if(strcmp(roxml_get_name(node1_ns, NULL, 0), "test") == 0) {
+ * 		printf("got the correct namespace alias\n");
+ * 	}
+ * 	if(strcmp(roxml_get_content(node1_ns, NULL, 0, NULL), "http://www.test.org") == 0) {
+ * 		printf("got the correct namespace\n");
+ * 	}
+ * 
+ * 	roxml_close(root);
+ * 	return 0;
+ * }
+ * 
+ * \endcode
+ */
+node_t*	ROXML_API roxml_get_ns		(node_t *n);
+
 /** \brief comment getter function
  *
  * \fn node_t* ROXML_API roxml_get_cmt(node_t *n, int nth);
