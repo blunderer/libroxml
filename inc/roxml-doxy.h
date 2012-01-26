@@ -61,6 +61,7 @@
  * <ul>
  * <li> load / unload XML document from buffers or files.</li>
  * <li> navigate thru an xml tree using simple getter API.</li>
+ * <li> handle namespace.</li>
  * <li> use xpath syntax to access some nodes in the XML tree.</li>
  * <li> read nodes contents (text, attributes, comments ...)</li>
  * <li> create/modify xml trees and save them to a file or buffer.</li>
@@ -68,6 +69,7 @@
  *
  * \note libroxml work with both strict XML documents but also with xml like formatted documents (without any <?xml?> definition...)
  * \warning libroxml do not handle DOCTYPE nodes. However, it will nicely ignore them during parsing and will still return the xml tree.
+ * \warning libroxml is not thread safe for all write operations (roxml_set_ns, roxml_add_node, roxml_del_node) therefore, those functions must be granted exclusiv access to the xml tree when called. On the other hand, all other functions can be safely called simultaneously.
  *
  * \section what_end </why libroxml>
  * \section how_sec <how does it work>
@@ -113,6 +115,7 @@
  * <li>\ref roxml_get_parent</li>
  * <li>\ref roxml_get_prev_sibling</li>
  * <li>\ref roxml_get_next_sibling</li>
+ * <li>\ref roxml_get_ns</li>
  * <li>\ref roxml_get_chld</li>
  * <li>\ref roxml_get_chld_nb</li>
  * <li>\ref roxml_get_attr</li>
@@ -131,6 +134,7 @@
  * <td>
  * <h2>Modify xml tree</h2>
  * <ul>
+ * <li>\ref roxml_set_ns</li>
  * <li>\ref roxml_add_node</li>
  * <li>\ref roxml_del_node</li>
  * <li>\ref roxml_commit_changes</li>

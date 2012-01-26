@@ -41,6 +41,17 @@
 
 /** \brief internal function
  *
+ * \fn void ROXML_INT roxml_reset_ns(node_t *n, node_t *ns);
+ * This function remove the namespace of a node if it is the one
+ * specified as argument, and replace it with its parent one
+ * \param n is one node of the tree
+ * \param ns is one nsdef of the tree
+ * \return void
+ */
+void	ROXML_INT roxml_reset_ns		(node_t *n, node_t *ns);
+
+/** \brief internal function
+ *
  * \fn void ROXML_INT roxml_free_node(node_t *n);
  * This function delete a node without handling its tree
  * \param n is one node of the tree

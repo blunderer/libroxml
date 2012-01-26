@@ -430,6 +430,43 @@ node_t * ROXML_API roxml_get_nodes(node_t *n, int type, char * name, int nth)
 	return ptr;
 }
 
+node_t * ROXML_API roxml_set_ns(node_t *n, node_t * ns)
+{
+	node_t * attr = NULL;
+	node_t * chld = NULL;
+
+	if(!n) {
+		return NULL;
+	}
+
+	if(ns) {
+		node_t * common_parent = n;
+		while(common_parent && common_parent != ns->prnt) {
+			common_parent = common_parent->prnt;
+		}
+		if(common_parent != ns->prnt) {
+			return NULL;
+		}
+	}
+
+	n->ns = ns;
+	chld = n->chld;
+	while(chld) {
+		roxml_set_ns(chld, ns);
+		chld = chld->sibl;
+	}
+
+	attr = n->attr;
+	while(attr) {
+		if((attr->type & ROXML_NS_NODE) == 0) {
+			attr->ns = ns;
+		}
+		attr = attr->sibl;
+	}
+
+	return n;
+}
+
 node_t * ROXML_API roxml_get_ns(node_t *n)
 {
 	return roxml_get_nodes(n, ROXML_NS_NODE, NULL, 0);
@@ -756,12 +793,23 @@ node_t * roxml_add_node(node_t * parent, int position, int type, char *name, cha
 	}
 
 	if(type & ROXML_ATTR_NODE) {
+		int xmlns_l = 0;
 		if(!name || !value) { return NULL; }
-		buffer = (char*)malloc(sizeof(char)*(name_l+content_l+4));
-		sprintf(buffer,"%s=\"%s\"",name, value);
-		content_pos = name_l+2;
-		end_node = name_l + 1;
-		end_content = name_l + content_l + 2;
+		if(type & ROXML_NS_NODE) {
+			if(name_l > 0) {
+				xmlns_l = 6;
+			} else {
+				xmlns_l = 5;
+			}
+			buffer = (char*)malloc(sizeof(char)*(name_l+content_l+xmlns_l+4));
+			sprintf(buffer,"xmlns%s%s=\"%s\"", name_l?":":"", name, value);
+		} else {
+			buffer = (char*)malloc(sizeof(char)*(name_l+content_l+4));
+			sprintf(buffer,"%s=\"%s\"",name, value);
+		}
+		content_pos = name_l + 2 + xmlns_l;
+		end_node = name_l + 1 + xmlns_l;
+		end_content = name_l + content_l + 2 + xmlns_l;
 	} else if(type & ROXML_CMT_NODE) {
 		if(!value) { return NULL; }
 		buffer = (char*)malloc(sizeof(char)*(content_l+8));
@@ -803,10 +851,20 @@ node_t * roxml_add_node(node_t * parent, int position, int type, char *name, cha
 			buffer = (char*)malloc(sizeof(char)*(name_l+5));
 			sprintf(buffer,"<%s />",name);
 		}
+	} else {
+		return NULL;
 	}
 
 	new_node = roxml_create_node(0, buffer, type | ROXML_PENDING | ROXML_BUFF);
 	new_node->end = end_node;
+
+	if(type & ROXML_NS_NODE) {
+		roxml_ns_t * ns = calloc(1, sizeof(roxml_ns_t) + name_l + 1);
+		ns->id = ROXML_NS_ID;
+		ns->alias = (char*)ns + sizeof(roxml_ns_t);
+		strcpy(ns->alias, name);
+		new_node->priv = ns;
+	}
 
 	if(type & (ROXML_ELM_NODE | ROXML_ATTR_NODE)) {
 		if(value && name) {

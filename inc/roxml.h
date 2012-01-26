@@ -109,10 +109,18 @@ typedef struct node node_t;
 /**
  * \def ROXML_NS_NODE
  * 
- * constant for processing_intruction nodes
+ * constant for namespace nodes
  * \see roxml_add_node
  */
 #define ROXML_NS_NODE	0x100
+
+/**
+ * \def ROXML_NSDEF_NODE
+ * 
+ * constant for namespace definition nodes
+ * \see roxml_add_node
+ */
+#define ROXML_NSDEF_NODE	(ROXML_NS_NODE | ROXML_ATTR_NODE)
 
 /**
  * \def ROXML_ALL_NODE
@@ -202,12 +210,13 @@ node_t*	ROXML_API roxml_load_fd			(int fd);
  *
  * \fn void ROXML_API roxml_close(node_t *n);
  * This function clear a document and all the corresponding nodes
- * It release all memory allocated during roxml_load_doc or roxml_load_file.
+ * It release all memory allocated during roxml_load_doc or roxml_load_file or roxml_add_node.
  * All nodes from the tree are not available anymore.
  * \param n is any node of the tree to be cleaned
  * \return void
  * \see roxml_load_doc
  * \see roxml_load_buf
+ * \see roxml_add_node
  */
 void 	ROXML_API roxml_close			(node_t *n);
 
@@ -290,6 +299,7 @@ node_t*	ROXML_API roxml_get_root		(node_t *n);
  * \param n is one node of the tree
  * \return the namespace or NULL if none are set for this node
  * \see roxml_add_node
+ * \see roxml_set_ns
  * \see roxml_get_nodes
  *
  * example:
@@ -334,6 +344,25 @@ node_t*	ROXML_API roxml_get_root		(node_t *n);
  * \endcode
  */
 node_t*	ROXML_API roxml_get_ns		(node_t *n);
+
+/** \brief namespace setter function
+ *
+ * \fn node_t* ROXML_API roxml_set_ns(node_t *n, node_t * ns);
+ * This function set the namespace of a node to the given namespace definition.
+ * The namespace must be previously defined in the xml tree in an ancestor of node n.
+ *
+ * \param n is one node of the tree
+ * \param ns is one nsdef node of the tree
+ * \return the node or NULL if ns cannot be set
+ * \see roxml_add_node
+ * \see roxml_get_ns
+ * \see roxml_get_nodes
+ *
+ * \warning: Setting a namespace to a node is recursif:
+ * - it will update all element and attribute that are descendant from current node
+ * - namespace will be applied to all new node added as descendant as current node
+ */
+node_t*	ROXML_API roxml_set_ns		(node_t *n, node_t * ns);
 
 /** \brief comment getter function
  *
@@ -522,6 +551,7 @@ int 	ROXML_API roxml_get_pi_nb		(node_t *n);
  * <li>\ref ROXML_PI_NODE: returns the process-instruction targeted application</li>
  * <li>\ref ROXML_TXT_NODE: returns NULL (or empty string if you provided a buffer in buffer param)</li>
  * <li>\ref ROXML_CMT_NODE: returns NULL (or empty string if you provided a buffer in buffer param)</li>
+ * <li>\ref ROXML_NS_NODE: returns the namespace alias associated with the ns node </li>
  * </ul>
  * Be carreful as if your buffer is too short for the returned string, it will be truncated
  * \param n is one node of the tree
@@ -545,6 +575,7 @@ char*	ROXML_API roxml_get_name		(node_t *n, char * buffer, int size);
  * <li>\ref ROXML_PI_NODE: returns the process-instruction instruction</li>
  * <li>\ref ROXML_TXT_NODE: returns the text content of the node</li>
  * <li>\ref ROXML_CMT_NODE: returns the text content of the comment</li>
+ * <li>\ref ROXML_NS_NODE: returns the namespace definition (usually an URL)</li>
  * </ul>
  * returned string should be freed using roxml_release when not used anymore
  * \param n is one node of the tree
@@ -758,6 +789,7 @@ void ROXML_API roxml_release			(void * data);
  * \return the newly created node
  * \see roxml_commit_changes
  * \see roxml_del_node
+ * \see roxml_close
  *
  * paramaters name and value depending on node type:
  * - \ref ROXML_ELM_NODE take at least a node name. the parameter value is optional and represents the text content.
@@ -765,6 +797,7 @@ void ROXML_API roxml_release			(void * data);
  * - \ref ROXML_CMT_NODE ignore the node name. the parameter value represents the comment.
  * - \ref ROXML_PI_NODE take the node name as process-instruction target. the parameter value represents the content of processing-instruction.
  * - \ref ROXML_ATTR_NODE take an attribute name. and the attribute value as given by parameter value.
+ * - \ref ROXML_NSDEF_NODE take an attribute name (empty string for default namespace). and the attribute value as given by parameter value.
  * 
  * some examples to obtain this xml result file
 \verbatim
@@ -909,11 +942,14 @@ int ROXML_API roxml_get_txt_nb			(node_t *n);
  *
  * \fn roxml_del_node(node_t * n);
  * this function delete a node from the tree. The node is not really deleted 
- * from the file or buffer until the roxml_commit_changes is called.
+ * from the file or buffer until the roxml_commit_changes is called, but it won't be
+ * visible anymore in the XML tree.
  * \param n the node to delete
  * \return 
  * \see roxml_add_node
  * \see roxml_commit_changes
+ *
+ * \warning when removing a nsdef node, all node using this namespace will be updated and inherit their parent namespace
  */
 void ROXML_API roxml_del_node			(node_t * n);
 

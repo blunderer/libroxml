@@ -2497,7 +2497,7 @@ int test_parse_namespaces(void)
 
 	root = roxml_load_doc("roxml.test.xml.ns");
 
-	ASSERT_NOT_NULL(root->ns);
+	ASSERT_NULL(root->ns);
 
 	node1 = root->chld->chld;
 	node2 = node1->sibl;
@@ -2522,10 +2522,7 @@ int test_parse_namespaces(void)
 	ASSERT_NOT_NULL(node10->attr);
 	ASSERT_STRING_EQUAL(((roxml_ns_t*)node10->attr->priv)->alias, "");
 
-	ASSERT_NOT_NULL(root->ns);
-	ASSERT_NOT_NULL(root->ns->ns);
-	ASSERT_NOT_NULL(root->ns->ns->ns);
-	ASSERT_NULL(root->ns->ns->ns->ns);
+	ASSERT_NULL(root->ns);
 
 	ASSERT_NOT_NULL(node1->ns);
 	ASSERT_NOT_NULL(node2->attr->ns);
@@ -2573,6 +2570,199 @@ int test_parse_namespaces(void)
 	ASSERT_STRING_EQUAL("http://www.default2.org", roxml_get_content(node12->attr, NULL, 0, NULL));
 
 	roxml_release(RELEASE_ALL);
+	roxml_close(root);
+
+	RETURN /* close context macro */
+}
+
+int test_write_namespaces(void)
+{
+	INIT /* init context macro */
+
+	node_t * ns1 = NULL;
+	node_t * ns2 = NULL;
+	node_t * attr0 = NULL;
+	node_t * attr1 = NULL;
+	node_t * attr2 = NULL;
+	node_t * attr3 = NULL;
+	node_t * attr4 = NULL;
+	node_t * attr5 = NULL;
+	node_t * node0 = NULL;
+	node_t * node1 = NULL;
+	node_t * node2 = NULL;
+	node_t * node3 = NULL;
+	node_t * node4 = NULL;
+	node_t * node5 = NULL;
+	node_t * node6 = NULL;
+	node_t * node7 = NULL;
+	node_t * node8 = NULL;
+	node_t * test = NULL;
+	node_t * root = roxml_load_doc("roxml.test.xml.ns");
+
+	ASSERT_NOT_NULL(root);
+
+	int len = roxml_commit_changes(root, "out.xml.ns", NULL, 1);
+
+	roxml_release(RELEASE_ALL);
+	roxml_close(root);
+
+	root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "root", NULL);
+	ns1 = roxml_add_node(root, 0, ROXML_NSDEF_NODE, "test", "http://www.test.org");
+	node0 = roxml_add_node(root, 0, ROXML_ELM_NODE, "node0", NULL);
+	node1 = roxml_add_node(node0, 0, ROXML_ELM_NODE, "node1", NULL);
+	node2 = roxml_add_node(node1, 0, ROXML_ELM_NODE, "node2", NULL);
+	node3 = roxml_add_node(node2, 0, ROXML_ELM_NODE, "node3", NULL);
+	ns2 = roxml_add_node(node3, 0, ROXML_NSDEF_NODE, "plop", "http://www.plop.org");
+	attr0 = roxml_add_node(node2, 0, ROXML_ATTR_NODE, "val", "0");
+	node4 = roxml_add_node(node2, 0, ROXML_ELM_NODE, "node4", NULL);
+	node5 = roxml_add_node(node4, 0, ROXML_ELM_NODE, "node5", NULL);
+	attr1 = roxml_add_node(node4, 0, ROXML_ATTR_NODE, "val", "1");
+	node6 = roxml_add_node(node4, 0, ROXML_ELM_NODE, "node6", NULL);
+	node7 = roxml_add_node(node4, 0, ROXML_ELM_NODE, "node7", NULL);
+	node0 = roxml_set_ns(node0, ns1);
+	test = roxml_set_ns(node5, ns2);
+	node4 = roxml_set_ns(node4, NULL);
+	node8 = roxml_add_node(node3, 0, ROXML_ELM_NODE, "node8", NULL);
+	node8 = roxml_set_ns(node8, ns2);
+	attr2 = roxml_add_node(node1, 0, ROXML_ATTR_NODE, "val", "2");
+	attr3 = roxml_add_node(node8, 0, ROXML_ATTR_NODE, "val", "3");
+	attr4 = roxml_add_node(node4, 0, ROXML_ATTR_NODE, "val", "4");
+
+	ASSERT_NULL(test);
+	ASSERT_NOT_NULL(node0);
+	ASSERT_NOT_NULL(node4);
+	ASSERT_NOT_NULL(node8);
+
+	ASSERT_NOT_NULL(node0->ns);
+	ASSERT_NOT_NULL(node1->ns);
+	ASSERT_NOT_NULL(node2->ns);
+	ASSERT_NOT_NULL(node3->ns);
+	ASSERT_NOT_NULL(node8->ns);
+	ASSERT_NULL(node4->ns);
+	ASSERT_NULL(node5->ns);
+	ASSERT_NULL(node6->ns);
+	ASSERT_NULL(node7->ns);
+	ASSERT_NOT_NULL(node8->ns);
+
+	ASSERT_NOT_NULL(attr0->ns);
+	ASSERT_NULL(attr1->ns);
+	ASSERT_NOT_NULL(attr2->ns);
+	ASSERT_NOT_NULL(attr3->ns);
+	ASSERT_NULL(attr4->ns);
+
+	ASSERT_EQUAL(node0->ns, ns1);
+	ASSERT_EQUAL(node8->ns, ns2);
+
+	len = roxml_commit_changes(root, "out.xml.ns.generated", NULL, 1);
+
+	roxml_close(root);
+
+	RETURN /* close context macro */
+}
+
+int test_del_namespaces(void)
+{
+	INIT /* init context macro */
+
+	node_t * ns1 = NULL;
+	node_t * ns2 = NULL;
+	node_t * attr0 = NULL;
+	node_t * attr1 = NULL;
+	node_t * attr2 = NULL;
+	node_t * attr3 = NULL;
+	node_t * attr4 = NULL;
+	node_t * attr5 = NULL;
+	node_t * node0 = NULL;
+	node_t * node1 = NULL;
+	node_t * node2 = NULL;
+	node_t * node3 = NULL;
+	node_t * node4 = NULL;
+	node_t * node5 = NULL;
+	node_t * node6 = NULL;
+	node_t * node7 = NULL;
+	node_t * node8 = NULL;
+	node_t * test = NULL;
+	node_t * root = roxml_load_doc("roxml.test.xml.ns");
+
+	ASSERT_NOT_NULL(root);
+
+	int len = roxml_commit_changes(root, "out.xml.ns", NULL, 1);
+
+	roxml_release(RELEASE_ALL);
+	roxml_close(root);
+
+	root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "root", NULL);
+	ns1 = roxml_add_node(root, 0, ROXML_NSDEF_NODE, "test", "http://www.test.org");
+	node0 = roxml_add_node(root, 0, ROXML_ELM_NODE, "node0", NULL);
+	node1 = roxml_add_node(node0, 0, ROXML_ELM_NODE, "node1", NULL);
+	node2 = roxml_add_node(node1, 0, ROXML_ELM_NODE, "node2", NULL);
+	node3 = roxml_add_node(node2, 0, ROXML_ELM_NODE, "node3", NULL);
+	ns2 = roxml_add_node(node3, 0, ROXML_NSDEF_NODE, "plop", "http://www.plop.org");
+	attr0 = roxml_add_node(node2, 0, ROXML_ATTR_NODE, "val", "0");
+	node4 = roxml_add_node(node2, 0, ROXML_ELM_NODE, "node4", NULL);
+	node5 = roxml_add_node(node4, 0, ROXML_ELM_NODE, "node5", NULL);
+	attr1 = roxml_add_node(node4, 0, ROXML_ATTR_NODE, "val", "1");
+	node6 = roxml_add_node(node4, 0, ROXML_ELM_NODE, "node6", NULL);
+	node0 = roxml_set_ns(node0, ns1);
+	test = roxml_set_ns(node5, ns2);
+	node4 = roxml_set_ns(node4, NULL);
+	node8 = roxml_add_node(node3, 0, ROXML_ELM_NODE, "node8", NULL);
+	node7 = roxml_add_node(node8, 0, ROXML_ELM_NODE, "node7", NULL);
+	node8 = roxml_set_ns(node8, ns2);
+	attr2 = roxml_add_node(node1, 0, ROXML_ATTR_NODE, "val", "2");
+	attr3 = roxml_add_node(node8, 0, ROXML_ATTR_NODE, "val", "3");
+	attr4 = roxml_add_node(node4, 0, ROXML_ATTR_NODE, "val", "4");
+	attr3 = roxml_set_ns(attr3, ns1);
+	node7 = roxml_set_ns(node7, ns1);
+
+	ASSERT_NOT_NULL(node0->ns);
+	ASSERT_NOT_NULL(node1->ns);
+	ASSERT_NOT_NULL(node2->ns);
+	ASSERT_NOT_NULL(node3->ns);
+	ASSERT_NOT_NULL(node8->ns);
+	ASSERT_NULL(node4->ns);
+	ASSERT_NULL(node5->ns);
+	ASSERT_NULL(node6->ns);
+	ASSERT_NOT_NULL(node7->ns);
+	ASSERT_NOT_NULL(node8->ns);
+
+	ASSERT_NOT_NULL(attr0->ns);
+	ASSERT_NULL(attr1->ns);
+	ASSERT_NOT_NULL(attr2->ns);
+	ASSERT_NOT_NULL(attr3->ns);
+	ASSERT_NULL(attr4->ns);
+
+	ASSERT_EQUAL(attr3->ns, ns1);
+	ASSERT_EQUAL(node7->ns, ns1);
+
+	roxml_del_node(ns1);
+
+	ASSERT_NULL(test);
+	ASSERT_NOT_NULL(node0);
+	ASSERT_NOT_NULL(node4);
+	ASSERT_NOT_NULL(node8);
+
+	ASSERT_NULL(node0->ns);
+	ASSERT_NULL(node1->ns);
+	ASSERT_NULL(node2->ns);
+	ASSERT_NULL(node3->ns);
+	ASSERT_NULL(node4->ns);
+	ASSERT_NULL(node5->ns);
+	ASSERT_NULL(node6->ns);
+	ASSERT_NOT_NULL(node7->ns);
+	ASSERT_NOT_NULL(node8->ns);
+
+	ASSERT_NULL(attr0->ns);
+	ASSERT_NULL(attr1->ns);
+	ASSERT_NULL(attr2->ns);
+	ASSERT_NOT_NULL(attr3->ns);
+	ASSERT_NULL(attr4->ns);
+
+	ASSERT_EQUAL(attr3->ns, ns2);
+	ASSERT_EQUAL(node7->ns, ns2);
+
+	len = roxml_commit_changes(root, "out.xml.ns.del", NULL, 1);
+
 	roxml_close(root);
 
 	RETURN /* close context macro */
@@ -2711,6 +2901,8 @@ int main(int argc, char ** argv)	{
 	TEST_FUNC(test_spec_nodes) 
 	TEST_FUNC(test_whitespaces_in_attr)
 	TEST_FUNC(test_parse_namespaces)
+	TEST_FUNC(test_write_namespaces)
+	TEST_FUNC(test_del_namespaces)
 
 	EXEC_UNITTEST /* exec tests depending on command line option see available options with --help */
 

@@ -50,7 +50,10 @@ clean:
 	$(call ECHO_DO, '  RM      objs', \
 	$(RM) $(OBJ1) $(OBJ2) $(OBJ3) )
 	$(call ECHO_DO, '  RM      results files', \
-	$(RM) out.xml.copy out.xml out.xml.human out.xml.spec.copy out.xml.valid.human out.buf.xml out.buf.xml.human)
+	$(RM) out.xml.copy out.xml out.xml.human out.xml.spec.copy \
+	  out.xml.valid.human out.buf.xml out.buf.xml.human \
+	  out.xml.ns.generated out.xml.ns out.xml.human.sub \
+	  out.xml.ns.del)
 	
 mrproper: clean
 	$(call ECHO_DO, '  RM      bins', \
