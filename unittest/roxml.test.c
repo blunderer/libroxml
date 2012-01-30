@@ -2527,9 +2527,7 @@ int test_parse_namespaces(void)
 	ASSERT_NOT_NULL(node1->ns);
 	ASSERT_NOT_NULL(node2->attr->ns);
 	ASSERT_NOT_NULL(node5->ns);
-	ASSERT_NOT_NULL(node5->attr->ns);
 	ASSERT_NOT_NULL(node6->ns);
-	ASSERT_NOT_NULL(node7->ns);
 	ASSERT_NOT_NULL(node10->ns);
 	ASSERT_NOT_NULL(node11->ns);
 	ASSERT_NOT_NULL(node12->ns);
@@ -2540,6 +2538,8 @@ int test_parse_namespaces(void)
 	ASSERT_NULL(node3->ns);
 	ASSERT_NULL(node4->ns);
 	ASSERT_NULL(node4->attr->ns);
+	ASSERT_NULL(node5->attr->ns);
+	ASSERT_NULL(node7->ns);
 	ASSERT_NULL(node8->ns);
 	ASSERT_NULL(node9->ns);
 	ASSERT_NULL(node14->ns);
@@ -2547,9 +2547,7 @@ int test_parse_namespaces(void)
 	ASSERT_EQUAL(root->chld->attr, node1->ns);
 	ASSERT_EQUAL(root->chld->attr, node2->attr->ns);
 	ASSERT_EQUAL(root->chld->attr, node5->ns);
-	ASSERT_EQUAL(root->chld->attr, node5->attr->ns);
 	ASSERT_EQUAL(root->chld->attr, node6->ns);
-	ASSERT_EQUAL(root->chld->attr, node7->ns);
 	ASSERT_EQUAL(node10->attr, node10->ns);
 	ASSERT_EQUAL(node10->attr, node11->ns);
 	ASSERT_EQUAL(node10->attr, node15->ns);
@@ -2646,8 +2644,8 @@ int test_write_namespaces(void)
 
 	ASSERT_NOT_NULL(attr0->ns);
 	ASSERT_NULL(attr1->ns);
-	ASSERT_NOT_NULL(attr2->ns);
-	ASSERT_NOT_NULL(attr3->ns);
+	ASSERT_NULL(attr2->ns);
+	ASSERT_NULL(attr3->ns);
 	ASSERT_NULL(attr4->ns);
 
 	ASSERT_EQUAL(node0->ns, ns1);
@@ -2728,7 +2726,7 @@ int test_del_namespaces(void)
 
 	ASSERT_NOT_NULL(attr0->ns);
 	ASSERT_NULL(attr1->ns);
-	ASSERT_NOT_NULL(attr2->ns);
+	ASSERT_NULL(attr2->ns);
 	ASSERT_NOT_NULL(attr3->ns);
 	ASSERT_NULL(attr4->ns);
 

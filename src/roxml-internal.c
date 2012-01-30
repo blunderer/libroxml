@@ -1080,7 +1080,7 @@ void ROXML_INT roxml_parent_node_at(node_t *parent, node_t * n, int position)
 		nb_child = roxml_get_attr_nb(parent);
 	}
 
-	if(parent->ns) {
+	if(parent->ns && ((roxml_ns_t*)parent->ns->priv)->alias[0] == '\0') {
 		n->ns = parent->ns;
 	}
 
@@ -1407,7 +1407,7 @@ node_t * roxml_parent_node(node_t *parent, node_t *n)
 {
 	n->prnt = parent;
 	if(parent)	{
-		if(parent->ns) {
+		if(parent->ns && ((roxml_ns_t*)parent->ns->priv)->alias[0] == '\0') {
 			n->ns = parent->ns;
 		}
 		if(roxml_get_type(n) == ROXML_ATTR_NODE)	{
