@@ -128,6 +128,7 @@ typedef struct _xpath_tok {
  */
 typedef struct _roxml_ns {
 	unsigned char id;		/*!< priv id == ROXML_NS_ID */
+	void * next;			/*!< one other priv data is following */
 	char * alias;			/*!< ns alias */
 } roxml_ns_t;
 

@@ -51,6 +51,7 @@
 #define ROXML_FUNC_COMMENT	7
 #define ROXML_FUNC_PI		8
 #define ROXML_FUNC_XPATH	9
+#define ROXML_FUNC_NSURI	10
 
 #define ROXML_FUNC_POS_STR	"position()"
 #define ROXML_FUNC_FIRST_STR	"first()"
@@ -59,6 +60,7 @@
 #define ROXML_FUNC_NODE_STR	"node()"
 #define ROXML_FUNC_COMMENT_STR	"comment()"
 #define ROXML_FUNC_PI_STR	"processing-instruction()"
+#define ROXML_FUNC_NSURI_STR	"namespace-uri()"
 
 #define ROXML_BULK_READ		4096
 #define ROXML_LONG_LEN		512

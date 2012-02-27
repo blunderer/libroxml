@@ -392,6 +392,7 @@ int _func_xpath_operator_equal(char * chunk, void * data)
 #endif /* DEBUG_PARSING */
 	int cur = 0;
 	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t*)data;
+
 	if(!ctx->bracket && !ctx->quoted && !ctx->dquoted) {
 		xpath_node_t *xp_root = ctx->new_node;
 		xpath_cond_t * xp_cond = (xpath_cond_t*)calloc(1, sizeof(xpath_cond_t));
@@ -430,7 +431,9 @@ int _func_xpath_operator_equal(char * chunk, void * data)
 			}
 			ctx->new_cond->arg2 = chunk+cur+1;
 			if((ctx->new_cond->arg2[0] > '9')||(ctx->new_cond->arg2[0] < '0')) {
-				ctx->new_cond->func = ROXML_FUNC_STRCOMP;
+				if(ctx->new_cond->func == 0) {
+					ctx->new_cond->func = ROXML_FUNC_STRCOMP;
+				}
 			}
 			cur++;
 		}
@@ -584,7 +587,9 @@ int _func_xpath_operator_diff(char * chunk, void * data)
 				}
 				ctx->new_cond->arg2 = chunk+cur+1;
 				if((ctx->new_cond->arg2[0] > '9')||(ctx->new_cond->arg2[0] < '0')) {
-					ctx->new_cond->func = ROXML_FUNC_STRCOMP;
+					if(ctx->new_cond->func == 0) {
+						ctx->new_cond->func = ROXML_FUNC_STRCOMP;
+					}
 				}
 				cur++;
 			}
@@ -670,6 +675,26 @@ int _func_xpath_last(char * chunk, void * data)
 	if (cur) ctx->shorten_cond = 0;
 	return cur;
 }
+
+int _func_xpath_nsuri(char * chunk, void * data)
+{
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n",__func__,chunk[0]);
+#endif /* DEBUG_PARSING */
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t*)data;
+	int cur = 0;
+
+	if(strncmp(chunk, ROXML_FUNC_NSURI_STR, strlen(ROXML_FUNC_NSURI_STR)) == 0) {
+		if(ctx->new_cond->func != ROXML_FUNC_XPATH) {
+			int func = ROXML_FUNC_NSURI;
+			cur += strlen(ROXML_FUNC_NSURI_STR)-1;
+			ctx->new_cond->func = func;
+		}
+	}
+	if (cur) ctx->shorten_cond = 0;
+	return cur;
+}
+
 
 int _func_xpath_operator_add(char * chunk, void * data)
 {

@@ -477,6 +477,7 @@ int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t ** xpath, int context)
 	parser = roxml_append_parser_item(parser, ROXML_FUNC_POS_STR, _func_xpath_position);
 	parser = roxml_append_parser_item(parser, ROXML_FUNC_FIRST_STR, _func_xpath_first);
 	parser = roxml_append_parser_item(parser, ROXML_FUNC_LAST_STR, _func_xpath_last);
+	parser = roxml_append_parser_item(parser, ROXML_FUNC_NSURI_STR, _func_xpath_nsuri);
 	parser = roxml_append_parser_item(parser, NULL, _func_xpath_default);
 
 	parser = roxml_parser_prepare(parser);
@@ -594,7 +595,7 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 		double iarg2;
 		char * sarg1;
 		char * sarg2;
-		
+
 		if(condition->func == ROXML_FUNC_POS) {
 			status = 0;
 			iarg2 = atof(condition->arg2);
@@ -644,6 +645,19 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 				}
 				iarg2 = atof(condition->arg2);
 				status = roxml_double_cmp(iarg1, iarg2, condition->op);
+			}
+		} else if(condition->func == ROXML_FUNC_NSURI) {
+			char strval[ROXML_BASE_LEN];
+			node_t *val = roxml_get_ns(candidat);
+			status = 0;
+			if(val) {
+				sarg1 = roxml_get_content(val, strval, ROXML_BASE_LEN, &status);
+				if(status >= ROXML_BASE_LEN) {
+					sarg1 = roxml_get_content(val, NULL, 0, &status);
+				}
+				sarg2 = condition->arg2;
+				status = roxml_string_cmp(sarg1, sarg2, condition->op);
+				roxml_release(sarg1);
 			}
 		} else if(condition->func == ROXML_FUNC_STRCOMP) {
 			char strval[ROXML_BASE_LEN];
@@ -785,7 +799,7 @@ int ROXML_INT roxml_add_to_pool(node_t *root, node_t *n, int req_id)
 			return 0;
 		}
 		last_tok = tok;
-		tok = tok->next;
+		tok = (xpath_tok_t*)tok->next;
 	}
 	if(last_tok == NULL) {
 		n->priv = calloc(1, sizeof(xpath_tok_t));
@@ -807,6 +821,7 @@ int ROXML_INT roxml_validate_axes(node_t *root, node_t *candidat, node_t ***ans,
 	int path_end = 0;
 	char * axes = NULL;
 	char intern_buff[INTERNAL_BUF_SIZE];
+	char intern_buff2[INTERNAL_BUF_SIZE];
 
 	if(xn == NULL) {
 		valid = 1;
@@ -840,11 +855,20 @@ int ROXML_INT roxml_validate_axes(node_t *root, node_t *candidat, node_t ***ans,
 	}
 
 	if(!valid) {
-		char * name  = roxml_get_name(candidat, intern_buff, INTERNAL_BUF_SIZE);
+		int ns_len = 0;
+		char * name  = intern_buff;
+		if(candidat->ns) {
+			name = roxml_get_name(candidat->ns, intern_buff, INTERNAL_BUF_SIZE);
+			ns_len = strlen(name);
+			if(ns_len) {
+				name[ns_len] = ':';
+				ns_len++;
+			}
+		}
+		roxml_get_name(candidat, intern_buff+ns_len, INTERNAL_BUF_SIZE-ns_len);
 		if(name && strcmp(name, axes) == 0)	{
 			valid = 1;
 		}	
-		roxml_release(name);
 	}
 
 	if(valid)	{
@@ -1043,7 +1067,10 @@ void ROXML_INT roxml_check_node(xpath_node_t *xp, node_t *root, node_t *context,
 			}
 		} break;
 		case ROXML_ID_NS: {
-			// ROXML_L_NS is not handled
+			validate_node = roxml_validate_axes(root, context->ns, ans, nb, max, xp, req_id);
+			if(validate_node)	{
+				roxml_check_node(xp->next, root, context, ans, nb, max, ROXML_DIRECT, req_id);
+			}
 		} break;
 		case ROXML_ID_ANC_O_SELF: {
 			node_t *current = context;
