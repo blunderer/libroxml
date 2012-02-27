@@ -2317,6 +2317,38 @@ int test_xpath(void)
 
 	roxml_close(root);
 
+	root = roxml_load_doc("roxml.test.xml.ns");
+
+	node_set = roxml_xpath(root, "/root/test:node6/node8", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node8")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "")
+
+	node_set = roxml_xpath(root, "/root/test:node6/namespace::test", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "test")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "http://www.test.org")
+
+	node_set = roxml_xpath(root, "/root/test:node6/namespace::*", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "test")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "http://www.test.org")
+
+	node_set = roxml_xpath(root, "/root/test:node6/namespace::plop", &nbans);
+	ASSERT_EQUAL(nbans, 0)
+
+	node_set = roxml_xpath(root, "/root/node10/node11/namespace::", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "http://www.default.org")
+
+	node_set = roxml_xpath(root, "/root/test:node6/namespace::test/node7", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node7")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "")
+
+	roxml_close(root);
+
 	roxml_release(RELEASE_ALL);
 
 	RETURN

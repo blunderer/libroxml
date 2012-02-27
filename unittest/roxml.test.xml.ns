@@ -4,7 +4,7 @@
  <node3/>
  <node4 value="3"/>
  <test:node5 value="4"/>
- <test:node6>
+ <test:node6 id=3>
   <node7/>
   <node8 xmlns="">
    <node9 />
