@@ -123,6 +123,15 @@ typedef struct node node_t;
 #define ROXML_NSDEF_NODE	(ROXML_NS_NODE | ROXML_ATTR_NODE)
 
 /**
+ * \def ROXML_CDATA_NODE
+ * 
+ * constant for cdata nodes
+ * \see roxml_add_node
+ */
+#define ROXML_CDATA_NODE	(ROXML_TXT_NODE | 0x200)
+
+
+/**
  * \def ROXML_ALL_NODE
  * 
  * constant for all types of nodes
@@ -742,6 +751,7 @@ node_t ** ROXML_API roxml_xpath			(node_t *n, char * path, int *nb_ans);
  *
  * \fn roxml_get_type(node_t *n);
  * This function tells if a node is an \ref ROXML_ATTR_NODE, \ref ROXML_TXT_NODE, \ref ROXML_PI_NODE, \ref ROXML_CMT_NODE or \ref ROXML_ELM_NODE.
+ * Warning: ROXML_CDATA_NODE are special. They return a type as ROXML_TXT_NODE.
  * \param n is the node to test
  * \return the node type
  */
@@ -783,9 +793,9 @@ void ROXML_API roxml_release			(void * data);
  * the position in the sibling list, instead of position in the children list.
  * \param parent the parent node
  * \param position the position as a child of parent 1 is the first child, 0 for auto position at the end of children list...
- * \param type the type of node between \ref ROXML_ATTR_NODE, \ref ROXML_ELM_NODE, \ref ROXML_TXT_NODE, \ref ROXML_PI_NODE, \ref ROXML_CMT_NODE
- * \param name the name of the node (mandatory for \ref ROXML_ATTR_NODE and \ref ROXML_ELM_NODE and \ref ROXML_PI_NODE only)
- * \param value the text content (mandatory for \ref ROXML_TXT_NODE, \ref ROXML_CMT_NODE, \ref ROXML_ATTR_NODE optional for \ref ROXML_ELM_NODE, \ref ROXML_PI_NODE). The text content for an attribute is the attribute value
+ * \param type the type of node between \ref ROXML_ATTR_NODE, \ref ROXML_ELM_NODE, \ref ROXML_TXT_NODE, \ref ROXML_CDATA_NODE, \ref ROXML_PI_NODE, \ref ROXML_CMT_NODE, \ref ROXML_NSDEF_NODE, \ref ROXML_NS_NODE.
+ * \param name the name of the node (mandatory for \ref ROXML_ATTR_NODE and \ref ROXML_ELM_NODE and \ref ROXML_PI_NODE and \ref ROXML_NSDEF_NODE and \ref ROXML_NS_NODE only)
+ * \param value the text content (mandatory for \ref ROXML_TXT_NODE, \ref ROXML_CDATA_NODE, \ref ROXML_CMT_NODE, \ref ROXML_ATTR_NODE and \ref ROXML_NSDEF_NODE optional for \ref ROXML_ELM_NODE, \ref ROXML_PI_NODE). The text content for an attribute is the attribute value
  * \return the newly created node
  * \see roxml_commit_changes
  * \see roxml_del_node
@@ -794,10 +804,12 @@ void ROXML_API roxml_release			(void * data);
  * paramaters name and value depending on node type:
  * - \ref ROXML_ELM_NODE take at least a node name. the parameter value is optional and represents the text content.
  * - \ref ROXML_TXT_NODE ignore the node name. the parameter value represents the text content.
+ * - \ref ROXML_CDATA_NODE ignore the node name. the parameter value represents the text content that will be encapsulated in CDATA tags.
  * - \ref ROXML_CMT_NODE ignore the node name. the parameter value represents the comment.
  * - \ref ROXML_PI_NODE take the node name as process-instruction target. the parameter value represents the content of processing-instruction.
  * - \ref ROXML_ATTR_NODE take an attribute name. and the attribute value as given by parameter value.
- * - \ref ROXML_NSDEF_NODE take an attribute name (empty string for default namespace). and the attribute value as given by parameter value.
+ * - \ref ROXML_NSDEF_NODE take an attribute name (empty string for default namespace). and the namespace value as given by parameter value.
+ * - \ref ROXML_NS_NODE take an attribute name (empty string for default namespace). 
  * 
  * some examples to obtain this xml result file
 \verbatim

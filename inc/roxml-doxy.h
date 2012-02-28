@@ -270,6 +270,7 @@
  * <tr><td>Descendent or self::<i>node()</td><td>/n0//n3</i></td></tr>
  * <tr><td>Parent</td><td><i>/n0/n1/../n1/n2</i></td></tr>
  * <tr><td>Self</td><td><i>/n0/n1/./n2</i></td></tr>
+ * <tr><td>Node in namespaces</td><td><i>/test::n0</i></td></tr>
  * </table border="0">
  *
  * \section full-xpath Full xpath
@@ -283,6 +284,7 @@
  * <tr><td>Following</td><td><i>following::n1</i></td></tr>
  * <tr><td>Ancestor</td><td><i>ancestor::n2</i></td></tr>
  * <tr><td>Ancestor-or-self</td><td><i>ancestor-or-self::n2</i></td></tr>
+ * <tr><td>Namespace</td><td><i>namespace::test</i></td></tr>
  * </table border="0">
  * </div>
  */

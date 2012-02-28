@@ -208,7 +208,7 @@
 #define ROXML_BUFF	0x02
 
 /**
- * \def ROXML_INT_ROOT
+ * \def ROXML_PENDING
  * 
  * constant for pending node
  */
