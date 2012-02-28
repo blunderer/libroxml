@@ -259,7 +259,9 @@
  * <tr><td>Node position</td><td><i>/n0[position() < 2]</i></td></tr>
  * <tr><td>Node position</td><td><i>/n0[position() >= 1]</i></td></tr>
  * <tr><td>Node position</td><td><i>/n0[position() <= 2]</i></td></tr>
+ * <tr><td>Node position</td><td><i>/n0[position() <= 2]/n1</i></td></tr>
  * <tr><td>Node position</td><td><i>/n0[2]</i></td></tr>
+ * <tr><td>Node with namespace</td><td><i>//*[namespace-uri() = 'http://test.com']</i></td></tr>
  * <tr><td>Other xpath</td><td><i>/n0[n1/\@attr]</i></td></tr>
  * </table border="0">
  *
