@@ -932,9 +932,8 @@ int _func_load_open_spec_node(char * chunk, void * data)
 			context->state = STATE_NODE_COMMENT;
 			while((chunk[cur] != '-')&&(chunk[cur] != '\0')) { cur++; }
 		} else if(strncmp(chunk, "![CDATA[", 8)==0) {
-#ifdef IGNORE_EMPTY_TEXT_NODES
-			context->empty_text_node = 0;
-#endif /* IGNORE_EMPTY_TEXT_NODES */
+			roxml_process_begin_node(context, context->pos-1);
+			roxml_set_type(context->candidat_node, ROXML_CDATA_NODE);
 			context->state = STATE_NODE_CDATA;
 			while((chunk[cur] != '[')&&(chunk[cur] != '\0')) { cur++; }
 		} else {
@@ -979,7 +978,9 @@ int _func_load_close_cdata(char * chunk, void * data)
 	if(context->state == STATE_NODE_CDATA)     {
 		if(chunk[1] == ']') {
 			cur = 2;
-			context->state = STATE_NODE_CONTENT;
+			context->state = STATE_NODE_SINGLE;
+			context->candidat_node->pos += 9;
+			context->candidat_node->end = context->pos;
 		}
 	}
 

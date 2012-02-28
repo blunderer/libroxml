@@ -1273,7 +1273,13 @@ void ROXML_INT roxml_write_node(node_t * n, FILE *f, char ** buf, int human, int
 					if(status >= ROXML_LONG_LEN) {
 						value = roxml_get_content(chld, NULL, 0, &status);
 					}
-					roxml_write_string(buf, f, value, offset, len);
+					if((chld->type & ROXML_CDATA_NODE) == ROXML_CDATA_NODE) {
+						roxml_write_string(buf, f, "<![CDATA[", offset, len);
+						roxml_write_string(buf, f, value, offset, len);
+						roxml_write_string(buf, f, "]]>", offset, len);
+					} else {
+						roxml_write_string(buf, f, value, offset, len);
+					}
 					if(human) {
 						roxml_write_string(buf, f, "\n", offset, len);
 					}
