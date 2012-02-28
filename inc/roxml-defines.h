@@ -41,26 +41,27 @@
 #define ROXML_OPERATOR_MUL	11
 #define ROXML_OPERATOR_DIV	12
 
-#define ROXML_FUNC_INTCOMP	0
-#define ROXML_FUNC_STRCOMP	1
-#define ROXML_FUNC_POS		2
-#define ROXML_FUNC_FIRST	3
-#define ROXML_FUNC_LAST		4
-#define ROXML_FUNC_TEXT		5
-#define ROXML_FUNC_NODE		6
-#define ROXML_FUNC_COMMENT	7
-#define ROXML_FUNC_PI		8
-#define ROXML_FUNC_XPATH	9
-#define ROXML_FUNC_NSURI	10
+#define ROXML_FUNC_INTCOMP	1
+#define ROXML_FUNC_STRCOMP	2
+#define ROXML_FUNC_POS		3
+#define ROXML_FUNC_FIRST	4
+#define ROXML_FUNC_LAST		5
+#define ROXML_FUNC_TEXT		6
+#define ROXML_FUNC_NODE		7
+#define ROXML_FUNC_COMMENT	8
+#define ROXML_FUNC_PI		9
+#define ROXML_FUNC_XPATH	10
+#define ROXML_FUNC_NSURI	11
 
 #define ROXML_FUNC_POS_STR	"position()"
 #define ROXML_FUNC_FIRST_STR	"first()"
 #define ROXML_FUNC_LAST_STR	"last()"
+#define ROXML_FUNC_NSURI_STR	"namespace-uri()"
+
 #define ROXML_FUNC_TEXT_STR	"text()"
 #define ROXML_FUNC_NODE_STR	"node()"
 #define ROXML_FUNC_COMMENT_STR	"comment()"
 #define ROXML_FUNC_PI_STR	"processing-instruction()"
-#define ROXML_FUNC_NSURI_STR	"namespace-uri()"
 
 #define ROXML_BULK_READ		4096
 #define ROXML_LONG_LEN		512

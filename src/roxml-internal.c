@@ -658,6 +658,9 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t *candidat)
 				sarg2 = condition->arg2;
 				status = roxml_string_cmp(sarg1, sarg2, condition->op);
 				roxml_release(sarg1);
+			} else {
+				sarg2 = condition->arg2;
+				status = roxml_string_cmp("", sarg2, condition->op);
 			}
 		} else if(condition->func == ROXML_FUNC_STRCOMP) {
 			char strval[ROXML_BASE_LEN];

@@ -1585,7 +1585,7 @@ int test_parse_xpath(void)
 	ASSERT_NULL(ptr[0].next->next->next);
 	roxml_free_xpath(ptr, ret);
 
-	strcpy(mypath, "/node[first() or last()]/item/title/@version | /node/item/title[@version < 3] | /node/item/title[@version = v1]");
+	strcpy(mypath, "/node[first() or last()]/item/title/@version | /node/item/title[@version < 3] | /node/item/title[@version = 'v1']");
 	ret = roxml_parse_xpath(mypath, &ptr, 0);	
 
 	ASSERT_EQUAL(ret, 3)
@@ -1711,6 +1711,11 @@ int test_xpath(void)
 	node_set = roxml_xpath(root, "/node0/node2", &nbans);
 	ASSERT_EQUAL(nbans, 1)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node2")
+	node2 = node_set[0];
+
+	node_set = roxml_xpath(root, "/node0/*[@name = 'name2']/node3/text()", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "text2")
 	node2 = node_set[0];
 
 	node_set = roxml_xpath(root, "/child::node0/child::node2/parent::", &nbans);
@@ -2343,6 +2348,31 @@ int test_xpath(void)
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "http://www.default.org")
 
 	node_set = roxml_xpath(root, "/root/test:node6/namespace::test/node7", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node7")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "")
+
+	node_set = roxml_xpath(root, "//*", &nbans);
+	ASSERT_EQUAL(nbans, 16)
+
+	node_set = roxml_xpath(root, "//*[namespace-uri() = '']", &nbans);
+	ASSERT_EQUAL(nbans, 8)
+	node_set = roxml_xpath(root, "//*[namespace-uri() = 'http://www.default2.org']", &nbans);
+	ASSERT_EQUAL(nbans, 2)
+	node_set = roxml_xpath(root, "//*[namespace-uri() = http://www.default2.org]", &nbans);
+	ASSERT_EQUAL(nbans, 2)
+	node_set = roxml_xpath(root, "//*[namespace-uri() != http://www.default2.org]", &nbans);
+	ASSERT_EQUAL(nbans, 14)
+	node_set = roxml_xpath(root, "//*[namespace-uri() = http://www.default.org]", &nbans);
+	ASSERT_EQUAL(nbans, 3)
+	node_set = roxml_xpath(root, "//*[namespace-uri() != http://www.default.org]", &nbans);
+	ASSERT_EQUAL(nbans, 13)
+	node_set = roxml_xpath(root, "//*[namespace-uri() = http://www.test.org]", &nbans);
+	ASSERT_EQUAL(nbans, 3)
+	node_set = roxml_xpath(root, "//*[namespace-uri() != http://www.test.org]", &nbans);
+	ASSERT_EQUAL(nbans, 13)
+
+	node_set = roxml_xpath(root, "//*[namespace-uri() = 'http://www.test.org']/node7", &nbans);
 	ASSERT_EQUAL(nbans, 1)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node7")
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "")
