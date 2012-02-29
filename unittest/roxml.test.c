@@ -1320,6 +1320,53 @@ int test_get_attr_nb(void)
 	RETURN
 }
 
+int test_del_node(void)
+{
+	INIT
+	
+	int nb = 0;
+
+	node_t *root = roxml_load_doc("roxml.test.xml");
+
+	node_t *node0 = roxml_get_chld(root, "node0", 0);
+	ASSERT_NOT_NULL(node0);
+	node_t *node1 = roxml_get_chld(node0, "node1", 0);
+	ASSERT_NOT_NULL(node1);
+	node_t *node2 = roxml_get_chld(node0, "node2", 0);
+	ASSERT_NOT_NULL(node1);
+	node_t *attr1 = roxml_get_attr(node1, NULL, 0);
+	ASSERT_NOT_NULL(attr1);
+	ASSERT_STRING_EQUAL(roxml_get_name(attr1, NULL, 0), "name")
+	nb = roxml_get_attr_nb(node1);
+	ASSERT_EQUAL(nb, 2);
+
+	roxml_del_node(attr1);
+	
+	nb = roxml_get_attr_nb(node1);
+	ASSERT_EQUAL(nb, 1);
+	attr1 = roxml_get_attr(node1, NULL, 0);
+	ASSERT_STRING_EQUAL(roxml_get_name(attr1, NULL, 0), "value")
+
+	node_t **node_set = roxml_xpath(root, "//*", &nb);
+	ASSERT_EQUAL(nb, 9);
+	
+	roxml_del_node(node2);
+
+	node_set = roxml_xpath(root, "//*", &nb);
+	ASSERT_EQUAL(nb, 4);
+
+	node_t * text = roxml_get_txt(node1, 0);
+	ASSERT_NOT_NULL(text);
+	ASSERT_STRING_EQUAL(roxml_get_content(node1, NULL, 0, NULL), "text1");
+
+	roxml_del_node(text);
+
+	ASSERT_STRING_EQUAL(roxml_get_content(node1, NULL, 0, NULL), "");
+
+	roxml_close(root);
+	RETURN
+}
+
 int test_get_attr(void)
 {
 	INIT
@@ -2953,6 +3000,7 @@ int main(int argc, char ** argv)	{
 	TEST_FUNC(test_get_content)
 	TEST_FUNC(test_get_attr_nb)
 	TEST_FUNC(test_get_attr)
+	TEST_FUNC(test_del_node)
 	TEST_FUNC(test_parse_xpath)
 	TEST_FUNC(test_xpath)
 	TEST_FUNC(test_get_node_type)
