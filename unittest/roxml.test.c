@@ -1001,15 +1001,15 @@ int test_create_node(void)
 	ASSERT_NULL(node->chld)
 	ASSERT_NULL(node->attr)
 
-	roxml_parent_node(cnode, node);
-	roxml_parent_node(node, anode);
+	roxml_parent_node(cnode, node, 0);
+	roxml_parent_node(node, anode, 0);
 	ASSERT_EQUAL(node->prnt, cnode)
 	ASSERT_EQUAL(anode->prnt, node)
 	ASSERT_EQUAL(cnode->chld, node)
 	ASSERT_EQUAL(node->attr, anode)
 
-	roxml_parent_node(cnode, node);
-	roxml_parent_node(node, anode);
+	roxml_parent_node(cnode, node, 0);
+	roxml_parent_node(node, anode, 0);
 	ASSERT_EQUAL(node->sibl, node)
 	ASSERT_EQUAL(anode->sibl, anode)
 

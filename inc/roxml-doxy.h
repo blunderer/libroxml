@@ -164,7 +164,6 @@
  * <li>\ref roxml_close_node</li>
  * <li>\ref roxml_load</li>
  * <li>\ref roxml_parent_node</li>
- * <li>\ref roxml_parent_node_at</li>
  * <li>\ref roxml_process_begin_node</li>
  * </ul>
  *

@@ -104,16 +104,6 @@ void 	ROXML_INT roxml_close_node		(node_t *n, node_t *close);
  */
 node_t*	ROXML_INT roxml_load			(node_t *current_node, FILE *file, char *buffer);
 
-/** \brief internal function
- *
- * \fn node_t* ROXML_INT roxml_parent_node(node_t *parent, node_t *n);
- * This function give a node to its parent and the parent to the node
- * \param parent is the parent node
- * \param n is one orphan node of the tree
- * \return the parented node
- */
-node_t * ROXML_INT roxml_parent_node		(node_t *parent, node_t *n);
-
 /** \brief node relocate function
  *
  * \fn roxml_parent_node_at(node_t *parent, node_t *n, int position);
@@ -123,7 +113,7 @@ node_t * ROXML_INT roxml_parent_node		(node_t *parent, node_t *n);
  * \param position the position, 0 means or > nb children means at the end
  * \return 
  */
-void ROXML_INT roxml_parent_node_at		(node_t *parent, node_t * n, int position);
+node_t * ROXML_INT roxml_parent_node		(node_t *parent, node_t * n, int position);
 
 /** \brief alloc memory function
  *

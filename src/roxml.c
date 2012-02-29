@@ -597,7 +597,12 @@ node_t * ROXML_API roxml_get_root(node_t *n)
 int ROXML_API roxml_get_type(node_t *n)
 {
 	if(n) {
-		return (n->type & (ROXML_ATTR_NODE | ROXML_ELM_NODE | ROXML_TXT_NODE | ROXML_PI_NODE | ROXML_CMT_NODE));
+		return (n->type & (ROXML_ATTR_NODE | 
+					ROXML_ELM_NODE | 
+					ROXML_TXT_NODE | 
+					ROXML_CMT_NODE |
+					ROXML_PI_NODE | 
+					ROXML_NS_NODE));
 	}
 	return 0;
 }
@@ -641,7 +646,7 @@ node_t * ROXML_API roxml_load_fd(int fd)
 		return NULL;
 	}
 	current_node = roxml_create_node(0, file, ROXML_ELM_NODE | ROXML_FILE);
-	current_node = roxml_parent_node(NULL, current_node);
+	current_node = roxml_parent_node(NULL, current_node, 0);
 	return roxml_load(current_node,  file, NULL);
 }
 
@@ -653,7 +658,7 @@ node_t * ROXML_API roxml_load_doc(char *filename)
 		return NULL;
 	}
 	current_node = roxml_create_node(0, file, ROXML_ELM_NODE | ROXML_FILE);
-	current_node = roxml_parent_node(NULL, current_node);
+	current_node = roxml_parent_node(NULL, current_node, 0);
 	return roxml_load(current_node,  file, NULL);
 }
 
@@ -662,7 +667,7 @@ node_t * ROXML_API roxml_load_buf(char *buffer)
 	node_t *current_node = NULL;
 	if(buffer == NULL)	{ return NULL; }
 	current_node = roxml_create_node(0, buffer, ROXML_ELM_NODE | ROXML_BUFF);
-	current_node = roxml_parent_node(NULL, current_node);
+	current_node = roxml_parent_node(NULL, current_node, 0);
 	return roxml_load(current_node, NULL, buffer);
 }
 
@@ -869,7 +874,7 @@ node_t * roxml_add_node(node_t * parent, int position, int type, char *name, cha
 	if(type & (ROXML_ELM_NODE | ROXML_ATTR_NODE)) {
 		if(value && name) {
 			node_t *new_txt = roxml_create_node(content_pos, buffer, ROXML_TXT_NODE | ROXML_PENDING | ROXML_BUFF);
-			roxml_parent_node(new_node, new_txt);
+			roxml_parent_node(new_node, new_txt, 0);
 			new_txt->end = end_content;
 		}
 	}
@@ -877,9 +882,9 @@ node_t * roxml_add_node(node_t * parent, int position, int type, char *name, cha
 	if(parent == NULL) {
 		parent = roxml_create_node(0, NULL, ROXML_ELM_NODE | ROXML_PENDING | ROXML_BUFF);
 		parent->end = 1;
-		roxml_parent_node(parent, new_node);
+		roxml_parent_node(parent, new_node, 0);
 	} else {
-		roxml_parent_node_at(parent, new_node, position);
+		roxml_parent_node(parent, new_node, position);
 	}
 	return new_node;
 }

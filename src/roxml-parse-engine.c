@@ -730,7 +730,7 @@ int _func_load_close_node(char * chunk, void * data)
 	switch(context->state) {
 		case STATE_NODE_NAME:
 			context->empty_text_node = 1;
-			context->current_node = roxml_parent_node(context->current_node, context->candidat_node);
+			context->current_node = roxml_parent_node(context->current_node, context->candidat_node, 0);
 		break;
 		case STATE_NODE_ATTR:
 			if((context->mode != MODE_COMMENT_DQUOTE)||(context->mode != MODE_COMMENT_QUOTE)) {
@@ -744,7 +744,7 @@ int _func_load_close_node(char * chunk, void * data)
 					}
 					roxml_close_node(context->candidat_val, to_be_closed);
 				}
-				context->current_node = roxml_parent_node(context->current_node, context->candidat_node);
+				context->current_node = roxml_parent_node(context->current_node, context->candidat_node, 0);
 				context->inside_node_state = STATE_INSIDE_ARG_BEG;
 				roxml_process_unaliased_ns(context);
 			} else {
@@ -754,7 +754,7 @@ int _func_load_close_node(char * chunk, void * data)
 		break;
 		case STATE_NODE_SINGLE:
 			context->empty_text_node = 1;
-			context->current_node = roxml_parent_node(context->current_node, context->candidat_node);
+			context->current_node = roxml_parent_node(context->current_node, context->candidat_node, 0);
 			if(context->current_node->prnt != NULL) { context->current_node = context->current_node->prnt; } 
 			roxml_process_unaliased_ns(context);
 		break;
@@ -1025,7 +1025,7 @@ int _func_load_default(char * chunk, void * data)
 					context->namespaces = context->candidat_arg;
 				} else if(context->ns == 0) {
 					context->candidat_arg = roxml_create_node(context->pos-1, context->src, ROXML_ATTR_NODE | context->type);
-					context->candidat_arg = roxml_parent_node(context->candidat_node, context->candidat_arg);
+					context->candidat_arg = roxml_parent_node(context->candidat_node, context->candidat_arg, 0);
 				}
 				context->ns = 0;
 				context->inside_node_state = STATE_INSIDE_ARG;
@@ -1047,7 +1047,7 @@ int _func_load_default(char * chunk, void * data)
 				} else {
 					context->candidat_val = roxml_create_node(context->pos, context->src, ROXML_TXT_NODE | context->type);
 				}
-				context->candidat_val = roxml_parent_node(context->candidat_arg, context->candidat_val);
+				context->candidat_val = roxml_parent_node(context->candidat_arg, context->candidat_val, 0);
 				context->inside_node_state = STATE_INSIDE_VAL;
 			} else if((context->inside_node_state == STATE_INSIDE_ARG)&&(chunk[0] == '=')) {
 				context->inside_node_state = STATE_INSIDE_VAL_BEG;
