@@ -1405,6 +1405,7 @@ void ROXML_INT roxml_del_arg_node(node_t * n)
 		}
 		current->sibl = n->sibl;
 	}
+	roxml_del_tree(n->chld);
 	return;
 }
 
