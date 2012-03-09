@@ -1,35 +1,26 @@
 #!/bin/bash
 
 if [ $# -lt 1 ]; then
-	echo "usage: $0 rev_num"
-	echo "usage: $0 local rev_num"
+	echo "usage: $0 <rev>"
 	echo "error: must specify a version number"
 	exit 1
 fi
 
 VERSION=$1
-TOP_DIR=$(dirname $0)/../../
-REV=$(LANG=C svn info $TOP_DIR | grep Revision | awk '{print $2}')
+TOP_DIR=$(cd $(dirname $0)/../../ && pwd)
 TMP_DIR=/tmp/build-libroxml-$(date +"%y%m%d%H%M%S")
 
 mkdir -p $TMP_DIR
 
-if [ "$VERSION" = "local" ]; then
-	echo "Exporting from local"
-	VERSION=$2
-	cp -r $TOP_DIR $TMP_DIR/libroxml-$VERSION > /dev/null
-	find $TMP_DIR/libroxml-$VERSION -name ".svn" -exec rm -fr {} \;
-else
-	echo "Exporting from SVN at rev $REV"
-	svn export -r $REV $TOP_DIR $TMP_DIR/libroxml-$VERSION > /dev/null
-fi
+echo "Exporting from GIT @$VERSION"
+(cd $TOP_DIR && git archive --format=tar --prefix=libroxml-$VERSION/ $VERSION . | gzip > $TMP_DIR/libroxml-$VERSION.tar.gz)
+tar zxf $TMP_DIR/libroxml-$VERSION.tar.gz -C $TMP_DIR/
 
 echo "Cleaning repository"
 rm -fr $TMP_DIR/libroxml-$VERSION/unittest
 rm -fr $TMP_DIR/libroxml-$VERSION/data/scripts
 rm -fr $TMP_DIR/libroxml-$VERSION/libroxml.spec
 rm -fr $TMP_DIR/libroxml-$VERSION/TODO
-make -C $TMP_DIR/libroxml-$VERSION/ mrproper
 
 mv $TMP_DIR/libroxml-$VERSION/debian $TMP_DIR/
 
