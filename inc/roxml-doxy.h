@@ -35,7 +35,7 @@
  * <li>the full \ref public-api and \ref priv-api documentation.</li>
  * </ul>
  *
- * The stripped binary is about 40K. The public API defines less than 30 functions to do all you need, making it very easy to start with.
+ * The stripped binary is about 50K. The public API defines less than 30 functions to do all you need, making it very easy to start with.
  * For bug reporting, you can check the google code dedicated project: http://libroxml.googlecode.com
  *
  * Libroxml is distributed under the terms of the <a href="http://www.gnu.org/licenses/lgpl.html">GNU Lesser General Public License</a>.
@@ -43,7 +43,7 @@
  * \section intro_end </introduction>
  * \section dl_sec <downloads>
  * The source code is available from google project SVN repository: 
- * \verbatim $> svn checkout http://libroxml.googlecode.com/svn/trunk/ \endverbatim
+ * \verbatim $> git clone https://code.google.com/p/libroxml \endverbatim
  *
  * You can download source packages:
  * <ul>
