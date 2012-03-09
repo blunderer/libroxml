@@ -104,9 +104,18 @@ void 	ROXML_INT roxml_close_node		(node_t *n, node_t *close);
  */
 node_t*	ROXML_INT roxml_load			(node_t *current_node, FILE *file, char *buffer);
 
+/** \brief node unlocate function
+ *
+ * \fn roxml_unparent_node(node_t *parent, node_t *n, int position);
+ * this function remove a node from the tree but do not destry it;
+* \param n the node to unparent
+ * \return the unparented node or NULL
+ */
+node_t * ROXML_INT roxml_unparent_node		(node_t * n);
+
 /** \brief node relocate function
  *
- * \fn roxml_parent_node_at(node_t *parent, node_t *n, int position);
+ * \fn roxml_parent_node(node_t *parent, node_t *n, int position);
  * this function change the position of a node in its parent list
  * \param parent the parent node
  * \param n the node to parent

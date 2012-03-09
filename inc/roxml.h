@@ -950,6 +950,19 @@ node_t * ROXML_API roxml_get_txt		(node_t * n, int nth);
  */
 int ROXML_API roxml_get_txt_nb			(node_t *n);
 
+/** \brief node reparent function
+ *
+ * \fn roxml_move_node(node_t * n, node_t * parent, int position)
+ * this function move a node to the specific parent in the tree. 
+ * \param n the node to reparent
+ * \param parent the new parent or NULL (to simply unparent a node)
+ * \param position the new position in the parent child list starting at 1, use 0 to simply append it
+ * \return the reparented node or NULL
+ * \see roxml_add_node
+ * \see roxml_commit_changes
+ */
+void ROXML_API roxml_move_node			(node_t * n, node_t * parent, int position)
+
 /** \brief node deletion function
  *
  * \fn roxml_del_node(node_t * n);

@@ -1069,6 +1069,26 @@ void ROXML_INT roxml_check_node(xpath_node_t *xp, node_t *root, node_t *context,
 	return;
 }
 
+node_t * ROXML_INT roxml_unparent_node(node_t *n)
+{
+	if(n && n->prnt) {
+		node_t * prev = n->prnt->chld;
+		while((prev != n)&&(prev->sibl != n)) {
+			prev = prev->sibl;
+		}
+		if(prev == n) {
+			n->prnt->next = n->sibl;
+			n->prnt->chld = n->sibl;
+		} else {
+			if(n->prnt->next == n) {
+				n->prnt->next = prev;
+			}
+			prev->sibl = n->sibl
+		}
+	}
+	return n;
+}
+
 node_t * ROXML_INT roxml_parent_node(node_t *parent, node_t * n, int position)
 {
 	int nb;

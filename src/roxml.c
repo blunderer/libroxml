@@ -773,6 +773,14 @@ int ROXML_API roxml_commit_changes(node_t *n, char * dest, char ** buffer, int h
 	return len;
 }
 
+node_t * roxml_move_node(node_t * n, node_t * parent, int position) 
+{
+	roxml_unparent_node(n);
+	roxml_parent_node(parent, n, position);
+
+	return n;
+}
+
 node_t * roxml_add_node(node_t * parent, int position, int type, char *name, char *value) 
 {
 	int name_l = 0;
