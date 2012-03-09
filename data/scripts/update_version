@@ -36,6 +36,9 @@ sed -i "s,\(PROJECT_NUMBER.*= \).*,\1$VERSION," doxy.cfg
 # man.cfg 'PROJECT_NUMBER         = VERSION'
 sed -i "s,\(PROJECT_NUMBER.*= \).*,\1$VERSION," man.cfg
 
+# CMakeLists.txt 'set (SOVERSION "2.0.2")'
+sed -i "s,\(set (SOVERSION \"\).*\(\")\),\1$VERSION\2," CMakeLists.txt
+
 # inc/roxml-doxy.h 'Lastest version is VERSION'
 sed -i "s,\(Lastest version is \)[0-9]*\.[0-9]*\.[0-9]*\(:.*\),\1$VERSION\2," inc/roxml-doxy.h
 
