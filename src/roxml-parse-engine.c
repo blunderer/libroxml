@@ -119,7 +119,7 @@ int roxml_parse_line(roxml_parser_item_t * head, char *line, int len, void * ctx
 			else if(ret < 0) { return -1; }
 		}
 	}
-	return 0;
+	return (chunk-line);
 }
 
 int _func_xpath_ignore(char * chunk, void * data)

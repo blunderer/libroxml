@@ -228,20 +228,30 @@ node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 	parser = roxml_parser_prepare(parser);
 
 	if(file)	{ 
+		int circle = 0;
 		int int_len = 0;
 		context.type = ROXML_FILE;
 		context.src = (void*)file;
 		context.pos = 0;
 		do {
 			int ret = 0;
-			int_len = fread(int_buffer, 1, ROXML_BULK_READ, file);
+			int chunk_len = 0;
+			int_len = fread(int_buffer+circle, 1, ROXML_BULK_READ-circle, file) + circle;
 			int_buffer[int_len] = '\0';
 
-			ret = roxml_parse_line(parser, int_buffer, int_len, &context);
-			if(ret < 0) {
+			if(int_len == ROXML_BULK_READ) {
+				chunk_len = int_len - ROXML_LONG_LEN;
+			} else {
+				chunk_len = int_len;
+			}
+
+			ret = roxml_parse_line(parser, int_buffer, chunk_len, &context);
+			circle = int_len-ret;
+			if((ret < 0)||(circle < 0)) {
 				error = 1;
 				break;
 			}
+			memmove(int_buffer, int_buffer+ret, circle);
 		} while(int_len == ROXML_BULK_READ);
 	} else	{
 		int ret = 0;

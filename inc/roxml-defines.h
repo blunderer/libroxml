@@ -63,10 +63,16 @@
 #define ROXML_FUNC_COMMENT_STR	"comment()"
 #define ROXML_FUNC_PI_STR	"processing-instruction()"
 
-#define ROXML_BULK_READ		4096
-#define ROXML_LONG_LEN		512
-#define ROXML_BASE_LEN		128
-#define ROXML_BULK_CTX		8
+#define ROXML_BULK_READ		4096		/* This is the internal buffer size for chunk of xml files */
+
+#define ROXML_LONG_LEN		512		/* This is the max size for XML objects (node name, attribute name and values...) 
+						 * It is caused by the split of the XML file for parsing: 
+						 * 512 bytes are reserved as security to handle splitting inside an XML object.
+						 */
+
+#define ROXML_BASE_LEN		256		/* this is the len of internal buffers. If a requested buffer is bigger, 
+						 * then a malloc/free will occur and may slow down libroxml.
+						 */
 
 #define ROXML_ID_CHILD		0
 #define ROXML_ID_DESC_O_SELF	1
