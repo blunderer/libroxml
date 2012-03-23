@@ -2881,6 +2881,8 @@ int test_write_tree(void)
 	char * buffer;
 	INIT /* init context macro */
 
+	node_t * text = NULL;
+	node_t * attr = NULL;
 	node_t *root = roxml_load_doc("roxml.test.xml");
 	node_t *node = roxml_add_node(root, 1, ROXML_CMT_NODE, NULL, "this is a test XML file");
 	node = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "this was a test XML file");
@@ -2969,8 +2971,47 @@ int test_write_tree(void)
 	len = roxml_commit_changes(root, "out.xml.valid.human", NULL, 1);
 	ASSERT_EQUAL(len, 96)
 
+	attr = roxml_add_node(node, 0, ROXML_ATTR_NODE, "id", "1234");
+	len = roxml_commit_changes(root, "out.xml.modattr", NULL, 1);
+	ASSERT_EQUAL(len, 106)
+
+	text = roxml_get_txt(attr, 0);
+	roxml_del_node(text);
+	roxml_add_node(attr, 0, ROXML_TXT_NODE, "id", "246");
+	len = roxml_commit_changes(root, "out.xml.modattr", NULL, 1);
+	ASSERT_EQUAL(len, 105)
+
+	attr = roxml_add_node(node, 0, ROXML_NSDEF_NODE, "xsd", "http://www.xsd.fr");
+	len = roxml_commit_changes(root, "out.xml.modattr", NULL, 1);
+
+	ASSERT_EQUAL(len, 135)
+
+	text = roxml_get_txt(attr, 0);
+	roxml_del_node(text);
+	len = roxml_commit_changes(root, "out.xml.modattr", NULL, 1);
+
+	ASSERT_EQUAL(len, 118)
+
+	roxml_add_node(attr, 0, ROXML_TXT_NODE, "xsd", "http://www.xsd.org");
+	len = roxml_commit_changes(root, "out.xml.modattr", NULL, 0);
+
+	ASSERT_EQUAL(len, 124)
+
 	roxml_close(root);
 	
+	root = roxml_load_doc("out.xml.modattr");
+	attr = roxml_get_attr(root, "xsd", 0);
+	ASSERT_NOT_NULL(attr);
+
+	text = roxml_get_txt(attr, 0);
+	roxml_del_node(text);
+	text = roxml_add_node(attr, 0, ROXML_TXT_NODE, "xsd", "http://www.default/xsd.org");
+	len = roxml_commit_changes(root, "out.xml.modattr2", NULL, 1);
+
+	ASSERT_EQUAL(len, 144)
+
+	roxml_close(root);
+
 	RETURN /* close context macro */
 }
 

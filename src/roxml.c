@@ -197,9 +197,16 @@ char * ROXML_API roxml_get_content(node_t *n, char * buffer, int bufsize, int *s
 		total = roxml_read(n->pos+name_len+2, read_size, content, n);
 
 	} else if(n->type & ROXML_ATTR_NODE)	{
+		int start_pos = 0;
 		int read_size = 0;
 		node_t *ptr = n->chld;
-		total = ptr->end - ptr->pos;
+		if(ptr) {
+			start_pos = ptr->pos;
+			total = ptr->end - ptr->pos;
+		} else {
+			start_pos = 0;
+			total = 0;
+		}
 		if(content == NULL) {
 			content = roxml_malloc(sizeof(char), total+1, PTR_CHAR);
 			bufsize = total+1;
@@ -209,7 +216,7 @@ char * ROXML_API roxml_get_content(node_t *n, char * buffer, int bufsize, int *s
 		if(read_size > bufsize-1) {
 			read_size = bufsize-1;
 		}
-		total = roxml_read(ptr->pos, read_size, content, ptr);
+		total = roxml_read(start_pos, read_size, content, ptr);
 	}
 
 	content[total] = '\0';
@@ -783,13 +790,22 @@ node_t * roxml_add_node(node_t * parent, int position, int type, char *name, cha
 	char * buffer = NULL;
 	node_t * new_node;
 
-	if(parent && !(parent->type & ROXML_ELM_NODE)) {
-		if(parent->prnt && (parent->prnt->type & ROXML_ELM_NODE)) {
-			parent = parent->prnt;
-		} else {
-			return NULL;
+	int allow_attrib_child;
+	
+	if(parent) {
+		if(parent->type & ROXML_ATTR_NODE) {
+			if(((type & ROXML_TXT_NODE) == 0)||(parent->chld)) {
+				return NULL;
+			}
+		} else if((parent->type&ROXML_ELM_NODE) == 0) {
+			if(parent->prnt && (parent->prnt->type & ROXML_ELM_NODE)) {
+				parent = parent->prnt;
+			} else {
+				return NULL;
+			}
 		}
 	}
+
 	if(value) {
 		content_l = strlen(value);
 	}
