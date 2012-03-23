@@ -146,7 +146,12 @@ int roxml_is_number(char *input)
 	int is_number = 0;
 	double r = strtod(input, &end);
 	
-	if((end == NULL) || (roxml_is_separator(end[0])) || (end[0] == '\0')) {
+	if((end == NULL) || 
+		(roxml_is_separator(end[0])) || 
+		(end[0] == '"') || 
+		(end[0] == '\'') || 
+		(end[0] == '\0')) 
+	{
 		is_number = 1;
 	}
 
