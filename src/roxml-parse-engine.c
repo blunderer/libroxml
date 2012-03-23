@@ -420,7 +420,7 @@ static int _func_xpath_operators(char * chunk, void * data, int operator, int op
 			if(ctx->content_quoted) {
 				xp_cond->func = ROXML_FUNC_STRCOMP;
 			}
-			if((xp_cond->arg2[0] > '9')||(xp_cond->arg2[0] < '0')) {
+			if(!roxml_is_number(xp_cond->arg2)) {
 				xp_cond->func = ROXML_FUNC_STRCOMP;
 			}
 		}
@@ -454,7 +454,7 @@ static int _func_xpath_operators(char * chunk, void * data, int operator, int op
 				if(ctx->content_quoted) {
 					ctx->new_cond->func = ROXML_FUNC_STRCOMP;
 				}
-				if((ctx->new_cond->arg2[0] > '9')||(ctx->new_cond->arg2[0] < '0')) {
+				if(!roxml_is_number(ctx->new_cond->arg2)) {
 					ctx->new_cond->func = ROXML_FUNC_STRCOMP;
 				}
 			}

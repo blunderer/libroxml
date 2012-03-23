@@ -443,6 +443,15 @@ node_t ** ROXML_INT roxml_exec_xpath(node_t *root, node_t *n, xpath_node_t *xpat
  */
 int ROXML_INT roxml_is_separator(char sep);
 
+/** \brief number tester
+ *
+ * \fn int roxml_is_number(char *input);
+ * This function tells if a string is a number
+ * \param input string to test
+ * \return 1 if the string was a number else 0
+ */
+int roxml_is_number(char *input);
+
 /** \brief node creation during parsing
  *
  * \fn roxml_process_begin_node(roxml_load_ctx_t *context, int position);

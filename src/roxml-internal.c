@@ -140,6 +140,20 @@ void ROXML_INT roxml_del_tree(node_t *n)
 	roxml_free_node(n);
 }
 
+int roxml_is_number(char *input)
+{
+	char *end;
+	int is_number = 0;
+	double r = strtod(input, &end);
+	
+	if((end == NULL) || (roxml_is_separator(end[0])) || (end[0] == '\0')) {
+		is_number = 1;
+	}
+
+	return is_number;
+}
+
+
 int ROXML_INT roxml_is_separator(char sep)
 {
 	int i = 0;
