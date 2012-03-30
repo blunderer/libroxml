@@ -2931,6 +2931,9 @@ int test_write_tree(void)
 	ASSERT_NOT_NULL(root->chld->sibl->sibl->chld->sibl->sibl->sibl->sibl->chld) // content3
 
 	FILE * fout = NULL;
+	int nb;
+	node_t ** node_set;
+
 	len = roxml_commit_changes(NULL, "out.xml", NULL, 1);
 	ASSERT_EQUAL(len, 0)
 
@@ -2958,6 +2961,14 @@ int test_write_tree(void)
 	fwrite(buffer, 1, len, fout);
 	fclose(fout);
 	free(buffer);
+
+	node_set = roxml_xpath(root, "//*", &nb);
+	ASSERT_EQUAL(nb, 4);
+	ASSERT_NOT_NULL(node_set);
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "xml");
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[1], NULL, 0), "node2");
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[2], NULL, 0), "node3");
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[3], NULL, 0), "node1");
 
 	roxml_close(root);
 	

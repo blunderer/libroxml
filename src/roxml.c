@@ -797,7 +797,7 @@ node_t * roxml_add_node(node_t * parent, int position, int type, char *name, cha
 			if(((type & ROXML_TXT_NODE) == 0)||(parent->chld)) {
 				return NULL;
 			}
-		} else if((parent->type&ROXML_ELM_NODE) == 0) {
+		} else if((parent->type & ROXML_ELM_NODE) == 0) {
 			if(parent->prnt && (parent->prnt->type & ROXML_ELM_NODE)) {
 				parent = parent->prnt;
 			} else {
@@ -896,8 +896,16 @@ node_t * roxml_add_node(node_t * parent, int position, int type, char *name, cha
 	}
 
 	if(parent == NULL) {
+		xpath_tok_table_t * table = (xpath_tok_table_t*)calloc(1, sizeof(xpath_tok_table_t));
 		parent = roxml_create_node(0, NULL, ROXML_ELM_NODE | ROXML_PENDING | ROXML_BUFF);
 		parent->end = 1;
+
+		table->id = ROXML_REQTABLE_ID;
+		table->ids[ROXML_REQTABLE_ID] = 1;
+
+		pthread_mutex_init(&table->mut, NULL);
+		parent->priv = (void*)table;
+
 		roxml_parent_node(parent, new_node, 0);
 	} else {
 		roxml_parent_node(parent, new_node, position);
