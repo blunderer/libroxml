@@ -3033,8 +3033,36 @@ int test_write_tree(void)
 	ASSERT_NOT_NULL(node_set);
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node1");
 
+	len = roxml_commit_changes(root, "out.xml.valid.raw", NULL, 0);
 	len = roxml_commit_changes(root, "out.xml.valid.xpath", NULL, 1);
+	ASSERT_EQUAL(len, 97);
 
+	roxml_close(root);
+
+	root = roxml_load_doc("out.xml.valid.raw");
+	len = roxml_commit_changes(root, "out.xml.valid.raw2", NULL, 0);
+	ASSERT_EQUAL(len, 85);
+	roxml_close(root);
+	root = roxml_load_doc("out.xml.valid.raw2");
+	len = roxml_commit_changes(root, "out.xml.valid.raw3", NULL, 0);
+	ASSERT_EQUAL(len, 85);
+	roxml_close(root);
+	root = roxml_load_doc("out.xml.valid.raw3");
+	len = roxml_commit_changes(root, "out.xml.valid.raw4", NULL, 0);
+	ASSERT_EQUAL(len, 85);
+	roxml_close(root);
+
+	root = roxml_load_doc("out.xml.valid.xpath");
+	len = roxml_commit_changes(root, "out.xml.valid.xpath2", NULL, 1);
+	ASSERT_EQUAL(len, 97);
+	roxml_close(root);
+	root = roxml_load_doc("out.xml.valid.xpath2");
+	len = roxml_commit_changes(root, "out.xml.valid.xpath3", NULL, 1);
+	ASSERT_EQUAL(len, 97);
+	roxml_close(root);
+	root = roxml_load_doc("out.xml.valid.xpath3");
+	len = roxml_commit_changes(root, "out.xml.valid.xpath4", NULL, 1);
+	ASSERT_EQUAL(len, 97);
 	roxml_close(root);
 
 	RETURN /* close context macro */

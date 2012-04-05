@@ -1312,7 +1312,17 @@ void ROXML_INT roxml_write_node(node_t * n, FILE *f, char ** buf, int human, int
 						roxml_write_string(buf, f, value, offset, len);
 						roxml_write_string(buf, f, "]]>", offset, len);
 					} else {
-						roxml_write_string(buf, f, value, offset, len);
+						char * end = value + status - 2;
+						char * strip = value;
+						while(roxml_is_separator(end[0])) {
+							end[0] = '\0';
+							end--;
+						}
+						while(roxml_is_separator(strip[0])) {
+							strip++;
+						}
+
+						roxml_write_string(buf, f, strip, offset, len);
 					}
 					if(human) {
 						roxml_write_string(buf, f, "\n", offset, len);
