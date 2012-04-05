@@ -195,6 +195,7 @@ node_t*	ROXML_API roxml_load_buf		(char *buffer);
  *
  * \fn node_t* ROXML_API roxml_load_doc(char *filename);
  * This function load a file document by parsing all the corresponding nodes
+ * \warning the file is not fully copied and thus, it should stay untouched until roxml_close is called on the corresponding XML tree.
  * \param filename the XML document to load
  * \return the root node or NULL
  * \see roxml_close
@@ -834,6 +835,7 @@ void ROXML_API roxml_release			(void * data);
  * 	roxml_add_node(tmp, 0, ROXML_ATTR_NODE, "id", "42");
  * 	tmp = roxml_add_node(tmp, 0, ROXML_ELM_NODE, "price", "24");
  * 	roxml_commit_changes(root, "/tmp/test.xml", NULL, 1);
+ *	roxml_close(root);
  * 	return 0;
  * }
  * \endcode
@@ -850,6 +852,7 @@ void ROXML_API roxml_release			(void * data);
  * 	tmp = roxml_add_node(tmp, 0, ROXML_ELM_NODE, "price", NULL);
  * 	tmp = roxml_add_node(tmp, 0, ROXML_TXT_NODE, NULL, "24");
  * 	roxml_commit_changes(root, "/tmp/test.xml", NULL, 1);
+ *	roxml_close(root);
  * 	return 0;
  * }
  * \endcode
@@ -878,6 +881,7 @@ void ROXML_API roxml_release			(void * data);
  *	roxml_add_node(node, 0, ROXML_ELM_NODE, "item", NULL);
  *	roxml_add_node(node, 0, ROXML_ELM_NODE, "item", NULL);
  * 	roxml_commit_changes(root, "/tmp/test.xml", NULL, 1);
+ *	roxml_close(root);
  * 	return 0;
  * }
  * \endcode
@@ -973,6 +977,9 @@ void ROXML_API roxml_del_node			(node_t * n);
  * The tree will be dumped to a file if 'dest' is not null and contains a valid path.
  * The tree will be dumped to a buffer if 'buffer' is not null. the buffer is allocated by the library
  * and a pointer to it will be stored into 'buffer'. The allocated buffer can be freed usinf free()
+ * \warning in the case of a tree loaded using roxml_load_doc, the roxml_commit_changes cannot be done to that same file
+ * since it may override datas it need. This usually result in a new file filled with garbages. The solution is to write it to a temporary file and rename it after roxml_close the current tree.
+ *
  * \param n the root node of the tree to write
  * \param dest the path to a file to write tree to
  * \param buffer the adress of a buffer where the tree will be written. This buffer have to be freed after use
@@ -1017,6 +1024,7 @@ void ROXML_API roxml_del_node			(node_t * n);
  * 	roxml_add_node(tmp, 0, ROXML_ATTR_NODE, "id", "42");
  * 	tmp = roxml_add_node(tmp, 0, ROXML_ELM_NODE, "price", "24");
  * 	roxml_commit_changes(root, "/tmp/test.xml", NULL, 0);
+ *	roxml_close(root);
  * 	return 0;
  * }
  * \endcode
@@ -1045,6 +1053,8 @@ void ROXML_API roxml_del_node			(node_t * n);
  *	file_out = fopen("/tmp/test.xml", "w");
  *      fwrite(buffer, 1, len, file_out);
  *      fclose(file_out);
+ *
+ *	roxml_close(root);
  * 	return 0;
  * }
  * \endcode
