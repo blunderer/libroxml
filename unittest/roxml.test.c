@@ -3023,6 +3023,20 @@ int test_write_tree(void)
 
 	roxml_close(root);
 
+	root = roxml_add_node(NULL, 0, ROXML_PI_NODE, "xml", "version=\"1.0\"");
+	node = roxml_add_node(root, 0, ROXML_ELM_NODE, "xml", NULL);
+	node = roxml_add_node(node, 0, ROXML_CMT_NODE, NULL, "this is a test XML file");
+	node = roxml_add_node(node, 0, ROXML_ELM_NODE, "node1", "content1");
+
+	node_set = roxml_xpath(root, "//*", &nb);
+	ASSERT_EQUAL(nb, 1);
+	ASSERT_NOT_NULL(node_set);
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node1");
+
+	len = roxml_commit_changes(root, "out.xml.valid.xpath", NULL, 1);
+
+	roxml_close(root);
+
 	RETURN /* close context macro */
 }
 
