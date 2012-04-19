@@ -2760,8 +2760,14 @@ int test_write_namespaces(void)
 	ASSERT_EQUAL(node0->ns, ns1);
 	ASSERT_EQUAL(node8->ns, ns2);
 
+	test = roxml_set_ns(node3, ns2);
+
 	len = roxml_commit_changes(root, "out.xml.ns.generated", NULL, 1);
 
+	roxml_close(root);
+
+	root = roxml_load_doc("out.xml.ns.generated");
+	len = roxml_commit_changes(root, "out.xml.ns.generated2", NULL, 1);
 	roxml_close(root);
 
 	RETURN /* close context macro */

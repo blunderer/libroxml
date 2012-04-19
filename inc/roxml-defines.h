@@ -222,6 +222,13 @@
 #define ROXML_PENDING	0x04
 
 /**
+ * \def ROXML_INVALID
+ * 
+ * constant for invalid node
+ */
+#define ROXML_INVALID	0x03
+
+/**
  * \def STATE_NODE_NONE
  * 
  * state for the state machine for init

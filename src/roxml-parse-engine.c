@@ -765,6 +765,10 @@ int _func_load_close_node(char * chunk, void * data)
 		break;
 	}
 
+	if(context->candidat_node->ns && ((context->candidat_node->ns->type & ROXML_INVALID) == ROXML_INVALID)) {
+		roxml_free_node(context->candidat_node->ns);
+	}
+
 	context->state = STATE_NODE_CONTENT;
 	context->previous_state = STATE_NODE_CONTENT;
 	context->candidat_txt = roxml_create_node(context->pos+1, context->src, ROXML_TXT_NODE | context->type);
@@ -968,6 +972,12 @@ int _func_load_colon(char * chunk, void * data)
 	if(context->state == STATE_NODE_NAME) {
 		context->state = STATE_NODE_BEG;
 		context->candidat_node->ns = roxml_lookup_nsdef(context->namespaces, context->curr_name);
+		if(!context->candidat_node->ns) {
+			char *nsname = malloc(context->curr_name_len+1);
+			memcpy(nsname, context->curr_name, context->curr_name_len);
+			nsname[context->curr_name_len] = '\0';
+			context->candidat_node->ns = roxml_create_node(0, nsname, ROXML_NSDEF_NODE | ROXML_PENDING | ROXML_INVALID);
+		}
 		context->candidat_node->pos += context->curr_name_len+2;
 		context->ns = 1;
 	} else if(context->state == STATE_NODE_ATTR) {
@@ -1033,6 +1043,14 @@ int _func_load_default(char * chunk, void * data)
 					memcpy(ns->alias, context->curr_name, context->curr_name_len);
 					context->candidat_arg->priv = ns;
 					context->nsdef = 0;
+					if(context->candidat_node->ns) {
+						if((context->candidat_node->ns->type & ROXML_INVALID) == ROXML_INVALID) {
+							if(strcmp(context->candidat_arg->prnt->ns->src.buf, ns->alias) == 0) {
+								roxml_free_node(context->candidat_node->ns);
+								context->candidat_node->ns = context->candidat_arg;
+							}
+						}
+					}
 				}
 			} else if(context->inside_node_state == STATE_INSIDE_VAL_BEG)  {
 				if(context->mode != MODE_COMMENT_NONE)     {

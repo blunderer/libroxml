@@ -321,7 +321,7 @@ node_t * ROXML_INT roxml_lookup_nsdef(node_t * nsdef, char * ns)
 	namespace[len] = '\0';
 
 	while(nsdef) {
-		if(strncmp(ns, ((roxml_ns_t*)nsdef->priv)->alias, len) == 0) {
+		if(nsdef->priv && strncmp(ns, ((roxml_ns_t*)nsdef->priv)->alias, len) == 0) {
 			break;
 		}
 		nsdef = nsdef->next;
@@ -1143,7 +1143,7 @@ node_t * ROXML_INT roxml_parent_node(node_t *parent, node_t * n, int position)
 	
 	n->prnt = parent;
 
-	if(parent->ns && ((roxml_ns_t*)parent->ns->priv)->alias[0] == '\0') {
+	if(parent->ns && ((parent->ns->type & ROXML_INVALID) != ROXML_INVALID) && ((roxml_ns_t*)parent->ns->priv)->alias[0] == '\0') {
 		n->ns = parent->ns;
 	}
 
