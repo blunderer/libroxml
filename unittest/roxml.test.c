@@ -2768,6 +2768,8 @@ int test_write_namespaces(void)
 
 	root = roxml_load_doc("out.xml.ns.generated");
 	len = roxml_commit_changes(root, "out.xml.ns.generated2", NULL, 1);
+	ASSERT_EQUAL(len, 345);
+
 	roxml_close(root);
 
 	RETURN /* close context macro */
@@ -2894,7 +2896,7 @@ int test_write_tree(void)
 	node = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "this was a test XML file");
 	len = roxml_commit_changes(root, "out.xml.copy", NULL, 1);
 
-	ASSERT_EQUAL(len, 386) 
+	ASSERT_EQUAL(len, 361) 
 
 	roxml_close(root);
 
@@ -2907,7 +2909,7 @@ int test_write_tree(void)
 	node = roxml_add_node(root, 0, ROXML_PI_NODE, "test", NULL);
 	len = roxml_commit_changes(root, "out.xml.spec.copy", NULL, 1);
 
-	ASSERT_EQUAL(len, 268) 
+	ASSERT_EQUAL(len, 253) 
 
 	roxml_close(root);
 

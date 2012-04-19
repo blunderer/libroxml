@@ -754,6 +754,8 @@ int ROXML_API roxml_commit_changes(node_t *n, char * dest, char ** buffer, int h
 		if((n->prnt == NULL)||(n->prnt && n->prnt->prnt == NULL)) {
 			if(n->prnt) {
 				n = n->prnt->chld;
+			} else {
+				n = n->chld;
 			}
 			while(n) {
 				roxml_write_node(n, fout, buffer, human, 0, &size, &len);
