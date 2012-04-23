@@ -53,7 +53,11 @@ clean:
 	$(RM) out.xml.copy out.xml out.xml.human out.xml.spec.copy \
 	  out.xml.valid.human out.buf.xml out.buf.xml.human \
 	  out.xml.ns.generated out.xml.ns out.xml.human.sub \
-	  out.xml.ns.del)
+	  out.xml.ns.del out.xml.modattr out.xml.modattr2 \
+	  out.xml.modattr3 out.xml.modattr4 out.xml.ns.generated2 \
+	  out.xml.valid.raw out.xml.valid.raw2 out.xml.valid.raw3 \
+	  out.xml.valid.raw4 out.xml.valid.xpath out.xml.valid.xpath2 \
+	  out.xml.valid.xpath3 out.xml.valid.xpath4)
 	
 mrproper: clean
 	$(call ECHO_DO, '  RM      bins', \
