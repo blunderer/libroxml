@@ -873,8 +873,8 @@ int ROXML_INT roxml_validate_axes(node_t *root, node_t * candidat, node_t *** an
 	int valid = 0;
 	int path_end = 0;
 	char *axes = NULL;
-	char intern_buff[INTERNAL_BUF_SIZE];
-	char intern_buff2[INTERNAL_BUF_SIZE];
+	char intern_buff[ROXML_LONG_LEN];
+	char intern_buff2[ROXML_LONG_LEN];
 
 	if (xn == NULL) {
 		valid = 1;
@@ -929,14 +929,14 @@ int ROXML_INT roxml_validate_axes(node_t *root, node_t * candidat, node_t *** an
 		int ns_len = 0;
 		char *name = intern_buff;
 		if (candidat->ns) {
-			name = roxml_get_name(candidat->ns, intern_buff, INTERNAL_BUF_SIZE);
+			name = roxml_get_name(candidat->ns, intern_buff, ROXML_LONG_LEN);
 			ns_len = strlen(name);
 			if (ns_len) {
 				name[ns_len] = ':';
 				ns_len++;
 			}
 		}
-		roxml_get_name(candidat, intern_buff + ns_len, INTERNAL_BUF_SIZE - ns_len);
+		roxml_get_name(candidat, intern_buff + ns_len, ROXML_LONG_LEN - ns_len);
 		if (name && strcmp(name, axes) == 0) {
 			valid = 1;
 		}
