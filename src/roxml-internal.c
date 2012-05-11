@@ -220,7 +220,6 @@ void ROXML_INT roxml_process_begin_node(roxml_load_ctx_t * context, int position
 node_t ROXML_INT *roxml_load(node_t *current_node, FILE * file, char *buffer)
 {
 	int error = 0;
-	char int_buffer[ROXML_BULK_READ + 1];
 	roxml_load_ctx_t context;
 	roxml_parser_item_t *parser = NULL;
 	xpath_tok_table_t *table = (xpath_tok_table_t *) calloc(1, sizeof(xpath_tok_table_t));
@@ -248,11 +247,16 @@ node_t ROXML_INT *roxml_load(node_t *current_node, FILE * file, char *buffer)
 	parser = roxml_parser_prepare(parser);
 
 	if (file) {
+		char *int_buffer;
 		int circle = 0;
 		int int_len = 0;
+
 		context.type = ROXML_FILE;
 		context.src = (void *)file;
 		context.pos = 0;
+
+		int_buffer = malloc(ROXML_BULK_READ+1);
+
 		do {
 			int ret = 0;
 			int chunk_len = 0;
