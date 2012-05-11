@@ -163,7 +163,7 @@ int roxml_is_number(char *input)
 int ROXML_INT roxml_is_separator(char sep)
 {
 	int i = 0;
-	char separators[32] = "\t\n ";
+	char separators[32] = "\r\t\n ";
 	while (separators[i] != 0) {
 		if (sep == separators[i]) {
 			return 1;
