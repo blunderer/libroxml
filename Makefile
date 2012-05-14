@@ -32,6 +32,8 @@ BINS = $(TARGET_SLIB) $(TARGET_LIB) $(TARGET_LN) $(TARGET_BIN)
 DESTDIR ?= /usr
 
 OS=$(shell uname)
+TUNE=$(shell test -f site.mk && echo tune)
+DOXYGEN = $(shell which doxygen)
 
 # specific, modifiable flags
 # set D=1 on command line to produce debuggable binary
@@ -59,7 +61,9 @@ else
 	FAKEROOT="fakeroot"
 endif
 
-DOXYGEN = $(shell which doxygen)
+ifeq ("${TUNE}", "tune")
+	override CFLAGS += -DROXML_USER_CONFIG
+endif
 
 # first rule (default)
 all:
