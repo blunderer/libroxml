@@ -1343,17 +1343,29 @@ int test_del_node(void)
 	roxml_del_node(attr1);
 	
 	nb = roxml_get_attr_nb(node1);
+#if(HAVE_READ_WRITE==1)
 	ASSERT_EQUAL(nb, 1);
 	attr1 = roxml_get_attr(node1, NULL, 0);
 	ASSERT_STRING_EQUAL(roxml_get_name(attr1, NULL, 0), "value")
+#else /* HAVE_READ_WRITE==0 */
+	ASSERT_EQUAL(nb, 2);
+#endif /* HAVE_READ_WRITE */
 
 	node_t **node_set = roxml_xpath(root, "//*", &nb);
+#if(HAVE_XPATH_ENGINE==1)
 	ASSERT_EQUAL(nb, 9);
+#else /* HAVE_XPATH_ENGINE==0 */
+	ASSERT_EQUAL(nb, 0);
+#endif /* HAVE_XPATH_ENGINE */
 	
 	roxml_del_node(node2);
 
 	node_set = roxml_xpath(root, "//*", &nb);
+#if(HAVE_XPATH_ENGINE==1)
 	ASSERT_EQUAL(nb, 4);
+#else /* HAVE_XPATH_ENGINE==0 */
+	ASSERT_EQUAL(nb, 0);
+#endif /* HAVE_XPATH_ENGINE */
 
 	node_t * text = roxml_get_txt(node1, 0);
 	ASSERT_NOT_NULL(text);
@@ -1361,7 +1373,11 @@ int test_del_node(void)
 
 	roxml_del_node(text);
 
+#if(HAVE_READ_WRITE==1)
 	ASSERT_STRING_EQUAL(roxml_get_content(node1, NULL, 0, NULL), "");
+#else /* HAVE_READ_WRITE==0 */
+	ASSERT_STRING_EQUAL(roxml_get_content(node1, NULL, 0, NULL), "text1");
+#endif /* HAVE_READ_WRITE */
 
 	roxml_close(root);
 	RETURN
@@ -1443,6 +1459,7 @@ int test_parse_xpath(void)
 {
 	INIT
 
+#if(HAVE_XPATH_ENGINE==1)
 	xpath_node_t *ptr;
 	char mypath[256] = "/node/item[12]/title";
 	int ret = roxml_parse_xpath(mypath, &ptr, 0);	
@@ -1703,6 +1720,8 @@ int test_parse_xpath(void)
 	ASSERT_EQUAL(ptr[2].next->next->cond->xp[0].xp_cond->op, ROXML_OPERATOR_EQU)
 
 	roxml_free_xpath(ptr, ret);
+
+#endif /* HAVE_XPATH_ENGINE */
 	RETURN
 }
 
@@ -1710,6 +1729,7 @@ int test_xpath(void)
 {
 	INIT
 
+#if(HAVE_XPATH_ENGINE==1)
 	int nbans;
 	node_t *node0;
 	node_t *node2;
@@ -2434,6 +2454,7 @@ int test_xpath(void)
 	roxml_close(root);
 
 	roxml_release(RELEASE_ALL);
+#endif /* HAVE_XPATH_ENGINE */
 
 	RETURN
 }
@@ -2514,6 +2535,7 @@ int test_spec_nodes(void)
 	ASSERT_STRING_EQUAL(content, " <node2></node2> ")
 
 	// test xpath
+#if (HAVE_XPATH_ENGINE==1)
 	node_t **node_set = roxml_xpath(root, "//comment()", &nbans);
 	ASSERT_EQUAL(nbans, 2)
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "this is a comment")
@@ -2542,6 +2564,7 @@ int test_spec_nodes(void)
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[4], NULL, 0, NULL), "value=\"2\"")
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[5], NULL, 0, NULL), " <node2></node2> ")
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[6], NULL, 0, NULL), " <toto/> ")
+#endif /* HAVE_XPATH_ENGINE */
 
 	roxml_release(RELEASE_ALL);
 	roxml_close(root);
@@ -2752,6 +2775,7 @@ int test_write_namespaces(void)
 	attr3 = roxml_add_node(node8, 0, ROXML_ATTR_NODE, "val", "3");
 	attr4 = roxml_add_node(node4, 0, ROXML_ATTR_NODE, "val", "4");
 
+#if (HAVE_READ_WRITE==1)
 	ASSERT_NULL(test);
 	ASSERT_NOT_NULL(node0);
 	ASSERT_NOT_NULL(node4);
@@ -2778,16 +2802,21 @@ int test_write_namespaces(void)
 	ASSERT_EQUAL(node8->ns, ns2);
 
 	test = roxml_set_ns(node3, ns2);
+#endif /* HAVE_READ_WRITE */ 
 
+#if (HAVE_COMMIT_XML_TREE==1)
 	len = roxml_commit_changes(root, "out.xml.ns.generated", NULL, 1);
+#endif /* HAVE_COMMIT_XML_TREE */
 
 	roxml_close(root);
 
+#if (HAVE_COMMIT_XML_TREE==1)
 	root = roxml_load_doc("out.xml.ns.generated");
 	len = roxml_commit_changes(root, "out.xml.ns.generated2", NULL, 1);
 	ASSERT_EQUAL(len, 345);
 
 	roxml_close(root);
+#endif /* HAVE_COMMIT_XML_TREE */
 
 	RETURN /* close context macro */
 }
@@ -2796,6 +2825,7 @@ int test_del_namespaces(void)
 {
 	INIT /* init context macro */
 
+#if (HAVE_READ_WRITE==1)
 	node_t * ns1 = NULL;
 	node_t * ns2 = NULL;
 	node_t * attr0 = NULL;
@@ -2896,6 +2926,7 @@ int test_del_namespaces(void)
 	len = roxml_commit_changes(root, "out.xml.ns.del", NULL, 1);
 
 	roxml_close(root);
+#endif /* HAVE_READ_WRITE */
 
 	RETURN /* close context macro */
 }
@@ -2906,6 +2937,7 @@ int test_write_tree(void)
 	char * buffer;
 	INIT /* init context macro */
 
+#if (HAVE_COMMIT_XML_TREE==1)
 	node_t * text = NULL;
 	node_t * attr = NULL;
 	node_t *root = roxml_load_doc("roxml.test.xml");
@@ -3095,6 +3127,7 @@ int test_write_tree(void)
 	ASSERT_EQUAL(len, 97);
 	roxml_close(root);
 
+#endif /* HAVE_COMMIT_XML_TREE */
 	RETURN /* close context macro */
 }
 

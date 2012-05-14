@@ -3,20 +3,31 @@ ifeq ($V,0)
 override V =
 endif
 
-SRC1 = unittest.c roxml.test.c ../src/roxml.c ../src/roxml-internal.c ../src/roxml-parse-engine.c
-OBJ1 = $(SRC1:.c=.o)
-SRC2 = roxml.perf.c ../src/roxml.c ../src/roxml-internal.c ../src/roxml-parse-engine.c
-OBJ2 = $(SRC2:.c=.o)
-SRC3 = roxml.mem.c ../src/roxml.c ../src/roxml-internal.c ../src/roxml-parse-engine.c
-OBJ3 = $(SRC3:.c=.o)
+OBJ1 = unittest.o roxml.test.o ../src/roxml.o ../src/roxml-internal.o ../src/roxml-parse-engine.o
+OBJ2 = roxml.perf.o ../src/roxml.o ../src/roxml-internal.o ../src/roxml-parse-engine.o
+OBJ3 = roxml.mem.o ../src/roxml.o ../src/roxml-internal.o ../src/roxml-parse-engine.o
+OBJ4 = unittest.o roxml.test-tiny.o ../src/roxml-tiny.o ../src/roxml-internal-tiny.o ../src/roxml-parse-engine-tiny.o
 
 RM = rm -f
 
-CFLAGS1 = -lefence -g -I../inc -DUNITTEST -DREENTRANT -DLINUX -Wall -Wextra -Wno-unused -D__DEBUG -DIGNORE_EMPTY_TEXT_NODES
-CFLAGS2 = -O3 -I../inc -DREENTRANT -DLINUX -Wall -Wextra -Wno-unused -DIGNORE_EMPTY_TEXT_NODES
+NOUNUSED = -Wno-unused-parameter -Wno-unused-variable -Wno-unused-but-set-variable
+
+CFLAGS1 = -lefence -g -I../inc -DUNITTEST -DREENTRANT -DLINUX -Wall -Wextra $(NOUNUSED) -D__DEBUG -DIGNORE_EMPTY_TEXT_NODES
+CFLAGS2 = -O3 -I../inc -DREENTRANT -DLINUX -Wall -Wextra $(NOUNUSED) -DIGNORE_EMPTY_TEXT_NODES
+CFLAGS4 = -lefence -g -I../inc -DUNITTEST -DREENTRANT -DLINUX -Wall -Wextra $(NOUNUSED) -D__DEBUG -DIGNORE_EMPTY_TEXT_NODES
+
+CFLAGS4 += -DHAVE_HEAP_BUFFERS=1
+CFLAGS4 += -DHAVE_SMALL_BUFFER=1
+CFLAGS4 += -DHAVE_SMALL_INPUT_FILE=1
+CFLAGS4 += -DHAVE_THREAD_SAFE=0
+CFLAGS4 += -DHAVE_READ_WRITE=0
+CFLAGS4 += -DHAVE_COMMIT_XML_TREE=0
+CFLAGS4 += -DHAVE_XPATH_ENGINE=0
+
 TARGET1 = roxml.unitC
 TARGET2 = roxml.perf
 TARGET3 = roxml.mem
+TARGET4 = roxml.tiny.unitC
 
 # rules verbosity
 define ECHO_DO
@@ -24,7 +35,7 @@ define ECHO_DO
 @ $2
 endef
 
-all: $(TARGET1) $(TARGET2) $(TARGET3)
+all: $(TARGET1) $(TARGET2) $(TARGET3) $(TARGET4)
 
 $(TARGET1): $(OBJ1)
 	$(call ECHO_DO, '  LD      $(notdir $@)', \
@@ -38,6 +49,10 @@ $(TARGET3): $(OBJ3)
 	$(call ECHO_DO, '  LD      $(notdir $@)', \
 	$(CC) -o $@ $^ )
 
+$(TARGET4): $(OBJ4)
+	$(call ECHO_DO, '  LD      $(notdir $@)', \
+	$(CC) -o $@ $^ )
+
 roxml.perf.o: roxml.perf.c
 	$(call ECHO_DO, '  CC      $(notdir $@)', \
 	$(CC) -c -o $@ $< $(CFLAGS2) )
@@ -46,9 +61,13 @@ roxml.perf.o: roxml.perf.c
 	$(call ECHO_DO, '  CC      $(notdir $@)', \
 	$(CC) -c -o $@ $< $(CFLAGS1) )
 
+%-tiny.o: %.c
+	$(call ECHO_DO, '  CC      $(notdir $@)', \
+	$(CC) -c -o $@ $< $(CFLAGS4) )
+
 clean:
 	$(call ECHO_DO, '  RM      objs', \
-	$(RM) $(OBJ1) $(OBJ2) $(OBJ3) )
+	$(RM) $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) )
 	$(call ECHO_DO, '  RM      results files', \
 	$(RM) out.xml.copy out.xml out.xml.human out.xml.spec.copy \
 	  out.xml.valid.human out.buf.xml out.buf.xml.human \
