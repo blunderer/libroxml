@@ -755,6 +755,7 @@ int _func_load_close_node(char * chunk, void * data)
 		case STATE_NODE_END:
 			context->empty_text_node = 1;
 			roxml_close_node(context->current_node, context->candidat_node);
+			context->candidat_node = NULL;
 			if(context->current_node->prnt != NULL) { context->current_node = context->current_node->prnt; }
 		break;
 		case STATE_NODE_CDATA:
@@ -765,7 +766,7 @@ int _func_load_close_node(char * chunk, void * data)
 		break;
 	}
 
-	if(context->candidat_node->ns && ((context->candidat_node->ns->type & ROXML_INVALID) == ROXML_INVALID)) {
+	if(context->candidat_node && context->candidat_node->ns && ((context->candidat_node->ns->type & ROXML_INVALID) == ROXML_INVALID)) {
 		roxml_free_node(context->candidat_node->ns);
 	}
 
