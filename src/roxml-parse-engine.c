@@ -904,7 +904,7 @@ int _func_load_end_node(char * chunk, void * data)
 			context->state = STATE_NODE_SINGLE;
 		break;
 		case STATE_NODE_ATTR:
-			if(context->mode != MODE_COMMENT_DQUOTE) { 
+			if((context->mode != MODE_COMMENT_DQUOTE)&&(context->mode != MODE_COMMENT_QUOTE)) { 
 				if(context->inside_node_state == STATE_INSIDE_VAL)      {
 					node_t * to_be_closed = NULL;
 					if(context->content_quoted) {
