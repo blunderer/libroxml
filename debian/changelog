@@ -1,3 +1,28 @@
+libroxml (2.2.0-1) unstable; urgency=low
+  * Add
+      namespace handling
+      improve CDATA handling
+      possibility to change an attribute value
+  * Bugfixes
+      fix namespace inheritance
+      fix build issues
+      fix internal priv data location coherency
+      fix potential error when parsing big XML file 
+      fix roxml_xpath crash 
+      fix multiple roxml_commit_changes increase xml file size 
+      fix libroxml fails to parse single-quoted attributes 
+      fix leak in roxml_del_node for attribute node 
+      fix memory leak for attributes and namespace definition 
+      fix missing indirection on len pointer when buffer is not long enought 
+      fix potential access to freed memory 
+      fix roxml_commit_changes that added a whitespace when writing some documents 
+      fix xpath compare on quoted numbers
+  * Update
+      documentation
+
+
+ -- Tristan Lelong <tristan.lelong@libroxml.net>  Fri, 1 Jun 2012 16:03:28 +0200
+
 libroxml (2.1.2-1) unstable; urgency=low
   * Bugfixes
       fix string compare in xpath fail
