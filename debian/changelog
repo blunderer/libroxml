@@ -15,7 +15,7 @@ libroxml (2.2.0-1) unstable; urgency=low
       fix memory leak for attributes and namespace definition 
       fix missing indirection on len pointer when buffer is not long enought 
       fix potential access to freed memory 
-      fix roxml_commit_changes that added a whitespace when writing some documents 
+      fix roxml_commit_changes that added a whitespaces
       fix xpath compare on quoted numbers
   * Update
       documentation
