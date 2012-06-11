@@ -106,7 +106,7 @@ node_t*	ROXML_INT roxml_load			(node_t *current_node, FILE *file, char *buffer);
 
 /** \brief node relocate function
  *
- * \fn roxml_parent_node_at(node_t *parent, node_t *n, int position);
+ * \fn roxml_parent_node(node_t *parent, node_t *n, int position);
  * this function change the position of a node in its parent list
  * \param parent the parent node
  * \param n the node to parent
@@ -474,10 +474,10 @@ void ROXML_INT roxml_process_unaliased_ns(roxml_load_ctx_t *context);
 
 /** \brief name space lookup in list
  *
- * \fn roxml_lookup_nsdef(node_t * ns, char * ns);
+ * \fn roxml_lookup_nsdef(node_t * nsdef, char * ns);
  * this function look for requested name space in nsdef list
- * \param the nsdef list
- * \param the namespace to find
+ * \param nsdef the nsdef list
+ * \param ns the namespace to find
  * \return the nsdef node or NULL
  */
 node_t * ROXML_INT roxml_lookup_nsdef(node_t * nsdef, char * ns);

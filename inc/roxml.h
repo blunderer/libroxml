@@ -556,12 +556,12 @@ int 	ROXML_API roxml_get_pi_nb		(node_t *n);
  * roxml_release when no longer needed.
  * depending on node type it will return:
  * <ul>
- * <li>\ref ROXML_ELM_NODE: returns the node name</li>
- * <li>\ref ROXML_ATTR_NODE: returns the attribute name</li>
- * <li>\ref ROXML_PI_NODE: returns the process-instruction targeted application</li>
- * <li>\ref ROXML_TXT_NODE: returns NULL (or empty string if you provided a buffer in buffer param)</li>
- * <li>\ref ROXML_CMT_NODE: returns NULL (or empty string if you provided a buffer in buffer param)</li>
- * <li>\ref ROXML_NS_NODE: returns the namespace alias associated with the ns node </li>
+ * <li> ROXML_ELM_NODE: returns the node name</li>
+ * <li> ROXML_ATTR_NODE: returns the attribute name</li>
+ * <li> ROXML_PI_NODE: returns the process-instruction targeted application</li>
+ * <li> ROXML_TXT_NODE: returns NULL (or empty string if you provided a buffer in buffer param)</li>
+ * <li> ROXML_CMT_NODE: returns NULL (or empty string if you provided a buffer in buffer param)</li>
+ * <li> ROXML_NS_NODE: returns the namespace alias associated with the ns node </li>
  * </ul>
  * Be carreful as if your buffer is too short for the returned string, it will be truncated
  * \param n is one node of the tree
@@ -580,12 +580,12 @@ char*	ROXML_API roxml_get_name		(node_t *n, char * buffer, int size);
  * if the returned pointer is NULL then the node either has no content or this function is irrelevant for this kind of node.
  * depending on node type it will return:
  * <ul>
- * <li>\ref ROXML_ELM_NODE: returns the concatenation of all direct text node children</li>
- * <li>\ref ROXML_ATTR_NODE: returns the attribute value</li>
- * <li>\ref ROXML_PI_NODE: returns the process-instruction instruction</li>
- * <li>\ref ROXML_TXT_NODE: returns the text content of the node</li>
- * <li>\ref ROXML_CMT_NODE: returns the text content of the comment</li>
- * <li>\ref ROXML_NS_NODE: returns the namespace definition (usually an URL)</li>
+ * <li> ROXML_ELM_NODE: returns the concatenation of all direct text node children</li>
+ * <li> ROXML_ATTR_NODE: returns the attribute value</li>
+ * <li> ROXML_PI_NODE: returns the process-instruction instruction</li>
+ * <li> ROXML_TXT_NODE: returns the text content of the node</li>
+ * <li> ROXML_CMT_NODE: returns the text content of the comment</li>
+ * <li> ROXML_NS_NODE: returns the namespace definition (usually an URL)</li>
  * </ul>
  * returned string should be freed using roxml_release when not used anymore
  * \param n is one node of the tree

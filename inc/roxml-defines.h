@@ -156,7 +156,7 @@
  * 
  * constant for char table pointers
  */
-#define PTR_CHAR_START	3
+#define PTR_CHAR_STAR	3
 
 /**
  * \def PTR_NODE
@@ -187,7 +187,7 @@
 #define PTR_INT_STAR	7
 
 /**
- * \def PTR_RESULT
+ * \def PTR_NODE_RESULT
  * 
  * constant for node table pointers where node are not to delete
  */

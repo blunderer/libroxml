@@ -148,7 +148,7 @@
  * </td>
  * </tr>
  * </table>
- * <div>
+ * </div>
  */
 
 /** \page priv-api private API
@@ -216,7 +216,7 @@
  * </td>
  * </tr>
  * </table>
- * <div>
+ * </div>
  */
 
 /** \page xpath xpath handling
