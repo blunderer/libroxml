@@ -122,6 +122,7 @@ doxy : doxy.cfg man.cfg
 	$P '  MAN'
 	$E - doxygen man.cfg &>/dev/null
 	$E - chmod -R a+rw docs
+	$E - rm docs/man/man3/*_inc_.3
 
 .PHONY: clean
 clean:
