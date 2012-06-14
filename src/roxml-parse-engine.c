@@ -24,7 +24,7 @@
 
 #include "roxml-internal.h"
 
-//#define DEBUG_PARSING
+/* #define DEBUG_PARSING */
 
 roxml_parser_item_t *roxml_append_parser_item(roxml_parser_item_t *head, char * key, roxml_parse_func func)
 {
@@ -119,6 +119,7 @@ int roxml_parse_line(roxml_parser_item_t * head, char *line, int len, void * ctx
 			else if(ret < 0) { return -1; }
 		}
 	}
+
 	return (chunk-line);
 }
 
@@ -666,10 +667,12 @@ int _func_load_quoted(char * chunk, void * data)
 #endif /* DEBUG_PARSING */
 	roxml_load_ctx_t *context = (roxml_load_ctx_t*)data;
 
-	if(context->mode == MODE_COMMENT_NONE) {
-		context->mode = MODE_COMMENT_QUOTE;
-	} else if(context->mode == MODE_COMMENT_QUOTE) {
-		context->mode = MODE_COMMENT_NONE;
+	if(context->state != STATE_NODE_CONTENT) {
+		if(context->mode == MODE_COMMENT_NONE) {
+			context->mode = MODE_COMMENT_QUOTE;
+		} else if(context->mode == MODE_COMMENT_QUOTE) {
+			context->mode = MODE_COMMENT_NONE;
+		}
 	}
 
 	return 0;
@@ -682,10 +685,12 @@ int _func_load_dquoted(char * chunk, void * data)
 #endif /* DEBUG_PARSING */
 	roxml_load_ctx_t *context = (roxml_load_ctx_t*)data;
 
-	if(context->mode == MODE_COMMENT_NONE) {
-		context->mode = MODE_COMMENT_DQUOTE;
-	} else if(context->mode == MODE_COMMENT_DQUOTE) {
-		context->mode = MODE_COMMENT_NONE;
+	if(context->state != STATE_NODE_CONTENT) {
+		if(context->mode == MODE_COMMENT_NONE) {
+			context->mode = MODE_COMMENT_DQUOTE;
+		} else if(context->mode == MODE_COMMENT_DQUOTE) {
+			context->mode = MODE_COMMENT_NONE;
+		}
 	}
 
 	return 0;
