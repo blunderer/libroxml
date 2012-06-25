@@ -667,7 +667,7 @@ int _func_load_quoted(char * chunk, void * data)
 #endif /* DEBUG_PARSING */
 	roxml_load_ctx_t *context = (roxml_load_ctx_t*)data;
 
-	if(context->state != STATE_NODE_CONTENT) {
+	if(context->state != STATE_NODE_CONTENT && context->state != STATE_NODE_COMMENT) {
 		if(context->mode == MODE_COMMENT_NONE) {
 			context->mode = MODE_COMMENT_QUOTE;
 		} else if(context->mode == MODE_COMMENT_QUOTE) {
@@ -685,7 +685,7 @@ int _func_load_dquoted(char * chunk, void * data)
 #endif /* DEBUG_PARSING */
 	roxml_load_ctx_t *context = (roxml_load_ctx_t*)data;
 
-	if(context->state != STATE_NODE_CONTENT) {
+	if(context->state != STATE_NODE_CONTENT && context->state != STATE_NODE_COMMENT) {
 		if(context->mode == MODE_COMMENT_NONE) {
 			context->mode = MODE_COMMENT_DQUOTE;
 		} else if(context->mode == MODE_COMMENT_DQUOTE) {
