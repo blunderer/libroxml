@@ -810,6 +810,9 @@ node_t * roxml_add_node(node_t * parent, int position, int type, char *name, cha
 
 	if(value) {
 		content_l = strlen(value);
+		if(!content_l) {
+			value = NULL;
+		}
 	}
 	if(name) {
 		name_l = strlen(name);
@@ -863,8 +866,7 @@ node_t * roxml_add_node(node_t * parent, int position, int type, char *name, cha
 		end_content = content_l + 1;
 	} else if(type & ROXML_ELM_NODE) {
 		if(!name) { return NULL; }
-		if(content_l)	{
-			if(!value) { return NULL; }
+		if(value)	{
 			buffer = (char*)malloc(sizeof(char)*(name_l*2+content_l+6));
 			sprintf(buffer,"<%s>%s</%s>",name, value, name);
 			content_pos = name_l+2;
