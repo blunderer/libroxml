@@ -1031,8 +1031,12 @@ void ROXML_INT roxml_check_node(xpath_node_t *xp, node_t *root, node_t *context,
 			roxml_check_node(xp->next, root, context, ans, nb, max, ROXML_DIRECT, req_id);
 		} break;
 		case ROXML_ID_PARENT: {
-			validate_node = roxml_validate_axes(root, context->prnt, ans, nb, max, xp, req_id);
-			roxml_check_node(xp->next, root, context->prnt, ans, nb, max, ROXML_DIRECT, req_id);
+			if (context->prnt) {
+				validate_node = roxml_validate_axes(root, context->prnt, ans, nb, max, xp, req_id);
+				roxml_check_node(xp->next, root, context->prnt, ans, nb, max, ROXML_DIRECT, req_id);
+			} else {
+				validate_node = 0;
+			}
 		} break;
 		case ROXML_ID_ATTR: {
 			node_t *attribute = context->attr;
