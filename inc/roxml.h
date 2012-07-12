@@ -130,6 +130,14 @@ typedef struct node node_t;
  */
 #define ROXML_CDATA_NODE	(ROXML_TXT_NODE | 0x200)
 
+/**
+ * \def ROXML_DOCTYPE_NODE
+ * 
+ * constant for doctype nodes
+ * \see roxml_add_node
+ */
+#define ROXML_DOCTYPE_NODE	0x400
+
 
 /**
  * \def ROXML_ALL_NODE

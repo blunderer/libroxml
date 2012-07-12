@@ -752,6 +752,14 @@ int _func_load_close_node(char * chunk, void * data)
 			}
 		break;
 		case STATE_NODE_SINGLE:
+			if(context->doctype) {
+				context->doctype--;
+				if(context->doctype > 0) {
+					context->pos++;
+					return 1;
+				}
+				context->candidat_node->end = context->pos;
+			}
 			context->empty_text_node = 1;
 			context->current_node = roxml_parent_node(context->current_node, context->candidat_node, 0);
 			if(context->current_node->prnt != NULL) { context->current_node = context->current_node->prnt; } 
@@ -813,9 +821,13 @@ int _func_load_open_spec_node(char * chunk, void * data)
 			context->state = STATE_NODE_CDATA;
 			while((chunk[cur] != '[')&&(chunk[cur] != '\0')) { cur++; }
 		} else {
-			roxml_process_begin_node(context, context->pos-1);
+			if(context->doctype == 0) {
+				roxml_process_begin_node(context, context->pos-1);
+				roxml_set_type(context->candidat_node, ROXML_DOCTYPE_NODE);
+			}
 			context->state = STATE_NODE_SINGLE;
 			context->previous_state = STATE_NODE_SINGLE;
+			context->doctype++;
 		}
 	}
 

@@ -149,6 +149,26 @@ char * ROXML_API roxml_get_content(node_t *n, char * buffer, int bufsize, int *s
 			}
 			ptr = ptr->sibl;
 		}
+	} else if(n->type & ROXML_DOCTYPE_NODE)	{
+		char doc_name[ROXML_BASE_LEN];
+		int read_size = 0;
+		int name_len = 0;
+
+		roxml_get_name(n, doc_name, ROXML_BASE_LEN);
+		name_len = strlen(doc_name) + 1;
+
+		total = n->end - n->pos - 1 - name_len;
+
+		if(content == NULL) {
+			content = roxml_malloc(sizeof(char), total+1, PTR_CHAR);
+			bufsize = total+1;
+		}
+		if(content == NULL) { return NULL; }
+		read_size = total;
+		if(read_size > bufsize-1) {
+			read_size = bufsize-1;
+		}
+		total = roxml_read(n->pos+name_len+1, read_size, content, n);
 	} else if(n->type & ROXML_TXT_NODE)	{
 		int read_size = 0;
 		total = n->end - n->pos;
@@ -270,7 +290,9 @@ char * ROXML_API roxml_get_name(node_t *n, char * buffer, int size)
 			offset++;
 			count++;
 		}
-	} else if(n->type & ROXML_ELM_NODE)	{
+	} else if((n->type & ROXML_ELM_NODE)||
+		(n->type & ROXML_DOCTYPE_NODE))
+	{
 		int offset = 0;
 		char *internal_ptr;
 		char internal_buf[INTERNAL_BUF_SIZE];
@@ -605,6 +627,7 @@ int ROXML_API roxml_get_type(node_t *n)
 {
 	if(n) {
 		return (n->type & (ROXML_ATTR_NODE | 
+					ROXML_DOCTYPE_NODE | 
 					ROXML_ELM_NODE | 
 					ROXML_TXT_NODE | 
 					ROXML_CMT_NODE |

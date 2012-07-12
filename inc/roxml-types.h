@@ -185,6 +185,7 @@ typedef struct _roxml_load_ctx {
 	node_t *namespaces;			/*!< available namespaces */
 	char * curr_name;			/*!< current node name (attr or elm) */
 	int curr_name_len;			/*!< current node name (attr or elm) lenght */
+	int doctype;				/*!< nested doctype count */
 } roxml_load_ctx_t;
 
 /** \struct roxml_xpath_ctx_t

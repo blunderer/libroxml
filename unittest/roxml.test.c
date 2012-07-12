@@ -2515,13 +2515,12 @@ int test_spec_nodes(void)
 	ASSERT_EQUAL(nbans, 1)
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "value=\"2\"")
 	node_set = roxml_xpath(root, "//*", &nbans);
-	ASSERT_EQUAL(nbans, 3)
-	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "!DOCTYPE")
-	ASSERT_STRING_EQUAL(roxml_get_name(node_set[1], NULL, 0), "node")
-	ASSERT_STRING_EQUAL(roxml_get_name(node_set[2], NULL, 0), "node1")
+	ASSERT_EQUAL(nbans, 2)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node")
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[1], NULL, 0), "node1")
 	node_set = roxml_xpath(root, "//node()", &nbans);
 	ASSERT_EQUAL(nbans, 7)
-	ASSERT_EQUAL(roxml_get_type(node_set[0]), ROXML_ELM_NODE)
+	ASSERT_EQUAL(roxml_get_type(node_set[0]), ROXML_DOCTYPE_NODE)
 	ASSERT_EQUAL(roxml_get_type(node_set[1]), ROXML_ELM_NODE)
 	ASSERT_EQUAL(roxml_get_type(node_set[2]), ROXML_TXT_NODE)
 	ASSERT_EQUAL(roxml_get_type(node_set[3]), ROXML_CMT_NODE)
@@ -2909,7 +2908,7 @@ int test_write_tree(void)
 	node = roxml_add_node(root, 0, ROXML_PI_NODE, "test", NULL);
 	len = roxml_commit_changes(root, "out.xml.spec.copy", NULL, 1);
 
-	ASSERT_EQUAL(len, 253) 
+	ASSERT_EQUAL(len, 264) 
 
 	roxml_close(root);
 
