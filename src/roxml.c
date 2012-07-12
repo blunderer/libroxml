@@ -660,7 +660,7 @@ node_t * ROXML_API roxml_load_fd(int fd)
 node_t * ROXML_API roxml_load_doc(char *filename)
 {
 	node_t *current_node = NULL;
-	FILE* file = fopen(filename, "r");
+	FILE* file = fopen(filename, "rb");
 	if(file == NULL)	{
 		return NULL;
 	}
