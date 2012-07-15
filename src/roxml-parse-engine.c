@@ -1043,8 +1043,13 @@ int _func_load_default(char * chunk, void * data)
 		case STATE_NODE_ATTR:
 			if(context->inside_node_state == STATE_INSIDE_ARG_BEG)  {
 				if(context->nsdef) {
-					context->candidat_arg->next = context->namespaces;
-					context->namespaces = context->candidat_arg;
+					if(context->namespaces == NULL) {
+						context->namespaces = context->candidat_arg;
+						context->last_ns = context->candidat_arg;
+					} else {
+						context->last_ns->next = context->candidat_arg;
+						context->last_ns = context->candidat_arg;
+					}
 				} else if(context->ns == 0) {
 					context->candidat_arg = roxml_create_node(context->pos-1, context->src, ROXML_ATTR_NODE | context->type);
 					context->candidat_arg = roxml_parent_node(context->candidat_node, context->candidat_arg, 0);
