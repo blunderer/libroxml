@@ -104,6 +104,16 @@ void 	ROXML_INT roxml_close_node		(node_t *n, node_t *close);
  */
 node_t*	ROXML_INT roxml_load			(node_t *current_node, FILE *file, char *buffer);
 
+/** \brief node append function
+ *
+ * \fn roxml_append_node(node_t *parent, node_t *n);
+ * this function add a given node as the last child of another node
+ * \param parent the parent node
+ * \param n the node to parent
+ * \return 
+ */
+node_t * ROXML_INT roxml_append_node		(node_t *parent, node_t * n);
+
 /** \brief node relocate function
  *
  * \fn roxml_parent_node(node_t *parent, node_t *n, int position);

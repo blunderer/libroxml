@@ -138,7 +138,6 @@ typedef struct node node_t;
  */
 #define ROXML_DOCTYPE_NODE	0x400
 
-
 /**
  * \def ROXML_ALL_NODE
  * 
@@ -146,6 +145,14 @@ typedef struct node node_t;
  * \see roxml_add_node
  */
 #define ROXML_ALL_NODE	(ROXML_PI_NODE | ROXML_CMT_NODE | ROXML_TXT_NODE | ROXML_ATTR_NODE | ROXML_ELM_NODE)
+
+/**
+ * \def ROXML_NODE_TYPES
+ * 
+ * constant for all nodes types
+ * \see roxml_get_types
+ */
+#define ROXML_NODE_TYPES	0x05f8
 
 /**
  * \def RELEASE_ALL
