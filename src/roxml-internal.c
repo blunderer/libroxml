@@ -87,10 +87,6 @@ void ROXML_INT roxml_close_node(node_t *n, node_t *close)
 		n->end = close->pos;
 		free(close);
 
-		if((n->type & ROXML_ELM_NODE) == ROXML_ELM_NODE) {
-			//n->next = NULL;
-		}
-
 #ifdef __DEBUG
 		if(n->type & ROXML_ELM_NODE) _nb_node++;
 		if(n->type & ROXML_ATTR_NODE) _nb_attr++;
