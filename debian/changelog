@@ -1,3 +1,18 @@
+libroxml (2.2.1-1) unstable; urgency=low
+  * Add
+      optimization for xml file read and doc parsing
+      DOCTYPE are still ignored but are more consistent
+      remove dead code
+  * Bugfixes
+      fix issues on parsing quotes
+      fix xpath //parent segfault
+      fix double free in roxml_del_node
+      fix windows issue when reading \r\n
+      fix multiple namespace declaration
+      fix source format for debianization
+
+ -- Tristan Lelong <tristan.lelong@libroxml.net>  Tue, 27 Nov 2012 10:16:16 -0800
+
 libroxml (2.2.0-1) unstable; urgency=low
   * Add
       namespace handling
