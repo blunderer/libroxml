@@ -25,6 +25,7 @@ rm -fr $TMP_DIR/libroxml-$VERSION/libroxml.spec
 rm -fr $TMP_DIR/libroxml-$VERSION/TODO
 
 mv $TMP_DIR/libroxml-$VERSION/debian $TMP_DIR/
+mv $TMP_DIR/libroxml-$VERSION/patches $TMP_DIR/
 
 echo "Export native source package"
 cd $TMP_DIR
@@ -37,7 +38,10 @@ tar zcf libroxml_$LIBROXML_VERSION.orig.tar.gz libroxml_$LIBROXML_VERSION > /dev
 
 echo "Build package"
 mv $TMP_DIR/debian $TMP_DIR/libroxml_$LIBROXML_VERSION/
-cd $TMP_DIR/libroxml_$LIBROXML_VERSION/ && dpkg-buildpackage
+mv $TMP_DIR/patches $TMP_DIR/libroxml_$LIBROXML_VERSION/
+(cd $TMP_DIR/libroxml_$LIBROXML_VERSION/ && quilt push -a)
+mv $TMP_DIR/libroxml_$LIBROXML_VERSION/patches $TMP_DIR/libroxml_$LIBROXML_VERSION/debian/
+(cd $TMP_DIR/libroxml_$LIBROXML_VERSION/ && dpkg-buildpackage)
 
 echo "********************************************************************"
 echo "Your package is built in '$TMP_DIR'"
