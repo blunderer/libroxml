@@ -1,6 +1,6 @@
 usr/lib/libroxml.a
 usr/lib/libroxml.so
 usr/include/roxml.h
-/usr/lib/pkgconfig/libroxml.pc
+usr/lib/pkgconfig/libroxml.pc
 usr/share/man/man3/*
 usr/share/doc/libroxml/html/*
