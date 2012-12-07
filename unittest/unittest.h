@@ -28,33 +28,33 @@ extern "C" {
 				}
 #define ASSERT_ESUP(a,b)	if((a) <= (b))	{\
 					func_is_on_error++;\
-					printf("ERROR\tin file '%s' function '%s' at line %d in thread id 0x%x in process %d: \n\t- %s !>= %s\n\t\t- %d !>= %d\n",\
-					__FILE__, __func__, __LINE__, (unsigned int)pthread_self(), getpid(), #a, #b, (int)(a), (int)(b)); \
+					printf("ERROR\tin file '%s' function '%s' at line %d in thread id 0x%x in process %d: \n\t- %s !>= %s\n\t\t- %ld !>= %ld\n",\
+					__FILE__, __func__, __LINE__, (unsigned int)pthread_self(), getpid(), #a, #b, (long)(a), (long)(b)); \
 				}
 #define ASSERT_EINF(a,b)	if((a) >= (b))	{\
 					func_is_on_error++;\
-					printf("ERROR\tin file '%s' function '%s' at line %d in thread id 0x%x in process %d: \n\t- %s !<= %s\n\t\t- %d !<= %d\n",\
-					__FILE__, __func__, __LINE__, (unsigned int)pthread_self(), getpid(), #a, #b, (int)(a), (int)(b)); \
+					printf("ERROR\tin file '%s' function '%s' at line %d in thread id 0x%x in process %d: \n\t- %s !<= %s\n\t\t- %ld !<= %ld\n",\
+					__FILE__, __func__, __LINE__, (unsigned int)pthread_self(), getpid(), #a, #b, (long)(a), (long)(b)); \
 				}
 #define ASSERT_SUP(a,b)		if((a) < (b))	{\
 					func_is_on_error++;\
-					printf("ERROR\tin file '%s' function '%s' at line %d in thread id 0x%x in process %d: \n\t- %s !> %s\n\t\t- %d !> %d\n",\
-					__FILE__, __func__, __LINE__, (unsigned int)pthread_self(), getpid(), #a, #b, (int)(a), (int)(b)); \
+					printf("ERROR\tin file '%s' function '%s' at line %d in thread id 0x%x in process %d: \n\t- %s !> %s\n\t\t- %ld !> %ld\n",\
+					__FILE__, __func__, __LINE__, (unsigned int)pthread_self(), getpid(), #a, #b, (long)(a), (long)(b)); \
 				}
 #define ASSERT_INF(a,b)		if((a) > (b))	{\
 					func_is_on_error++;\
-					printf("ERROR\tin file '%s' function '%s' at line %d in thread id 0x%x in process %d: \n\t- %s !< %s\n\t\t- %d !< %d\n",\
-					__FILE__, __func__, __LINE__, (unsigned int)pthread_self(), getpid(), #a, #b, (int)(a), (int)(b)); \
+					printf("ERROR\tin file '%s' function '%s' at line %d in thread id 0x%x in process %d: \n\t- %s !< %s\n\t\t- %ld !< %ld\n",\
+					__FILE__, __func__, __LINE__, (unsigned int)pthread_self(), getpid(), #a, #b, (long)(a), (long)(b)); \
 				}
 #define ASSERT_EQUAL(a,b)	if((a) != (b))	{\
 					func_is_on_error++;\
-					printf("ERROR\tin file '%s' function '%s' at line %d in thread id 0x%x in process %d: \n\t- %s != %s\n\t- %d != %d\n\t- 0x%x != 0x%x\n",\
-					__FILE__, __func__, __LINE__, (unsigned int)pthread_self(), getpid(), #a, #b, (int)(a), (int)(b), (int)(a), (int)(b));\
+					printf("ERROR\tin file '%s' function '%s' at line %d in thread id 0x%x in process %d: \n\t- %s != %s\n\t- %ld != %ld\n\t- 0x%lx != 0x%lx\n",\
+					__FILE__, __func__, __LINE__, (unsigned int)pthread_self(), getpid(), #a, #b, (long)(a), (long)(b), (long)(a), (long)(b));\
 				}
 #define ASSERT_NOT_EQUAL(a,b)	if((a) == (b))	{\
 					func_is_on_error++;\
-					printf("ERROR\tin file '%s' function '%s' at line %d  in thread id 0x%x in process %d: \n\t- %s == %s\n\t- %d == %d\n\t- 0x%x != 0x%x\n",\
-					__FILE__, __func__, __LINE__, (unsigned int)pthread_self(), getpid(), #a, #b, (int)(a), (int)b, (int)(a), (int)b);\
+					printf("ERROR\tin file '%s' function '%s' at line %d  in thread id 0x%x in process %d: \n\t- %s == %s\n\t- %ld == %ld\n\t- 0x%lx != 0x%lx\n",\
+					__FILE__, __func__, __LINE__, (unsigned int)pthread_self(), getpid(), #a, #b, (long)(a), (long)b, (long)(a), (long)b);\
 				}
 #define ASSERT_TRUE(a)		if(!(a))	{\
 					func_is_on_error++;\
