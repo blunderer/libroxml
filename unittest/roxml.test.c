@@ -2371,6 +2371,16 @@ int test_xpath(void)
 
 	root = roxml_load_doc("roxml.test.xml.ns");
 
+	node_set = roxml_xpath(root, "/root/@test2:value", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "value")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "1")
+
+	node_set = roxml_xpath(root, "/root/node2/@test:value", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "value")
+	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "2")
+
 	node_set = roxml_xpath(root, "/root/test:node6/node8", &nbans);
 	ASSERT_EQUAL(nbans, 1)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node8")
@@ -2403,7 +2413,9 @@ int test_xpath(void)
 	ASSERT_EQUAL(nbans, 16)
 
 	node_set = roxml_xpath(root, "//*[namespace-uri() = '']", &nbans);
-	ASSERT_EQUAL(nbans, 8)
+	ASSERT_EQUAL(nbans, 4)
+	node_set = roxml_xpath(root, "//*[namespace-uri() = 'http://www.default.fr']", &nbans);
+	ASSERT_EQUAL(nbans, 4)
 	node_set = roxml_xpath(root, "//*[namespace-uri() = 'http://www.default2.org']", &nbans);
 	ASSERT_EQUAL(nbans, 2)
 	node_set = roxml_xpath(root, "//*[namespace-uri() = http://www.default2.org]", &nbans);
@@ -2626,7 +2638,11 @@ int test_parse_namespaces(void)
 	/* check ns def */
 	ASSERT_NOT_NULL(root->chld);
 	ASSERT_NOT_NULL(root->chld->attr);
-	ASSERT_STRING_EQUAL(((roxml_ns_t*)root->chld->attr->priv)->alias, "test");
+	ASSERT_STRING_EQUAL(((roxml_ns_t*)root->chld->attr->priv)->alias, "");
+	ASSERT_NOT_NULL(root->chld->attr->sibl);
+	ASSERT_STRING_EQUAL(((roxml_ns_t*)root->chld->attr->sibl->priv)->alias, "test");
+	ASSERT_NOT_NULL(root->chld->attr->sibl->sibl);
+	ASSERT_STRING_EQUAL(((roxml_ns_t*)root->chld->attr->sibl->sibl->priv)->alias, "test2");
 	ASSERT_NOT_NULL(node10->attr);
 	ASSERT_STRING_EQUAL(((roxml_ns_t*)node10->attr->priv)->alias, "");
 
@@ -2642,9 +2658,9 @@ int test_parse_namespaces(void)
 	ASSERT_NOT_NULL(node13->ns);
 	ASSERT_NOT_NULL(node15->ns);
 
-	ASSERT_NULL(node2->ns);
-	ASSERT_NULL(node3->ns);
-	ASSERT_NULL(node4->ns);
+	ASSERT_NOT_NULL(node2->ns);
+	ASSERT_NOT_NULL(node3->ns);
+	ASSERT_NOT_NULL(node4->ns);
 	ASSERT_NULL(node4->attr->ns);
 	ASSERT_NULL(node5->attr->ns);
 	ASSERT_NULL(node7->ns);
@@ -2652,10 +2668,13 @@ int test_parse_namespaces(void)
 	ASSERT_NULL(node9->ns);
 	ASSERT_NULL(node14->ns);
 
-	ASSERT_EQUAL(root->chld->attr, node1->ns);
-	ASSERT_EQUAL(root->chld->attr, node2->attr->ns);
-	ASSERT_EQUAL(root->chld->attr, node5->ns);
-	ASSERT_EQUAL(root->chld->attr, node6->ns);
+	ASSERT_EQUAL(root->chld->attr->sibl, node1->ns);
+	ASSERT_EQUAL(root->chld->attr->sibl, node2->attr->ns);
+	ASSERT_EQUAL(root->chld->attr->sibl, node5->ns);
+	ASSERT_EQUAL(root->chld->attr->sibl, node6->ns);
+	ASSERT_EQUAL(root->chld->attr, node2->ns);
+	ASSERT_EQUAL(root->chld->attr, node3->ns);
+	ASSERT_EQUAL(root->chld->attr, node4->ns);
 	ASSERT_EQUAL(node10->attr, node10->ns);
 	ASSERT_EQUAL(node10->attr, node11->ns);
 	ASSERT_EQUAL(node10->attr, node15->ns);
@@ -2666,8 +2685,12 @@ int test_parse_namespaces(void)
 	ASSERT_EQUAL(node8->attr->type & ROXML_NS_NODE, ROXML_NS_NODE);
 	ASSERT_EQUAL(node10->attr->type & ROXML_NS_NODE, ROXML_NS_NODE);
 
-	ASSERT_STRING_EQUAL("test", roxml_get_name(root->chld->attr, NULL, 0));
-	ASSERT_STRING_EQUAL("http://www.test.org", roxml_get_content(root->chld->attr, NULL, 0, NULL));
+	ASSERT_STRING_EQUAL("", roxml_get_name(root->chld->attr, NULL, 0));
+	ASSERT_STRING_EQUAL("test", roxml_get_name(root->chld->attr->sibl, NULL, 0));
+	ASSERT_STRING_EQUAL("test2", roxml_get_name(root->chld->attr->sibl->sibl, NULL, 0));
+	ASSERT_STRING_EQUAL("http://www.default.fr", roxml_get_content(root->chld->attr, NULL, 0, NULL));
+	ASSERT_STRING_EQUAL("http://www.test.org", roxml_get_content(root->chld->attr->sibl, NULL, 0, NULL));
+	ASSERT_STRING_EQUAL("http://www.test.org", roxml_get_content(root->chld->attr->sibl->sibl, NULL, 0, NULL));
 	ASSERT_STRING_EQUAL("", roxml_get_name(node8->attr, NULL, 0));
 	ASSERT_STRING_EQUAL("", roxml_get_content(node8->attr, NULL, 0, NULL));
 	ASSERT_STRING_EQUAL("", roxml_get_name(node10->attr, NULL, 0));

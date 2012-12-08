@@ -1,4 +1,4 @@
-<root xmlns:test="http://www.test.org">
+<root xmlns="http://www.default.fr" xmlns:test="http://www.test.org" xmlns:test2="http://www.test.org" test2:value="1">
  <test:node1/>
  <node2 test:value="2"/>
  <node3/>

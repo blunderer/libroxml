@@ -1090,6 +1090,13 @@ int _func_load_default(char * chunk, void * data)
 				roxml_close_node(context->candidat_arg, to_be_closed);
 				if((context->curr_name_len==5)&&(strncmp(context->curr_name, "xmlns", 5) == 0)) {
 					context->nsdef = 1;
+					if(context->namespaces == NULL) {
+						context->namespaces = context->candidat_arg;
+						context->last_ns = context->candidat_arg;
+					} else {
+						context->last_ns->next = context->candidat_arg;
+						context->last_ns = context->candidat_arg;
+					}
 				}
 			}
 		break;
