@@ -6,5 +6,6 @@
 *.so
 *.so.*
 *.d
+*.patch
 
 /roxml
