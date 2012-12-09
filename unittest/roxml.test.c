@@ -2154,12 +2154,8 @@ int test_xpath(void)
 	ASSERT_EQUAL(nbans, 1)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node0")
 
-	node_set = roxml_xpath(root, "/node0[item/@val > 2]", &nbans);
-	ASSERT_EQUAL(nbans, 1)
-	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node0")
-
 	node_set = roxml_xpath(root, "/node0[item/@val > 2]/item", &nbans);
-	ASSERT_EQUAL(nbans, 6)
+	ASSERT_EQUAL(nbans, 7)
 	node_t *attr = roxml_get_attr(node_set[0], "id", 0);
 	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "0")
 	attr = roxml_get_attr(node_set[1], "id", 0);
@@ -2261,12 +2257,12 @@ int test_xpath(void)
 	node_set = roxml_xpath(root, "/node0/item[last()]", &nbans);
 	ASSERT_EQUAL(nbans, 1)
 	attr = roxml_get_attr(node_set[0], "id", 0);
-	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "5")
+	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "6")
 	
 	node_set = roxml_xpath(root, "/node0/item[last() - 1]", &nbans);
 	ASSERT_EQUAL(nbans, 1)
 	attr = roxml_get_attr(node_set[0], "id", 0);
-	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "4")
+	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "5")
 	
 	node_set = roxml_xpath(root, "/node0/item[first() + 1]", &nbans);
 	ASSERT_EQUAL(nbans, 1)
@@ -2284,7 +2280,7 @@ int test_xpath(void)
 	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "2")
 	
 	node_set = roxml_xpath(root, "/node0/item[position() != 2]", &nbans);
-	ASSERT_EQUAL(nbans, 5)
+	ASSERT_EQUAL(nbans, 6)
 	attr = roxml_get_attr(node_set[0], "id", 0);
 	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "0")
 	attr = roxml_get_attr(node_set[1], "id", 0);
@@ -2304,7 +2300,7 @@ int test_xpath(void)
 	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "1")
 	
 	node_set = roxml_xpath(root, "/node0/item[position() > 3]", &nbans);
-	ASSERT_EQUAL(nbans, 3)
+	ASSERT_EQUAL(nbans, 4)
 	attr = roxml_get_attr(node_set[0], "id", 0);
 	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "3")
 	attr = roxml_get_attr(node_set[1], "id", 0);
@@ -2322,7 +2318,7 @@ int test_xpath(void)
 	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "2")
 	
 	node_set = roxml_xpath(root, "/node0/item[position() >= 3]", &nbans);
-	ASSERT_EQUAL(nbans, 4)
+	ASSERT_EQUAL(nbans, 5)
 	attr = roxml_get_attr(node_set[0], "id", 0);
 	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "2")
 	attr = roxml_get_attr(node_set[1], "id", 0);
@@ -2331,6 +2327,11 @@ int test_xpath(void)
 	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "4")
 	attr = roxml_get_attr(node_set[3], "id", 0);
 	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "5")
+
+	node_set = roxml_xpath(root, "/node0/item[@id = 6]", &nbans);
+	ASSERT_EQUAL(nbans, 1)
+	attr = roxml_get_attr(node_set[0], "str", 0);
+	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "33><32")
 
 	roxml_close(root);
 

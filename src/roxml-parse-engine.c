@@ -707,6 +707,7 @@ int _func_load_open_node(char * chunk, void * data)
 	switch(context->state) {
 		case STATE_NODE_CDATA:
 		case STATE_NODE_COMMENT:
+		case STATE_NODE_ATTR:
 		break;
 		default:
 			context->state = STATE_NODE_BEG;
@@ -732,7 +733,7 @@ int _func_load_close_node(char * chunk, void * data)
 			context->current_node = roxml_append_node(context->current_node, context->candidat_node);
 		break;
 		case STATE_NODE_ATTR:
-			if((context->mode != MODE_COMMENT_DQUOTE)||(context->mode != MODE_COMMENT_QUOTE)) {
+			if((context->mode != MODE_COMMENT_DQUOTE)&&(context->mode != MODE_COMMENT_QUOTE)) {
 				if(context->inside_node_state == STATE_INSIDE_VAL)      {
 					node_t * to_be_closed = NULL;
 					if(context->content_quoted) {
