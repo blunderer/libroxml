@@ -671,9 +671,8 @@ node_t ** ROXML_API roxml_xpath(node_t *n, char * path, int *nb_ans)
 	root = roxml_get_root(n);
 
 	full_path_to_find = strdup(path);
-	path_to_find = full_path_to_find;
 
-	index = roxml_parse_xpath(path_to_find, &xpath, 0);
+	index = roxml_parse_xpath(full_path_to_find, &xpath, 0);
 
 	if(index >= 0) {
 		node_set = roxml_exec_xpath(root, n, xpath, index, &count);
