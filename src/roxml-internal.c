@@ -282,11 +282,9 @@ node_t * ROXML_INT roxml_load(node_t *current_node, FILE *file, char *buffer)
 
 	roxml_parser_free(parser);
 
-#ifdef IGNORE_EMPTY_TEXT_NODES
 	if(context.empty_text_node == 1) {
 		roxml_free_node(context.candidat_txt);
 	}
-#endif /* IGNORE_EMPTY_TEXT_NODES */
 
 	if(!error) {
 		node_t * virtroot = NULL;
