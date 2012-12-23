@@ -556,27 +556,6 @@ node_t * ROXML_API roxml_get_root(node_t *n)
 		root = n;
 
 		while(root->prnt) root = root->prnt;
-		
-		if(root->chld && (root->chld->type & ROXML_NODE_TYPES) == ROXML_PI_NODE) {
-			int lone_elm = 0;
-			char root_name[16];
-			node_t * lone_elm_node = 0;
-			if(strcmp(roxml_get_name(root->chld, root_name, 16), "xml") == 0) {
-				if(root->chld->sibl) {
-					node_t * ptr = root->chld->sibl;
-					while(ptr) {
-						if(ptr->type & ROXML_ELM_NODE) {
-							lone_elm_node = ptr;
-							lone_elm++;
-						}
-						ptr = ptr->sibl;
-					}
-				}
-			}
-			if(lone_elm == 1) {
-				root = lone_elm_node;
-			}
-		}
 	}
 	return root;
 }
