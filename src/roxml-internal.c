@@ -188,7 +188,6 @@ void ROXML_INT roxml_process_unaliased_ns(roxml_load_ctx_t *context)
 			context->candidat_arg->ns = context->candidat_arg;
 			context->candidat_node->ns = context->candidat_arg;
 
-			context->candidat_arg->next = context->namespaces;
 			context->namespaces = context->candidat_arg;
 		}
 	}
