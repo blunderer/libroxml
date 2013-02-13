@@ -116,11 +116,11 @@ all : $(TARGET_SLIB) $(if $(filter -static, $(LDFLAGS)), , $(TARGET_LN)) $(TARGE
 .PHONY : doxy
 doxy : doxy.cfg man.cfg
 	$P '  DOXYGEN'
-	$E - doxygen doxy.cfg &>/dev/null
+	$E - doxygen doxy.cfg >/dev/null 2>&1
 	$E - cp data/icons/roxml.png docs/html/
 	$E - cp data/icons/libroxml-ex.png docs/html/
 	$P '  MAN'
-	$E - doxygen man.cfg &>/dev/null
+	$E - doxygen man.cfg >/dev/null 2>&1
 	$E - chmod -R a+rw docs
 	$E - rm docs/man/man3/*_inc_.3
 
@@ -134,7 +134,7 @@ mrproper : clean
 	$P '  RM      docs'
 	$E rm -fr docs/man docs/html docs/latex
 	$P '  CLEAN   debian'
-	$E - $(FAKEROOT) $(MAKE) -f $(abspath $(DEBIAN_RULES)) clean &>/dev/null
+	$E - $(FAKEROOT) $(MAKE) -f $(abspath $(DEBIAN_RULES)) clean >/dev/null 2>&1
 	$P '  CLEAN   fuse.xml'
 	$E - $(MAKE) -C $(abspath fuse.xml) mrproper >/dev/null
 
