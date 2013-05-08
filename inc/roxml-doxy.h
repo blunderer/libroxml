@@ -1,6 +1,6 @@
 /** \file roxml-doxy.h
  *  \brief doxygen source documentation for libroxml.so
- *         
+ *
  * This is the header file used to develop some
  * softwares using the libroxml.so library.
  * \author blunderer <blunderer@blunderer.org>
@@ -290,4 +290,3 @@
  * </table border="0">
  * </div>
  */
-

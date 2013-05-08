@@ -1,6 +1,6 @@
 /** \file roxml-defines.h
  *  \brief internal header for libroxml.so
- *         
+ *
  * This is the internal header file used by roxml.c
  * \author blunderer <blunderer@blunderer.org>
  * \date 23 Dec 2008
@@ -9,12 +9,12 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Lesser General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -63,16 +63,16 @@
 #define ROXML_FUNC_COMMENT_STR	"comment()"
 #define ROXML_FUNC_PI_STR	"processing-instruction()"
 
-#define ROXML_BULK_READ		4096		/* This is the internal buffer size for chunk of xml files */
+#define ROXML_BULK_READ		4096	/* This is the internal buffer size for chunk of xml files */
 
-#define ROXML_LONG_LEN		512		/* This is the max size for XML objects (node name, attribute name and values...) 
-						 * It is caused by the split of the XML file for parsing: 
-						 * 512 bytes are reserved as security to handle splitting inside an XML object.
-						 */
+#define ROXML_LONG_LEN		512	/* This is the max size for XML objects (node name, attribute name and values...)
+					 * It is caused by the split of the XML file for parsing:
+					 * 512 bytes are reserved as security to handle splitting inside an XML object.
+					 */
 
-#define ROXML_BASE_LEN		256		/* this is the len of internal buffers. If a requested buffer is bigger, 
-						 * then a malloc/free will occur and may slow down libroxml.
-						 */
+#define ROXML_BASE_LEN		256	/* this is the len of internal buffers. If a requested buffer is bigger,
+					 * then a malloc/free will occur and may slow down libroxml.
+					 */
 
 #define ROXML_ID_CHILD		0
 #define ROXML_ID_DESC_O_SELF	1
@@ -114,301 +114,300 @@
 
 #define ROXML_REQTABLE_ID	0
 #define ROXML_NS_ID		1
-#define ROXML_XPATH_FIRST_ID	16	
+#define ROXML_XPATH_FIRST_ID	16
 
 /**
  * \def MAX_NS_LEN
- * 
+ *
  * constant for namespace lenght
  */
 #define MAX_NS_LEN		128
 
 /**
  * \def INTERNAL_BUF_SIZE
- * 
+ *
  * constant for internal buffer size
  */
 #define INTERNAL_BUF_SIZE	512
 
 /**
  * \def PTR_NONE
- * 
+ *
  * constant for void pointers
  */
 #define PTR_NONE	-1
 
 /**
  * \def PTR_VOID
- * 
+ *
  * constant for void pointers
  */
 #define PTR_VOID	0
 
 /**
  * \def PTR_CHAR
- * 
+ *
  * constant for char pointers
  */
 #define PTR_CHAR	2
 
 /**
  * \def PTR_CHAR_STAR
- * 
+ *
  * constant for char table pointers
  */
 #define PTR_CHAR_STAR	3
 
 /**
  * \def PTR_NODE
- * 
+ *
  * constant for node pointers
  */
 #define PTR_NODE	4
 
 /**
  * \def PTR_NODE_STAR
- * 
+ *
  * constant for node table pointers
  */
 #define PTR_NODE_STAR	5
 
 /**
  * \def PTR_INT
- * 
+ *
  * constant for int pointer
  */
 #define PTR_INT	6
 
 /**
  * \def PTR_INT_STAR
- * 
+ *
  * constant for int table pointers
  */
 #define PTR_INT_STAR	7
 
 /**
  * \def PTR_NODE_RESULT
- * 
+ *
  * constant for node table pointers where node are not to delete
  */
 #define PTR_NODE_RESULT	8
 
 /**
  * \def PTR_IS_STAR(a)
- * 
+ *
  * macro returning if a memory_cell is a star cell
  */
 #define PTR_IS_STAR(a)	((a)->type % 2)
 
 /**
  * \def ROXML_FILE
- * 
+ *
  * constant for argument node
  */
 #define ROXML_FILE	0x01
 
 /**
  * \def ROXML_BUFF
- * 
+ *
  * constant for buffer document
  */
 #define ROXML_BUFF	0x02
 
 /**
  * \def ROXML_PENDING
- * 
+ *
  * constant for pending node
  */
 #define ROXML_PENDING	0x04
 
 /**
  * \def ROXML_INVALID
- * 
+ *
  * constant for invalid node
  */
 #define ROXML_INVALID	0x03
 
 /**
  * \def STATE_NODE_NONE
- * 
+ *
  * state for the state machine for init
  */
 #define STATE_NODE_NONE		0
 
 /**
  * \def STATE_NODE_BEG
- * 
+ *
  * state for the state machine for begining of a node
  */
 #define STATE_NODE_BEG		1
 
 /**
  * \def STATE_NODE_NAME
- * 
- * state for the state machine for name read 
+ *
+ * state for the state machine for name read
  */
 #define STATE_NODE_NAME		2
 
 /**
  * \def STATE_NODE_END
- * 
+ *
  * state for the state machine for end of node
  */
 #define STATE_NODE_END		3
 
 /**
  * \def STATE_NODE_STRING
- * 
- * state for the state machine for string reading 
+ *
+ * state for the state machine for string reading
  */
 #define STATE_NODE_STRING	4
 
 /**
  * \def STATE_NODE_ARG
- * 
- * state for the state machine for attribute name reading 
+ *
+ * state for the state machine for attribute name reading
  */
 #define STATE_NODE_ARG		5
 
 /**
  * \def STATE_NODE_ARGVAL
- * 
- * state for the state machine for attribute value reading 
+ *
+ * state for the state machine for attribute value reading
  */
 #define STATE_NODE_ARGVAL	6
 
 /**
  * \def STATE_NODE_SEP	
- * 
+ *
  * state for the state machine for separator reading
  */
 #define STATE_NODE_SEP		7
 
 /**
  * \def STATE_NODE_PI
- * 
+ *
  * state for the state machine for separator reading
  */
 #define STATE_NODE_PI		8
 
 /**
  * \def STATE_NODE_SINGLE
- * 
- * state for the state machine for single nodes 
+ *
+ * state for the state machine for single nodes
  */
 #define STATE_NODE_SINGLE	9
 
 /**
  * \def STATE_NODE_ATTR
- * 
- * state for the state machine for attribut reading 
+ *
+ * state for the state machine for attribut reading
  */
 #define STATE_NODE_ATTR		10
 
 /**
  * \def STATE_NODE_CONTENT
- * 
+ *
  * state for the state machine for content read
  */
 #define STATE_NODE_CONTENT	11
 
 /**
  * \def STATE_NODE_COMMENT_BEG
- * 
+ *
  * state for the state machine for separator reading
  */
 #define STATE_NODE_COMMENT_BEG		12
 
 /**
  * \def STATE_NODE_COMMENT	
- * 
+ *
  * state for the state machine for separator reading
  */
 #define STATE_NODE_COMMENT		14
 
 /**
  * \def STATE_NODE_COMMENT_END	
- * 
+ *
  * state for the state machine for separator reading
  */
 #define STATE_NODE_COMMENT_END		15
 
 /**
  * \def STATE_NODE_CDATA_BEG
- * 
+ *
  * state for the state machine for separator reading
  */
 #define STATE_NODE_CDATA_BEG		16
 
 /**
  * \def STATE_NODE_CDATA
- * 
+ *
  * state for the state machine for separator reading
  */
 #define STATE_NODE_CDATA		22
 
 /**
  * \def STATE_NODE_CDATA_END
- * 
+ *
  * state for the state machine for separator reading
  */
 #define STATE_NODE_CDATA_END		23
 
 /**
  * \def MODE_COMMENT_NONE
- * 
- * mode init in state machine 
+ *
+ * mode init in state machine
  */
 #define MODE_COMMENT_NONE	0
 
 /**
  * \def MODE_COMMENT_QUOTE
- * 
+ *
  * mode quoted in state machine
  */
 #define MODE_COMMENT_QUOTE	1
 
 /**
  * \def MODE_COMMENT_DQUOTE
- * 
+ *
  * mode double quoted in state machine
  */
 #define MODE_COMMENT_DQUOTE	2
 
 /**
  * \def STATE_INSIDE_ARG_BEG
- * 
+ *
  * inside node state begining (attribute declaration)
  */
 #define STATE_INSIDE_ARG_BEG	0
 
 /**
  * \def STATE_INSIDE_ARG
- * 
+ *
  * inside node state arg name
  */
 #define STATE_INSIDE_ARG	1
 
 /**
  * \def STATE_INSIDE_VAL_BEG
- * 
+ *
  * inside node state arg value
  */
 #define STATE_INSIDE_VAL_BEG	2
 
 /**
  * \def STATE_INSIDE_VAL
- * 
+ *
  * inside node state arg value
  */
 #define STATE_INSIDE_VAL	3
 
 /**
  * \def ROXML_WHITE(n)
- * 
+ *
  * save current document position and recall to node
  */
 #define ROXML_WHITE(n) ((n==' ')||(n=='\t')||(n=='\n')||(n=='\r'))
 
 #endif /* ROXML_DEF_H */
-

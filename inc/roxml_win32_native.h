@@ -22,4 +22,3 @@ typedef CRITICAL_SECTION pthread_mutex_t;
 #define pthread_mutex_destroy(a)	DeleteCriticalSection(a)
 
 #endif /* ROXML_WIN32_NATIVE_THREAD_H */
-

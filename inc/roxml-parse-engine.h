@@ -1,6 +1,6 @@
 /** \file roxml-parse-engine.h
  *  \brief header for libroxml.so
- *         
+ *
  * This is the source file for lib libroxml.so internal functions
  * \author blunderer <blunderer@blunderer.org>
  * \date 20 Fev 2010
@@ -22,7 +22,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-
 #ifndef ROXML_PARSE_ENGINE_H
 #define ROXML_PARSE_ENGINE_H
 
@@ -35,7 +34,7 @@
  * \param func the function to call on match
  * \return the head item
  */
-roxml_parser_item_t * ROXML_INT roxml_append_parser_item(roxml_parser_item_t *head, char * key, roxml_parse_func func);
+roxml_parser_item_t ROXML_INT *roxml_append_parser_item(roxml_parser_item_t * head, char *key, roxml_parse_func func);
 
 /** \brief parser table deletion 
  *
@@ -44,7 +43,7 @@ roxml_parser_item_t * ROXML_INT roxml_append_parser_item(roxml_parser_item_t *he
  * \param head the parser object
  * \return
  */
-void ROXML_INT roxml_parser_free(roxml_parser_item_t *head);
+void ROXML_INT roxml_parser_free(roxml_parser_item_t * head);
 
 /** \brief parser list deletion
  *
@@ -53,7 +52,7 @@ void ROXML_INT roxml_parser_free(roxml_parser_item_t *head);
  * \param head the parser object
  * \return
  */
-void ROXML_INT roxml_parser_clear(roxml_parser_item_t *head);
+void ROXML_INT roxml_parser_clear(roxml_parser_item_t * head);
 
 /** \brief line parsing function
  *
@@ -65,7 +64,7 @@ void ROXML_INT roxml_parser_clear(roxml_parser_item_t *head);
  * \param ctx user data passed to the callbacks
  * \return the number of bytes processed
  */
-int ROXML_INT roxml_parse_line(roxml_parser_item_t * head, char *line, int len, void * ctx);
+int ROXML_INT roxml_parse_line(roxml_parser_item_t * head, char *line, int len, void *ctx);
 
 /** \brief parser preparation function
  *
@@ -74,47 +73,46 @@ int ROXML_INT roxml_parse_line(roxml_parser_item_t * head, char *line, int len, 
  * \param head the parser object
  * \return
  */
-roxml_parser_item_t * ROXML_INT roxml_parser_prepare(roxml_parser_item_t *head);
+roxml_parser_item_t ROXML_INT *roxml_parser_prepare(roxml_parser_item_t * head);
 
 // xpath parser functions
-int _func_xpath_ignore(char * chunk, void * data);
-int _func_xpath_new_node(char * chunk, void * data);
-int _func_xpath_quote(char * chunk, void * data);
-int _func_xpath_dquote(char * chunk, void * data);
-int _func_xpath_open_parenthesys(char * chunk, void * data);
-int _func_xpath_close_parenthesys(char * chunk, void * data);
-int _func_xpath_open_brackets(char * chunk, void * data);
-int _func_xpath_close_brackets(char * chunk, void * data);
-int _func_xpath_condition_or(char * chunk, void * data);
-int _func_xpath_condition_and(char * chunk, void * data);
-int _func_xpath_path_or(char * chunk, void * data);
-int _func_xpath_operator_equal(char * chunk, void * data);
-int _func_xpath_operator_sup(char * chunk, void * data);
-int _func_xpath_operator_inf(char * chunk, void * data);
-int _func_xpath_operator_diff(char * chunk, void * data);
-int _func_xpath_number(char * chunk, void * data);
-int _func_xpath_position(char * chunk, void * data);
-int _func_xpath_first(char * chunk, void * data);
-int _func_xpath_last(char * chunk, void * data);
-int _func_xpath_nsuri(char * chunk, void * data);
-int _func_xpath_operator_add(char * chunk, void * data);
-int _func_xpath_operator_subs(char * chunk, void * data);
-int _func_xpath_default(char * chunk, void * data);
-int _func_xpath_all(char * chunk, void * data);
+int _func_xpath_ignore(char *chunk, void *data);
+int _func_xpath_new_node(char *chunk, void *data);
+int _func_xpath_quote(char *chunk, void *data);
+int _func_xpath_dquote(char *chunk, void *data);
+int _func_xpath_open_parenthesys(char *chunk, void *data);
+int _func_xpath_close_parenthesys(char *chunk, void *data);
+int _func_xpath_open_brackets(char *chunk, void *data);
+int _func_xpath_close_brackets(char *chunk, void *data);
+int _func_xpath_condition_or(char *chunk, void *data);
+int _func_xpath_condition_and(char *chunk, void *data);
+int _func_xpath_path_or(char *chunk, void *data);
+int _func_xpath_operator_equal(char *chunk, void *data);
+int _func_xpath_operator_sup(char *chunk, void *data);
+int _func_xpath_operator_inf(char *chunk, void *data);
+int _func_xpath_operator_diff(char *chunk, void *data);
+int _func_xpath_number(char *chunk, void *data);
+int _func_xpath_position(char *chunk, void *data);
+int _func_xpath_first(char *chunk, void *data);
+int _func_xpath_last(char *chunk, void *data);
+int _func_xpath_nsuri(char *chunk, void *data);
+int _func_xpath_operator_add(char *chunk, void *data);
+int _func_xpath_operator_subs(char *chunk, void *data);
+int _func_xpath_default(char *chunk, void *data);
+int _func_xpath_all(char *chunk, void *data);
 
 // load parser functions
-int _func_load_quoted(char * chunk, void * data);
-int _func_load_dquoted(char * chunk, void * data);
-int _func_load_open_spec_node(char * chunk, void * data);
-int _func_load_close_cdata(char * chunk, void * data);
-int _func_load_close_comment(char * chunk, void * data);
-int _func_load_close_pi(char * chunk, void * data);
-int _func_load_open_node(char * chunk, void * data);
-int _func_load_close_node(char * chunk, void * data);
-int _func_load_end_node(char * chunk, void * data);
-int _func_load_white(char * chunk, void * data);
-int _func_load_colon(char * chunk, void * data);
-int _func_load_default(char * chunk, void * data);
+int _func_load_quoted(char *chunk, void *data);
+int _func_load_dquoted(char *chunk, void *data);
+int _func_load_open_spec_node(char *chunk, void *data);
+int _func_load_close_cdata(char *chunk, void *data);
+int _func_load_close_comment(char *chunk, void *data);
+int _func_load_close_pi(char *chunk, void *data);
+int _func_load_open_node(char *chunk, void *data);
+int _func_load_close_node(char *chunk, void *data);
+int _func_load_end_node(char *chunk, void *data);
+int _func_load_white(char *chunk, void *data);
+int _func_load_colon(char *chunk, void *data);
+int _func_load_default(char *chunk, void *data);
 
 #endif /* ROXML_PARSE_ENGINE_H */
-

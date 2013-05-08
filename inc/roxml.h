@@ -72,7 +72,7 @@ typedef struct node node_t;
  * \see roxml_add_node
  * 
  */
-#define ROXML_STD_NODE	0x010 
+#define ROXML_STD_NODE	0x010
 
 /**
  * \def ROXML_ELM_NODE
@@ -175,7 +175,7 @@ typedef struct node node_t;
  * int main(void)
  * {
  *	int len;
- * 	node_t * root = roxml_load_doc("/tmp/doc.xml");
+ * 	node_t *root = roxml_load_doc("/tmp/doc.xml");
  *	
  *	// roxml_get_content allocate a buffer and store the content in it if no buffer was given
  *	printf("root content = '%s'\n", roxml_get_content(root, NULL, 0, &len));
@@ -204,7 +204,7 @@ typedef struct node node_t;
  * \see roxml_load_fd
  * \see roxml_load_doc
  */
-node_t*	ROXML_API roxml_load_buf		(char *buffer);
+node_t *ROXML_API roxml_load_buf(char *buffer);
 
 /** \brief load function for files
  *
@@ -217,7 +217,7 @@ node_t*	ROXML_API roxml_load_buf		(char *buffer);
  * \see roxml_load_fd
  * \see roxml_load_buf
  */
-node_t*	ROXML_API roxml_load_doc		(char *filename);
+node_t *ROXML_API roxml_load_doc(char *filename);
 
 /** \brief load function for file descriptors
  *
@@ -229,7 +229,7 @@ node_t*	ROXML_API roxml_load_doc		(char *filename);
  * \see roxml_load_doc
  * \see roxml_load_buf
  */
-node_t*	ROXML_API roxml_load_fd			(int fd);
+node_t *ROXML_API roxml_load_fd(int fd);
 
 /** \brief unload function
  *
@@ -243,7 +243,7 @@ node_t*	ROXML_API roxml_load_fd			(int fd);
  * \see roxml_load_buf
  * \see roxml_add_node
  */
-void 	ROXML_API roxml_close			(node_t *n);
+void ROXML_API roxml_close(node_t *n);
 
 /** \brief next sibling getter function
  *
@@ -252,7 +252,7 @@ void 	ROXML_API roxml_close			(node_t *n);
  * \param n is one node of the tree
  * \return the next sibling node
  */
-node_t*	ROXML_API roxml_get_next_sibling	(node_t *n);
+node_t *ROXML_API roxml_get_next_sibling(node_t *n);
 
 /** \brief prev sibling getter function
  *
@@ -261,7 +261,7 @@ node_t*	ROXML_API roxml_get_next_sibling	(node_t *n);
  * \param n is one node of the tree
  * \return the prev sibling node
  */
-node_t*	ROXML_API roxml_get_prev_sibling	(node_t *n);
+node_t *ROXML_API roxml_get_prev_sibling(node_t *n);
 
 /** \brief parent getter function
  *
@@ -270,7 +270,7 @@ node_t*	ROXML_API roxml_get_prev_sibling	(node_t *n);
  * \param n is one node of the tree
  * \return the parent node
  */
-node_t*	ROXML_API roxml_get_parent		(node_t *n);
+node_t *ROXML_API roxml_get_parent(node_t *n);
 
 /** \brief root getter function
  *
@@ -314,7 +314,7 @@ node_t*	ROXML_API roxml_get_parent		(node_t *n);
  * \param n is one node of the tree
  * \return the root node
  */
-node_t*	ROXML_API roxml_get_root		(node_t *n);
+node_t *ROXML_API roxml_get_root(node_t *n);
 
 /** \brief namespace getter function
  *
@@ -340,13 +340,13 @@ node_t*	ROXML_API roxml_get_root		(node_t *n);
  * 
  * int main(void)
  * {
- * 	node_t * root = roxml_load_doc("/tmp/doc.xml");
- * 	node_t * xml =  roxml_get_chld(root, NULL,  0);
- *	node_t * nsdef = roxml_get_attr(xml, NULL, 0);
- * 	node_t * node1 = roxml_get_chld(xml, NULL, 0);
- * 	node_t * attr1 = roxml_get_attr(node1, NULL, 0);
- * 	node_t * node1_ns = roxml_get_ns(node1);
- * 	node_t * attr1_ns = roxml_get_ns(attr1);
+ * 	node_t *root = roxml_load_doc("/tmp/doc.xml");
+ * 	node_t *xml =  roxml_get_chld(root, NULL,  0);
+ *	node_t *nsdef = roxml_get_attr(xml, NULL, 0);
+ * 	node_t *node1 = roxml_get_chld(xml, NULL, 0);
+ * 	node_t *attr1 = roxml_get_attr(node1, NULL, 0);
+ * 	node_t *node1_ns = roxml_get_ns(node1);
+ * 	node_t *attr1_ns = roxml_get_ns(attr1);
  *
  * 	// here node1_ns and attr1_ns are the "test:" namespace
  * 	if(node1_ns == nsdef) {
@@ -368,11 +368,11 @@ node_t*	ROXML_API roxml_get_root		(node_t *n);
  * 
  * \endcode
  */
-node_t*	ROXML_API roxml_get_ns		(node_t *n);
+node_t *ROXML_API roxml_get_ns(node_t *n);
 
 /** \brief namespace setter function
  *
- * \fn node_t* ROXML_API roxml_set_ns(node_t *n, node_t * ns);
+ * \fn node_t* ROXML_API roxml_set_ns(node_t *n, node_t *ns);
  * This function set the namespace of a node to the given namespace definition.
  * The namespace must be previously defined in the xml tree in an ancestor of node n.
  *
@@ -387,7 +387,7 @@ node_t*	ROXML_API roxml_get_ns		(node_t *n);
  * - it will update all element and attribute that are descendant from current node
  * - namespace will be applied to all new node added as descendant as current node
  */
-node_t*	ROXML_API roxml_set_ns		(node_t *n, node_t * ns);
+node_t *ROXML_API roxml_set_ns(node_t *n, node_t * ns);
 
 /** \brief comment getter function
  *
@@ -417,10 +417,10 @@ node_t*	ROXML_API roxml_set_ns		(node_t *n, node_t * ns);
  * 
  * int main(void)
  * {
- * 	node_t * root = roxml_load_doc("/tmp/doc.xml");
- * 	node_t * xml =  roxml_get_chld(root, NULL,  0);
- * 	node_t * cmt1 = roxml_get_cmt(xml, 0);
- * 	node_t * cmt2 = roxml_get_cmt(xml, 1);
+ * 	node_t *root = roxml_load_doc("/tmp/doc.xml");
+ * 	node_t *xml =  roxml_get_chld(root, NULL,  0);
+ * 	node_t *cmt1 = roxml_get_cmt(xml, 0);
+ * 	node_t *cmt2 = roxml_get_cmt(xml, 1);
  * 
  * 	// here cmt1 is the "comment1" node
  * 	if(strcmp(roxml_get_content(cmt1, NULL, 0, NULL), "comment1") == 0) {
@@ -437,7 +437,7 @@ node_t*	ROXML_API roxml_set_ns		(node_t *n, node_t * ns);
  * 
  * \endcode
  */
-node_t*	ROXML_API roxml_get_cmt		(node_t *n, int nth);
+node_t *ROXML_API roxml_get_cmt(node_t *n, int nth);
 
 /** \brief comments number getter function
  *
@@ -448,7 +448,7 @@ node_t*	ROXML_API roxml_get_cmt		(node_t *n, int nth);
  * \see roxml_get_cmt_nb
  * \see roxml_get_nodes
  */
-int 	ROXML_API roxml_get_cmt_nb		(node_t *n);
+int ROXML_API roxml_get_cmt_nb(node_t *n);
 
 /** \brief chld getter function
  *
@@ -476,10 +476,10 @@ int 	ROXML_API roxml_get_cmt_nb		(node_t *n);
  *
  * int main(void)
  * {
- * 	node_t * root = roxml_load_doc("/tmp/doc.xml");
+ * 	node_t *root = roxml_load_doc("/tmp/doc.xml");
  *	
- *	node_t * child_by_name = roxml_get_chld(root, "item2", 0);
- *	node_t * child_by_nth = roxml_get_chld(root, NULL, 2);
+ *	node_t *child_by_name = roxml_get_chld(root, "item2", 0);
+ *	node_t *child_by_nth = roxml_get_chld(root, NULL, 2);
  *
  *	// here child_by_name == child_by_nth
  *	if(child_by_name == child_by_nth) {
@@ -491,7 +491,7 @@ int 	ROXML_API roxml_get_cmt_nb		(node_t *n);
  * }
  * \endcode
  */
-node_t*	ROXML_API roxml_get_chld		(node_t *n, char * name, int nth);
+node_t *ROXML_API roxml_get_chld(node_t *n, char *name, int nth);
 
 /** \brief chlds number getter function
  *
@@ -500,7 +500,7 @@ node_t*	ROXML_API roxml_get_chld		(node_t *n, char * name, int nth);
  * \param n is one node of the tree
  * \return  the number of chlildren
  */
-int 	ROXML_API roxml_get_chld_nb		(node_t *n);
+int ROXML_API roxml_get_chld_nb(node_t *n);
 
 /** \brief process-instruction getter function
  *
@@ -530,10 +530,10 @@ int 	ROXML_API roxml_get_chld_nb		(node_t *n);
  * 
  * int main(void)
  * {
- * 	node_t * root = roxml_load_doc("/tmp/doc.xml");
- * 	node_t * xml =  roxml_get_chld(root, NULL,  0);
- * 	node_t * pi1 = roxml_get_pi(xml, 0);
- * 	node_t * pi2 = roxml_get_pi(xml, 1);
+ * 	node_t *root = roxml_load_doc("/tmp/doc.xml");
+ * 	node_t *xml =  roxml_get_chld(root, NULL,  0);
+ * 	node_t *pi1 = roxml_get_pi(xml, 0);
+ * 	node_t *pi2 = roxml_get_pi(xml, 1);
  * 
  * 	// here pi1 is the <?value="2"?> node
  * 	if(strcmp(roxml_get_content(pi1, NULL, 0, NULL), "value=\"2\"") == 0) {
@@ -550,7 +550,7 @@ int 	ROXML_API roxml_get_chld_nb		(node_t *n);
  * 
  * \endcode
  */
-node_t*	ROXML_API roxml_get_pi		(node_t *n, int nth);
+node_t *ROXML_API roxml_get_pi(node_t *n, int nth);
 
 /** \brief process-instruction number getter function
  *
@@ -561,7 +561,7 @@ node_t*	ROXML_API roxml_get_pi		(node_t *n, int nth);
  * \see roxml_get_pi
  * \see roxml_get_nodes_nb
  */
-int 	ROXML_API roxml_get_pi_nb		(node_t *n);
+int ROXML_API roxml_get_pi_nb(node_t *n);
 
 /** \brief name getter function
  *
@@ -585,7 +585,7 @@ int 	ROXML_API roxml_get_pi_nb		(node_t *n);
  * \return the name of the node (return our buffer pointer if it wasn't NULL)
  * \see roxml_release
  */
-char*	ROXML_API roxml_get_name		(node_t *n, char * buffer, int size);
+char *ROXML_API roxml_get_name(node_t *n, char *buffer, int size);
 
 /** \brief content getter function
  *
@@ -611,7 +611,7 @@ char*	ROXML_API roxml_get_name		(node_t *n, char * buffer, int size);
  * \return the text content
  * \see roxml_release
  */
-char *	ROXML_API roxml_get_content		(node_t *n, char * buffer, int bufsize, int * size);
+char *ROXML_API roxml_get_content(node_t *n, char *buffer, int bufsize, int *size);
 
 /** \brief number of nodes getter function
  *
@@ -644,7 +644,7 @@ char *	ROXML_API roxml_get_content		(node_t *n, char * buffer, int bufsize, int 
  *
  * int main(void)
  * {
- * 	node_t * root = roxml_load_doc("/tmp/doc.xml");
+ * 	node_t *root = roxml_load_doc("/tmp/doc.xml");
  *
  *	int all_nodes_1 = roxml_get_nodes_nb(root, ROXML_ELM_NODE | ROXML_CMT_NODE | ROXML_PI_NODE | ROXML_TXT_NODE | ROXML_ATTR_NODE);
  *	int all_nodes_2 = roxml_get_nodes_nb(root, ROXML_ALL_NODES);
@@ -674,7 +674,7 @@ char *	ROXML_API roxml_get_content		(node_t *n, char * buffer, int bufsize, int 
  * }
  * \endcode
  */
-int	ROXML_API roxml_get_nodes_nb		(node_t *n, int type);
+int ROXML_API roxml_get_nodes_nb(node_t *n, int type);
 
 /** \brief nodes getter function
  *
@@ -695,7 +695,7 @@ int	ROXML_API roxml_get_nodes_nb		(node_t *n, int type);
  * \see roxml_get_cmt
  * \see roxml_get_pi
  */
-node_t*	ROXML_API roxml_get_nodes		(node_t *n, int type, char * name, int nth);
+node_t *ROXML_API roxml_get_nodes(node_t *n, int type, char *name, int nth);
 
 /** \brief number of attribute getter function
  *
@@ -705,7 +705,7 @@ node_t*	ROXML_API roxml_get_nodes		(node_t *n, int type, char * name, int nth);
  * \param n is one node of the tree
  * \return the number of attributes in node
  */
-int	ROXML_API roxml_get_attr_nb		(node_t *n);
+int ROXML_API roxml_get_attr_nb(node_t *n);
 
 /** \brief attribute getter function
  *
@@ -730,12 +730,12 @@ int	ROXML_API roxml_get_attr_nb		(node_t *n);
  *
  * int main(void)
  * {
- * 	node_t * root = roxml_load_doc("/tmp/doc.xml");
- * 	node_t * item1 = roxml_get_chld(root, NULL, 0);
- * 	node_t * item2 = roxml_get_chld(item1, NULL, 0);
+ * 	node_t *root = roxml_load_doc("/tmp/doc.xml");
+ * 	node_t *item1 = roxml_get_chld(root, NULL, 0);
+ * 	node_t *item2 = roxml_get_chld(item1, NULL, 0);
  *
- * 	node_t * attr_by_name = roxml_get_attr(item2, "id", 0);
- * 	node_t * attr_by_nth = roxml_get_attr(item2, NULL, 0);
+ * 	node_t *attr_by_name = roxml_get_attr(item2, "id", 0);
+ * 	node_t *attr_by_nth = roxml_get_attr(item2, NULL, 0);
  *
  * 	// here attr_by_name == attr_by_nth
  * 	if(attr_by_name == attr_by_nth) {
@@ -747,7 +747,7 @@ int	ROXML_API roxml_get_attr_nb		(node_t *n);
  * }
  * \endcode
  */
-node_t*	ROXML_API roxml_get_attr		(node_t *n, char * name, int nth);
+node_t *ROXML_API roxml_get_attr(node_t *n, char *name, int nth);
 
 /** \brief exec path function
  *
@@ -761,7 +761,7 @@ node_t*	ROXML_API roxml_get_attr		(node_t *n, char * name, int nth);
  *
  * handled xpath are described in \ref xpath
  */
-node_t ** ROXML_API roxml_xpath			(node_t *n, char * path, int *nb_ans);
+node_t **ROXML_API roxml_xpath(node_t *n, char *path, int *nb_ans);
 
 /** \brief node type function
  *
@@ -771,7 +771,7 @@ node_t ** ROXML_API roxml_xpath			(node_t *n, char * path, int *nb_ans);
  * \param n is the node to test
  * \return the node type
  */
-int ROXML_API roxml_get_type			(node_t *n);
+int ROXML_API roxml_get_type(node_t *n);
 
 /** \brief node get position function
  *
@@ -780,7 +780,7 @@ int ROXML_API roxml_get_type			(node_t *n);
  * \param n is the node to test
  * \return the postion between 1 and N
  */
-int ROXML_API roxml_get_node_position		(node_t *n);
+int ROXML_API roxml_get_node_position(node_t *n);
 
 /** \brief memory cleanning function
  *
@@ -797,11 +797,11 @@ int ROXML_API roxml_get_node_position		(node_t *n);
  * \param data the pointer to delete or NULL or \ref RELEASE_ALL or \ref RELEASE_LAST
  * \return void
  */
-void ROXML_API roxml_release			(void * data);
+void ROXML_API roxml_release(void *data);
 
 /** \brief add a node to the tree
  *
- * \fn roxml_add_node(node_t * parent, int position, int type, char *name, char *value);
+ * \fn roxml_add_node(node_t *parent, int position, int type, char *name, char *value);
  * this function add a new node to the tree. This will not update de buffer or file,
  * only the RAM loaded tree. One should call \ref roxml_commit_changes to save modifications.
  * If the parent node is an \ref ROXML_ELM_NODE, then, new node will be added as a child. Else
@@ -844,8 +844,8 @@ void ROXML_API roxml_release			(void * data);
  *
  * int main(void)
  * {
- * 	node_t * root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
- * 	node_t * tmp = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample XML file");
+ * 	node_t *root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
+ * 	node_t *tmp = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample XML file");
  * 	tmp = roxml_add_node(root, 0, ROXML_ELM_NODE, "item", NULL);
  * 	roxml_add_node(tmp, 0, ROXML_ATTR_NODE, "id", "42");
  * 	tmp = roxml_add_node(tmp, 0, ROXML_ELM_NODE, "price", "24");
@@ -860,8 +860,8 @@ void ROXML_API roxml_release			(void * data);
  *
  * int main(void)
  * {
- * 	node_t * root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
- * 	node_t * tmp = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample XML file");
+ * 	node_t *root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
+ * 	node_t *tmp = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample XML file");
  * 	tmp = roxml_add_node(root, 0, ROXML_ELM_NODE, "item", NULL);
  * 	roxml_add_node(tmp, 0, ROXML_ATTR_NODE, "id", "42");
  * 	tmp = roxml_add_node(tmp, 0, ROXML_ELM_NODE, "price", NULL);
@@ -889,8 +889,8 @@ void ROXML_API roxml_release			(void * data);
  *
  * int main(void)
  * {
- *	node_t * root = roxml_add_node(NULL, 0, ROXML_PI_NODE, "xml", "version=\"1.0\" encoding=\"UTF-8\"");
- *	node_t * node = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample file");
+ *	node_t *root = roxml_add_node(NULL, 0, ROXML_PI_NODE, "xml", "version=\"1.0\" encoding=\"UTF-8\"");
+ *	node_t *node = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample file");
  *	node = roxml_add_node(root, 0, ROXML_ELM_NODE, "doc", "basic content");
  *	roxml_add_node(node, 0, ROXML_ELM_NODE, "item", NULL);
  *	roxml_add_node(node, 0, ROXML_ELM_NODE, "item", NULL);
@@ -901,7 +901,7 @@ void ROXML_API roxml_release			(void * data);
  * }
  * \endcode
  */
-node_t * ROXML_API roxml_add_node		(node_t * parent, int position, int type, char *name, char *value);
+node_t *ROXML_API roxml_add_node(node_t *parent, int position, int type, char *name, char *value);
 
 /** \brief text node getter function
  *
@@ -933,10 +933,10 @@ node_t * ROXML_API roxml_add_node		(node_t * parent, int position, int type, cha
  * int main(void)
  * {
  *	int len;
- *	node_t * root = roxml_load_doc("/tmp/doc.xml");
- *	node_t * item = roxml_get_chld(root, NULL, 0);
+ *	node_t *root = roxml_load_doc("/tmp/doc.xml");
+ *	node_t *item = roxml_get_chld(root, NULL, 0);
  *
- *	node_t * text = roxml_get_txt(item, 0);
+ *	node_t *text = roxml_get_txt(item, 0);
  *	char * text_content = roxml_get_content(text, NULL, 0, &len);
  *	// HERE text_content is equal to "This is"
  *	printf("text_content = '%s'\n", text_content);
@@ -956,7 +956,7 @@ node_t * ROXML_API roxml_add_node		(node_t * parent, int position, int type, cha
  * }
  * \endcode
  */
-node_t * ROXML_API roxml_get_txt		(node_t * n, int nth);
+node_t *ROXML_API roxml_get_txt(node_t *n, int nth);
 
 /** \brief text node number getter function
  *
@@ -967,11 +967,11 @@ node_t * ROXML_API roxml_get_txt		(node_t * n, int nth);
  * \return the number of text node
  * \see roxml_get_txt
  */
-int ROXML_API roxml_get_txt_nb			(node_t *n);
+int ROXML_API roxml_get_txt_nb(node_t *n);
 
 /** \brief node deletion function
  *
- * \fn roxml_del_node(node_t * n);
+ * \fn roxml_del_node(node_t *n);
  * this function delete a node from the tree. The node is not really deleted 
  * from the file or buffer until the roxml_commit_changes is called, but it won't be
  * visible anymore in the XML tree.
@@ -982,7 +982,7 @@ int ROXML_API roxml_get_txt_nb			(node_t *n);
  *
  * \warning when removing a nsdef node, all node using this namespace will be updated and inherit their parent namespace
  */
-void ROXML_API roxml_del_node			(node_t * n);
+void ROXML_API roxml_del_node(node_t *n);
 
 /** \brief sync function
  *
@@ -1007,8 +1007,8 @@ void ROXML_API roxml_del_node			(node_t * n);
  *
  * int main(void)
  * {
- * 	node_t * root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
- * 	node_t * tmp = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample XML file");
+ * 	node_t *root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
+ * 	node_t *tmp = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample XML file");
  * 	tmp = roxml_add_node(root, 0, ROXML_ELM_NODE, "item", NULL);
  * 	roxml_add_node(tmp, 0, ROXML_ATTR_NODE, "id", "42");
  * 	tmp = roxml_add_node(tmp, 0, ROXML_ELM_NODE, "price", "24");
@@ -1033,8 +1033,8 @@ void ROXML_API roxml_del_node			(node_t * n);
  *
  * int main(void)
  * {
- * 	node_t * root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
- * 	node_t * tmp = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample XML file");
+ * 	node_t *root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
+ * 	node_t *tmp = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample XML file");
  * 	tmp = roxml_add_node(root, 0, ROXML_ELM_NODE, "item", NULL);
  * 	roxml_add_node(tmp, 0, ROXML_ATTR_NODE, "id", "42");
  * 	tmp = roxml_add_node(tmp, 0, ROXML_ELM_NODE, "price", "24");
@@ -1057,8 +1057,8 @@ void ROXML_API roxml_del_node			(node_t * n);
  *	int len = 0;
  *	char * buffer = NULL;
  *	FILE * file_out;
- * 	node_t * root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
- * 	node_t * tmp = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample XML file");
+ * 	node_t *root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
+ * 	node_t *tmp = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample XML file");
  * 	tmp = roxml_add_node(root, 0, ROXML_ELM_NODE, "item", NULL);
  * 	roxml_add_node(tmp, 0, ROXML_ATTR_NODE, "id", "42");
  * 	tmp = roxml_add_node(tmp, 0, ROXML_ELM_NODE, "price", "24");
@@ -1078,8 +1078,6 @@ void ROXML_API roxml_del_node			(node_t * n);
 <root><!-- sample XML file --><item id="42"><price>24</price></item></root>
 \endverbatim
  */
-int ROXML_API roxml_commit_changes		(node_t *n, char * dest, char ** buffer, int human);
-
+int ROXML_API roxml_commit_changes(node_t *n, char *dest, char **buffer, int human);
 
 #endif /* ROXML_H */
-
