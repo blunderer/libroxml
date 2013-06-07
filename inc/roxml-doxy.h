@@ -47,8 +47,8 @@
  *
  * You can download source packages:
  * <ul>
- * <li>Lastest version is 2.2.1: <a href="http://libroxml.googlecode.com/files/libroxml-2.2.1.tar.gz">download now</a></li>
- * <li>Go to the download section if you need older libroxml revision: http://code.google.com/p/libroxml/downloads/list</li>
+ * <li>Lastest version is 2.2.2: <a href="http://www.libroxml.com/downloads/libroxml-2.2.2.tar.gz">download now</a></li>
+ * <li>Go to the download section if you need older libroxml revision: http://www.libroxml/downloads</li>
  * </ul>
  * 
  * \section dl_end </downloads>

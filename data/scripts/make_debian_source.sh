@@ -23,6 +23,7 @@ rm -fr $TMP_DIR/libroxml-$VERSION/unittest
 rm -fr $TMP_DIR/libroxml-$VERSION/data/scripts
 rm -fr $TMP_DIR/libroxml-$VERSION/libroxml.spec
 rm -fr $TMP_DIR/libroxml-$VERSION/TODO
+rm -fr $TMP_DIR/libroxml-$VERSION/.gitignore
 
 mv $TMP_DIR/libroxml-$VERSION/debian $TMP_DIR/
 mv $TMP_DIR/libroxml-$VERSION/patches $TMP_DIR/

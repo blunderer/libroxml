@@ -4,7 +4,7 @@
 #export DH_VERBOSE=1
 
 # shared library versions, option 1
-version=2.2.1
+version=2.2.2
 major=2
 LD_LIBRARY_PATH:=$(LD_LIBRARY_PATH):.
 

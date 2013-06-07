@@ -1,3 +1,18 @@
+libroxml (2.2.2-1) unstable; urgency=low
+  * Add
+      .gitignore
+
+  * Bugfixes
+      fix coding style
+      fix self referenced namespaces
+      fix bashism in Makefile
+      fix consistency issue on valid and not valid documents
+      fix memory leak when IGNORE_EMPTY_TEXT_NODES isn't defined
+      fix parsing of '<' and '>' in attributes
+      fix default namespace parsing
+
+ -- Tristan Lelong <tristan.lelong@libroxml.net>  Fri, 07 Jun 2013 15:06:28 -0700
+
 libroxml (2.2.1-1) unstable; urgency=low
   * Add
       optimization for xml file read and doc parsing

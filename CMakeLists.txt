@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 2.6)
 project (roxml)
 
 set (VERSION "2")
-set (SOVERSION "2.2.1")
+set (SOVERSION "2.2.2")
 
 set (TOPDIR "")
 
