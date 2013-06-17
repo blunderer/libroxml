@@ -57,6 +57,8 @@ else
 	FAKEROOT="fakeroot"
 endif
 
+DOXYGEN = $(shell which doxygen)
+
 # first rule (default)
 all:
 
@@ -115,14 +117,19 @@ all : $(TARGET_SLIB) $(if $(filter -static, $(LDFLAGS)), , $(TARGET_LN)) $(TARGE
 
 .PHONY : doxy
 doxy : doxy.cfg man.cfg
+ifeq ("$(DOXYGEN)", "")
+	$P '  SKIP DOC'
+	$E echo "doxygen not found: skipping doc"
+else
 	$P '  DOXYGEN'
-	$E - doxygen doxy.cfg >/dev/null 2>&1
+	$E - $(DOXYGEN) doxy.cfg >/dev/null 2>&1
 	$E - cp data/icons/roxml.png docs/html/
 	$E - cp data/icons/libroxml-ex.png docs/html/
 	$P '  MAN'
-	$E - doxygen man.cfg >/dev/null 2>&1
+	$E - $(DOXYGEN) man.cfg >/dev/null 2>&1
 	$E - chmod -R a+rw docs
 	$E - rm docs/man/man3/*_inc_.3
+endif
 
 .PHONY: clean
 clean:
