@@ -165,15 +165,15 @@ install: $(TARGETS) doxy
 	$E mkdir -p $(DESTDIR)/usr/share/man/man1
 	$E mkdir -p $(DESTDIR)/usr/share/doc/libroxml/html
 	$P '  INSTALL FILES'
-	$E install -D $(TARGET_SLIB) $(DESTDIR)/usr/lib
-	$E install -D $(TARGET_LIB) $(DESTDIR)/usr/lib
-	$E install -D $(TARGET_BIN) $(DESTDIR)/usr/bin
-	$E install -D $(INC) $(DESTDIR)/usr/include
-	$E install -D docs/roxml.1 $(DESTDIR)/usr/share/man/man1/
-	$E [ ! -d docs/man/man3 ] || install -D docs/man/man3/* $(DESTDIR)/usr/share/man/man3/
-	$E [ ! -d docs/html ] || install -D docs/html/* $(DESTDIR)/usr/share/doc/libroxml/html/
+	$E install $(TARGET_SLIB) $(DESTDIR)/usr/lib
+	$E install $(TARGET_LIB) $(DESTDIR)/usr/lib
+	$E install $(TARGET_BIN) $(DESTDIR)/usr/bin
+	$E install $(INC) $(DESTDIR)/usr/include
+	$E install docs/roxml.1 $(DESTDIR)/usr/share/man/man1/
+	$E [ ! -d docs/man/man3 ] || install docs/man/man3/* $(DESTDIR)/usr/share/man/man3/
+	$E [ ! -d docs/html ] || install docs/html/* $(DESTDIR)/usr/share/doc/libroxml/html/
 	$E install -m644 libroxml.pc $(DESTDIR)/usr/lib/pkgconfig
-	$E cp -d $(TARGET_LN) $(DESTDIR)/usr/lib
+	$E cp -R $(TARGET_LN) $(DESTDIR)/usr/lib
 
 .PHONY: uninstall
 uninstall:
