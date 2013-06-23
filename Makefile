@@ -179,14 +179,16 @@ install: $(TARGETS) doxy
 uninstall:
 	$P '  UNINSTALL'
 	$E rm -f $(DESTDIR)/usr/lib/pkgconfig/libroxml.pc
-	$E rm -f $(DESTDIR)/usr/lib/$(TARGET_SLIB)
-	$E rm -f $(DESTDIR)/usr/lib/$(TARGET_LIB)
-	$E rm -f $(DESTDIR)/usr/bin/$(TARGET_BIN)
-	$E rm -f $(DESTDIR)/usr/include/$(INC)
+	$E rm -f $(DESTDIR)/usr/lib/$(notdir $(TARGET_SLIB))
+	$E rm -f $(DESTDIR)/usr/lib/$(notdir $(TARGET_LN))
+	$E rm -f $(DESTDIR)/usr/lib/$(notdir $(TARGET_LIB))
+	$E rm -f $(DESTDIR)/usr/bin/$(notdir $(TARGET_BIN))
+	$E rm -f $(DESTDIR)/usr/include/$(notdir $(INC))
 	$E rm -fr $(DESTDIR)/usr/share/doc/libroxml
 	$E rm -fr $(DESTDIR)/usr/share/man/man1/roxml.1
 	$E rm -fr $(DESTDIR)/usr/share/man/man3/roxml*
 	$E rm -fr $(DESTDIR)/usr/share/man/man3/ROXML*
+	$E rm -fr $(DESTDIR)/usr/share/man/man3/deprecated.3
 	$E rm -fr $(DESTDIR)/usr/share/man/man3/node_t.3
 	$E rm -fr $(DESTDIR)/usr/share/man/man3/RELEASE_ALL.3
 	$E rm -fr $(DESTDIR)/usr/share/man/man3/RELEASE_LAST.3
