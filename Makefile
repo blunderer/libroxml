@@ -29,6 +29,8 @@ TARGET_LN = $O/libroxml.so
 TARGET_BIN = $O/roxml
 BINS = $(TARGET_SLIB) $(TARGET_LIB) $(TARGET_LN) $(TARGET_BIN)
 
+DESTDIR ?= /usr
+
 OS=$(shell uname)
 
 # specific, modifiable flags
@@ -158,40 +160,40 @@ fuse.xml: $(TARGET_LN)
 .PHONY: install
 install: $(TARGETS) doxy
 	$P '  INSTALL DIRS'
-	$E mkdir -p $(DESTDIR)/usr/bin
-	$E mkdir -p $(DESTDIR)/usr/include
-	$E mkdir -p $(DESTDIR)/usr/lib/pkgconfig
-	$E mkdir -p $(DESTDIR)/usr/share/man/man3
-	$E mkdir -p $(DESTDIR)/usr/share/man/man1
-	$E mkdir -p $(DESTDIR)/usr/share/doc/libroxml/html
+	$E mkdir -p $(DESTDIR)/bin
+	$E mkdir -p $(DESTDIR)/include
+	$E mkdir -p $(DESTDIR)/lib/pkgconfig
+	$E mkdir -p $(DESTDIR)/share/man/man3
+	$E mkdir -p $(DESTDIR)/share/man/man1
+	$E mkdir -p $(DESTDIR)/share/doc/libroxml/html
 	$P '  INSTALL FILES'
-	$E install $(TARGET_SLIB) $(DESTDIR)/usr/lib
-	$E install $(TARGET_LIB) $(DESTDIR)/usr/lib
-	$E install $(TARGET_BIN) $(DESTDIR)/usr/bin
-	$E install $(INC) $(DESTDIR)/usr/include
-	$E install docs/roxml.1 $(DESTDIR)/usr/share/man/man1/
-	$E [ ! -d docs/man/man3 ] || install docs/man/man3/* $(DESTDIR)/usr/share/man/man3/
-	$E [ ! -d docs/html ] || install docs/html/* $(DESTDIR)/usr/share/doc/libroxml/html/
-	$E install -m644 libroxml.pc $(DESTDIR)/usr/lib/pkgconfig
-	$E cp -R $(TARGET_LN) $(DESTDIR)/usr/lib
+	$E install $(TARGET_SLIB) $(DESTDIR)/lib
+	$E install $(TARGET_LIB) $(DESTDIR)/lib
+	$E install $(TARGET_BIN) $(DESTDIR)/bin
+	$E install $(INC) $(DESTDIR)/include
+	$E install docs/roxml.1 $(DESTDIR)/share/man/man1/
+	$E [ ! -d docs/man/man3 ] || install docs/man/man3/* $(DESTDIR)/share/man/man3/
+	$E [ ! -d docs/html ] || install docs/html/* $(DESTDIR)/share/doc/libroxml/html/
+	$E install -m644 libroxml.pc $(DESTDIR)/lib/pkgconfig
+	$E cp -R $(TARGET_LN) $(DESTDIR)/lib
 
 .PHONY: uninstall
 uninstall:
 	$P '  UNINSTALL'
-	$E rm -f $(DESTDIR)/usr/lib/pkgconfig/libroxml.pc
-	$E rm -f $(DESTDIR)/usr/lib/$(notdir $(TARGET_SLIB))
-	$E rm -f $(DESTDIR)/usr/lib/$(notdir $(TARGET_LN))
-	$E rm -f $(DESTDIR)/usr/lib/$(notdir $(TARGET_LIB))
-	$E rm -f $(DESTDIR)/usr/bin/$(notdir $(TARGET_BIN))
-	$E rm -f $(DESTDIR)/usr/include/$(notdir $(INC))
-	$E rm -fr $(DESTDIR)/usr/share/doc/libroxml
-	$E rm -fr $(DESTDIR)/usr/share/man/man1/roxml.1
-	$E rm -fr $(DESTDIR)/usr/share/man/man3/roxml*
-	$E rm -fr $(DESTDIR)/usr/share/man/man3/ROXML*
-	$E rm -fr $(DESTDIR)/usr/share/man/man3/deprecated.3
-	$E rm -fr $(DESTDIR)/usr/share/man/man3/node_t.3
-	$E rm -fr $(DESTDIR)/usr/share/man/man3/RELEASE_ALL.3
-	$E rm -fr $(DESTDIR)/usr/share/man/man3/RELEASE_LAST.3
+	$E rm -f $(DESTDIR)/lib/pkgconfig/libroxml.pc
+	$E rm -f $(DESTDIR)/lib/$(notdir $(TARGET_SLIB))
+	$E rm -f $(DESTDIR)/lib/$(notdir $(TARGET_LN))
+	$E rm -f $(DESTDIR)/lib/$(notdir $(TARGET_LIB))
+	$E rm -f $(DESTDIR)/bin/$(notdir $(TARGET_BIN))
+	$E rm -f $(DESTDIR)/include/$(notdir $(INC))
+	$E rm -fr $(DESTDIR)/share/doc/libroxml
+	$E rm -fr $(DESTDIR)/share/man/man1/roxml.1
+	$E rm -fr $(DESTDIR)/share/man/man3/roxml*
+	$E rm -fr $(DESTDIR)/share/man/man3/ROXML*
+	$E rm -fr $(DESTDIR)/share/man/man3/deprecated.3
+	$E rm -fr $(DESTDIR)/share/man/man3/node_t.3
+	$E rm -fr $(DESTDIR)/share/man/man3/RELEASE_ALL.3
+	$E rm -fr $(DESTDIR)/share/man/man3/RELEASE_LAST.3
 
 .PHONY: help
 help:
