@@ -1237,9 +1237,9 @@ node_t ROXML_INT *roxml_parent_node(node_t *parent, node_t * n, int position)
 	}
 
 	if (n->type & ROXML_ATTR_NODE) {
-		nb = roxml_get_attr_nb(n->prnt);
+		nb = roxml_get_attr_nb(parent);
 	} else {
-		nb = roxml_get_nodes_nb(n->prnt,
+		nb = roxml_get_nodes_nb(parent,
 					ROXML_PI_NODE | ROXML_CMT_NODE | ROXML_TXT_NODE | ROXML_ELM_NODE |
 					ROXML_DOCTYPE_NODE);
 	}
