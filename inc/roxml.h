@@ -139,12 +139,20 @@ typedef struct node node_t;
 #define ROXML_DOCTYPE_NODE	0x400
 
 /**
- * \def ROXML_ALL_NODE
+ * \def ROXML_ALL_NODES
  * 
  * constant for all types of nodes
  * \see roxml_add_node
  */
-#define ROXML_ALL_NODE	(ROXML_PI_NODE | ROXML_CMT_NODE | ROXML_TXT_NODE | ROXML_ATTR_NODE | ROXML_ELM_NODE)
+#define ROXML_ALL_NODES	(ROXML_PI_NODE | ROXML_CMT_NODE | ROXML_TXT_NODE | ROXML_ATTR_NODE | ROXML_ELM_NODE)
+
+/**
+ * \def ROXML_ALL_NODE
+ * 
+ * constant for all types of nodes for backward compatibility
+ * \see roxml_add_node
+ */
+#define ROXML_ALL_NODE	ROXML_ALL_NODES
 
 /**
  * \def ROXML_NODE_TYPES
@@ -681,7 +689,7 @@ int ROXML_API roxml_get_nodes_nb(node_t *n, int type);
  * \fn char* ROXML_API roxml_get_nodes(node_t *n, int type, char * name, int nth);
  * This function get the nth node matching type contained in a node, or the first node named name.
  * All other roxml_get_* are wrapper to this function.
- * When asking for several node type (let say ROXML_ALL_NODE), all ROXML_ATTR_NODE will be 
+ * When asking for several node type (let say ROXML_ALL_NODES), all ROXML_ATTR_NODE will be 
  * placed first, then, all other nodes will come mixed, depending on xml document order.
  * 
  * \param n is one node of the tree
