@@ -43,13 +43,13 @@
  * 
  * \section intro_end </introduction>
  * \section dl_sec <downloads>
- * The source code is available from google project SVN repository: 
+ * The source code is available from google project GIT repository: 
  * \verbatim $> git clone https://code.google.com/p/libroxml \endverbatim
  *
  * You can download source packages:
  * <ul>
- * <li>Lastest version is 2.2.2: <a href="http://www.libroxml.com/downloads/libroxml-2.2.2.tar.gz">download now</a></li>
- * <li>Go to the download section if you need older libroxml revision: http://www.libroxml/downloads</li>
+ * <li>Lastest version is 2.2.2: <a href="http://download.libroxml.net/pool/v2.x/libroxml-2.2.2.tar.gz">download now</a></li>
+ * <li>Go to the download section if you need older libroxml revision: http://download.libroxml.net </li>
  * </ul>
  * 
  * \section dl_end </downloads>
