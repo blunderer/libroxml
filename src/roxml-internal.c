@@ -218,16 +218,29 @@ void ROXML_INT roxml_process_begin_node(roxml_load_ctx_t * context, int position
 	context->candidat_node = roxml_create_node(position, context->src, ROXML_ELM_NODE | context->type);
 }
 
-node_t ROXML_INT *roxml_load(node_t *current_node, FILE * file, char *buffer)
+node_t ROXML_INT *roxml_load(node_t *current_node, FILE * file, char *buffer, void **ctx)
 {
 	int error = 0;
+	int non_seekable = 0;
 	roxml_load_ctx_t context;
 	roxml_parser_item_t *parser = NULL;
-	xpath_tok_table_t *table = (xpath_tok_table_t *) calloc(1, sizeof(xpath_tok_table_t));
+	xpath_tok_table_t *table;
 
-	memset(&context, 0, sizeof(roxml_load_ctx_t));
-	context.empty_text_node = 1;
-	context.current_node = current_node;
+	if (ctx)
+		non_seekable = 1;
+
+	if (ctx && *ctx) {
+		node_t *virtroot;
+		memcpy(&context, *ctx, sizeof(roxml_load_ctx_t));
+		current_node = context.current_node;
+		virtroot = roxml_get_root(current_node);
+		table = virtroot->priv;
+	} else {
+		memset(&context, 0, sizeof(roxml_load_ctx_t));
+		context.empty_text_node = 1;
+		context.current_node = current_node;
+		table = (xpath_tok_table_t *) calloc(1, sizeof(xpath_tok_table_t));
+	}
 
 	parser = roxml_append_parser_item(parser, " ", _func_load_white);
 	parser = roxml_append_parser_item(parser, "<", _func_load_open_node);
@@ -254,7 +267,6 @@ node_t ROXML_INT *roxml_load(node_t *current_node, FILE * file, char *buffer)
 
 		context.type = ROXML_FILE;
 		context.src = (void *)file;
-		context.pos = 0;
 
 		int_buffer = malloc(ROXML_BULK_READ+1);
 
@@ -270,13 +282,25 @@ node_t ROXML_INT *roxml_load(node_t *current_node, FILE * file, char *buffer)
 				chunk_len = int_len;
 			}
 
+			if (non_seekable) {
+				context.type = ROXML_BUFF;
+				context.src = malloc(ROXML_BULK_READ+1);
+				context.pos = 0;
+			}
+
 			ret = roxml_parse_line(parser, int_buffer, chunk_len, &context);
 			circle = int_len - ret;
 			if ((ret < 0) || (circle < 0)) {
 				error = 1;
 				break;
 			}
-			memmove(int_buffer, int_buffer + ret, circle);
+
+			if (non_seekable) {
+				int_buffer = malloc(ROXML_BULK_READ+1);
+				memcpy(int_buffer, context.src + ret, circle);
+			} else {
+				memmove(int_buffer, int_buffer + ret, circle);
+			}
 		} while (int_len == ROXML_BULK_READ);
 	} else {
 		int ret = 0;
@@ -292,23 +316,29 @@ node_t ROXML_INT *roxml_load(node_t *current_node, FILE * file, char *buffer)
 
 	if (context.empty_text_node == 1) {
 		roxml_free_node(context.candidat_txt);
+		context.empty_text_node = 0;
+		context.candidat_txt = NULL;
 	}
 
 	if (!error) {
 		node_t *virtroot = NULL;
 		current_node = roxml_get_root(current_node);
 		virtroot = current_node;
-		while (virtroot->prnt) {
-			virtroot = virtroot->prnt;
-		}
 
-		table->id = ROXML_REQTABLE_ID;
-		table->ids[ROXML_REQTABLE_ID] = 1;
-		pthread_mutex_init(&table->mut, NULL);
-		virtroot->priv = (void *)table;
+		if (!ctx || (ctx && !*ctx)) {
+			table->id = ROXML_REQTABLE_ID;
+			table->ids[ROXML_REQTABLE_ID] = 1;
+			pthread_mutex_init(&table->mut, NULL);
+			virtroot->priv = (void *)table;
+		}
 	} else {
 		roxml_close(current_node);
 		return NULL;
+	}
+
+	if (ctx) {
+		*ctx = malloc(sizeof(roxml_load_ctx_t));
+		memcpy(*ctx, &context, sizeof(roxml_load_ctx_t));
 	}
 
 	return current_node;

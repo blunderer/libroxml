@@ -623,20 +623,24 @@ int ROXML_API roxml_get_node_position(node_t *n)
 	return idx;
 }
 
-node_t ROXML_API *roxml_load_fd(int fd)
+node_t ROXML_API *roxml_load_fd(int fd, void **ctx)
 {
 	FILE *file = NULL;
 	node_t *current_node = NULL;
 	if (fd < 0) {
 		return NULL;
 	}
+
+	fcntl(fd, F_SETFL, O_NONBLOCK);
+
 	file = fdopen(fd, "r");
 	if (file == NULL) {
 		return NULL;
 	}
+
 	current_node = roxml_create_node(0, file, ROXML_ELM_NODE | ROXML_FILE);
 	current_node = roxml_append_node(NULL, current_node);
-	return roxml_load(current_node, file, NULL);
+	return roxml_load(current_node, file, NULL, ctx);
 }
 
 node_t ROXML_API *roxml_load_doc(char *filename)
@@ -648,7 +652,7 @@ node_t ROXML_API *roxml_load_doc(char *filename)
 	}
 	current_node = roxml_create_node(0, file, ROXML_ELM_NODE | ROXML_FILE);
 	current_node = roxml_append_node(NULL, current_node);
-	return roxml_load(current_node, file, NULL);
+	return roxml_load(current_node, file, NULL, NULL);
 }
 
 node_t ROXML_API *roxml_load_buf(char *buffer)
@@ -659,7 +663,7 @@ node_t ROXML_API *roxml_load_buf(char *buffer)
 	}
 	current_node = roxml_create_node(0, buffer, ROXML_ELM_NODE | ROXML_BUFF);
 	current_node = roxml_append_node(NULL, current_node);
-	return roxml_load(current_node, NULL, buffer);
+	return roxml_load(current_node, NULL, buffer, NULL);
 }
 
 node_t ROXML_API **roxml_xpath(node_t *n, char *path, int *nb_ans)

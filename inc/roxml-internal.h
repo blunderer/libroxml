@@ -93,17 +93,18 @@ void ROXML_INT roxml_close_node(node_t *n, node_t * close);
 
 /** \brief generic load function
  *
- * \fn node_t* ROXML_API roxml_load(node_t *current_node, FILE *file, char *buffer);
+ * \fn node_t* ROXML_API roxml_load(node_t *current_node, FILE *file, char *buffer, void **ctx);
  * This function load a document and all the corresponding nodes
  * file and buffer params are exclusive. You usualy want to load
  * either a file OR a buffer
  * \param current_node the XML root
  * \param file file descriptor of document
  * \param buffer address of buffer that contains xml
+ * \param ctx pointer to the context to use for splitted parsing
  * \return the root node or NULL
  * see roxml_close
  */
-node_t ROXML_INT *roxml_load(node_t *current_node, FILE * file, char *buffer);
+node_t ROXML_INT *roxml_load(node_t *current_node, FILE * file, char *buffer, void **ctx);
 
 /** \brief node append function
  *

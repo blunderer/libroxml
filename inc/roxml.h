@@ -230,15 +230,16 @@ node_t *ROXML_API roxml_load_doc(char *filename);
 
 /** \brief load function for file descriptors
  *
- * \fn node_t* ROXML_API roxml_load_fd(int fd);
+ * \fn node_t* ROXML_API roxml_load_fd(int fd, void *ctx);
  * This function load a document by parsing all the corresponding nodes
  * \param fd the opened fiel descriptor to XML document to load
+ * \param ctx the context of the parsing engine for parsing a stream in several steps
  * \return the root node or NULL
  * \see roxml_close
  * \see roxml_load_doc
  * \see roxml_load_buf
  */
-node_t *ROXML_API roxml_load_fd(int fd);
+node_t *ROXML_API roxml_load_fd(int fd, void **ctx);
 
 /** \brief unload function
  *
