@@ -1198,7 +1198,7 @@ node_t ROXML_INT *roxml_append_node(node_t *parent, node_t * n)
 	n->prnt = parent;
 
 	if (parent->ns && ((parent->ns->type & ROXML_INVALID) != ROXML_INVALID)
-	    && ((roxml_ns_t *) parent->ns->priv)->alias[0] == '\0') {
+	    && parent->ns->priv && ((roxml_ns_t *) parent->ns->priv)->alias[0] == '\0') {
 		if (n->ns == NULL) {
 			n->ns = parent->ns;
 		}

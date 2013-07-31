@@ -822,6 +822,7 @@ int _func_load_close_node(char *chunk, void *data)
 	if (context->candidat_node && context->candidat_node->ns
 	    && ((context->candidat_node->ns->type & ROXML_INVALID) == ROXML_INVALID)) {
 		roxml_free_node(context->candidat_node->ns);
+		context->candidat_node->ns = NULL;
 	}
 
 	context->state = STATE_NODE_CONTENT;
