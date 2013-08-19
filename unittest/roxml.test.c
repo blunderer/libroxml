@@ -2962,6 +2962,9 @@ int test_write_tree(void)
 	len = roxml_commit_changes(NULL, "out.xml", NULL, 1);
 	ASSERT_EQUAL(len, 0)
 
+	len = roxml_commit_changes(root, "this-path-does-not-exist/out.xml", NULL, 1);
+	ASSERT_EQUAL(len, 0)
+
 	len = roxml_commit_changes(root, "out.xml", NULL, 0);
 	ASSERT_EQUAL(len, 176)
 
