@@ -723,43 +723,43 @@ int ROXML_API roxml_commit_changes(node_t *n, char *dest, char **buffer, int hum
 {
 	int size = 0;
 	int len = 0;
+
 	FILE *fout = NULL;
 
 	if (n) {
-		len = ROXML_LONG_LEN;
 		if (dest) {
 			fout = fopen(dest, "w");
-		}
-		if (buffer) {
+		} else if (buffer) {
 			*buffer = (char *)malloc(ROXML_LONG_LEN);
 			memset(*buffer, 0, ROXML_LONG_LEN);
 		}
 
-		if ((n->prnt == NULL) || (n->prnt && n->prnt->prnt == NULL)) {
-			if (n->prnt) {
-				n = n->prnt->chld;
+		if (fout || buffer) {
+			len = ROXML_LONG_LEN;
+
+			if ((n->prnt == NULL) || (n->prnt && n->prnt->prnt == NULL)) {
+				if (n->prnt) {
+					n = n->prnt->chld;
+				} else {
+					n = n->chld;
+				}
+				while (n) {
+					roxml_write_node(n, fout, buffer, human, 0, &size, &len);
+					n = n->sibl;
+				}
 			} else {
-				n = n->chld;
-			}
-			while (n) {
 				roxml_write_node(n, fout, buffer, human, 0, &size, &len);
-				n = n->sibl;
 			}
-		} else {
-			roxml_write_node(n, fout, buffer, human, 0, &size, &len);
-		}
 
-		if (buffer) {
-			char *ptr = NULL;
-			len -= ROXML_LONG_LEN;
-			ptr = *buffer + len;
-			len += strlen(ptr);
-		} else {
-			len = ftell(fout);
-		}
-
-		if (fout) {
-			fclose(fout);
+			if (buffer) {
+				char *ptr = NULL;
+				len -= ROXML_LONG_LEN;
+				ptr = *buffer + len;
+				len += strlen(ptr);
+			} else if (fout) {
+				len = ftell(fout);
+				fclose(fout);
+			}
 		}
 	}
 
