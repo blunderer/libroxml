@@ -46,7 +46,7 @@ DEFINES = -DIGNORE_EMPTY_TEXT_NODES
 
 # options
 override CPPFLAGS += -Iinc/
-override CFLAGS += $(OPTIM) -fPIC -Wall -Wextra -Wno-unused -Wno-unused-parameter -Werror -Iinc/ $(DEFINES)
+override CFLAGS += $(OPTIM) -fPIC -Wall -Wextra -Wno-unused-parameter -Werror -Iinc/ $(DEFINES)
 override LDFLAGS += 
 
 ifeq ("$(OS)", "Darwin")

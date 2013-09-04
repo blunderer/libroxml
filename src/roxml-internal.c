@@ -152,7 +152,13 @@ int roxml_is_number(char *input)
 {
 	char *end;
 	int is_number = 0;
-	double r = strtod(input, &end);
+
+	/*
+	 * we don't need the value per see and some compiler will
+	 * complain about an initialized but unused variable if we
+	 * get it.
+	 */
+	(void)strtod(input, &end);
 
 	if ((end == NULL) || (roxml_is_separator(end[0])) || (end[0] == '"') || (end[0] == '\'') || (end[0] == '\0')) {
 		is_number = 1;
@@ -879,7 +885,6 @@ int ROXML_INT roxml_validate_axes(node_t *root, node_t * candidat, node_t *** an
 	int path_end = 0;
 	char *axes = NULL;
 	char intern_buff[ROXML_LONG_LEN];
-	char intern_buff2[ROXML_LONG_LEN];
 
 	if (xn == NULL) {
 		valid = 1;

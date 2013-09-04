@@ -670,7 +670,6 @@ node_t ROXML_API **roxml_xpath(node_t *n, char *path, int *nb_ans)
 	node_t **node_set = NULL;
 	node_t *root = n;
 	char *full_path_to_find;
-	char *path_to_find;
 
 	if (n == NULL) {
 		if (nb_ans) {
@@ -775,8 +774,6 @@ node_t ROXML_API *roxml_add_node(node_t *parent, int position, int type, char *n
 	int end_content = 0;
 	char *buffer = NULL;
 	node_t *new_node;
-
-	int allow_attrib_child;
 
 	if (parent) {
 		if (parent->type & ROXML_ATTR_NODE) {
