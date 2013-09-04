@@ -1556,6 +1556,20 @@ void ROXML_INT roxml_del_arg_node(node_t *n)
 	return;
 }
 
+/* do not call this function if n->prnt == NULL */
+static node_t *roxml_get_real_prev_sibling(node_t *n)
+{
+	node_t *current = n->prnt->chld;
+	node_t *prev = NULL;
+
+	while (current != n) {
+		prev = current;
+		current = current->sibl;
+	}
+
+	return prev;
+}
+
 void ROXML_INT roxml_del_txt_node(node_t *n)
 {
 	node_t *current = n->prnt->chld;
@@ -1563,7 +1577,7 @@ void ROXML_INT roxml_del_txt_node(node_t *n)
 		current = current->sibl;
 	}
 	if (n->prnt && n->prnt->next == n) {
-		n->prnt->next = n->sibl;
+		n->prnt->next = roxml_get_real_prev_sibling(n);
 	}
 	if (current == n) {
 		n->prnt->chld = n->sibl;
@@ -1580,7 +1594,7 @@ void ROXML_INT roxml_del_std_node(node_t *n)
 {
 	node_t *current = n->prnt->chld;
 	if (n->prnt && n->prnt->next == n) {
-		n->prnt->next = n->sibl;
+		n->prnt->next = roxml_get_real_prev_sibling(n);
 	}
 	if (current == n) {
 		n->prnt->chld = n->sibl;
