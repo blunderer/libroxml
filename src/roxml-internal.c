@@ -284,6 +284,8 @@ node_t ROXML_INT *roxml_load(node_t *current_node, FILE * file, char *buffer)
 			}
 			memmove(int_buffer, int_buffer + ret, circle);
 		} while (int_len == ROXML_BULK_READ);
+
+		free(int_buffer);
 	} else {
 		int ret = 0;
 		context.type = ROXML_BUFF;
