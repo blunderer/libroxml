@@ -1618,15 +1618,26 @@ void ROXML_INT roxml_del_std_node(node_t *n)
 void roxml_compute_and(node_t *root, node_t **node_set, int *count, int cur_req_id, int prev_req_id)
 {
 	int i = 0;
-	for (i = 0; i < *count; i++) {
-		if ((!roxml_in_pool(root, node_set[i], cur_req_id)) || (!roxml_in_pool(root, node_set[i], prev_req_id))) {
-			(*count)--;
+	int limit = *count;
+	int pool1 = 0, pool2 = 0;
+
+	for (i = 0; i < limit; i++) {
+		if (pool1 == 0)
+			if (roxml_in_pool(root, node_set[i], cur_req_id))
+				pool1++;
+		if (pool2 == 0)
+			if (roxml_in_pool(root, node_set[i], prev_req_id))
+				pool2++;
+		if (pool1 && pool2)
+			break;
+	}
+
+	if (!pool1 || !pool2) {
+		for (i = 0; i < limit; i++) {
 			roxml_del_from_pool(root, node_set[i], cur_req_id);
 			roxml_del_from_pool(root, node_set[i], prev_req_id);
-			if (*count > 0) {
-				node_set[i] = node_set[(*count) - 1];
-			}
 		}
+		*count = 0;
 	}
 }
 
