@@ -262,7 +262,7 @@ node_t ROXML_INT *roxml_load(node_t *current_node, FILE * file, char *buffer)
 		context.src = (void *)file;
 		context.pos = 0;
 
-		int_buffer = malloc(ROXML_BULK_READ+1);
+		int_buffer = malloc(ROXML_BULK_READ + 1);
 
 		do {
 			int ret = 0;

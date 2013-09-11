@@ -444,7 +444,7 @@ int ROXML_INT roxml_in_pool(node_t *root, node_t * n, int req_id);
  * \param count the pointer to a variable that is filled with the resulting node number
  * \return  the resulting node set that have to be freed with roxml_release
  */
-node_t *ROXML_INT *roxml_exec_xpath(node_t *root, node_t * n, xpath_node_t * xpath, int index, int *count);
+node_t ROXML_INT **roxml_exec_xpath(node_t *root, node_t *n, xpath_node_t *xpath, int index, int *count);
 
 /** \brief separator tester
  *
