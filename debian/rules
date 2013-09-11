@@ -26,7 +26,7 @@ install: build
 	dh_testroot
 	dh_prep
 	dh_installdirs
-	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp install
+	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp/usr install
 
 
 # Build architecture-independent files here.
