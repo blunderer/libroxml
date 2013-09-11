@@ -1,16 +1,16 @@
 Index: libroxml/Makefile
 ===================================================================
---- libroxml.orig/Makefile	2012-11-28 04:21:09.677262725 +0100
-+++ libroxml/Makefile	2012-11-28 04:52:17.118619011 +0100
-@@ -43,9 +43,9 @@
+--- libroxml.orig/Makefile	2013-09-11 15:41:48.000000000 -0700
++++ libroxml/Makefile	2013-09-11 15:43:09.724917829 -0700
+@@ -45,9 +45,9 @@
  DEFINES = -DIGNORE_EMPTY_TEXT_NODES
  
  # options
 -override CPPFLAGS += -Iinc/
--override CFLAGS += $(OPTIM) -fPIC -Wall -Wextra -Wno-unused -Werror -Iinc/ $(DEFINES)
+-override CFLAGS += $(OPTIM) -fPIC -Wall -Wextra -Wno-unused-parameter -Wno-unused-result -Werror -Iinc/ $(DEFINES)
 -override LDFLAGS += 
 +override CPPFLAGS += $(shell dpkg-buildflags --get CPPFLAGS) -Iinc/
-+override CFLAGS += $(shell dpkg-buildflags --get CFLAGS) $(OPTIM) -fPIC -Wall -Wextra -Wno-unused -Werror -Iinc/ $(DEFINES)
++override CFLAGS += $(shell dpkg-buildflags --get CFLAGS) $(OPTIM) -fPIC -Wall -Wextra -Wno-unused-parameter -Wno-unused-result -Werror -Iinc/ $(DEFINES)
 +override LDFLAGS += $(shell dpkg-buildflags --get LDFLAGS)
  
  ifeq ("$(OS)", "Darwin")

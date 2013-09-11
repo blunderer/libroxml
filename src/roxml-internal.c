@@ -154,11 +154,11 @@ int roxml_is_number(char *input)
 	int is_number = 0;
 
 	/*
-	 * we don't need the value per see and some compiler will
+	 * we don't need the value per se and some compiler will
 	 * complain about an initialized but unused variable if we
 	 * get it.
 	 */
-	(void)strtod(input, &end);
+	strtod(input, &end);
 
 	if ((end == NULL) || (roxml_is_separator(end[0])) || (end[0] == '"') || (end[0] == '\'') || (end[0] == '\0')) {
 		is_number = 1;
