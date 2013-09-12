@@ -48,7 +48,7 @@
  *
  * You can download source packages:
  * <ul>
- * <li>Lastest version is 2.2.2: <a href="http://download.libroxml.net/pool/v2.x/libroxml-2.2.2.tar.gz">download now</a></li>
+ * <li>Lastest version is 2.2.3: <a href="http://download.libroxml.net/pool/v2.x/libroxml-2.2.3.tar.gz">download now</a></li>
  * <li>Go to the download section if you need older libroxml revision: http://download.libroxml.net </li>
  * </ul>
  * 

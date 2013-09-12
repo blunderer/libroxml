@@ -1,3 +1,24 @@
+libroxml (2.2.3-1) unstable; urgency=low
+  * Add
+      static linking exception to LGPL v2.1 license
+      optimization for small systems (buffer size, heap/stack allocations...)
+
+  * Bugfixes
+      fix error on missing doxygen
+      fix generic/OSX install/uninstall
+      fix setting specific position on node creation
+      fix spelling mistake in ROXML_ALL_NODES define
+      fix missing \r into separators list
+      fix potential segfault on default namespaces
+      fix potential segfault when committing to a file
+      fix segfault when dest parameter is invalid
+      fix potential node leak
+      fix newer compiler warnings
+      fix memory leak on file load
+      fix xpath and handling in condition
+
+ -- Tristan Lelong <tristan.lelong@libroxml.net>  Wed, 11 Sep 2013 19:59:36 -0700
+
 libroxml (2.2.2-1) unstable; urgency=low
   * Add
       .gitignore
