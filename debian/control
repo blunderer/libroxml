@@ -1,31 +1,12 @@
 Source: libroxml
 Priority: extra
 Maintainer: Tristan Lelong <tristan.lelong@libroxml.net>
-Build-Depends: debhelper (>= 7), doxygen
-Standards-Version: 3.9.3
+Build-Depends: debhelper (>= 7), dpkg (>= 1.15.6~), doxygen
+Standards-Version: 3.9.4
 Section: libs
 Homepage: http://www.libroxml.net
 
-Package: libroxml-dev
-Section: libdevel
-Architecture: any
-Depends: libroxml0 (= ${binary:Version}), ${misc:Depends}
-Description: libroxml development files
- Because XML parsing is always hard to reinvent 
- Because very often, xml libraries are too big to fit with little application 
- libroxml allow you to easily: 
-   - load / unload document from files 
-   - load / unload document from buffer 
-   - navigate thru the xml tree using libroxml C/C++ API 
-   - read attributes and attributes' values for nodes 
-   - get text content of nodes 
-   - use XPath expressions 
-   - modify the loaded XML tree 
-   - create XML from scratch 
-   - apply modification from the loaded XML tree to a file or buffer 
-
 Package: libroxml0
-Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Light C XML parsing library
@@ -42,20 +23,14 @@ Description: Light C XML parsing library
    - create XML from scratch 
    - apply modification from the loaded XML tree to a file or buffer 
 
+Package: libroxml-dev
+Section: libdevel
+Architecture: any
+Depends: libroxml0 (= ${binary:Version}), ${misc:Depends}
+Description: libroxml development files
+
 Package: libroxml-dbg
 Section: debug
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libroxml0
+Depends: libroxml0 (= ${binary:Version}), ${misc:Depends}
 Description: Light C XML parsing library debug files
- Because XML parsing is always hard to reinvent 
- Because very often, xml libraries are too big to fit with little application 
- libroxml allow you to easily: 
-   - load / unload document from files 
-   - load / unload document from buffer 
-   - navigate thru the xml tree using libroxml C/C++ API 
-   - read attributes and attributes' values for nodes 
-   - get text content of nodes 
-   - use XPath expressions 
-   - modify the loaded XML tree 
-   - create XML from scratch 
-   - apply modification from the loaded XML tree to a file or buffer 

@@ -2,7 +2,7 @@
  *  \brief header for libroxml.so
  *         
  * This is the header file used to develop some
- * softwares using the libroxml.so library.
+ * software using the libroxml.so library.
  * \author blunderer <blunderer@blunderer.org>
  * \date 23 Dec 2008
  *
@@ -297,7 +297,7 @@ node_t *ROXML_API roxml_get_parent(node_t *n);
  <item/>
 </data2>
 \endverbatim
- * will be processed sucessfully and the root node will have 2 children: data1 and data2
+ * will be processed successfully and the root node will have 2 children: data1 and data2
  *
  * if document was:
  * \verbatim
@@ -1006,7 +1006,7 @@ void ROXML_API roxml_del_node(node_t *n);
  *
  * \param n the root node of the tree to write
  * \param dest the path to a file to write tree to
- * \param buffer the adress of a buffer where the tree will be written. This buffer have to be freed after use
+ * \param buffer the address of a buffer where the tree will be written. This buffer have to be freed after use
  * \param human 0 for one-line tree, or 1 for human format (using tabs, newlines...)
  * \return the number of bytes written to file or buffer 
  * 

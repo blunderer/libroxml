@@ -1,7 +1,8 @@
+Uses the dpkg-buildflags for building the debian package
 Index: libroxml/Makefile
 ===================================================================
---- libroxml.orig/Makefile	2013-09-11 15:41:48.000000000 -0700
-+++ libroxml/Makefile	2013-09-11 15:43:09.724917829 -0700
+--- libroxml.orig/Makefile	2013-09-24 09:33:27.420199129 -0700
++++ libroxml/Makefile	2013-09-24 09:33:37.364199395 -0700
 @@ -45,9 +45,9 @@
  DEFINES = -DIGNORE_EMPTY_TEXT_NODES
  

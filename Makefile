@@ -112,7 +112,7 @@ $(TARGET_LN): $(TARGET_LIB)
 $(TARGET_BIN): $(OBJ_BIN)
 $(TARGET_BIN): | $(if $(filter -static, $(LDFLAGS)), $(TARGET_SLIB), $(TARGET_LIB))
 	$P '  LD      $(@F)'
-	$E $(CC) $(LDFLAGS) $^ -L$O -lroxml -lpthread -o $@
+	$E $(CC) $(LDFLAGS) $^ -L$O -lroxml -o $@
 
 .PHONY : all
 all : $(TARGET_SLIB) $(if $(filter -static, $(LDFLAGS)), , $(TARGET_LN)) $(TARGET_BIN) $(PY_LIB)
