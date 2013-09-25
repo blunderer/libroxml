@@ -480,8 +480,8 @@ static int _func_xpath_operators(char *chunk, void *data, int operator, int oper
 			cur++;
 		}
 	}
-	return cur;
 	ctx->shorten_cond = 0;
+	return cur;
 }
 
 int _func_xpath_operator_equal(char *chunk, void *data)

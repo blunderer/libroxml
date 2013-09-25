@@ -62,8 +62,9 @@ int ROXML_INT roxml_read(int pos, int size, char *buffer, node_t *node)
 
 	if (size > 0 && buffer) {
 		if (node->type & ROXML_FILE) {
-			fseek(node->src.fil, pos, SEEK_SET);
-			ret_len = fread(buffer, 1, size, node->src.fil);
+			if (fseek(node->src.fil, pos, SEEK_SET) == 0) {
+				ret_len = fread(buffer, 1, size, node->src.fil);
+			}
 		} else {
 			char *r1 = buffer;
 			char const *r2 = node->src.buf + pos;
@@ -315,6 +316,7 @@ node_t ROXML_INT *roxml_load(node_t *current_node, FILE * file, char *buffer)
 		pthread_mutex_init(&table->mut, NULL);
 		virtroot->priv = (void *)table;
 	} else {
+		free(table);
 		roxml_close(current_node);
 		return NULL;
 	}
@@ -958,7 +960,7 @@ int ROXML_INT roxml_validate_axes(node_t *root, node_t * candidat, node_t *** an
 		valid = roxml_validate_predicat(xn, candidat);
 	}
 
-	if ((valid) && (xn->xp_cond)) {
+	if ((valid) && (xn) && (xn->xp_cond)) {
 		int status;
 		char *sarg1;
 		char *sarg2;
@@ -1662,8 +1664,12 @@ node_t **roxml_exec_xpath(node_t *root, node_t * n, xpath_node_t * xpath, int in
 	node_t **node_set = roxml_malloc(sizeof(node_t *), max_answers, PTR_NODE_RESULT);
 
 	*count = 0;
-	req_ids = calloc(index, sizeof(int));
 	glob_id = roxml_request_id(root);
+	if (glob_id < 0) {
+		roxml_release(node_set);
+		return NULL;
+	}
+	req_ids = calloc(index, sizeof(int));
 
 	// process all and xpath
 	for (path_id = 0; path_id < index; path_id++) {
