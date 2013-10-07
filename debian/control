@@ -28,9 +28,13 @@ Section: libdevel
 Architecture: any
 Depends: libroxml0 (= ${binary:Version}), ${misc:Depends}
 Description: libroxml development files
+ This package includes all the development files for creating softwares 
+ relying on libroxml for XML handling.
 
 Package: libroxml-dbg
 Section: debug
 Architecture: any
 Depends: libroxml0 (= ${binary:Version}), ${misc:Depends}
 Description: Light C XML parsing library debug files
+ This package contains all the binaries with debug symbols allowing
+ for clear debugging of software relying on the libroxml.
