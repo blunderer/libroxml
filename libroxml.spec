@@ -6,7 +6,7 @@ Summary: a light and powerful C xml parsing library
 Name: %{name}
 Version: %{version}
 Release: %{release}
-Source: http://libroxml.googlecode.com/files/libroxml-%{version}.tar.gz
+Source: http://download.libroxml.net/pool/v2.x/libroxml-%{version}.tar.gz
 Vendor: blunderer
 URL:  http://www.libroxml.net
 License: LGPL
@@ -14,7 +14,7 @@ Group: System Environment/Libraries
 Prefix: %{_prefix}
 
 %description
-libroxml is a very light, low fingerprint, fast, and powerful
+libroxml is a very light, low footprint, fast, and powerful
 library designed for parsing XML files. This is perfectly suitable
 for little embedded systems but you can also use it widely in various
 applications for xml configuration file reading for example.
