@@ -225,8 +225,6 @@ char ROXML_API *roxml_get_content(node_t *n, char *buffer, int bufsize, int *siz
 char ROXML_API *roxml_get_name(node_t *n, char *buffer, int size)
 {
 	int offset = 0;
-	int count = 0;
-	int total = 0;
 	char tmp_name[ROXML_LONG_LEN];
 
 	memset(tmp_name, 0, ROXML_LONG_LEN * sizeof(char));
@@ -258,7 +256,10 @@ char ROXML_API *roxml_get_name(node_t *n, char *buffer, int size)
 		}
 		return NULL;
 	} else {
+		int count = 0;
+		int total = 0;
 		int spec_offset = 0;
+
 		if (n->type & ROXML_PI_NODE) {
 			spec_offset = 2;
 		} else if (n->type & ROXML_DOCTYPE_NODE) {
@@ -727,9 +728,9 @@ int ROXML_API roxml_commit_changes(node_t *n, char *dest, char **buffer, int hum
 	int size = 0;
 	int len = 0;
 
-	FILE *fout = NULL;
-
 	if (n) {
+		FILE *fout = NULL;
+
 		if (dest) {
 			fout = fopen(dest, "w");
 		} else if (buffer) {

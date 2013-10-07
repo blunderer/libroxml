@@ -100,17 +100,17 @@ int main(int argc, char **argv)
 
 	for (j = 0; j < max; j++) {
 		char *c = NULL;
-		char *s = NULL;
-		node_t *child;
-		node_t *ns = NULL;
+
 		c = roxml_get_content(ans[j], NULL, 0, NULL);
 		if (c) {
 			if (*c == 0) {
+				char *s = NULL;
 				int i = 0;
 				int nb_chld = roxml_get_chld_nb(ans[j]);
+
 				for (i = 0; i < nb_chld; i++) {
-					child = roxml_get_chld(ans[j], NULL, i);
-					ns = roxml_get_ns(child);
+					node_t *child = roxml_get_chld(ans[j], NULL, i);
+					node_t *ns = roxml_get_ns(child);
 					c = roxml_get_name(child, NULL, 0);
 					if (!quiet) {
 						fprintf(stdout, "ans[%d]: ", j);

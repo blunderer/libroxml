@@ -1080,7 +1080,6 @@ int _func_load_colon(char *chunk, void *data)
 
 int _func_load_default(char *chunk, void *data)
 {
-	node_t *to_be_closed;
 	int cur = 1;
 	roxml_load_ctx_t *context = (roxml_load_ctx_t *) data;
 #ifdef DEBUG_PARSING
@@ -1156,6 +1155,8 @@ int _func_load_default(char *chunk, void *data)
 			context->candidat_val = roxml_append_node(context->candidat_arg, context->candidat_val);
 			context->inside_node_state = STATE_INSIDE_VAL;
 		} else if ((context->inside_node_state == STATE_INSIDE_ARG) && (chunk[0] == '=')) {
+			node_t *to_be_closed;
+
 			context->inside_node_state = STATE_INSIDE_VAL_BEG;
 			to_be_closed = roxml_create_node(context->pos, context->src, ROXML_ATTR_NODE | context->type);
 			roxml_close_node(context->candidat_arg, to_be_closed);

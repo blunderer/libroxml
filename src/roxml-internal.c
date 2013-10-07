@@ -120,7 +120,7 @@ void ROXML_INT roxml_free_node(node_t *n)
 		unsigned char id = *(unsigned char *)n->priv;
 
 		if (id == ROXML_REQTABLE_ID) {
-			xpath_tok_t *tok = (xpath_tok_t *) n->priv;
+			xpath_tok_t *tok;
 			xpath_tok_table_t *table = (xpath_tok_table_t *) n->priv;
 			tok = table->next;
 			pthread_mutex_destroy(&table->mut);
@@ -664,10 +664,10 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t * candidat)
 			}
 			status = roxml_double_cmp(iarg1, iarg2, ROXML_OPERATOR_EQU);
 		} else if (condition->func == ROXML_FUNC_INTCOMP) {
-			char strval[ROXML_BASE_LEN];
 			node_t *val = roxml_get_attr(candidat, condition->arg1 + 1, 0);
 			status = 0;
 			if (val) {
+				char strval[ROXML_BASE_LEN];
 				iarg1 = atof(roxml_get_content(val, strval, ROXML_BASE_LEN, &status));
 				if (status >= ROXML_BASE_LEN) {
 					iarg1 = atof(roxml_get_content(val, NULL, 0, &status));
@@ -677,10 +677,10 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t * candidat)
 				status = roxml_double_cmp(iarg1, iarg2, condition->op);
 			}
 		} else if (condition->func == ROXML_FUNC_NSURI) {
-			char strval[ROXML_BASE_LEN];
 			node_t *val = roxml_get_ns(candidat);
 			status = 0;
 			if (val) {
+				char strval[ROXML_BASE_LEN];
 				sarg1 = roxml_get_content(val, strval, ROXML_BASE_LEN, &status);
 				if (status >= ROXML_BASE_LEN) {
 					sarg1 = roxml_get_content(val, NULL, 0, &status);
@@ -693,10 +693,10 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t * candidat)
 				status = roxml_string_cmp("", sarg2, condition->op);
 			}
 		} else if (condition->func == ROXML_FUNC_STRCOMP) {
-			char strval[ROXML_BASE_LEN];
 			node_t *val = roxml_get_attr(candidat, condition->arg1 + 1, 0);
 			status = 0;
 			if (val) {
+				char strval[ROXML_BASE_LEN];
 				sarg1 = roxml_get_content(val, strval, ROXML_BASE_LEN, &status);
 				if (status >= ROXML_BASE_LEN) {
 					sarg1 = roxml_get_content(val, NULL, 0, &status);
@@ -962,11 +962,11 @@ int ROXML_INT roxml_validate_axes(node_t *root, node_t * candidat, node_t *** an
 
 	if ((valid) && (xn) && (xn->xp_cond)) {
 		int status;
-		char *sarg1;
-		char *sarg2;
 		xpath_cond_t *condition = xn->xp_cond;
 		valid = 0;
 		if (condition->func == ROXML_FUNC_STRCOMP) {
+			char *sarg1;
+			char *sarg2;
 			char strval[ROXML_BASE_LEN];
 			sarg1 = roxml_get_content(candidat, strval, ROXML_BASE_LEN, &status);
 			if (status >= ROXML_BASE_LEN) {
@@ -1299,9 +1299,9 @@ node_t ROXML_INT *roxml_parent_node(node_t *parent, node_t * n, int position)
 
 void ROXML_INT roxml_print_space(FILE * f, char **buf, int *offset, int *len, int lvl)
 {
-	int i = 0;
-
 	if (lvl > 0) {
+		int i = 0;
+
 		if (buf && *buf) {
 			int pos = *offset + lvl;
 			if (pos >= *len) {
@@ -1345,12 +1345,14 @@ void ROXML_INT roxml_write_string(char **buf, FILE * f, char *str, int *offset, 
 void ROXML_INT roxml_write_node(node_t *n, FILE * f, char **buf, int human, int lvl, int *offset, int *len)
 {
 	char name[ROXML_BASE_LEN];
-	char ns[ROXML_BASE_LEN];
+
 	roxml_get_name(n, name, ROXML_BASE_LEN);
 	if (human) {
 		roxml_print_space(f, buf, offset, len, lvl);
 	}
 	if ((n->type & ROXML_NODE_TYPES) == ROXML_ELM_NODE) {
+		char ns[ROXML_BASE_LEN];
+
 		node_t *attr = n->attr;
 		if (n->prnt) {
 			roxml_write_string(buf, f, "<", offset, len);
@@ -1368,7 +1370,7 @@ void ROXML_INT roxml_write_node(node_t *n, FILE * f, char **buf, int human, int 
 			char *value;
 			char arg[ROXML_BASE_LEN];
 			char val[ROXML_BASE_LEN];
-			char arg_ns[ROXML_BASE_LEN];
+
 			roxml_get_name(attr, arg, ROXML_BASE_LEN);
 			value = roxml_get_content(attr, val, ROXML_BASE_LEN, &status);
 			if (status >= ROXML_BASE_LEN) {
@@ -1382,6 +1384,7 @@ void ROXML_INT roxml_write_node(node_t *n, FILE * f, char **buf, int human, int 
 				}
 			}
 			if (attr->ns) {
+				char arg_ns[ROXML_BASE_LEN];
 				roxml_get_name(attr->ns, arg_ns, ROXML_BASE_LEN);
 				if (arg_ns[0] != '\0') {
 					roxml_write_string(buf, f, arg_ns, offset, len);
@@ -1404,8 +1407,8 @@ void ROXML_INT roxml_write_node(node_t *n, FILE * f, char **buf, int human, int 
 				}
 			}
 			while (chld) {
-				char val[ROXML_LONG_LEN];
 				if (chld->type & ROXML_TXT_NODE) {
+					char val[ROXML_LONG_LEN];
 					char *value;
 					int status;
 					if (human) {
