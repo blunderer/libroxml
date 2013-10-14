@@ -1485,6 +1485,9 @@ void ROXML_INT roxml_write_node(node_t *n, FILE * f, char **buf, int human, int 
 		} else if ((n->type & ROXML_NODE_TYPES) == ROXML_PI_NODE) {
 			strcpy(head, "<?");
 			strcpy(tail, "?>");
+		} else {
+			head[0] = '\0';
+			tail[0] = '\0';
 		}
 
 		roxml_write_string(buf, f, head, offset, len);
