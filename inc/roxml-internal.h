@@ -36,8 +36,9 @@
 #include <fcntl.h>
 #include <string.h>
 
-#include "roxml-defines.h"
+#include "roxml-tune.h"
 #include "roxml-types.h"
+#include "roxml-defines.h"
 #include "roxml.h"
 
 /** \brief internal function

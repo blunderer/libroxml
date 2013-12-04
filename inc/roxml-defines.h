@@ -24,6 +24,10 @@
 #ifndef ROXML_DEF_H
 #define ROXML_DEF_H
 
+#ifndef ROXML_TUNE_H
+#error "roxml-tune.h must be included before roxml-def.h to tune it."
+#endif
+
 #define ROXML_PATH_OR	"|"
 #define ROXML_PATH_AND	"&"
 #define ROXML_COND_OR	"or"
@@ -76,24 +80,26 @@
  * 
  * This is the internal buffer size for chunk of xml files
  */
+#if(HAVE_SMALL_BUFFER==1)
+#define ROXML_BULK_READ		256
+#else /* HAVE_SMALL_BUFFER==0 */
 #define ROXML_BULK_READ		4096
-
-/**
- * \def ROXML_LONG_LEN
- * 
- * This is the max size for XML objects (node name, attribute name and values...)
- * It is caused by the split of the XML file for parsing:
- * 512 bytes are reserved as security to handle splitting inside an XML object.
- */
-#define ROXML_LONG_LEN		512
+#endif /* HAVE_SMALL_BUFFER */
 
 /**
  * \def ROXML_BASE_LEN
  * 
- * this is the len of internal buffers. If a requested buffer is bigger,
+ * This is the max size for XML objects (node name, attribute name and values...)
+ * It is caused by the split of the XML file for parsing:
+ * 512 bytes are reserved as security to handle splitting inside an XML object.
+ * This is also the len of internal buffers. If a requested buffer is bigger,
  * then a malloc/free will occur and may slow down libroxml.
  */
-#define ROXML_BASE_LEN		256
+#if(HAVE_SMALL_BUFFER==1)
+#define ROXML_BASE_LEN		64
+#else /* HAVE_SMALL_BUFFER==0 */
+#define ROXML_BASE_LEN		512
+#endif /* HAVE_SMALL_BUFFER */
 
 #define ROXML_ID_CHILD		0
 #define ROXML_ID_DESC_O_SELF	1

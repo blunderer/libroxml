@@ -135,6 +135,7 @@ int roxml_parse_line(roxml_parser_item_t * head, char *line, int len, void *ctx)
 	return (chunk - line);
 }
 
+#if(HAVE_XPATH_ENGINE==1) 
 int _func_xpath_ignore(char *chunk, void *data)
 {
 #ifdef DEBUG_PARSING
@@ -690,6 +691,7 @@ int _func_xpath_default(char *chunk, void *data)
 	ctx->shorten_cond = 0;
 	return cur > 0 ? cur : 1;
 }
+#endif /* HAVE_XPATH_ENGINE */
 
 int _func_load_quoted(char *chunk, void *data)
 {

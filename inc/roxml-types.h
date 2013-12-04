@@ -24,12 +24,6 @@
 #ifndef ROXML_TYPES_H
 #define ROXML_TYPES_H
 
-#ifdef _WIN32
-#include "roxml_win32_native.h"
-#else
-#include <pthread.h>
-#endif
-
 /** \typedef roxml_parse_func 
  *
  * \brief parser callback functions
@@ -39,6 +33,20 @@
  * number of handled bytes or 0 if doesn't want to handle this key
  */
 typedef int (*roxml_parse_func) (char *chunk, void *data);
+
+/** \typedef roxml_pos_t
+ *
+ * \brief type for node indexes in raw tree
+ * 
+ * this is the type used for node indexes in raw tree.
+ * this type induce a maximum size for XML document
+ * that can be handled (both from file or buffer)
+ */
+#if(HAVE_SMALL_INPUT_FILE==1)
+typedef unsigned short roxml_pos_t;
+#else /* HAVE_SMALL_INPUT_FILE==0 */
+typedef unsigned int roxml_pos_t;
+#endif /* HAVE_SMALL_INPUT_FILE */
 
 /** \struct memory_cell_t
  *
@@ -148,8 +156,8 @@ typedef struct node {
 		FILE *fil;	/*!< loaded document */
 		void *src;	/*!< xml src address */
 	} src;			/*!< xml tree source */
-	unsigned long pos;	/*!< offset of begining of opening node in file */
-	unsigned long end;	/*!< offset of begining of closing node in file */
+	roxml_pos_t pos;	/*!< offset of begining of opening node in file */
+	roxml_pos_t end;	/*!< offset of begining of closing node in file */
 	struct node *sibl;	/*!< ref to brother */
 	struct node *chld;	/*!< ref to chld */
 	struct node *prnt;	/*!< ref to parent */
