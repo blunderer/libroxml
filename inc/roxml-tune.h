@@ -150,8 +150,8 @@
 
 	#define pthread_self()			0
 	#define pthread_mutex_init(a, b)
-	#define pthread_mutex_lock(a)
-	#define pthread_mutex_unlock(a)
+	#define pthread_mutex_lock(a)		*(a) = 0
+	#define pthread_mutex_unlock(a)		*(a) = 0
 	#define pthread_mutex_destroy(a)
 #else /* HAVE_THREAD_SAFE==1 */
 	#if defined(_WIN32)

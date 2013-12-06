@@ -745,7 +745,7 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t * candidat)
 int ROXML_INT roxml_request_id(node_t *root)
 {
 	int i = 0;
-	xpath_tok_table_t *table = NULL;
+	xpath_tok_table_t *table;
 
 	while (root->prnt) {
 		root = root->prnt;
@@ -767,7 +767,7 @@ int ROXML_INT roxml_request_id(node_t *root)
 
 int ROXML_INT roxml_in_pool(node_t *root, node_t * n, int req_id)
 {
-	xpath_tok_table_t *table = NULL;
+	xpath_tok_table_t *table;
 
 	while (root->prnt) {
 		root = root->prnt;
