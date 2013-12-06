@@ -2,7 +2,7 @@
  * This option should be activated by default.
  * If unsure, set to 1
  */
-#define HAVE_THREAD_SAFE	1
+#define CONFIG_XML_THREAD_SAFE	1
 
 /* Is the target library uses stack for internal
  * buffers or heap.
@@ -10,7 +10,7 @@
  * This option should not be activated by default.
  * If unsure, set to 0
  */
-#define HAVE_HEAP_BUFFERS	0
+#define CONFIG_XML_HEAP_BUFFERS	0
 
 /* Define the size of internal buffer.
  * For very small systems, large internal buffers
@@ -18,7 +18,7 @@
  * This option should not be activated by default.
  * If unsure, set to 0
  */
-#define HAVE_SMALL_BUFFER	0
+#define CONFIG_XML_SMALL_BUFFER	0
 
 /* Limit the size of input XML libroxml can handle
  * to 64kb instead of 4Gb.
@@ -26,7 +26,7 @@
  * This option should not be activated by default.
  * If unsure, set to 0
  */
-#define HAVE_SMALL_INPUT_FILE	0
+#define CONFIG_XML_SMALL_INPUT_FILE	0
 
 /* Can the target library modify XML tree
  * When set to 0, this result in smaller binary.
@@ -34,7 +34,7 @@
  * This option should be activated by default.
  * If unsure, set to 1
  */
-#define HAVE_READ_WRITE		1
+#define CONFIG_XML_READ_WRITE		1
 
 /* Can the target library commit a tree
  * When set to 0, this result in smaller binary.
@@ -42,7 +42,7 @@
  * This option should be activated by default.
  * If unsure, set to 1
  */
-#define HAVE_COMMIT_XML_TREE	1
+#define CONFIG_XML_COMMIT_XML_TREE	1
 
 /* Can the target library perform xpath queries
  * When set to 0, this result in smaller binary.
@@ -50,4 +50,4 @@
  * This option should be activated by default.
  * If unsure, set to 1
  */
-#define HAVE_XPATH_ENGINE	1
+#define CONFIG_XML_XPATH_ENGINE	1

@@ -42,11 +42,11 @@ typedef int (*roxml_parse_func) (char *chunk, void *data);
  * this type induce a maximum size for XML document
  * that can be handled (both from file or buffer)
  */
-#if(HAVE_SMALL_INPUT_FILE==1)
+#if(CONFIG_XML_SMALL_INPUT_FILE==1)
 typedef unsigned short roxml_pos_t;
-#else /* HAVE_SMALL_INPUT_FILE==0 */
+#else /* CONFIG_XML_SMALL_INPUT_FILE==0 */
 typedef unsigned int roxml_pos_t;
-#endif /* HAVE_SMALL_INPUT_FILE */
+#endif /* CONFIG_XML_SMALL_INPUT_FILE */
 
 /** \struct memory_cell_t
  *

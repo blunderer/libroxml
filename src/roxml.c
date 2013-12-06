@@ -681,7 +681,7 @@ node_t ROXML_API **roxml_xpath(node_t *n, char *path, int *nb_ans)
 	int count = 0;
 	node_t **node_set = NULL;
 
-#if(HAVE_XPATH_ENGINE==1)
+#if(CONFIG_XML_XPATH_ENGINE==1)
 
 	int index = 0;
 	xpath_node_t *xpath = NULL;
@@ -712,7 +712,7 @@ node_t ROXML_API **roxml_xpath(node_t *n, char *path, int *nb_ans)
 			node_set = NULL;
 		}
 	}
-#endif /* HAVE_XPATH_ENGINE*/
+#endif /* CONFIG_XML_XPATH_ENGINE*/
 	if (nb_ans) {
 		*nb_ans = count;
 	}
@@ -722,7 +722,7 @@ node_t ROXML_API **roxml_xpath(node_t *n, char *path, int *nb_ans)
 
 void ROXML_API roxml_del_node(node_t *n)
 {
-#if(HAVE_READ_WRITE==1) 
+#if(CONFIG_XML_READ_WRITE==1) 
 	if (n == NULL)
 		return;
 
@@ -735,14 +735,14 @@ void ROXML_API roxml_del_node(node_t *n)
 		roxml_del_txt_node(n);
 	}
 	roxml_free_node(n);
-#endif /* HAVE_READ_WRITE */
+#endif /* CONFIG_XML_READ_WRITE */
 }
 
 int ROXML_API roxml_commit_changes(node_t *n, char *dest, char **buffer, int human)
 {
 	int len = 0;
 
-#if(HAVE_COMMIT_XML_TREE==1)
+#if(CONFIG_XML_COMMIT_XML_TREE==1)
 
 	int size = 0;
 
@@ -783,7 +783,7 @@ int ROXML_API roxml_commit_changes(node_t *n, char *dest, char **buffer, int hum
 			}
 		}
 	}
-#endif /* HAVE_COMMIT_XML_TREE */
+#endif /* CONFIG_XML_COMMIT_XML_TREE */
 
 	return len;
 }
@@ -792,7 +792,7 @@ node_t ROXML_API *roxml_add_node(node_t *parent, int position, int type, char *n
 {
 	node_t *new_node = NULL;
 
-#if(HAVE_READ_WRITE==1) 
+#if(CONFIG_XML_READ_WRITE==1) 
 
 	int name_l = 0;
 	int end_node = 0;
@@ -927,7 +927,7 @@ node_t ROXML_API *roxml_add_node(node_t *parent, int position, int type, char *n
 	} else {
 		roxml_parent_node(parent, new_node, position);
 	}
-#endif /* HAVE_READ_WRITE */
+#endif /* CONFIG_XML_READ_WRITE */
 
 	return new_node;
 }

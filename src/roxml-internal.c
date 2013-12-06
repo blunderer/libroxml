@@ -451,7 +451,7 @@ int ROXML_INT roxml_get_node_internal_position(node_t *n)
 	return idx;
 }
 
-#if(HAVE_XPATH_ENGINE==1)
+#if(CONFIG_XML_XPATH_ENGINE==1)
 int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t **xpath, int context)
 {
 	int ret = 0;
@@ -1318,7 +1318,7 @@ node_t **roxml_exec_xpath(node_t *root, node_t * n, xpath_node_t * xpath, int in
 
 	return node_set;
 }
-#endif /* HAVE_XPATH_ENGINE */
+#endif /* CONFIG_XML_XPATH_ENGINE */
 
 node_t ROXML_INT *roxml_append_node(node_t *parent, node_t * n)
 {
@@ -1419,7 +1419,7 @@ node_t ROXML_INT *roxml_parent_node(node_t *parent, node_t * n, int position)
 	return n;
 }
 
-#if(HAVE_COMMIT_XML_TREE==1)
+#if(CONFIG_XML_COMMIT_XML_TREE==1)
 void ROXML_INT roxml_print_space(FILE * f, char **buf, int *offset, int *len, int lvl)
 {
 	if (lvl > 0) {
@@ -1640,9 +1640,9 @@ void ROXML_INT roxml_write_node(node_t *n, FILE * f, char **buf, int human, int 
 	}
 	ROXML_PUT_BASE_BUFFER(name);
 }
-#endif /* HAVE_COMMIT_XML_TREE */
+#endif /* CONFIG_XML_COMMIT_XML_TREE */
 
-#if(HAVE_READ_WRITE==1)
+#if(CONFIG_XML_READ_WRITE==1)
 void ROXML_INT roxml_reset_ns(node_t *n, node_t * ns)
 {
 	node_t *attr = NULL;
@@ -1696,7 +1696,7 @@ void ROXML_INT roxml_del_arg_node(node_t *n)
 	roxml_del_tree(n->chld);
 	return;
 }
-#endif /* HAVE_READ_WRITE */
+#endif /* CONFIG_XML_READ_WRITE */
 
 /* do not call this function if n->prnt == NULL */
 static node_t *roxml_get_real_prev_sibling(node_t *n)
