@@ -7,6 +7,7 @@
 *.so.*
 *.d
 *.patch
+*.pc
 
 .deps
 .dirstamp
@@ -33,3 +34,4 @@
 /missing
 
 /roxml
+/mount.fuse.xml

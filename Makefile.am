@@ -41,6 +41,15 @@ bin_PROGRAMS = roxml
 roxml_SOURCES = src/roxml-parser.c
 roxml_LDADD = libroxml.la
 
+# mount.fuse.xml helper
+if WITH_FUSE
+  bin_PROGRAMS += mount.fuse.xml
+  mount_fuse_xml_SOURCES = fuse.xml/xmlfs.c
+  mount_fuse_xml_CFLAGS = -D_FILE_OFFSET_BITS=64 $(FUSE_CFLAGS)
+  mount_fuse_xml_LDADD = libroxml.la $(FUSE_LIBS)
+endif
+EXTRA_DIST += fuse.xml/README
+
 # pkg-config .pc file
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libroxml.pc

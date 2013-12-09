@@ -42,5 +42,31 @@ AC_ARG_ENABLE(debug,
               [enable_debug=no])
 AM_CONDITIONAL(DEBUG,test x$enable_debug = xyes)
 
+################################
+# Fuse helper
+################################
+AC_ARG_WITH(fuse,
+              [AS_HELP_STRING([--with-fuse],
+              [Build fuse helper [default=no]])],
+              [],
+              [with_fuse=no])
+AM_CONDITIONAL(WITH_FUSE,test x$with_fuse = xyes)
+if test x$with_fuse = xyes; then
+    AC_CHECK_HEADERS([fuse.h],
+                     [
+                     PKG_CHECK_MODULES([FUSE], [fuse], [], [
+                         AC_SEARCH_LIBS([fuse_main], [fuse], [], [
+                             AC_MSG_ERROR([unable to find the fuse library])
+                         ])
+                     ])
+                     ],
+                     AC_MSG_ERROR([fuse.h not found: the fuse xml helper cannot be built]),
+                     [
+#define _FILE_OFFSET_BITS 64
+#include <fuse.h>
+                     ]
+    )
+fi
+
 AC_CONFIG_FILES(Makefile libroxml.pc)
 AC_OUTPUT
