@@ -15,16 +15,13 @@ endif
 INC = inc/roxml.h
 SRC_LIB = src/roxml.c src/roxml-internal.c src/roxml-parse-engine.c
 SRC_BIN = src/roxml-parser.c
-SRC_PY = src/roxml-python.c
 DEPS = $(patsubst %.c, $O/%.d, $(SRC_LIB) $(SRC_BIN))
 OBJS = $(OBJ_LIB) $(OBJ_BIN)
 OBJ_LIB = $(SRC_LIB:%.c=$O/%.o)
 OBJ_BIN = $(SRC_BIN:%.c=$O/%.o)
-OBJ_PY = $(SRC_PY:%.c=$O/%.o)
 TARGETS = $(TARGET_SLIB) $(TARGET_LN) $(TARGET_LIB) $(TARGET_BIN)
 TARGET_SLIB = $O/libroxml.a
 TARGET_LIB = $O/libroxml.so.0
-TARGET_PYLIB = $O/pyroxml.so
 TARGET_LN = $O/libroxml.so
 TARGET_BIN = $O/roxml
 BINS = $(TARGET_SLIB) $(TARGET_LIB) $(TARGET_LN) $(TARGET_BIN)
@@ -119,7 +116,7 @@ $(TARGET_BIN): | $(if $(filter -static, $(LDFLAGS)), $(TARGET_SLIB), $(TARGET_LI
 	$E $(CC) $(LDFLAGS) $^ -L$O -lroxml -o $@
 
 .PHONY : all
-all : $(TARGET_SLIB) $(if $(filter -static, $(LDFLAGS)), , $(TARGET_LN)) $(TARGET_BIN) $(PY_LIB)
+all : $(TARGET_SLIB) $(if $(filter -static, $(LDFLAGS)), , $(TARGET_LN)) $(TARGET_BIN)
 
 .PHONY : doxy
 doxy : doxy.cfg man.cfg
@@ -150,11 +147,6 @@ mrproper : clean
 	$E - $(FAKEROOT) $(MAKE) -f $(abspath $(DEBIAN_RULES)) clean >/dev/null 2>&1
 	$P '  CLEAN   fuse.xml'
 	$E - $(MAKE) -C $(abspath fuse.xml) mrproper >/dev/null
-
-.PHONY: $(TARGET_PYLIB)
-$(TARGET_PYLIB): $(TARGET_LIB) $(OBJ_PY)
-	$P '  CC $@'
-	$E $(CC) $(LDFLAGS) -shared $^ -L$O -lroxml -o $@
 
 .PHONY: fuse.xml
 fuse.xml: $(TARGET_LN)
