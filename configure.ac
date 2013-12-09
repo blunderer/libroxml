@@ -68,5 +68,24 @@ if test x$with_fuse = xyes; then
     )
 fi
 
+################################
+# Documentation
+################################
+AC_ARG_ENABLE(docs,
+              [AS_HELP_STRING([--enable-docs],
+              [Enable documentation build [default=no]])],
+              [],
+              [enable_docs=no])
+AM_CONDITIONAL(DOCS,test x$enable_docs != xno)
+if test x$enable_docs != xno; then
+    AC_PATH_PROG([DOXYGEN], [doxygen])
+    if test x$DOXYGEN = x; then
+        AC_MSG_ERROR([doxygen not found: the docs cannot be built])
+    fi
+fi
+
+################################
+# Output files
+################################
 AC_CONFIG_FILES(Makefile libroxml.pc)
 AC_OUTPUT

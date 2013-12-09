@@ -33,5 +33,9 @@
 /install-sh
 /missing
 
+/docs/html
+/docs/latex
+/docs/man
+
 /roxml
 /mount.fuse.xml

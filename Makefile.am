@@ -58,4 +58,42 @@ EXTRA_DIST += libroxml.pc.in
 # Additional project files
 EXTRA_DIST += \
 	License.txt \
-	CMakeLists.txt
+	CMakeLists.txt \
+	debian \
+	libroxml.spec
+
+# Documentation
+EXTRA_DIST += \
+	doxy.cfg \
+	man.cfg \
+	data \
+	docs
+
+if DOCS
+docs: doxygen-docs
+doxygen-docs: doxygen-html doxygen-man
+
+doxygen-html:
+	$(AM_V_GEN)$(DOXYGEN) doxy.cfg >/dev/null 2>&1
+	@cp data/icons/roxml.png docs/html/
+	@cp data/icons/libroxml-ex.png docs/html/
+
+doxygen-man:
+	$(AM_V_GEN)$(DOXYGEN) man.cfg >/dev/null 2>&1
+	@chmod -R a+rw docs
+	@rm docs/man/man3/*_inc_.3
+
+clean-local: docs-clean
+docs-clean:
+	rm -fr docs/man docs/html docs/latex
+
+man1_MANS = docs/roxml.1
+nodist_man3_MANS = docs/man/man3/*.3
+
+nodist_doc_DATA = docs/html/*
+
+$(man1_MANS): docs
+$(nodist_man3_MANS): docs
+$(nodist_doc_DATA): docs
+
+endif
