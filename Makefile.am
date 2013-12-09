@@ -41,7 +41,12 @@ bin_PROGRAMS = roxml
 roxml_SOURCES = src/roxml-parser.c
 roxml_LDADD = libroxml.la
 
+# pkg-config .pc file
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libroxml.pc
+EXTRA_DIST += libroxml.pc.in
+
 # Additional project files
-EXTRA_DIST = \
+EXTRA_DIST += \
 	License.txt \
 	CMakeLists.txt
