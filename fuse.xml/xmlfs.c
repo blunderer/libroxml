@@ -158,7 +158,7 @@ static int xmlfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, of
 			filler(buf, fname, NULL, 0);
 			roxml_release(name);
 		}
-		nb = roxml_get_text_nb(n);
+		nb = roxml_get_txt_nb(n);
 		if(nb > 0)	{
 			DEBUG("content file")
 			char fname[512];
