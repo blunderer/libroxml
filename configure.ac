@@ -24,6 +24,8 @@ AC_LIBTOOL_WIN32_DLL
 
 AC_CONFIG_HEADERS([inc/config.h])
 AM_INIT_AUTOMAKE(subdir-objects)
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
+AM_SILENT_RULES([yes])
 
 # needed to handle 64-bit architecture
 AC_CHECK_SIZEOF(int)
@@ -40,5 +42,5 @@ AC_ARG_ENABLE(debug,
               [enable_debug=no])
 AM_CONDITIONAL(DEBUG,test x$enable_debug = xyes)
 
-AC_CONFIG_FILES(Makefile)
+AC_CONFIG_FILES(Makefile libroxml.pc)
 AC_OUTPUT
