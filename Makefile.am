@@ -8,22 +8,22 @@ endif
 
 AUTOMAKE_OPTIONS = foreign nostdinc
 ACLOCAL_AMFLAGS = -I m4
-AM_CPPFLAGS = -I./inc -I$(top_srcdir)/inc
+AM_CPPFLAGS = -I$(top_srcdir)/src -I$(top_builddir)/src
 AM_LD = $(CC)
 AM_CFLAGS = -Wall $(DEBUG_CFLAGS)
 EXTRA_DIST =
 CLEANFILES =
 
 # Project headers
-include_HEADERS = inc/roxml.h
+include_HEADERS = src/roxml.h
 noinst_HEADERS = \
-	inc/roxml-defines.h \
-	inc/roxml-internal.h \
-	inc/roxml-parse-engine.h \
-	inc/roxml-tune.h \
-	inc/roxml-types.h \
-	inc/roxml-win32-native.h
-EXTRA_DIST += inc/roxml-doxy.h.in
+	src/roxml-defines.h \
+	src/roxml-internal.h \
+	src/roxml-parse-engine.h \
+	src/roxml-tune.h \
+	src/roxml-types.h \
+	src/roxml-win32-native.h
+EXTRA_DIST += src/roxml-doxy.h.in
 
 # Libraries
 lib_LTLIBRARIES = libroxml.la

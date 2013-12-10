@@ -22,7 +22,7 @@ AM_PROG_CC_C_O
 AC_PROG_LIBTOOL
 AC_LIBTOOL_WIN32_DLL
 
-AC_CONFIG_HEADERS([inc/config.h])
+AC_CONFIG_HEADERS([src/config.h])
 AM_INIT_AUTOMAKE(subdir-objects)
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
 AM_SILENT_RULES([yes])
@@ -209,5 +209,5 @@ AM_CONDITIONAL(ENABLE_TESTS,test x$enable_tests != xno)
 ################################
 # Output files
 ################################
-AC_CONFIG_FILES(Makefile libroxml.pc doxy.cfg man.cfg inc/roxml-doxy.h)
+AC_CONFIG_FILES(Makefile libroxml.pc doxy.cfg man.cfg src/roxml-doxy.h)
 AC_OUTPUT

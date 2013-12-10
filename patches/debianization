@@ -1,17 +1,17 @@
 Uses the dpkg-buildflags for building the debian package
 Index: libroxml/Makefile
 ===================================================================
---- libroxml.orig/Makefile	2013-09-24 09:33:27.420199129 -0700
-+++ libroxml/Makefile	2013-09-24 09:33:37.364199395 -0700
-@@ -45,9 +45,9 @@
+--- libroxml.orig/Makefile	2013-12-09 22:55:20.110948341 -0800
++++ libroxml/Makefile	2013-12-09 22:56:57.035448209 -0800
+@@ -44,9 +44,9 @@
  DEFINES = -DIGNORE_EMPTY_TEXT_NODES
  
  # options
--override CPPFLAGS += -Iinc/
--override CFLAGS += $(OPTIM) -fPIC -Wall -Wextra -Wno-unused-parameter -Wno-unused-result -Werror -Iinc/ $(DEFINES)
+-override CPPFLAGS += 
+-override CFLAGS += $(OPTIM) -fPIC -Wall -Wextra -Wno-unused-parameter -Wno-unused-result -Werror $(DEFINES)
 -override LDFLAGS += 
-+override CPPFLAGS += $(shell dpkg-buildflags --get CPPFLAGS) -Iinc/
-+override CFLAGS += $(shell dpkg-buildflags --get CFLAGS) $(OPTIM) -fPIC -Wall -Wextra -Wno-unused-parameter -Wno-unused-result -Werror -Iinc/ $(DEFINES)
++override CPPFLAGS += $(shell dpkg-buildflags --get CPPFLAGS)
++override CFLAGS += $(shell dpkg-buildflags --get CFLAGS) $(OPTIM) -fPIC -Wall -Wextra -Wno-unused-parameter -Wno-unused-result -Werror $(DEFINES)
 +override LDFLAGS += $(shell dpkg-buildflags --get LDFLAGS)
  
  ifeq ("$(OS)", "Darwin")

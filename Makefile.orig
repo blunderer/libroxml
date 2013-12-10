@@ -12,7 +12,7 @@ D = 0
 endif
 
 # files
-INC = inc/roxml.h
+INC = src/roxml.h
 SRC_LIB = src/roxml.c src/roxml-internal.c src/roxml-parse-engine.c
 SRC_BIN = src/roxml-parser.c
 DEPS = $(patsubst %.c, $O/%.d, $(SRC_LIB) $(SRC_BIN))
@@ -44,8 +44,8 @@ endif
 DEFINES = -DIGNORE_EMPTY_TEXT_NODES
 
 # options
-override CPPFLAGS += -Iinc/
-override CFLAGS += $(OPTIM) -fPIC -Wall -Wextra -Wno-unused-parameter -Wno-unused-result -Werror -Iinc/ $(DEFINES)
+override CPPFLAGS += 
+override CFLAGS += $(OPTIM) -fPIC -Wall -Wextra -Wno-unused-parameter -Wno-unused-result -Werror $(DEFINES)
 override LDFLAGS += 
 
 ifeq ("$(OS)", "Darwin")

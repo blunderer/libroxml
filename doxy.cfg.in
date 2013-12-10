@@ -656,13 +656,13 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = @top_srcdir@/src/roxml.c \
-                         @top_srcdir@/inc/roxml.h \
-                         @top_srcdir@/inc/roxml-internal.h \
+                         @top_srcdir@/src/roxml.h \
+                         @top_srcdir@/src/roxml-internal.h \
                          @top_srcdir@/src/roxml-internal.c \
-                         @top_srcdir@/inc/roxml-defines.h \
-                         @top_srcdir@/inc/roxml-types.h \
-                         @top_srcdir@/inc/roxml-tune.h \
-                         @top_srcdir@/inc/roxml-doxy.h
+                         @top_srcdir@/src/roxml-defines.h \
+                         @top_srcdir@/src/roxml-types.h \
+                         @top_srcdir@/src/roxml-tune.h \
+                         @top_srcdir@/src/roxml-doxy.h
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is
