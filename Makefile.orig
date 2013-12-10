@@ -119,17 +119,17 @@ $(TARGET_BIN): | $(if $(filter -static, $(LDFLAGS)), $(TARGET_SLIB), $(TARGET_LI
 all : $(TARGET_SLIB) $(if $(filter -static, $(LDFLAGS)), , $(TARGET_LN)) $(TARGET_BIN)
 
 .PHONY : doxy
-doxy : doxy.cfg man.cfg
+doxy : docs/doxy.cfg docs/man.cfg
 ifeq ("$(DOXYGEN)", "")
 	$P '  SKIP DOC'
 	$E echo "doxygen not found: skipping doc"
 else
 	$P '  DOXYGEN'
-	$E - $(DOXYGEN) doxy.cfg >/dev/null 2>&1
+	$E - $(DOXYGEN) docs/doxy.cfg >/dev/null 2>&1
 	$E - cp data/icons/roxml.png docs/html/
 	$E - cp data/icons/libroxml-ex.png docs/html/
 	$P '  MAN'
-	$E - $(DOXYGEN) man.cfg >/dev/null 2>&1
+	$E - $(DOXYGEN) docs/man.cfg >/dev/null 2>&1
 	$E - chmod -R a+rw docs
 	$E - rm docs/man/man3/*_inc_.3
 endif

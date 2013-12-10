@@ -31,10 +31,10 @@ stamp-h1
 /install-sh
 /missing
 
-/inc/config.h*
-/inc/roxml-doxy.h*
-/doxy.cfg
-/man.cfg
+/src/config.h*
+/src/roxml-doxy.h*
+/docs/doxy.cfg
+/docs/man.cfg
 /docs/html
 /docs/latex
 /docs/man

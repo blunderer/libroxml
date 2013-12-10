@@ -67,8 +67,6 @@ EXTRA_DIST += \
 
 # Documentation
 EXTRA_DIST += \
-	doxy.cfg.in \
-	man.cfg.in \
 	data \
 	docs
 
@@ -77,14 +75,13 @@ docs: doxygen-docs
 doxygen-docs: doxygen-html doxygen-man
 
 doxygen-html:
-	$(AM_V_GEN)$(DOXYGEN) doxy.cfg >/dev/null 2>&1
+	$(AM_V_GEN)$(DOXYGEN) docs/doxy.cfg >/dev/null 2>&1
 	$(AM_V_GEN)cp $(top_srcdir)/data/icons/roxml.png docs/html/
 	$(AM_V_GEN)cp $(top_srcdir)/data/icons/libroxml-ex.png docs/html/
 
 doxygen-man:
-	$(AM_V_GEN)$(DOXYGEN) man.cfg >/dev/null 2>&1
+	$(AM_V_GEN)$(DOXYGEN) docs/man.cfg >/dev/null 2>&1
 	$(AM_V_GEN)chmod -R a+rw docs
-	$(AM_V_GEN)rm docs/man/man3/*_inc_.3
 
 clean-local: docs-clean
 docs-clean:

@@ -209,5 +209,5 @@ AM_CONDITIONAL(ENABLE_TESTS,test x$enable_tests != xno)
 ################################
 # Output files
 ################################
-AC_CONFIG_FILES(Makefile libroxml.pc doxy.cfg man.cfg src/roxml-doxy.h)
+AC_CONFIG_FILES(Makefile libroxml.pc docs/doxy.cfg docs/man.cfg src/roxml-doxy.h)
 AC_OUTPUT
