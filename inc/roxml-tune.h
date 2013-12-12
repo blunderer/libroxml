@@ -57,8 +57,8 @@
 #error "roxml-defines.h must be included after roxml-tune.h to be tuned."
 #endif
 
-#ifdef ROXML_USER_CONFIG
-#include "../site.mk"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 
 /*************** Define the default behaviour **********************/

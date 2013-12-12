@@ -85,6 +85,81 @@ if test x$enable_docs != xno; then
 fi
 
 ################################
+# Tune options
+################################
+AC_DEFUN([AC_ROXML_TUNE],
+[
+    AC_ARG_ENABLE($1,
+                  [AS_HELP_STRING([$3],
+                  [$4 [default=$2]])],
+                  [
+                      if test x$enableval = xno; then
+                          $1=no
+                      else
+                          $1=yes
+                      fi
+                  ],
+                  [$1=$2]
+    )
+    if test x$$1 != xno; then
+        roxml_tune=1
+    else
+        roxml_tune=0
+    fi
+    AC_DEFINE_UNQUOTED([$5], [$roxml_tune], [$4 [default=$2]])
+    AC_MSG_NOTICE([Tune option $5 set to $roxml_tune])
+])
+
+# CONFIG_XML_THREAD_SAFE
+AC_ROXML_TUNE(xml_thread_safe,
+              [yes],
+              [--disable-xml-thread-safe],
+              [Is the target library thread safe or not.],
+              [CONFIG_XML_THREAD_SAFE])
+
+# CONFIG_XML_HEAP_BUFFERS
+AC_ROXML_TUNE(xml_heap_buffers,
+              [no],
+              [--enable-xml-heap-buffers],
+              [Is the target library uses stack for internal buffers or heap. This is not compatible with thread safety.],
+              [CONFIG_XML_HEAP_BUFFERS])
+
+# CONFIG_XML_SMALL_BUFFER
+AC_ROXML_TUNE(xml_small_buffer,
+              [no],
+              [--enable-xml-small-buffer],
+              [Define the size of internal buffer. For very small systems, large internal buffers can cause the systeml the behave strangely.],
+              [CONFIG_XML_SMALL_BUFFER])
+
+# CONFIG_XML_SMALL_INPUT_FILE
+AC_ROXML_TUNE(xml_small_input_file,
+              [no],
+              [--enable-xml-small-input-file],
+              [Limit the size of input XML libroxml can handle to 64kb instead of 4Gb. Setting this option will reduce the size of RAM loaded tree.],
+              [CONFIG_XML_SMALL_INPUT_FILE])
+
+# CONFIG_XML_READ_WRITE
+AC_ROXML_TUNE(xml_read_write,
+              [yes],
+              [--disable-xml-read-write],
+              [Can the target library modify XML tree. When set to 0, this result in smaller binary (this saves about 3kb).],
+              [CONFIG_XML_READ_WRITE])
+
+# CONFIG_XML_COMMIT_XML_TREE
+AC_ROXML_TUNE(xml_commit_xml_tree,
+              [yes],
+              [--disable-xml-commit-xml-tree],
+              [Can the target library commit a tree. When set to 0, this result in smaller binary (this saves about 5kb).],
+              [CONFIG_XML_COMMIT_XML_TREE])
+
+# CONFIG_XML_XPATH_ENGINE
+AC_ROXML_TUNE(xml_xpath_engine,
+              [yes],
+              [--disable-xml-xpath-engine],
+              [Can the target library perform xpath queries. When set to 0, this result in smaller binary (this saves about 20kb).],
+              [CONFIG_XML_XPATH_ENGINE])
+
+################################
 # Output files
 ################################
 AC_CONFIG_FILES(Makefile libroxml.pc)
