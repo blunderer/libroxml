@@ -17,12 +17,12 @@ EXTRA_DIST =
 include_HEADERS = inc/roxml.h
 noinst_HEADERS = \
 	inc/roxml-defines.h \
-	inc/roxml-doxy.h \
 	inc/roxml-internal.h \
 	inc/roxml-parse-engine.h \
 	inc/roxml-tune.h \
 	inc/roxml-types.h \
 	inc/roxml-win32-native.h
+EXTRA_DIST += inc/roxml-doxy.h.in
 
 # Libraries
 lib_LTLIBRARIES = libroxml.la
@@ -66,8 +66,8 @@ EXTRA_DIST += \
 
 # Documentation
 EXTRA_DIST += \
-	doxy.cfg \
-	man.cfg \
+	doxy.cfg.in \
+	man.cfg.in \
 	data \
 	docs
 

@@ -172,5 +172,5 @@ AC_ROXML_TUNE(xml_xpath_engine,
 ################################
 # Output files
 ################################
-AC_CONFIG_FILES(Makefile libroxml.pc)
+AC_CONFIG_FILES(Makefile libroxml.pc doxy.cfg man.cfg inc/roxml-doxy.h)
 AC_OUTPUT

@@ -32,6 +32,8 @@ inc/config.h*
 /depcomp
 /install-sh
 /missing
+/doxy.cfg
+/man.cfg
 
 /docs/html
 /docs/latex
