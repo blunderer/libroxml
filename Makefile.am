@@ -8,7 +8,7 @@ endif
 
 AUTOMAKE_OPTIONS = foreign nostdinc
 ACLOCAL_AMFLAGS = -I m4
-AM_CPPFLAGS = -I. -I$(top_srcdir) -I$(top_srcdir)/inc
+AM_CPPFLAGS = -I./inc -I$(top_srcdir)/inc
 AM_LD = $(CC)
 AM_CFLAGS = -Wall $(DEBUG_CFLAGS)
 EXTRA_DIST =
@@ -77,19 +77,19 @@ doxygen-docs: doxygen-html doxygen-man
 
 doxygen-html:
 	$(AM_V_GEN)$(DOXYGEN) doxy.cfg >/dev/null 2>&1
-	@cp data/icons/roxml.png docs/html/
-	@cp data/icons/libroxml-ex.png docs/html/
+	$(AM_V_GEN)cp $(top_srcdir)/data/icons/roxml.png docs/html/
+	$(AM_V_GEN)cp $(top_srcdir)/data/icons/libroxml-ex.png docs/html/
 
 doxygen-man:
 	$(AM_V_GEN)$(DOXYGEN) man.cfg >/dev/null 2>&1
-	@chmod -R a+rw docs
-	@rm docs/man/man3/*_inc_.3
+	$(AM_V_GEN)chmod -R a+rw docs
+	$(AM_V_GEN)rm docs/man/man3/*_inc_.3
 
 clean-local: docs-clean
 docs-clean:
 	rm -fr docs/man docs/html docs/latex
 
-man1_MANS = docs/roxml.1
+man1_MANS = $(top_srcdir)/docs/roxml.1
 nodist_man3_MANS = docs/man/man3/*.3
 
 nodist_doc_DATA = docs/html/*
