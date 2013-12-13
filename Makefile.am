@@ -34,12 +34,14 @@ libroxml_la_SOURCES = \
 	src/roxml-parse-engine.c
 libroxml_la_LDFLAGS = $(VERSION_INFO)
 
-# Binaries
-bin_PROGRAMS = roxml
+bin_PROGRAMS =
 
 # The roxml utility
-roxml_SOURCES = src/roxml-parser.c
-roxml_LDADD = libroxml.la
+if ENABLE_ROXML
+  bin_PROGRAMS += roxml
+  roxml_SOURCES = src/roxml-parser.c
+  roxml_LDADD = libroxml.la
+endif
 
 # mount.fuse.xml helper
 if WITH_FUSE

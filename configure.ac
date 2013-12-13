@@ -69,6 +69,16 @@ if test x$with_fuse = xyes; then
 fi
 
 ################################
+# Build roxml binary
+################################
+AC_ARG_ENABLE(roxml,
+              [AS_HELP_STRING([--disable-roxml],
+              [Disable roxml binary build [default=yes]])],
+              [],
+              [enable_roxml=yes])
+AM_CONDITIONAL(ENABLE_ROXML,test x$enable_roxml != xno)
+
+################################
 # Documentation
 ################################
 AC_ARG_ENABLE(docs,
