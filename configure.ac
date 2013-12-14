@@ -170,6 +170,16 @@ AC_ROXML_TUNE(xml_xpath_engine,
               [CONFIG_XML_XPATH_ENGINE])
 
 ################################
+# Build unit tests
+################################
+AC_ARG_ENABLE(tests,
+              [AS_HELP_STRING([--enable-tests],
+              [Enable unit tests build [default=no]])],
+              [],
+              [enable_tests=no])
+AM_CONDITIONAL(ENABLE_TESTS,test x$enable_tests != xno)
+
+################################
 # Output files
 ################################
 AC_CONFIG_FILES(Makefile libroxml.pc doxy.cfg man.cfg inc/roxml-doxy.h)
