@@ -32,6 +32,33 @@ AC_CHECK_SIZEOF(int)
 AC_CHECK_SIZEOF(long)
 AC_CHECK_SIZEOF(size_t)
 
+# tests some compiler flags
+AC_MSG_CHECKING([whether CC supports -Wno-unused])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+		[AC_MSG_RESULT([yes])]
+		[AM_TEST_CFLAGS="$AM_TEST_CFLAGS -Wno-unused"],
+		[AC_MSG_RESULT([no])])
+
+AC_MSG_CHECKING([whether CC supports -Wunused-parameter])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+		[AC_MSG_RESULT([yes])]
+		[AM_TEST_CFLAGS="$AM_TEST_CFLAGS -Wno-unused-parameter"],
+		[AC_MSG_RESULT([no])])
+
+AC_MSG_CHECKING([whether CC supports -Wunused-variable])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+		[AC_MSG_RESULT([yes])]
+		[AM_TEST_CFLAGS="$AM_TEST_CFLAGS -Wno-unused-variable"],
+		[AC_MSG_RESULT([no])])
+
+AC_MSG_CHECKING([whether CC supports -Wunused-but-set-variable])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+		[AC_MSG_RESULT([yes])]
+		[AM_TEST_CFLAGS="$AM_TEST_CFLAGS -Wno-unused-but-set-variable"],
+		[AC_MSG_RESULT([no])])
+
+AC_SUBST(AM_TEST_CFLAGS)
+
 ################################
 # Debugging options
 ################################

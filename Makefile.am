@@ -136,7 +136,7 @@ noinst_LIBRARIES = \
 		unittest/libroxml_test.a \
 		unittest/libroxml_test_tiny.a
 
-TEST_CFLAGS = -DUNITTEST -DREENTRANT -DLINUX -D__DEBUG -DIGNORE_EMPTY_TEXT_NODES -Wall
+TEST_CFLAGS = -DUNITTEST -DREENTRANT -DLINUX -D__DEBUG -DIGNORE_EMPTY_TEXT_NODES -Wall -Wextra @AM_TEST_CFLAGS@
 
 # Test library libroxml_test.a
 unittest_libroxml_test_a_SOURCES = \
