@@ -15,22 +15,26 @@ add_library(roxml-dynamic SHARED
 		${TOPDIR}src/roxml.c
 		${TOPDIR}src/roxml-internal.c
 		${TOPDIR}src/roxml-parse-engine.c
-		${TOPDIR}inc/roxml.h
-		${TOPDIR}inc/roxml-defines.h
-		${TOPDIR}inc/roxml-internal.h
-		${TOPDIR}inc/roxml-parse-engine.h
-		${TOPDIR}inc/roxml-types.h
+		${TOPDIR}src/roxml.h
+		${TOPDIR}src/roxml-defines.h
+		${TOPDIR}src/roxml-internal.h
+		${TOPDIR}src/roxml-parse-engine.h
+		${TOPDIR}src/roxml-types.h
+		${TOPDIR}src/roxml-tune.h
+		${TOPDIR}src/roxml-win32-native.h
 		)
 		
 add_library(roxml-static STATIC
 		${TOPDIR}src/roxml.c
 		${TOPDIR}src/roxml-internal.c
 		${TOPDIR}src/roxml-parse-engine.c
-		${TOPDIR}inc/roxml.h
-		${TOPDIR}inc/roxml-defines.h
-		${TOPDIR}inc/roxml-internal.h
-		${TOPDIR}inc/roxml-parse-engine.h
-		${TOPDIR}inc/roxml-types.h
+		${TOPDIR}src/roxml.h
+		${TOPDIR}src/roxml-defines.h
+		${TOPDIR}src/roxml-internal.h
+		${TOPDIR}src/roxml-parse-engine.h
+		${TOPDIR}src/roxml-types.h
+		${TOPDIR}src/roxml-tune.h
+		${TOPDIR}src/roxml-win32-native.h
 		)
 		
 add_executable(roxml-tool
@@ -58,5 +62,5 @@ set_target_properties (roxml-tool
 
 install (TARGETS roxml-dynamic roxml-static DESTINATION lib/)
 install (TARGETS roxml-tool DESTINATION bin/)
-install (FILES "${TOPDIR}inc/roxml.h" DESTINATION include/)
+install (FILES "${TOPDIR}src/roxml.h" DESTINATION include/)
 
