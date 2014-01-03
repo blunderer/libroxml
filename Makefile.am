@@ -92,11 +92,11 @@ docs-clean:
 man1_MANS = $(top_srcdir)/docs/roxml.1
 nodist_man3_MANS = docs/man/man3/*.3
 
-nodist_doc_DATA = docs/html/*
+nodist_html_DATA = docs/html/*
 
 $(man1_MANS): docs
 $(nodist_man3_MANS): docs
-$(nodist_doc_DATA): docs
+$(nodist_html_DATA): docs
 
 endif
 

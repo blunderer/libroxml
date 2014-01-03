@@ -12,7 +12,7 @@ CFLAGS=`dpkg-buildflags --get CFLAGS`
 LDFLAGS=`dpkg-buildflags --get LDFLAGS`
 CPPFLAGS=`dpkg-buildflags --get CPPFLAGS`
 
-CONFIGURE_FLAGS:=--prefix=/usr --enable-docs CC="$(CC)" CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"
+CONFIGURE_FLAGS:=--prefix=/usr --enable-docs --disable-silent-rules CC="$(CC)" CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"
 
 configure:
 	./configure $(CONFIGURE_FLAGS)
