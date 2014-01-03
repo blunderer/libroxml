@@ -61,13 +61,12 @@ EXTRA_DIST += libroxml.pc.in
 # Additional project files
 EXTRA_DIST += \
 	License.txt \
-	CMakeLists.txt \
-	debian \
-	libroxml.spec
+	CMakeLists.txt
 
 # Documentation
 EXTRA_DIST += \
-	data \
+	data/html \
+	data/icons \
 	docs
 
 if DOCS
@@ -102,20 +101,6 @@ $(nodist_doc_DATA): docs
 endif
 
 # Unit tests
-EXTRA_DIST += \
-	unittest/HOWTO \
-	unittest/libxml2.perf \
-	unittest/roxml.test.xml \
-	unittest/roxml.test.xml.attributes \
-	unittest/roxml.test.xml.human \
-	unittest/roxml.test.xml.invalid \
-	unittest/roxml.test.xml.multiple \
-	unittest/roxml.test.xml.ns \
-	unittest/roxml.test.xml.specnodes \
-	unittest/roxml.test.xml.valid \
-	unittest/roxml.test.xml.valid.comment \
-	unittest/roxml.test.xml.whitespaces \
-	unittest/roxml.test.xml.wrong
 
 if ENABLE_TESTS
 
@@ -126,7 +111,7 @@ noinst_bin_PROGRAMS = \
 	unittest/roxml.tiny.unitC
 noinst_bindir = unittest
 
-noinst_HEADERS += unittest/unittest.h
+nodist_noinst_HEADERS = unittest/unittest.h
 
 # Test libraries
 noinst_LIBRARIES = \
@@ -146,8 +131,7 @@ unittest_libroxml_test_a_CFLAGS = $(TEST_CFLAGS)
 unittest_libroxml_test_tiny_a_SOURCES = \
 	src/roxml.c \
 	src/roxml-internal.c \
-	src/roxml-parse-engine.c \
-	unittest/roxml.test.c
+	src/roxml-parse-engine.c
 unittest_libroxml_test_tiny_a_CFLAGS = \
 	$(TEST_CFLAGS) \
 	-UHAVE_CONFIG_H \
@@ -160,25 +144,25 @@ unittest_libroxml_test_tiny_a_CFLAGS = \
 	-DCONFIG_XML_XPATH_ENGINE=0
 
 # roxml.unitC
-unittest_roxml_unitC_SOURCES = \
+nodist_unittest_roxml_unitC_SOURCES = \
 	unittest/unittest.c \
 	unittest/roxml.test.c
 unittest_roxml_unitC_LDADD = unittest/libroxml_test.a
 unittest_roxml_unitC_CFLAGS = $(TEST_CFLAGS)
 
 # roxml.perf
-unittest_roxml_perf_SOURCES = \
+nodist_unittest_roxml_perf_SOURCES = \
 	unittest/roxml.perf.c
 unittest_roxml_perf_LDADD = unittest/libroxml_test.a
 unittest_roxml_perf_CFLAGS = -O3 -DREENTRANT -DLINUX -DIGNORE_EMPTY_TEXT_NODES -Wall
 
 # roxml.mem
-unittest_roxml_mem_SOURCES = unittest/roxml.mem.c
+nodist_unittest_roxml_mem_SOURCES = unittest/roxml.mem.c
 unittest_roxml_mem_LDADD = unittest/libroxml_test.a
 unittest_roxml_mem_CFLAGS = $(TEST_CFLAGS)
 
 # roxml.tiny.unitC
-unittest_roxml_tiny_unitC_SOURCES = unittest/unittest.c
+nodist_unittest_roxml_tiny_unitC_SOURCES = unittest/unittest.c
 unittest_roxml_tiny_unitC_LDADD = unittest/libroxml_test_tiny.a
 unittest_roxml_tiny_unitC_CFLAGS = $(TEST_CFLAGS)
 
