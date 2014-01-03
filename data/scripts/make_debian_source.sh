@@ -10,36 +10,34 @@ VERSION=$1
 TOP_DIR=$(cd $(dirname $0)/../../ && pwd)
 TMP_DIR=/tmp/build-libroxml-$(date +"%y%m%d%H%M%S")
 
-LIBROXML_VERSION=$(sed -n "s,\(Version: \)\(.*\),\2,p" $TOP_DIR/libroxml.pc)
+LIBROXML_MAJOR=$(sed -n 's#.*MAJOR_VERSION.*, \(.*\))$#\1#p' $TOP_DIR/configure.ac)
+LIBROXML_MINOR=$(sed -n 's#.*MINOR_VERSION.*, \(.*\))$#\1#p' $TOP_DIR/configure.ac)
+LIBROXML_MICRO=$(sed -n 's#.*MICRO_VERSION.*, \(.*\))$#\1#p' $TOP_DIR/configure.ac)
+LIBROXML_VERSION=$LIBROXML_MAJOR.$LIBROXML_MINOR.$LIBROXML_MICRO
 
 mkdir -p $TMP_DIR
+mkdir -p $TMP_DIR/logs
 
-echo "Exporting from GIT @$VERSION"
-(cd $TOP_DIR && git archive --format=tar --prefix=libroxml-$VERSION/ $VERSION . | gzip > $TMP_DIR/libroxml-$VERSION.tar.gz)
-tar zxf $TMP_DIR/libroxml-$VERSION.tar.gz -C $TMP_DIR/ && rm -f $TMP_DIR/libroxml-$VERSION.tar.gz
+echo "== Exporting from GIT @$VERSION libroxml-$LIBROXML_VERSION =="
+(cd $TOP_DIR && git archive --format=tar --prefix=libroxml-$VERSION/ $VERSION . > $TMP_DIR/libroxml-$VERSION.tar)
+tar xf $TMP_DIR/libroxml-$VERSION.tar -C $TMP_DIR/ && rm -f $TMP_DIR/libroxml-$VERSION.tar
 
-echo "Cleaning repository"
-rm -fr $TMP_DIR/libroxml-$VERSION/unittest
-rm -fr $TMP_DIR/libroxml-$VERSION/data/scripts
-rm -fr $TMP_DIR/libroxml-$VERSION/libroxml.spec
-rm -fr $TMP_DIR/libroxml-$VERSION/TODO
-rm -fr $TMP_DIR/libroxml-$VERSION/.gitignore
+echo "== Generating upstream sources =="
+(cd $TMP_DIR/libroxml-$VERSION/ && ./autogen.sh) &> $TMP_DIR/logs/upstream-source.txt
+(cd $TMP_DIR/libroxml-$VERSION/ && ./configure) >> $TMP_DIR/logs/upstream-source.txt
+(cd $TMP_DIR/libroxml-$VERSION/ && make dist-gzip && mv libroxml-$LIBROXML_VERSION.tar.gz ..) >> $TMP_DIR/logs/upstream-source.txt
 
-mv $TMP_DIR/libroxml-$VERSION/debian $TMP_DIR/
+echo "== Generating debian source package =="
+(cd $TMP_DIR/ && tar zxf libroxml-$LIBROXML_VERSION.tar.gz)
+cp -a $TMP_DIR/libroxml-$LIBROXML_VERSION.tar.gz $TMP_DIR/libroxml_$LIBROXML_VERSION.orig.tar.gz
+cp -a $TMP_DIR/libroxml-$VERSION/debian $TMP_DIR/libroxml-$LIBROXML_VERSION
 
-echo "Export native source package"
-cd $TMP_DIR
-mv libroxml-$VERSION libroxml-$LIBROXML_VERSION 
-tar zcf libroxml-$LIBROXML_VERSION.tar.gz libroxml-$LIBROXML_VERSION > /dev/null
-mv libroxml-$LIBROXML_VERSION libroxml_$LIBROXML_VERSION 
+echo "== Build package =="
+(cd $TMP_DIR/libroxml-$LIBROXML_VERSION/ && QUILT_PATCHES=debian/patches quilt push -a) > $TMP_DIR/logs/buildpackage.txt
+(cd $TMP_DIR/libroxml-$LIBROXML_VERSION/ && dpkg-buildpackage -us -uc) &>> $TMP_DIR/logs/buildpackage.txt
 
-echo "Generate original package"
-tar zcf libroxml_$LIBROXML_VERSION.orig.tar.gz libroxml_$LIBROXML_VERSION > /dev/null
-
-echo "Build package"
-mv $TMP_DIR/debian $TMP_DIR/libroxml_$LIBROXML_VERSION/
-(cd $TMP_DIR/libroxml_$LIBROXML_VERSION/ && QUILT_PATCHES=debian/patches quilt push -a)
-(cd $TMP_DIR/libroxml_$LIBROXML_VERSION/ && dpkg-buildpackage)
+echo "== Analyze package =="
+(cd $TMP_DIR/ && lintian -vIiE --pedantic --color=auto *.changes *.deb *.dsc) > $TMP_DIR/logs/lintian.txt
 
 echo "********************************************************************"
 echo "Your package is built in '$TMP_DIR'"
