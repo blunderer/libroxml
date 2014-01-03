@@ -8,17 +8,25 @@ version=2.2.3
 major=2
 LD_LIBRARY_PATH:=$(LD_LIBRARY_PATH):.
 
+CFLAGS=`dpkg-buildflags --get CFLAGS`
+LDFLAGS=`dpkg-buildflags --get LDFLAGS`
+CPPFLAGS=`dpkg-buildflags --get CPPFLAGS`
+
+CONFIGURE_FLAGS:=--prefix=/usr --enable-docs CC="$(CC)" CFLAGS="$(CFLAGS)" CPPFLAGS="$(CPPFLAGS)" LDFLAGS="$(LDFLAGS)"
+
+configure:
+	./configure $(CONFIGURE_FLAGS)
+
 build: build-arch build-indep
 build-indep: ;
-build-arch: 
+build-arch: configure
 	dh_testdir
-	$(MAKE) doxy
 	$(MAKE)
 
 clean: 
 	dh_testdir
 	dh_testroot
-	$(MAKE) mrproper
+	[ ! -f Makefile ] || $(MAKE) -f Makefile distclean
 	dh_clean 
 
 install: build
@@ -26,7 +34,7 @@ install: build
 	dh_testroot
 	dh_prep
 	dh_installdirs
-	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp/usr install
+	$(MAKE) DESTDIR=$(CURDIR)/debian/tmp/ install
 
 
 # Build architecture-independent files here.

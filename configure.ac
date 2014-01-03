@@ -200,10 +200,13 @@ AC_ROXML_TUNE(xml_xpath_engine,
 # Build unit tests
 ################################
 AC_ARG_ENABLE(tests,
-              [AS_HELP_STRING([--enable-tests],
-              [Enable unit tests build [default=no]])],
-              [],
-              [enable_tests=no])
+	      [AS_HELP_STRING([--enable-tests],
+	      [Enable unit tests build (only available from git repository)[default=no]])],
+	      [],
+	      [enable_tests=no])
+if test x$enable_tests != xno; then
+	AC_CHECK_FILE(unittest/unittest.c, , enable_tests=no)
+fi
 AM_CONDITIONAL(ENABLE_TESTS,test x$enable_tests != xno)
 
 ################################
