@@ -5,7 +5,10 @@ if [ ! -f data/scripts/update_version ]; then
 	exit 1
 fi
 
-PREV_VERS=$(sed -n "s,\(Version: \)\(.*\),\2,p" libroxml.pc)
+LIBROXML_MAJOR=$(sed -n 's#.*MAJOR_VERSION.*, \(.*\))$#\1#p' configure.ac)
+LIBROXML_MINOR=$(sed -n 's#.*MINOR_VERSION.*, \(.*\))$#\1#p' configure.ac)
+LIBROXML_MICRO=$(sed -n 's#.*MICRO_VERSION.*, \(.*\))$#\1#p' configure.ac)
+PREV_VERS=$LIBROXML_MAJOR.$LIBROXML_MINOR.$LIBROXML_MICRO
 
 echo -n "previous version (detected=$PREV_VERS): "
 read ANS
@@ -24,26 +27,11 @@ DATE=$(LANG=C date +"%a, %d %b %Y %X %z")
 # debian/rules 'version=VERSION'
 sed -i "s,\(version=\).*,\1$VERSION," debian/rules
 
-# libroxml.pc 'Version: VERSION'
-sed -i "s,\(Version: \).*,\1$VERSION," libroxml.pc
-
 # libroxml.spec 'version VERSION'
 sed -i "s,\(version \).*,\1$VERSION," libroxml.spec
 
-# doxy.cfg 'PROJECT_NUMBER         = VERSION'
-sed -i "s,\(PROJECT_NUMBER.*= \).*,\1$VERSION," doxy.cfg
-
-# man.cfg 'PROJECT_NUMBER         = VERSION'
-sed -i "s,\(PROJECT_NUMBER.*= \).*,\1$VERSION," man.cfg
-
 # CMakeLists.txt 'set (SOVERSION "2.0.2")'
 sed -i "s,\(set (SOVERSION \"\).*\(\")\),\1$VERSION\2," CMakeLists.txt
-
-# inc/roxml-doxy.h 'Lastest version is VERSION'
-sed -i "s,\(Lastest version is \)[0-9]*\.[0-9]*\.[0-9]*\(:.*\),\1$VERSION\2," inc/roxml-doxy.h
-
-# inc/roxml-doxy.h 'libroxml-VERSION.tar.gz'
-sed -i "s,\(libroxml-\)[0-9]*\.[0-9]*\.[0-9]*\(.tar.gz\),\1$VERSION\2," inc/roxml-doxy.h
 
 # debian/changelog
 echo "libroxml ($VERSION-1) unstable; urgency=low" > .debian.changelog
