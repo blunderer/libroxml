@@ -59,15 +59,55 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
 
 AC_SUBST(AM_TEST_CFLAGS)
 
+AC_MSG_NOTICE()
+AC_MSG_NOTICE(Configuration is:)
+AC_MSG_NOTICE()
+AC_MSG_NOTICE(General:)
+
 ################################
-# Debugging options
+# Build roxml binary
 ################################
-AC_ARG_ENABLE(debug,
-              [AS_HELP_STRING([--enable-debug],
-              [Turn on debugging [default=no]])],
+AC_ARG_ENABLE(roxml,
+              [AS_HELP_STRING([--disable-roxml],
+              [Disable roxml binary build [default=yes]])],
               [],
-              [enable_debug=no])
-AM_CONDITIONAL(DEBUG,test x$enable_debug = xyes)
+              [enable_roxml=yes])
+AM_CONDITIONAL(ENABLE_ROXML,test x$enable_roxml != xno)
+
+AC_MSG_NOTICE(Roxml shell parser    ......... $enable_roxml)
+
+################################
+# Documentation
+################################
+AC_ARG_ENABLE(docs,
+              [AS_HELP_STRING([--enable-docs],
+              [Enable documentation build [default=no]])],
+              [],
+              [enable_docs=no])
+AM_CONDITIONAL(DOCS,test x$enable_docs != xno)
+if test x$enable_docs != xno; then
+    AC_PATH_PROG([DOXYGEN], [doxygen])
+    if test x$DOXYGEN = x; then
+        AC_MSG_ERROR([doxygen not found: the docs cannot be built])
+    fi
+fi
+
+AC_MSG_NOTICE(Documentation         ......... $enable_docs)
+
+################################
+# Build unit tests
+################################
+AC_ARG_ENABLE(tests,
+	      [AS_HELP_STRING([--enable-tests],
+	      [Enable unit tests build (only available from git repository)[default=no]])],
+	      [],
+	      [enable_tests=no])
+if test x$enable_tests != xno; then
+	AC_CHECK_FILE(unittest/unittest.c, , enable_tests=no)
+fi
+AM_CONDITIONAL(ENABLE_TESTS,test x$enable_tests != xno)
+
+AC_MSG_NOTICE(Unittests             ......... $enable_tests)
 
 ################################
 # Fuse helper
@@ -95,35 +135,26 @@ if test x$with_fuse = xyes; then
     )
 fi
 
-################################
-# Build roxml binary
-################################
-AC_ARG_ENABLE(roxml,
-              [AS_HELP_STRING([--disable-roxml],
-              [Disable roxml binary build [default=yes]])],
-              [],
-              [enable_roxml=yes])
-AM_CONDITIONAL(ENABLE_ROXML,test x$enable_roxml != xno)
+AC_MSG_NOTICE(Fuse module           ......... $with_fuse)
 
 ################################
-# Documentation
+# Debugging options
 ################################
-AC_ARG_ENABLE(docs,
-              [AS_HELP_STRING([--enable-docs],
-              [Enable documentation build [default=no]])],
+AC_ARG_ENABLE(debug,
+              [AS_HELP_STRING([--enable-debug],
+              [Turn on debugging [default=no]])],
               [],
-              [enable_docs=no])
-AM_CONDITIONAL(DOCS,test x$enable_docs != xno)
-if test x$enable_docs != xno; then
-    AC_PATH_PROG([DOXYGEN], [doxygen])
-    if test x$DOXYGEN = x; then
-        AC_MSG_ERROR([doxygen not found: the docs cannot be built])
-    fi
-fi
+              [enable_debug=no])
+AM_CONDITIONAL(DEBUG,test x$enable_debug = xyes)
+
+AC_MSG_NOTICE(Debug                 ......... $enable_debug)
 
 ################################
 # Tune options
 ################################
+AC_MSG_NOTICE()
+AC_MSG_NOTICE(Tuning:)
+
 AC_DEFUN([AC_ROXML_TUNE],
 [
     AC_ARG_ENABLE($1,
@@ -140,11 +171,12 @@ AC_DEFUN([AC_ROXML_TUNE],
     )
     if test x$$1 != xno; then
         roxml_tune=1
+	AC_MSG_NOTICE([$6 ......... $7])
     else
         roxml_tune=0
+	AC_MSG_NOTICE([$6 ......... $8])
     fi
     AC_DEFINE_UNQUOTED([$5], [$roxml_tune], [$4 [default=$2]])
-    AC_MSG_NOTICE([Tune option $5 set to $roxml_tune])
 ])
 
 # CONFIG_XML_THREAD_SAFE
@@ -152,65 +184,60 @@ AC_ROXML_TUNE(xml_thread_safe,
               [yes],
               [--disable-xml-thread-safe],
               [Is the target library thread safe or not.],
-              [CONFIG_XML_THREAD_SAFE])
+              [CONFIG_XML_THREAD_SAFE],
+	      Thread safety        ,yes,no)
 
 # CONFIG_XML_HEAP_BUFFERS
 AC_ROXML_TUNE(xml_heap_buffers,
               [no],
               [--enable-xml-heap-buffers],
               [Is the target library uses stack for internal buffers or heap. This is not compatible with thread safety.],
-              [CONFIG_XML_HEAP_BUFFERS])
+              [CONFIG_XML_HEAP_BUFFERS],
+	      Buffers type         ,stack,heap)
 
 # CONFIG_XML_SMALL_BUFFER
 AC_ROXML_TUNE(xml_small_buffer,
               [no],
               [--enable-xml-small-buffer],
               [Define the size of internal buffer. For very small systems, large internal buffers can cause the systeml the behave strangely.],
-              [CONFIG_XML_SMALL_BUFFER])
+              [CONFIG_XML_SMALL_BUFFER],
+	      Internal buffers     ,small,standard)
 
 # CONFIG_XML_SMALL_INPUT_FILE
 AC_ROXML_TUNE(xml_small_input_file,
               [no],
               [--enable-xml-small-input-file],
               [Limit the size of input XML libroxml can handle to 64kb instead of 4Gb. Setting this option will reduce the size of RAM loaded tree.],
-              [CONFIG_XML_SMALL_INPUT_FILE])
+              [CONFIG_XML_SMALL_INPUT_FILE],
+	      Input file           ,small (< 64kB),large (> 64kB))
 
 # CONFIG_XML_READ_WRITE
 AC_ROXML_TUNE(xml_read_write,
               [yes],
               [--disable-xml-read-write],
               [Can the target library modify XML tree. When set to 0, this result in smaller binary (this saves about 3kb).],
-              [CONFIG_XML_READ_WRITE])
+              [CONFIG_XML_READ_WRITE],
+	      Write support        ,yes,no)
 
 # CONFIG_XML_COMMIT_XML_TREE
 AC_ROXML_TUNE(xml_commit_xml_tree,
               [yes],
               [--disable-xml-commit-xml-tree],
               [Can the target library commit a tree. When set to 0, this result in smaller binary (this saves about 5kb).],
-              [CONFIG_XML_COMMIT_XML_TREE])
+              [CONFIG_XML_COMMIT_XML_TREE],
+	      Commit support       ,yes,no)
 
 # CONFIG_XML_XPATH_ENGINE
 AC_ROXML_TUNE(xml_xpath_engine,
               [yes],
               [--disable-xml-xpath-engine],
               [Can the target library perform xpath queries. When set to 0, this result in smaller binary (this saves about 20kb).],
-              [CONFIG_XML_XPATH_ENGINE])
-
-################################
-# Build unit tests
-################################
-AC_ARG_ENABLE(tests,
-	      [AS_HELP_STRING([--enable-tests],
-	      [Enable unit tests build (only available from git repository)[default=no]])],
-	      [],
-	      [enable_tests=no])
-if test x$enable_tests != xno; then
-	AC_CHECK_FILE(unittest/unittest.c, , enable_tests=no)
-fi
-AM_CONDITIONAL(ENABLE_TESTS,test x$enable_tests != xno)
+              [CONFIG_XML_XPATH_ENGINE],
+	      Xpath support        ,yes,no)
 
 ################################
 # Output files
 ################################
+AC_MSG_NOTICE()
 AC_CONFIG_FILES(Makefile libroxml.pc docs/doxy.cfg docs/man.cfg src/roxml-doxy.h)
 AC_OUTPUT
