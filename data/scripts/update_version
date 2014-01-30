@@ -21,9 +21,18 @@ if [ -z "$ANS" ]; then
 fi
 VERSION=$ANS
 
+MAJOR=$(echo $VERSION | cut -d"." -f1)
+MINOR=$(echo $VERSION | cut -d"." -f2)
+MICRO=$(echo $VERSION | cut -d"." -f3)
+
 DATE=$(LANG=C date +"%a, %d %b %Y %X %z")
 
 # update version number in required files:
+# configure.ac 'version=VERSION"
+sed -i "s#\(.*MAJOR_VERSION.*, \)\(.*\))\$#\1$MAJOR)#" configure.ac
+sed -i "s#\(.*MINOR_VERSION.*, \)\(.*\))\$#\1$MINOR)#" configure.ac
+sed -i "s#\(.*MICRO_VERSION.*, \)\(.*\))\$#\1$MICRO)#" configure.ac
+
 # debian/rules 'version=VERSION'
 sed -i "s,\(version=\).*,\1$VERSION," debian/rules
 

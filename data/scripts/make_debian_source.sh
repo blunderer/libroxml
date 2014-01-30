@@ -19,18 +19,18 @@ mkdir -p $TMP_DIR
 mkdir -p $TMP_DIR/logs
 
 echo "== Exporting from GIT @$VERSION libroxml-$LIBROXML_VERSION =="
-(cd $TOP_DIR && git archive --format=tar --prefix=libroxml-$VERSION/ $VERSION . > $TMP_DIR/libroxml-$VERSION.tar)
-tar xf $TMP_DIR/libroxml-$VERSION.tar -C $TMP_DIR/ && rm -f $TMP_DIR/libroxml-$VERSION.tar
+(cd $TOP_DIR && git archive --format=tar --prefix=libroxml-git-$VERSION/ $VERSION . > $TMP_DIR/libroxml-git-$VERSION.tar)
+tar xf $TMP_DIR/libroxml-git-$VERSION.tar -C $TMP_DIR/ && rm -f $TMP_DIR/libroxml-git-$VERSION.tar
 
 echo "== Generating upstream sources =="
-(cd $TMP_DIR/libroxml-$VERSION/ && ./autogen.sh) &> $TMP_DIR/logs/upstream-source.txt
-(cd $TMP_DIR/libroxml-$VERSION/ && ./configure) >> $TMP_DIR/logs/upstream-source.txt
-(cd $TMP_DIR/libroxml-$VERSION/ && make dist-gzip && mv libroxml-$LIBROXML_VERSION.tar.gz ..) >> $TMP_DIR/logs/upstream-source.txt
+(cd $TMP_DIR/libroxml-git-$VERSION/ && ./autogen.sh) &> $TMP_DIR/logs/upstream-source.txt
+(cd $TMP_DIR/libroxml-git-$VERSION/ && ./configure) >> $TMP_DIR/logs/upstream-source.txt
+(cd $TMP_DIR/libroxml-git-$VERSION/ && make dist-gzip && mv libroxml-$LIBROXML_VERSION.tar.gz ..) >> $TMP_DIR/logs/upstream-source.txt
 
 echo "== Generating debian source package =="
 (cd $TMP_DIR/ && tar zxf libroxml-$LIBROXML_VERSION.tar.gz)
 cp -a $TMP_DIR/libroxml-$LIBROXML_VERSION.tar.gz $TMP_DIR/libroxml_$LIBROXML_VERSION.orig.tar.gz
-cp -a $TMP_DIR/libroxml-$VERSION/debian $TMP_DIR/libroxml-$LIBROXML_VERSION
+cp -a $TMP_DIR/libroxml-git-$VERSION/debian $TMP_DIR/libroxml-$LIBROXML_VERSION
 
 echo "== Build package =="
 (cd $TMP_DIR/libroxml-$LIBROXML_VERSION/ && QUILT_PATCHES=debian/patches quilt push -a) > $TMP_DIR/logs/buildpackage.txt
