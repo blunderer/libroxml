@@ -57,11 +57,13 @@
 #define ROXML_FUNC_PI		9
 #define ROXML_FUNC_XPATH	10
 #define ROXML_FUNC_NSURI	11
+#define ROXML_FUNC_LNAME	12
 
 #define ROXML_FUNC_POS_STR	"position()"
 #define ROXML_FUNC_FIRST_STR	"first()"
 #define ROXML_FUNC_LAST_STR	"last()"
 #define ROXML_FUNC_NSURI_STR	"namespace-uri()"
+#define ROXML_FUNC_LNAME_STR	"local-name()"
 
 #define ROXML_FUNC_TEXT_STR	"text()"
 #define ROXML_FUNC_NODE_STR	"node()"

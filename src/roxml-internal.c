@@ -507,6 +507,7 @@ int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t **xpath, int context)
 	parser = roxml_append_parser_item(parser, ROXML_FUNC_FIRST_STR, _func_xpath_first);
 	parser = roxml_append_parser_item(parser, ROXML_FUNC_LAST_STR, _func_xpath_last);
 	parser = roxml_append_parser_item(parser, ROXML_FUNC_NSURI_STR, _func_xpath_nsuri);
+	parser = roxml_append_parser_item(parser, ROXML_FUNC_LNAME_STR, _func_xpath_lname);
 	parser = roxml_append_parser_item(parser, NULL, _func_xpath_default);
 
 	parser = roxml_parser_prepare(parser);
@@ -695,6 +696,11 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t * candidat)
 				sarg2 = condition->arg2;
 				status = roxml_string_cmp("", sarg2, condition->op);
 			}
+		} else if (condition->func == ROXML_FUNC_LNAME) {
+			ROXML_GET_BASE_BUFFER(strval);
+			roxml_get_name(candidat, strval, ROXML_BASE_LEN);
+			status = strcmp(strval, condition->arg2) == 0;
+			ROXML_PUT_BASE_BUFFER(strval);
 		} else if (condition->func == ROXML_FUNC_STRCOMP) {
 			node_t *val = roxml_get_attr(candidat, condition->arg1 + 1, 0);
 			status = 0;

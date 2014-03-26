@@ -97,6 +97,7 @@ int _func_xpath_position(char *chunk, void *data);
 int _func_xpath_first(char *chunk, void *data);
 int _func_xpath_last(char *chunk, void *data);
 int _func_xpath_nsuri(char *chunk, void *data);
+int _func_xpath_lname(char *chunk, void *data);
 int _func_xpath_operator_add(char *chunk, void *data);
 int _func_xpath_operator_subs(char *chunk, void *data);
 int _func_xpath_default(char *chunk, void *data);

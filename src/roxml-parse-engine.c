@@ -590,6 +590,14 @@ int _func_xpath_nsuri(char *chunk, void *data)
 	return _func_xpath_funcs(chunk, data, ROXML_FUNC_NSURI, ROXML_FUNC_NSURI_STR);
 }
 
+int _func_xpath_lname(char *chunk, void *data)
+{
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	return _func_xpath_funcs(chunk, data, ROXML_FUNC_LNAME, ROXML_FUNC_LNAME_STR);
+}
+
 int _func_xpath_operator_add(char *chunk, void *data)
 {
 #ifdef DEBUG_PARSING
