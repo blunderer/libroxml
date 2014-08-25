@@ -27,10 +27,6 @@
 #ifndef ROXML_H
 #define ROXML_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 /**
  * \def ROXML_API
  * 
@@ -49,6 +45,13 @@
  */
 typedef struct node node_t;
 #endif
+
+/**
+ * \def ROXML_INVALID_NODE
+ * 
+ * constant for invalid nodes
+ */
+#define ROXML_INVALID_NODE	0x00
 
 /**
  * \def ROXML_ATTR_NODE

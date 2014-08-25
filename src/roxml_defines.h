@@ -1,4 +1,4 @@
-/** \file roxml-defines.h
+/** \file roxml_defines.h
  *  \brief internal header for libroxml.so
  *
  * This is the internal header file used by roxml.c
@@ -25,7 +25,7 @@
 #define ROXML_DEF_H
 
 #ifndef ROXML_TUNE_H
-#error "roxml-tune.h must be included before roxml-def.h to tune it."
+#error "roxml_tune.h must be included before roxml_defines.h to tune it."
 #endif
 
 #define ROXML_PATH_OR	"|"

@@ -3,7 +3,8 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <sys/time.h>
-#include "roxml-internal.h"
+#include <string.h>
+#include "roxml_internal.h"
 
 int main(int argc, char ** argv)
 {

@@ -2,7 +2,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
-#include "roxml-internal.h"
+#include <string.h>
+#include "roxml_internal.h"
+#include "roxml_core.h"
 
 int main(int argc, char ** argv)
 {

@@ -1,4 +1,4 @@
-/** \file roxml-parser.c
+/** \file roxml_parser.c
  *  \brief command line xml parser
  *
  * \author blunderer <blunderer@blunderer.org>
@@ -25,6 +25,9 @@
 #include "roxml.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 void print_help(void)
 {

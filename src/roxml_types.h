@@ -1,4 +1,4 @@
-/** \file roxml-types.h
+/** \file roxml_types.h
  *  \brief internal header for libroxml.so
  *
  * This is the internal header file used by roxml.c
@@ -23,6 +23,8 @@
 
 #ifndef ROXML_TYPES_H
 #define ROXML_TYPES_H
+
+#include <stdio.h>
 
 /** \typedef roxml_parse_func 
  *

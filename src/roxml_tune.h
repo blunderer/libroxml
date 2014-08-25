@@ -1,4 +1,4 @@
-/** \file roxml-tune.h
+/** \file roxml_tune.h
  *  \brief header for libroxml.so
  *         
  * This is the header file used to tune libroxml.
@@ -26,27 +26,20 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-/** \page roxml-tune tuning libroxml
+/** \page roxml_tune tuning libroxml
  *
  * Being dedicated to embedded systems, libroxml include the ability to tune its behaviour.
- * files \file roxml-tune.h, \file roxml-tiny.h and \file site.in are used for that purpose.
+ * files \file roxml_tune.h, \file roxml_tiny.h and \file site.in are used for that purpose.
  * 
- * \section tune <roxml-tune>
+ * \section tune <roxml_tune>
  * This file describe all options that can be used. Each consist of a #define CONFIG_XML_xxx set to
  * either 0 or 1. This file describes default values and should not be modified but to had options. 
  *
- * This file also implements some tuning options. We try not to use #defines all over the code except 
- * to activate or remove some portion. Instead, we do define macros.
+ * The configure mecanism will be used to select which files needs to be compiled in. The roxml_stub 
+ * will provide an empty stub API when function is disabled to make sure the library interface stays
+ * consistent.
  *
- * \section tune_end </roxml-tune>
- *
- * \section mk <site.mk>
- * This file is actually not handled in the source control system. The sample site.in is provided. Creating the site.mk
- * file in the libroxml root directory will automagically turn the USER DEFINED CONF behaviour.
- * Users should activate or remove options using this file.
- * All options are describer into file \file roxml-tune.h
- *
- * \section mk_end </roxml.mk>
+ * \section tune_end </roxml_tune>
  *
  */
 
@@ -54,7 +47,7 @@
 #define ROXML_TUNE_H
 
 #ifdef ROXML_DEF_H
-#error "roxml-defines.h must be included after roxml-tune.h to be tuned."
+#error "roxml_defines.h must be included after roxml_tune.h to be tuned."
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -155,7 +148,7 @@
 	#define pthread_mutex_destroy(a)
 #else /* CONFIG_XML_THREAD_SAFE==1 */
 	#if defined(_WIN32)
-		#include "roxml-win32-native.h"
+		#include "roxml_win32_native.h"
 	#else
 		#include <pthread.h>
 	#endif

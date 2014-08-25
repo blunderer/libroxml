@@ -1,355 +1,70 @@
-/** \file roxml-internal.c
- *  \brief source for libroxml.so
- *
- * This is the source file for lib libroxml.so internal functions
- * \author blunderer <blunderer@blunderer.org>
- * \date 11 Jan 2010
- *
- * Copyright (C) 2010 blunderer
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * The author added a static linking exception, see License.txt.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
- */
+#include <stdlib.h>
+#include <string.h>
+#include <roxml_mem.h>
+#include <roxml_core.h>
+#include <roxml_xpath.h>
+#include <roxml_parser.h>
 
-#include "roxml-internal.h"
-#include "roxml-parse-engine.h"
-
-#ifdef __DEBUG
-unsigned int _nb_node = 0;
-unsigned int _nb_attr = 0;
-unsigned int _nb_text = 0;
-#endif
-
-/** \brief head of memory manager */
-memory_cell_t head_cell = { PTR_NONE, 0, NULL, 0, NULL, NULL };
-
-void ROXML_INT *roxml_malloc(int size, int num, int type)
-{
-	memory_cell_t *cell = &head_cell;
-	while (cell->next != NULL) {
-		cell = cell->next;
-	}
-	cell->next = (memory_cell_t *) malloc(sizeof(memory_cell_t));
-	if (!cell->next) {
-		return NULL;
-	}
-	cell->next->next = NULL;
-	cell->next->prev = cell;
-	cell = cell->next;
-	cell->type = type;
-	cell->id = pthread_self();
-	cell->occ = size;
-	cell->ptr = calloc(num, size);
-	head_cell.prev = cell;
-	return cell->ptr;
-}
-
-int ROXML_INT roxml_read(int pos, int size, char *buffer, node_t *node)
-{
-	int ret_len = 0;
-
-	if (size > 0 && buffer) {
-		if (node->type & ROXML_FILE) {
-			if (fseek(node->src.fil, pos, SEEK_SET) == 0) {
-				ret_len = fread(buffer, 1, size, node->src.fil);
-			}
-		} else {
-			char *r1 = buffer;
-			char const *r2 = node->src.buf + pos;
-
-			while (size-- && (*r1++ = *r2++)) ;
-			ret_len = r1 - buffer;
-		}
-	}
-	return ret_len;
-}
-
-node_t ROXML_INT *roxml_create_node(int pos, void *src, int type)
-{
-	node_t *n = (node_t *) calloc(1, sizeof(node_t));
-	n->type = type;
-	n->src.src = src;
-	n->pos = pos;
-	n->end = pos;
-
-	return n;
-}
-
-void ROXML_INT roxml_close_node(node_t *n, node_t * close)
-{
-	if (n) {
-		n->end = close->pos;
-		free(close);
-
-#ifdef __DEBUG
-		if (n->type & ROXML_ELM_NODE)
-			_nb_node++;
-		if (n->type & ROXML_ATTR_NODE)
-			_nb_attr++;
-		if (n->type & ROXML_TXT_NODE)
-			_nb_text++;
-#endif
-	}
-}
-
-void ROXML_INT roxml_free_node(node_t *n)
-{
-	if (!n) {
-		return;
-	}
-
-	if (n->type & ROXML_PENDING) {
-		if (n->pos == 0) {
-			free(n->src.buf);
-		}
-	}
-
-	if (n->priv) {
-		unsigned char id = *(unsigned char *)n->priv;
-
-		if (id == ROXML_REQTABLE_ID) {
-			xpath_tok_t *tok;
-			xpath_tok_table_t *table = (xpath_tok_table_t *) n->priv;
-			tok = table->next;
-			pthread_mutex_destroy(&table->mut);
-			free(table);
-			while (tok) {
-				xpath_tok_t *to_delete = tok;
-				tok = tok->next;
-				free(to_delete);
-			}
-		} else if (id == ROXML_NS_ID) {
-			roxml_ns_t *ns = (roxml_ns_t *) n->priv;
-			free(ns);
-		}
-	}
-	free(n);
-}
-
-void ROXML_INT roxml_del_tree(node_t *n)
-{
-	if (n == NULL) {
-		return;
-	}
-	roxml_del_tree(n->chld);
-	roxml_del_tree(n->sibl);
-	roxml_del_tree(n->attr);
-	roxml_free_node(n);
-}
-
-int roxml_is_number(char *input)
-{
-	char *end;
-	int is_number = 0;
+ROXML_INT int roxml_is_number(char *input)
+{        
+	char *end;                  
+	int is_number = 0;        
 
 	/*
 	 * we don't need the value per se and some compiler will
 	 * complain about an initialized but unused variable if we
-	 * get it.
-	 */
+	 * get it.                                    
+	 */                           
 	strtod(input, &end);
 
 	if ((end == NULL) || (roxml_is_separator(end[0])) || (end[0] == '"') || (end[0] == '\'') || (end[0] == '\0')) {
 		is_number = 1;
-	}
+	}                              
 
-	return is_number;
+	return is_number; 
 }
 
-int ROXML_INT roxml_is_separator(char sep)
+ROXML_API node_t **roxml_xpath(node_t *n, char *path, int *nb_ans)
 {
-	int i = 0;
-	char separators[32] = "\r\t\n ";
-	while (separators[i] != 0) {
-		if (sep == separators[i]) {
-			return 1;
+	int count = 0;
+	node_t **node_set = NULL;
+	int index = 0;
+	xpath_node_t *xpath = NULL;
+	node_t *root = n;
+	char *full_path_to_find;
+
+	if (n == NULL) {
+		if (nb_ans) {
+			*nb_ans = 0;
 		}
-		i++;
-	}
-	return 0;
-}
-
-void ROXML_INT roxml_process_unaliased_ns(roxml_load_ctx_t * context)
-{
-	if (context->nsdef) {
-		context->nsdef = 0;
-		context->candidat_arg->type |= ROXML_NS_NODE;
-
-		if (context->candidat_val->pos == context->candidat_val->end) {
-			context->candidat_node->ns = NULL;
-			context->candidat_arg->ns = NULL;
-		} else {
-			roxml_ns_t *ns = calloc(1, sizeof(roxml_ns_t) + 1);
-			ns->id = ROXML_NS_ID;
-			ns->alias = (char *)ns + sizeof(roxml_ns_t);
-
-			context->candidat_arg->priv = ns;
-			context->candidat_arg->ns = context->candidat_arg;
-			context->candidat_node->ns = context->candidat_arg;
-
-			context->namespaces = context->candidat_arg;
-		}
-	}
-}
-
-void ROXML_INT roxml_process_begin_node(roxml_load_ctx_t * context, int position)
-{
-	if (context->candidat_txt) {
-#ifdef IGNORE_EMPTY_TEXT_NODES
-		if (context->empty_text_node == 0) {
-#endif /* IGNORE_EMPTY_TEXT_NODES */
-			node_t *to_be_closed =
-			    roxml_create_node(position, context->src, ROXML_TXT_NODE | context->type);
-			context->candidat_txt = roxml_append_node(context->current_node, context->candidat_txt);
-			roxml_close_node(context->candidat_txt, to_be_closed);
-			context->current_node = context->candidat_txt->prnt;
-#ifdef IGNORE_EMPTY_TEXT_NODES
-		} else {
-			roxml_free_node(context->candidat_txt);
-		}
-#endif /* IGNORE_EMPTY_TEXT_NODES */
-		context->candidat_txt = NULL;
-	}
-	context->candidat_node = roxml_create_node(position, context->src, ROXML_ELM_NODE | context->type);
-}
-
-node_t ROXML_INT *roxml_load(node_t *current_node, FILE * file, char *buffer)
-{
-	int error = 0;
-	roxml_load_ctx_t context;
-	roxml_parser_item_t *parser = NULL;
-	xpath_tok_table_t *table = (xpath_tok_table_t *) calloc(1, sizeof(xpath_tok_table_t));
-
-	memset(&context, 0, sizeof(roxml_load_ctx_t));
-	context.empty_text_node = 1;
-	context.current_node = current_node;
-
-	parser = roxml_append_parser_item(parser, " ", _func_load_white);
-	parser = roxml_append_parser_item(parser, "<", _func_load_open_node);
-	parser = roxml_append_parser_item(parser, ">", _func_load_close_node);
-	parser = roxml_append_parser_item(parser, "/", _func_load_end_node);
-	parser = roxml_append_parser_item(parser, "'", _func_load_quoted);
-	parser = roxml_append_parser_item(parser, "\"", _func_load_dquoted);
-	parser = roxml_append_parser_item(parser, "\t", _func_load_white);
-	parser = roxml_append_parser_item(parser, "\n", _func_load_white);
-	parser = roxml_append_parser_item(parser, "\r", _func_load_white);
-	parser = roxml_append_parser_item(parser, "!", _func_load_open_spec_node);
-	parser = roxml_append_parser_item(parser, "]", _func_load_close_cdata);
-	parser = roxml_append_parser_item(parser, "-", _func_load_close_comment);
-	parser = roxml_append_parser_item(parser, "?", _func_load_close_pi);
-	parser = roxml_append_parser_item(parser, ":", _func_load_colon);
-	parser = roxml_append_parser_item(parser, NULL, _func_load_default);
-
-	parser = roxml_parser_prepare(parser);
-
-	if (file) {
-		char *int_buffer;
-		int circle = 0;
-		int int_len = 0;
-
-		context.type = ROXML_FILE;
-		context.src = (void *)file;
-		context.pos = 0;
-
-		int_buffer = malloc(ROXML_BULK_READ + 1);
-
-		do {
-			int ret = 0;
-			int chunk_len = 0;
-			int_len = fread(int_buffer + circle, 1, ROXML_BULK_READ - circle, file) + circle;
-			int_buffer[int_len] = '\0';
-
-			if (int_len == ROXML_BULK_READ) {
-				chunk_len = int_len - ROXML_BASE_LEN;
-			} else {
-				chunk_len = int_len;
-			}
-
-			ret = roxml_parse_line(parser, int_buffer, chunk_len, &context);
-			circle = int_len - ret;
-			if ((ret < 0) || (circle < 0)) {
-				error = 1;
-				break;
-			}
-			memmove(int_buffer, int_buffer + ret, circle);
-		} while (int_len == ROXML_BULK_READ);
-
-		free(int_buffer);
-	} else {
-		int ret = 0;
-		context.type = ROXML_BUFF;
-		context.src = (void *)buffer;
-		ret = roxml_parse_line(parser, buffer, 0, &context);
-		if (ret < 0) {
-			error = 1;
-		}
-	}
-
-	roxml_parser_free(parser);
-
-	if (context.empty_text_node == 1) {
-		roxml_free_node(context.candidat_txt);
-	}
-
-	if (!error) {
-		node_t *virtroot = NULL;
-		current_node = roxml_get_root(current_node);
-		virtroot = current_node;
-		while (virtroot->prnt) {
-			virtroot = virtroot->prnt;
-		}
-
-		table->id = ROXML_REQTABLE_ID;
-		table->ids[ROXML_REQTABLE_ID] = 1;
-		pthread_mutex_init(&table->mut, NULL);
-		virtroot->priv = (void *)table;
-	} else {
-		free(table);
-		roxml_close(current_node);
 		return NULL;
 	}
 
-	return current_node;
-}
+	root = roxml_get_root(n);
 
-node_t ROXML_INT *roxml_lookup_nsdef(node_t *nsdef, char *ns)
-{
-	int len = 0;
-	char namespace[MAX_NS_LEN];
+	full_path_to_find = strdup(path);
 
-	for (len = 0; ns[len] != '\0' && ns[len] != ':'; len++) {
-		namespace[len] = ns[len];
-	}
-	namespace[len] = '\0';
+	index = roxml_parse_xpath(full_path_to_find, &xpath, 0);
 
-	while (nsdef) {
-		if (nsdef->priv && strcmp(namespace, ((roxml_ns_t *) nsdef->priv)->alias) == 0) {
-			break;
+	if (index >= 0) {
+		node_set = roxml_exec_xpath(root, n, xpath, index, &count);
+
+		roxml_free_xpath(xpath, index);
+		free(full_path_to_find);
+
+		if (count == 0) {
+			roxml_release(node_set);
+			node_set = NULL;
 		}
-		nsdef = nsdef->next;
 	}
-	return nsdef;
+	if (nb_ans) {
+		*nb_ans = count;
+	}
+
+	return node_set;
 }
 
-void ROXML_INT roxml_set_type(node_t *n, int type)
-{
-	n->type &= ~(ROXML_ATTR_NODE | ROXML_ELM_NODE | ROXML_TXT_NODE | ROXML_CMT_NODE | ROXML_PI_NODE);
-	n->type |= type;
-}
-
-xpath_node_t ROXML_INT *roxml_set_axes(xpath_node_t *node, char *axes, int *offset)
+ROXML_INT xpath_node_t *roxml_set_axes(xpath_node_t *node, char *axes, int *offset)
 {
 	struct _xpath_axes {
 		char id;
@@ -428,7 +143,7 @@ xpath_node_t ROXML_INT *roxml_set_axes(xpath_node_t *node, char *axes, int *offs
 	return node;
 }
 
-int ROXML_INT roxml_get_node_internal_position(node_t *n)
+ROXML_INT int roxml_get_node_internal_position(node_t *n)
 {
 	int idx = 1;
 	node_t *prnt;
@@ -451,8 +166,7 @@ int ROXML_INT roxml_get_node_internal_position(node_t *n)
 	return idx;
 }
 
-#if(CONFIG_XML_XPATH_ENGINE==1)
-int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t **xpath, int context)
+ROXML_INT int roxml_parse_xpath(char *path, xpath_node_t **xpath, int context)
 {
 	int ret = 0;
 	roxml_xpath_ctx_t ctx;
@@ -525,7 +239,7 @@ int ROXML_INT roxml_parse_xpath(char *path, xpath_node_t **xpath, int context)
 	return -1;
 }
 
-void ROXML_INT roxml_free_xcond(xpath_cond_t * xcond)
+ROXML_INT void roxml_free_xcond(xpath_cond_t * xcond)
 {
 	if (xcond->next) {
 		roxml_free_xcond(xcond->next);
@@ -536,7 +250,7 @@ void ROXML_INT roxml_free_xcond(xpath_cond_t * xcond)
 	free(xcond);
 }
 
-void ROXML_INT roxml_free_xpath(xpath_node_t *xpath, int nb)
+ROXML_INT void roxml_free_xpath(xpath_node_t *xpath, int nb)
 {
 	int i = 0;
 	for (i = 0; i < nb; i++) {
@@ -551,7 +265,7 @@ void ROXML_INT roxml_free_xpath(xpath_node_t *xpath, int nb)
 	free(xpath);
 }
 
-double ROXML_INT roxml_double_oper(double a, double b, int op)
+ROXML_INT double roxml_double_oper(double a, double b, int op)
 {
 	if (op == ROXML_OPERATOR_ADD) {
 		return (a + b);
@@ -565,7 +279,7 @@ double ROXML_INT roxml_double_oper(double a, double b, int op)
 	return 0;
 }
 
-int ROXML_INT roxml_double_cmp(double a, double b, int op)
+ROXML_INT int roxml_double_cmp(double a, double b, int op)
 {
 	if (op == ROXML_OPERATOR_DIFF) {
 		return (a != b);
@@ -583,7 +297,7 @@ int ROXML_INT roxml_double_cmp(double a, double b, int op)
 	return 0;
 }
 
-int ROXML_INT roxml_string_cmp(char *sa, char *sb, int op)
+ROXML_INT int roxml_string_cmp(char *sa, char *sb, int op)
 {
 	int result;
 
@@ -605,7 +319,7 @@ int ROXML_INT roxml_string_cmp(char *sa, char *sb, int op)
 	return 0;
 }
 
-int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t * candidat)
+ROXML_INT int roxml_validate_predicat(xpath_node_t *xn, node_t * candidat)
 {
 	int first = 1;
 	int valid = 0;
@@ -748,7 +462,7 @@ int ROXML_INT roxml_validate_predicat(xpath_node_t *xn, node_t * candidat)
 	return valid;
 }
 
-int ROXML_INT roxml_request_id(node_t *root)
+ROXML_INT int roxml_request_id(node_t *root)
 {
 	int i = 0;
 	xpath_tok_table_t *table;
@@ -771,7 +485,7 @@ int ROXML_INT roxml_request_id(node_t *root)
 	return -1;
 }
 
-int ROXML_INT roxml_in_pool(node_t *root, node_t * n, int req_id)
+ROXML_INT int roxml_in_pool(node_t *root, node_t * n, int req_id)
 {
 	xpath_tok_table_t *table;
 
@@ -801,7 +515,7 @@ int ROXML_INT roxml_in_pool(node_t *root, node_t * n, int req_id)
 	return 0;
 }
 
-void ROXML_INT roxml_release_id(node_t *root, node_t **pool, int pool_len, int req_id)
+ROXML_INT void roxml_release_id(node_t *root, node_t **pool, int pool_len, int req_id)
 {
 	int i = 0;
 	xpath_tok_table_t *table = NULL;
@@ -820,7 +534,7 @@ void ROXML_INT roxml_release_id(node_t *root, node_t **pool, int pool_len, int r
 	pthread_mutex_unlock(&table->mut);
 }
 
-void roxml_del_from_pool(node_t *root, node_t * n, int req_id)
+ROXML_INT void roxml_del_from_pool(node_t *root, node_t * n, int req_id)
 {
 	xpath_tok_table_t *table = NULL;
 
@@ -852,7 +566,7 @@ void roxml_del_from_pool(node_t *root, node_t * n, int req_id)
 	pthread_mutex_unlock(&table->mut);
 }
 
-int ROXML_INT roxml_add_to_pool(node_t *root, node_t * n, int req_id)
+ROXML_INT int roxml_add_to_pool(node_t *root, node_t * n, int req_id)
 {
 	xpath_tok_table_t *table;
 	xpath_tok_t *tok;
@@ -891,8 +605,7 @@ int ROXML_INT roxml_add_to_pool(node_t *root, node_t * n, int req_id)
 	return 1;
 }
 
-int ROXML_INT roxml_validate_axes(node_t *root, node_t * candidat, node_t *** ans, int *nb, int *max,
-				  xpath_node_t *xn, int req_id)
+ROXML_INT int roxml_validate_axes(node_t *root, node_t * candidat, node_t *** ans, int *nb, int *max, xpath_node_t *xn, int req_id)
 {
 
 	int valid = 0;
@@ -1022,8 +735,7 @@ int ROXML_INT roxml_validate_axes(node_t *root, node_t * candidat, node_t *** an
 	return valid;
 }
 
-void ROXML_INT roxml_check_node(xpath_node_t *xp, node_t * root, node_t * context, node_t *** ans, int *nb, int *max,
-				int ignore, int req_id)
+ROXML_INT void roxml_check_node(xpath_node_t *xp, node_t * root, node_t * context, node_t *** ans, int *nb, int *max, int ignore, int req_id)
 {
 	int validate_node = 0;
 
@@ -1211,7 +923,7 @@ void ROXML_INT roxml_check_node(xpath_node_t *xp, node_t * root, node_t * contex
 	return;
 }
 
-void roxml_compute_and(node_t *root, node_t **node_set, int *count, int cur_req_id, int prev_req_id)
+ROXML_INT void roxml_compute_and(node_t *root, node_t **node_set, int *count, int cur_req_id, int prev_req_id)
 {
 	int i = 0;
 	int limit = *count;
@@ -1237,7 +949,7 @@ void roxml_compute_and(node_t *root, node_t **node_set, int *count, int cur_req_
 	}
 }
 
-void roxml_compute_or(node_t *root, node_t **node_set, int *count, int req_id, int glob_id)
+ROXML_INT void roxml_compute_or(node_t *root, node_t **node_set, int *count, int req_id, int glob_id)
 {
 	int i = 0;
 	for (i = 0; i < *count; i++) {
@@ -1248,7 +960,7 @@ void roxml_compute_or(node_t *root, node_t **node_set, int *count, int req_id, i
 	}
 }
 
-node_t **roxml_exec_xpath(node_t *root, node_t * n, xpath_node_t * xpath, int index, int *count)
+ROXML_INT node_t **roxml_exec_xpath(node_t *root, node_t * n, xpath_node_t * xpath, int index, int *count)
 {
 	int path_id;
 	int max_answers = 1;
@@ -1324,435 +1036,567 @@ node_t **roxml_exec_xpath(node_t *root, node_t * n, xpath_node_t * xpath, int in
 
 	return node_set;
 }
-#endif /* CONFIG_XML_XPATH_ENGINE */
 
-node_t ROXML_INT *roxml_append_node(node_t *parent, node_t * n)
+ROXML_INT int _func_xpath_ignore(char *chunk, void *data)
 {
-	if (parent == NULL) {
-		return n;
-	}
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	return 1;
+}
 
-	n->prnt = parent;
-
-	if (parent->ns && ((parent->ns->type & ROXML_INVALID) != ROXML_INVALID)
-	    && parent->ns->priv && ((roxml_ns_t *) parent->ns->priv)->alias[0] == '\0') {
-		if (n->ns == NULL) {
-			n->ns = parent->ns;
-		}
-	}
-
-	if (n->type & ROXML_ATTR_NODE) {
-		if (parent->attr) {
-			node_t *attr = parent->attr;
-			while (attr->sibl) {
-				attr = attr->sibl;
-			}
-			attr->sibl = n;
+ROXML_INT int _func_xpath_new_node(char *chunk, void *data)
+{
+	int cur = 0;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	if (!ctx->quoted && !ctx->dquoted && !ctx->parenthesys && !ctx->bracket) {
+		int offset = 0;
+		xpath_node_t *tmp_node = (xpath_node_t *) calloc(1, sizeof(xpath_node_t));
+		if ((chunk[cur] == '/') && (ctx->is_first_node)) {
+			free(tmp_node);
+			ctx->new_node = ctx->first_node;
+			ctx->first_node->abs = 1;
+		} else if ((chunk[cur] == '/') && (ctx->wait_first_node)) {
+			free(tmp_node);
+			ctx->first_node->abs = 1;
+		} else if ((ctx->is_first_node) || (ctx->wait_first_node)) {
+			free(tmp_node);
 		} else {
-			parent->attr = n;
+			if (ctx->new_node) {
+				ctx->new_node->next = tmp_node;
+			}
+			ctx->new_node = tmp_node;
 		}
+		ctx->is_first_node = 0;
+		ctx->wait_first_node = 0;
+		ctx->new_node = roxml_set_axes(ctx->new_node, chunk + cur, &offset);
+		cur = offset + 1;
+	}
+	ctx->shorten_cond = 0;
+	return cur;
+}
+
+ROXML_INT int _func_xpath_quote(char *chunk, void *data)
+{
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	if (!ctx->dquoted) {
+		if (ctx->quoted && ctx->content_quoted == MODE_COMMENT_QUOTE) {
+			ctx->content_quoted = MODE_COMMENT_NONE;
+			chunk[0] = '\0';
+		}
+		ctx->quoted = (ctx->quoted + 1) % 2;
+	}
+	ctx->shorten_cond = 0;
+	return 1;
+}
+
+ROXML_INT int _func_xpath_dquote(char *chunk, void *data)
+{
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	if (!ctx->quoted) {
+		if (ctx->dquoted && ctx->content_quoted == MODE_COMMENT_DQUOTE) {
+			ctx->content_quoted = MODE_COMMENT_NONE;
+			chunk[0] = '\0';
+		}
+		ctx->dquoted = (ctx->dquoted + 1) % 2;
+	}
+	ctx->shorten_cond = 0;
+	return 1;
+}
+
+ROXML_INT int _func_xpath_open_parenthesys(char *chunk, void *data)
+{
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	if (!ctx->quoted && !ctx->dquoted) {
+		ctx->parenthesys = (ctx->parenthesys + 1) % 2;
+	}
+	ctx->shorten_cond = 0;
+	return 1;
+}
+
+ROXML_INT int _func_xpath_close_parenthesys(char *chunk, void *data)
+{
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	if (!ctx->quoted && !ctx->dquoted) {
+		ctx->parenthesys = (ctx->parenthesys + 1) % 2;
+	}
+	ctx->shorten_cond = 0;
+	return 1;
+}
+
+ROXML_INT int _func_xpath_open_brackets(char *chunk, void *data)
+{
+	xpath_cond_t *tmp_cond;
+	int cur = 0;
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	if (!ctx->quoted && !ctx->dquoted) {
+		ctx->bracket = (ctx->bracket + 1) % 2;
+		chunk[0] = '\0';
+
+		ctx->shorten_cond = 1;
+		tmp_cond = (xpath_cond_t *) calloc(1, sizeof(xpath_cond_t));
+		ctx->new_node->cond = tmp_cond;
+		ctx->new_cond = tmp_cond;
+		ctx->new_cond->arg1 = chunk + cur + 1;
 	} else {
-		if (parent->next) {
-			parent->next->sibl = n;
-		} else {
-			parent->chld = n;
-		}
-		parent->next = n;
+		ctx->shorten_cond = 0;
 	}
-
-	return n;
+	cur++;
+	return 1;
 }
 
-node_t ROXML_INT *roxml_parent_node(node_t *parent, node_t * n, int position)
+ROXML_INT int _func_xpath_close_brackets(char *chunk, void *data)
 {
-	int nb;
+	int cur = 0;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	if (!ctx->quoted && !ctx->dquoted) {
+		ctx->bracket = (ctx->bracket + 1) % 2;
+		chunk[0] = '\0';
 
-	if (n == NULL) {
-		return NULL;
-	}
-	if (parent == NULL) {
-		return n;
-	}
-
-	if (position == 0) {
-		return roxml_append_node(parent, n);
-	}
-
-	if (n->type & ROXML_ATTR_NODE) {
-		nb = roxml_get_attr_nb(parent);
-	} else {
-		nb = roxml_get_nodes_nb(parent,
-					ROXML_PI_NODE | ROXML_CMT_NODE | ROXML_TXT_NODE | ROXML_ELM_NODE |
-					ROXML_DOCTYPE_NODE);
-	}
-
-	if (position > nb) {
-		return roxml_append_node(parent, n);
-	}
-
-	n->prnt = parent;
-
-	if (parent->ns && ((parent->ns->type & ROXML_INVALID) != ROXML_INVALID)
-	    && ((roxml_ns_t *) parent->ns->priv)->alias[0] == '\0') {
-		if (n->ns == NULL) {
-			n->ns = parent->ns;
-		}
-	}
-
-	if (position == 1) {
-		if (n->type & ROXML_ATTR_NODE) {
-			n->sibl = parent->attr;
-			parent->attr = n;
-		} else {
-			n->sibl = parent->chld;
-			parent->chld = n;
-		}
-	} else {
-		int i;
-		node_t *prev = parent->chld;
-		node_t *next = parent->chld;
-
-		if (n->type & ROXML_ATTR_NODE) {
-			next = parent->attr;
-		}
-		for (i = 1; i < position; i++) {
-			prev = next;
-			next = next->sibl;
-		}
-		n->sibl = next;
-		prev->sibl = n;
-	}
-	return n;
-}
-
-#if(CONFIG_XML_COMMIT_XML_TREE==1)
-void ROXML_INT roxml_print_space(FILE * f, char **buf, int *offset, int *len, int lvl)
-{
-	if (lvl > 0) {
-		int i = 0;
-
-		if (buf && *buf) {
-			int pos = *offset + lvl;
-			if (pos >= *len) {
-				*buf = realloc(*buf, *len + ROXML_BASE_LEN);
-				memset(*buf + *len, 0, ROXML_BASE_LEN);
-				*len += ROXML_BASE_LEN;
-			}
-			for (; i < lvl; i++) {
-				strcat(*buf, " ");
-			}
-			*offset = pos;
-		}
-		if (f) {
-			for (; i < lvl; i++) {
-				fwrite(" ", 1, 1, f);
-			}
-		}
-	}
-}
-
-void ROXML_INT roxml_write_string(char **buf, FILE * f, char *str, int *offset, int *len)
-{
-	int min_len = strlen(str);
-	int pos = *offset + min_len;
-	int appended_space = ROXML_BASE_LEN * ((int)(min_len / ROXML_BASE_LEN) + 1);
-
-	if ((pos >= *len) && (buf) && (*buf)) {
-		*buf = realloc(*buf, *len + appended_space);
-		memset(*buf + *len, 0, appended_space);
-		*len += appended_space;
-	}
-	if (f) {
-		fprintf(f, "%s", str);
-	}
-	if (buf && *buf) {
-		strcat(*buf + (*offset), str);
-	}
-	*offset = pos;
-}
-
-void ROXML_INT roxml_write_node(node_t *n, FILE * f, char **buf, int human, int lvl, int *offset, int *len)
-{
-	ROXML_GET_BASE_BUFFER(name);
-
-	roxml_get_name(n, name, ROXML_BASE_LEN);
-	if (human) {
-		roxml_print_space(f, buf, offset, len, lvl);
-	}
-	if ((n->type & ROXML_NODE_TYPES) == ROXML_ELM_NODE) {
-		ROXML_GET_BASE_BUFFER(ns);
-		node_t *attr = n->attr;
-		if (n->prnt) {
-			roxml_write_string(buf, f, "<", offset, len);
-			if (n->ns) {
-				roxml_get_name(n->ns, ns, ROXML_BASE_LEN);
-				if (ns[0] != '\0') {
-					roxml_write_string(buf, f, ns, offset, len);
-					roxml_write_string(buf, f, ":", offset, len);
-				}
-			}
-			roxml_write_string(buf, f, name, offset, len);
-		}
-		while (attr) {
-			int status = 0;
-			char *value;
-			char arg[ROXML_BASE_LEN];
-			char val[ROXML_BASE_LEN];
-
-			roxml_get_name(attr, arg, ROXML_BASE_LEN);
-			value = roxml_get_content(attr, val, ROXML_BASE_LEN, &status);
-			if (status >= ROXML_BASE_LEN) {
-				value = roxml_get_content(attr, NULL, 0, &status);
-			}
-			roxml_write_string(buf, f, " ", offset, len);
-			if (attr->type & ROXML_NS_NODE) {
-				roxml_write_string(buf, f, "xmlns", offset, len);
-				if (arg[0] != '\0') {
-					roxml_write_string(buf, f, ":", offset, len);
-				}
-			}
-			if (attr->ns) {
-				ROXML_GET_BASE_BUFFER(arg_ns);
-				roxml_get_name(attr->ns, arg_ns, ROXML_BASE_LEN);
-				if (arg_ns[0] != '\0') {
-					roxml_write_string(buf, f, arg_ns, offset, len);
-					roxml_write_string(buf, f, ":", offset, len);
-				}
-				ROXML_PUT_BASE_BUFFER(arg_ns);
-			}
-			roxml_write_string(buf, f, arg, offset, len);
-			roxml_write_string(buf, f, "=\"", offset, len);
-			roxml_write_string(buf, f, value, offset, len);
-			roxml_write_string(buf, f, "\"", offset, len);
-			attr = attr->sibl;
-			roxml_release(value);
-		}
-		if (n->chld) {
-			node_t *chld = n->chld;
-			if (n->prnt) {
-				roxml_write_string(buf, f, ">", offset, len);
-				if (human) {
-					roxml_write_string(buf, f, "\n", offset, len);
-				}
-			}
-			while (chld) {
-				if (chld->type & ROXML_TXT_NODE) {
-					ROXML_GET_BASE_BUFFER(val);
-					char *value;
-					int status;
-					if (human) {
-						roxml_print_space(f, buf, offset, len, lvl + 1);
-					}
-					value = roxml_get_content(chld, val, ROXML_BASE_LEN, &status);
-					if (status >= ROXML_BASE_LEN) {
-						value = roxml_get_content(chld, NULL, 0, &status);
-					}
-					if ((chld->type & ROXML_CDATA_NODE) == ROXML_CDATA_NODE) {
-						roxml_write_string(buf, f, "<![CDATA[", offset, len);
-						roxml_write_string(buf, f, value, offset, len);
-						roxml_write_string(buf, f, "]]>", offset, len);
-					} else {
-						char *end = value + status - 2;
-						char *strip = value;
-						while (roxml_is_separator(end[0])) {
-							end[0] = '\0';
-							end--;
-						}
-						while (roxml_is_separator(strip[0])) {
-							strip++;
-						}
-
-						roxml_write_string(buf, f, strip, offset, len);
-					}
-					if (human) {
-						roxml_write_string(buf, f, "\n", offset, len);
-					}
-					chld = chld->sibl;
-					roxml_release(value);
-					ROXML_PUT_BASE_BUFFER(val);
-				} else {
-					roxml_write_node(chld, f, buf, human, lvl + 1, offset, len);
-					chld = chld->sibl;
-				}
-			}
-			if (n->prnt) {
-				if (human) {
-					roxml_print_space(f, buf, offset, len, lvl);
-				}
-				roxml_write_string(buf, f, "</", offset, len);
-				if (n->ns) {
-					if (ns[0] != '\0') {
-						roxml_write_string(buf, f, ns, offset, len);
-						roxml_write_string(buf, f, ":", offset, len);
-					}
-				}
-				roxml_write_string(buf, f, name, offset, len);
-				roxml_write_string(buf, f, ">", offset, len);
-				if (human) {
-					roxml_write_string(buf, f, "\n", offset, len);
-				}
+		if (ctx->new_cond) {
+			if (ctx->new_cond->func == ROXML_FUNC_XPATH) {
+				xpath_node_t *xp;
+				ctx->new_cond->func2 = roxml_parse_xpath(ctx->new_cond->arg1, &xp, 1);
+				ctx->new_cond->xp = xp;
 			}
 		} else {
-			roxml_write_string(buf, f, "/>", offset, len);
-			if (human) {
-				roxml_write_string(buf, f, "\n", offset, len);
+			return -1;
+		}
+	}
+	cur++;
+	ctx->shorten_cond = 0;
+	return 1;
+}
+
+ROXML_INT int _func_xpath_condition_or(char *chunk, void *data)
+{
+	xpath_node_t *tmp_node;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	int cur = 0;
+	int len = 0;
+	xpath_cond_t *tmp_cond;
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+
+	len = strlen(ROXML_COND_OR);
+
+	if (strncmp(chunk, ROXML_COND_OR, len) == 0) {
+		if (roxml_is_separator(*(chunk - 1)) && roxml_is_separator(*(chunk + len))) {
+			if (!ctx->bracket && !ctx->quoted && !ctx->dquoted) {
+				if (ctx->context != 1) {
+					return 0;
+				}
+				chunk[-1] = '\0';
+				cur += strlen(ROXML_COND_OR);
+				tmp_node = (xpath_node_t *) calloc(ctx->nbpath + 1, sizeof(xpath_node_t));
+				memcpy(tmp_node, ctx->first_node, ctx->nbpath * sizeof(xpath_node_t));
+				free(ctx->first_node);
+				ctx->first_node = tmp_node;
+				ctx->wait_first_node = 1;
+				ctx->new_node = tmp_node + ctx->nbpath;
+				ctx->new_node->rel = ROXML_OPERATOR_OR;
+				ctx->nbpath++;
+			} else if (ctx->bracket && !ctx->quoted && !ctx->dquoted) {
+				if (ctx->new_cond->func != ROXML_FUNC_XPATH) {
+					chunk[-1] = '\0';
+					cur += strlen(ROXML_COND_OR);
+					tmp_cond = (xpath_cond_t *) calloc(1, sizeof(xpath_cond_t));
+					if (ctx->new_cond) {
+						ctx->new_cond->next = tmp_cond;
+					}
+					ctx->new_cond = tmp_cond;
+					ctx->new_cond->rel = ROXML_OPERATOR_OR;
+					ctx->new_cond->arg1 = chunk + cur + 1;
+				}
 			}
 		}
-		ROXML_PUT_BASE_BUFFER(ns);
-	} else {
-		char *value;
-		int status;
-		char head[8];
-		char tail[8];
-
-		ROXML_GET_BASE_BUFFER(val);
-
-		if ((n->type & ROXML_NODE_TYPES) == ROXML_CMT_NODE) {
-			strcpy(head, "<!--");
-			strcpy(tail, "-->");
-		} else if ((n->type & ROXML_NODE_TYPES) == ROXML_DOCTYPE_NODE) {
-			strcpy(head, "<");
-			strcpy(tail, ">");
-		} else if ((n->type & ROXML_NODE_TYPES) == ROXML_PI_NODE) {
-			strcpy(head, "<?");
-			strcpy(tail, "?>");
-		} else {
-			head[0] = '\0';
-			tail[0] = '\0';
-		}
-
-		roxml_write_string(buf, f, head, offset, len);
-
-		if (name[0]) {
-			roxml_write_string(buf, f, name, offset, len);
-		}
-
-		value = roxml_get_content(n, val, ROXML_BASE_LEN, &status);
-		if (status >= ROXML_BASE_LEN) {
-			value = roxml_get_content(n, NULL, 0, &status);
-		}
-		if (name[0] && value && value[0]) {
-			roxml_write_string(buf, f, " ", offset, len);
-		}
-		roxml_write_string(buf, f, value, offset, len);
-		roxml_release(value);
-
-		roxml_write_string(buf, f, tail, offset, len);
-
-		if (human) {
-			roxml_write_string(buf, f, "\n", offset, len);
-		}
-		ROXML_PUT_BASE_BUFFER(val);
 	}
-	ROXML_PUT_BASE_BUFFER(name);
+	if (cur)
+		ctx->shorten_cond = 0;
+	return cur;
 }
-#endif /* CONFIG_XML_COMMIT_XML_TREE */
 
-#if(CONFIG_XML_READ_WRITE==1)
-void ROXML_INT roxml_reset_ns(node_t *n, node_t * ns)
+ROXML_INT int _func_xpath_condition_and(char *chunk, void *data)
 {
-	node_t *attr = NULL;
-	node_t *chld = NULL;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	int cur = 0;
+	int len = 0;
+	xpath_node_t *tmp_node;
+	xpath_cond_t *tmp_cond;
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
 
-	if (!n) {
-		return;
-	}
+	len = strlen(ROXML_COND_AND);
 
-	if (n->ns == ns) {
-		if (n->prnt) {
-			n->ns = n->prnt->ns;
-		} else {
-			n->ns = NULL;
-		}
-	}
-
-	chld = n->chld;
-	while (chld) {
-		roxml_reset_ns(chld, ns);
-		chld = chld->sibl;
-	}
-
-	attr = n->attr;
-	while (attr) {
-		if ((attr->type & ROXML_NS_NODE) == 0) {
-			if (attr->ns == ns) {
-				attr->ns = attr->prnt->ns;
+	if (strncmp(chunk, ROXML_COND_AND, len) == 0) {
+		if (roxml_is_separator(*(chunk - 1)) && roxml_is_separator(*(chunk + len))) {
+			if (!ctx->bracket && !ctx->quoted && !ctx->dquoted) {
+				if (ctx->context != 1) {
+					return 0;
+				}
+				chunk[-1] = '\0';
+				cur += strlen(ROXML_COND_AND);
+				tmp_node = (xpath_node_t *) calloc(ctx->nbpath + 1, sizeof(xpath_node_t));
+				memcpy(tmp_node, ctx->first_node, ctx->nbpath * sizeof(xpath_node_t));
+				free(ctx->first_node);
+				ctx->first_node = tmp_node;
+				ctx->wait_first_node = 1;
+				ctx->new_node = tmp_node + ctx->nbpath;
+				ctx->new_node->rel = ROXML_OPERATOR_AND;
+				ctx->nbpath++;
+			} else if (ctx->bracket && !ctx->quoted && !ctx->dquoted) {
+				if (ctx->new_cond->func != ROXML_FUNC_XPATH) {
+					chunk[-1] = '\0';
+					cur += strlen(ROXML_COND_AND);
+					tmp_cond = (xpath_cond_t *) calloc(1, sizeof(xpath_cond_t));
+					if (ctx->new_cond) {
+						ctx->new_cond->next = tmp_cond;
+					}
+					ctx->new_cond = tmp_cond;
+					ctx->new_cond->rel = ROXML_OPERATOR_AND;
+					ctx->new_cond->arg1 = chunk + cur + 1;
+				}
 			}
 		}
-		attr = attr->sibl;
 	}
+	if (cur)
+		ctx->shorten_cond = 0;
+	return cur;
 }
 
-void ROXML_INT roxml_del_arg_node(node_t *n)
+ROXML_INT int _func_xpath_path_or(char *chunk, void *data)
 {
-	node_t *current = n->prnt->attr;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	int cur = 0;
+	xpath_node_t *tmp_node;
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
 
-	if (n->type & ROXML_NS_NODE) {
-		roxml_reset_ns(n->prnt, n);
+	if (!ctx->bracket && !ctx->quoted && !ctx->dquoted) {
+		chunk[-1] = '\0';
+		cur += strlen(ROXML_PATH_OR);
+		tmp_node = (xpath_node_t *) calloc(ctx->nbpath + 1, sizeof(xpath_node_t));
+		memcpy(tmp_node, ctx->first_node, ctx->nbpath * sizeof(xpath_node_t));
+		free(ctx->first_node);
+		ctx->first_node = tmp_node;
+		ctx->wait_first_node = 1;
+		ctx->new_node = tmp_node + ctx->nbpath;
+		ctx->new_node->rel = ROXML_OPERATOR_OR;
+		ctx->nbpath++;
 	}
+	ctx->shorten_cond = 0;
+	return cur;
+}
 
-	if (current == n) {
-		n->prnt->attr = n->sibl;
-	} else if (current) {
-		while (current->sibl && current->sibl != n) {
-			current = current->sibl;
+ROXML_INT int _func_xpath_operators(char *chunk, void *data, int operator, int operator_bis)
+{
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	int cur = 0;
+	if (!ctx->bracket && !ctx->quoted && !ctx->dquoted) {
+		xpath_node_t *xp_root = ctx->new_node;
+		xpath_cond_t *xp_cond = (xpath_cond_t *) calloc(1, sizeof(xpath_cond_t));
+		xp_root->xp_cond = xp_cond;
+		chunk[cur] = '\0';
+		xp_cond->op = operator;
+		if (ROXML_WHITE(chunk[cur - 1])) {
+			chunk[cur - 1] = '\0';
 		}
-		current->sibl = n->sibl;
-	}
-	roxml_del_tree(n->chld);
-	return;
-}
-#endif /* CONFIG_XML_READ_WRITE */
-
-/* do not call this function if n->prnt == NULL */
-static node_t *roxml_get_real_prev_sibling(node_t *n)
-{
-	node_t *current = n->prnt->chld;
-	node_t *prev = NULL;
-
-	while (current != n) {
-		prev = current;
-		current = current->sibl;
-	}
-
-	return prev;
-}
-
-void ROXML_INT roxml_del_txt_node(node_t *n)
-{
-	node_t *current = n->prnt->chld;
-	while (current && (current->type & ROXML_TXT_NODE) == 0) {
-		current = current->sibl;
-	}
-	if (n->prnt && n->prnt->next == n) {
-		n->prnt->next = roxml_get_real_prev_sibling(n);
-	}
-	if (current == n) {
-		n->prnt->chld = n->sibl;
-	} else if (current) {
-		while (current->sibl && current->sibl != n) {
-			current = current->sibl;
+		if (chunk[cur + 1] == '=') {
+			cur++;
+			chunk[cur] = '\0';
+			xp_cond->op = operator_bis;
 		}
-		current->sibl = n->sibl;
-	}
-
-}
-
-void ROXML_INT roxml_del_std_node(node_t *n)
-{
-	node_t *current = n->prnt->chld;
-	if (n->prnt && n->prnt->next == n) {
-		n->prnt->next = roxml_get_real_prev_sibling(n);
-	}
-	if (current == n) {
-		n->prnt->chld = n->sibl;
-	} else if (current) {
-		while (current->sibl && current->sibl != n) {
-			current = current->sibl;
+		if (ROXML_WHITE(chunk[cur + 1])) {
+			cur++;
+			chunk[cur] = '\0';
 		}
-		current->sibl = n->sibl;
+		xp_cond->arg2 = chunk + cur + 1;
+		if (xp_cond->arg2[0] == '"') {
+			ctx->content_quoted = MODE_COMMENT_DQUOTE;
+			xp_cond->arg2++;
+		} else if (xp_cond->arg2[0] == '\'') {
+			ctx->content_quoted = MODE_COMMENT_QUOTE;
+			xp_cond->arg2++;
+		}
+		if (!xp_cond->func) {
+			xp_cond->func = ROXML_FUNC_INTCOMP;
+			if (!roxml_is_number(xp_cond->arg2)) {
+				xp_cond->func = ROXML_FUNC_STRCOMP;
+			}
+		}
+		cur++;
+	} else if (ctx->bracket && !ctx->quoted && !ctx->dquoted) {
+		if (ctx->new_cond->func != ROXML_FUNC_XPATH) {
+			chunk[cur] = '\0';
+			ctx->new_cond->op = operator;
+			if (ROXML_WHITE(chunk[cur - 1])) {
+				chunk[cur - 1] = '\0';
+			}
+			if (chunk[cur + 1] == '=') {
+				cur++;
+				chunk[cur] = '\0';
+				ctx->new_cond->op = operator_bis;
+			}
+			if (ROXML_WHITE(chunk[cur + 1])) {
+				cur++;
+				chunk[cur] = '\0';
+			}
+			ctx->new_cond->arg2 = chunk + cur + 1;
+			if (ctx->new_cond->arg2[0] == '"') {
+				ctx->content_quoted = MODE_COMMENT_DQUOTE;
+				ctx->new_cond->arg2++;
+			} else if (ctx->new_cond->arg2[0] == '\'') {
+				ctx->content_quoted = MODE_COMMENT_QUOTE;
+				ctx->new_cond->arg2++;
+			}
+			if (ctx->new_cond->func == 0) {
+				ctx->new_cond->func = ROXML_FUNC_INTCOMP;
+				if (!roxml_is_number(ctx->new_cond->arg2)) {
+					ctx->new_cond->func = ROXML_FUNC_STRCOMP;
+				}
+			}
+			cur++;
+		}
 	}
-	roxml_del_tree(n->chld);
-	roxml_del_tree(n->attr);
+	ctx->shorten_cond = 0;
+	return cur;
 }
 
+ROXML_INT int _func_xpath_operator_equal(char *chunk, void *data)
+{
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	return _func_xpath_operators(chunk, data, ROXML_OPERATOR_EQU, ROXML_OPERATOR_EQU);
+}
+
+ROXML_INT int _func_xpath_operator_sup(char *chunk, void *data)
+{
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	return _func_xpath_operators(chunk, data, ROXML_OPERATOR_SUP, ROXML_OPERATOR_ESUP);
+}
+
+ROXML_INT int _func_xpath_operator_inf(char *chunk, void *data)
+{
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	return _func_xpath_operators(chunk, data, ROXML_OPERATOR_INF, ROXML_OPERATOR_EINF);
+}
+
+ROXML_INT int _func_xpath_operator_diff(char *chunk, void *data)
+{
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	return _func_xpath_operators(chunk, data, ROXML_OPERATOR_DIFF, ROXML_OPERATOR_DIFF);
+}
+
+ROXML_INT int _func_xpath_number(char *chunk, void *data)
+{
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	int cur = 0;
+	if (ctx->bracket && !ctx->quoted && !ctx->dquoted) {
+		if ((ctx->new_cond->func != ROXML_FUNC_XPATH) && (ctx->shorten_cond)) {
+			cur = 1;
+			ctx->new_cond->func = ROXML_FUNC_POS;
+			ctx->new_cond->op = ROXML_OPERATOR_EQU;
+			ctx->new_cond->arg2 = chunk;
+			while ((chunk[cur + 1] >= '0') && (chunk[cur + 1] <= '9')) {
+				cur++;
+			}
+		}
+	}
+	ctx->shorten_cond = 0;
+	return cur;
+}
+
+ROXML_INT int _func_xpath_funcs(char *chunk, void *data, int func, char *name)
+{
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	int cur = 0;
+
+	if (strncmp(chunk, name, strlen(name)) == 0) {
+		if (ctx->new_cond->func != func) {
+			cur += strlen(name);
+			ctx->new_cond->func = func;
+		}
+	}
+	if (cur)
+		ctx->shorten_cond = 0;
+	return cur;
+}
+
+ROXML_INT int _func_xpath_position(char *chunk, void *data)
+{
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	return _func_xpath_funcs(chunk, data, ROXML_FUNC_POS, ROXML_FUNC_POS_STR);
+}
+
+ROXML_INT int _func_xpath_first(char *chunk, void *data)
+{
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	return _func_xpath_funcs(chunk, data, ROXML_FUNC_FIRST, ROXML_FUNC_FIRST_STR);
+}
+
+ROXML_INT int _func_xpath_last(char *chunk, void *data)
+{
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	return _func_xpath_funcs(chunk, data, ROXML_FUNC_LAST, ROXML_FUNC_LAST_STR);
+}
+
+ROXML_INT int _func_xpath_nsuri(char *chunk, void *data)
+{
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	return _func_xpath_funcs(chunk, data, ROXML_FUNC_NSURI, ROXML_FUNC_NSURI_STR);
+}
+
+ROXML_INT int _func_xpath_lname(char *chunk, void *data)
+{
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	return _func_xpath_funcs(chunk, data, ROXML_FUNC_LNAME, ROXML_FUNC_LNAME_STR);
+}
+
+ROXML_INT int _func_xpath_operator_add(char *chunk, void *data)
+{
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	int cur = 0;
+	if (ctx->bracket && !ctx->quoted && !ctx->dquoted) {
+		if (ctx->new_cond->func != ROXML_FUNC_XPATH) {
+			if ((ctx->new_cond->func == ROXML_FUNC_LAST) || (ctx->new_cond->func == ROXML_FUNC_FIRST)) {
+				ctx->new_cond->op = ROXML_OPERATOR_ADD;
+			}
+			chunk[cur] = '\0';
+			if (ROXML_WHITE(chunk[cur + 1])) {
+				cur++;
+				chunk[cur] = '\0';
+			}
+			ctx->new_cond->arg2 = chunk + cur + 1;
+		}
+	}
+	ctx->shorten_cond = 0;
+	return cur;
+}
+
+ROXML_INT int _func_xpath_operator_subs(char *chunk, void *data)
+{
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	int cur = 0;
+	if (ctx->bracket && !ctx->quoted && !ctx->dquoted) {
+		if (ctx->new_cond->func != ROXML_FUNC_XPATH) {
+			if ((ctx->new_cond->func == ROXML_FUNC_LAST) || (ctx->new_cond->func == ROXML_FUNC_FIRST)) {
+				ctx->new_cond->op = ROXML_OPERATOR_SUB;
+			}
+			chunk[cur] = '\0';
+			if (ROXML_WHITE(chunk[cur + 1])) {
+				cur++;
+				chunk[cur] = '\0';
+			}
+			ctx->new_cond->arg2 = chunk + cur + 1;
+		}
+	}
+	ctx->shorten_cond = 0;
+	return cur;
+}
+
+ROXML_INT int _func_xpath_default(char *chunk, void *data)
+{
+#ifdef DEBUG_PARSING
+	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
+#endif /* DEBUG_PARSING */
+	int cur = 0;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+
+	if ((ctx->is_first_node) || (ctx->wait_first_node)) {
+		if (!ctx->quoted && !ctx->dquoted && !ctx->parenthesys && !ctx->bracket) {
+			int offset = 0;
+			xpath_node_t *tmp_node = (xpath_node_t *) calloc(1, sizeof(xpath_node_t));
+			if ((chunk[cur] == '/') && (ctx->is_first_node)) {
+				free(tmp_node);
+				ctx->new_node = ctx->first_node;
+				ctx->first_node->abs = 1;
+			} else if ((chunk[cur] == '/') && (ctx->wait_first_node)) {
+				free(tmp_node);
+				ctx->first_node->abs = 1;
+			} else if ((ctx->is_first_node) || (ctx->wait_first_node)) {
+				free(tmp_node);
+			} else {
+				if (ctx->new_node) {
+					ctx->new_node->next = tmp_node;
+				}
+				ctx->new_node = tmp_node;
+			}
+			ctx->is_first_node = 0;
+			ctx->wait_first_node = 0;
+			ctx->new_node = roxml_set_axes(ctx->new_node, chunk + cur, &offset);
+			cur += offset;
+		}
+	} else if (ctx->bracket && !ctx->quoted && !ctx->dquoted) {
+		if (ctx->new_cond->func != ROXML_FUNC_XPATH) {
+			if (ctx->shorten_cond) {
+				int bracket_lvl = 1;
+				ctx->new_cond->func = ROXML_FUNC_XPATH;
+				ctx->new_cond->arg1 = chunk + cur;
+				while (bracket_lvl > 0) {
+					if (chunk[cur] == '[') {
+						bracket_lvl++;
+					} else if (chunk[cur] == ']') {
+						bracket_lvl--;
+					}
+					cur++;
+				}
+				cur--;
+			}
+		}
+	}
+	ctx->shorten_cond = 0;
+	return cur > 0 ? cur : 1;
+}

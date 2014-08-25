@@ -1,4 +1,4 @@
-/** \file roxml-doxy.h
+/** \file roxml_doxy.h
  *  \brief doxygen source documentation for libroxml.so
  *
  * This is the header file used to develop some
@@ -69,7 +69,7 @@
  *</ul>
  *
  * \note libroxml work with both strict XML documents but also with xml like formatted documents (without any <?xml?> definition...)
- * \warning libroxml may behave strangely when dealing with node names or attribute values bigger than 512 bytes. FOr those who really need it, they can increase this limit by modifying the ROXML_BASE_LEN define in roxml-defines.h.
+ * \warning libroxml may behave strangely when dealing with node names or attribute values bigger than 512 bytes. FOr those who really need it, they can increase this limit by modifying the ROXML_BASE_LEN define in roxml_defines.h.
  * \warning libroxml do not handle DOCTYPE nodes. However, it will nicely ignore them during parsing and will still return the xml tree.
  * \warning libroxml is not thread safe for all write operations (roxml_set_ns, roxml_add_node, roxml_del_node) therefore, those functions must be granted exclusiv access to the xml tree when called. On the other hand, all other functions can be safely called simultaneously.
  *

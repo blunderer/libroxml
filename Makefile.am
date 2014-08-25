@@ -17,22 +17,42 @@ CLEANFILES =
 # Project headers
 include_HEADERS = src/roxml.h
 noinst_HEADERS = \
-	src/roxml-defines.h \
-	src/roxml-internal.h \
-	src/roxml-parse-engine.h \
-	src/roxml-tune.h \
-	src/roxml-types.h \
-	src/roxml-win32-native.h
-EXTRA_DIST += src/roxml-doxy.h.in
+	src/roxml_defines.h \
+	src/roxml_internal.h \
+	src/roxml_parser.h \
+	src/roxml_tune.h \
+	src/roxml_types.h \
+	src/roxml_buff.h \
+	src/roxml_commit.h \
+	src/roxml_content.h \
+	src/roxml_core.h \
+	src/roxml_doxy.h \
+	src/roxml_edit.h \
+	src/roxml_file.h \
+	src/roxml.h \
+	src/roxml_mem.h \
+	src/roxml_nav.h \
+	src/roxml_xpath.h \
+	src/roxml_win32_native.h
+EXTRA_DIST += src/roxml_doxy.h.in
 
 # Libraries
 lib_LTLIBRARIES = libroxml.la
 
 # The libroxml library
 libroxml_la_SOURCES = \
-	src/roxml.c \
-	src/roxml-internal.c \
-	src/roxml-parse-engine.c
+	src/roxml_buff.c \
+	src/roxml_commit.c \
+	src/roxml_content.c \
+	src/roxml_core.c \
+	src/roxml_edit.c \
+	src/roxml_file.c \
+	src/roxml_mem.c \
+	src/roxml_nav.c \
+	src/roxml_parser.c \
+	src/roxml_stub.c \
+	src/roxml_xpath.c
+
 libroxml_la_LDFLAGS = $(VERSION_INFO)
 
 bin_PROGRAMS =
@@ -40,7 +60,7 @@ bin_PROGRAMS =
 # The roxml utility
 if ENABLE_ROXML
   bin_PROGRAMS += roxml
-  roxml_SOURCES = src/roxml-parser.c
+  roxml_SOURCES = src/roxml_shell.c
   roxml_LDADD = libroxml.la
 endif
 
@@ -122,16 +142,34 @@ TEST_CFLAGS = -DUNITTEST -DREENTRANT -DLINUX -D__DEBUG -DIGNORE_EMPTY_TEXT_NODES
 
 # Test library libroxml_test.a
 unittest_libroxml_test_a_SOURCES = \
-	src/roxml.c \
-	src/roxml-internal.c \
-	src/roxml-parse-engine.c
+	src/roxml_buff.c \
+	src/roxml_commit.c \
+	src/roxml_content.c \
+	src/roxml_core.c \
+	src/roxml_edit.c \
+	src/roxml_file.c \
+	src/roxml_mem.c \
+	src/roxml_nav.c \
+	src/roxml_parser.c \
+	src/roxml_stub.c \
+	src/roxml_xpath.c
+
 unittest_libroxml_test_a_CFLAGS = $(TEST_CFLAGS)
 
 # Test library libroxml_test_tiny.a
 unittest_libroxml_test_tiny_a_SOURCES = \
-	src/roxml.c \
-	src/roxml-internal.c \
-	src/roxml-parse-engine.c
+	src/roxml_buff.c \
+	src/roxml_commit.c \
+	src/roxml_content.c \
+	src/roxml_core.c \
+	src/roxml_edit.c \
+	src/roxml_file.c \
+	src/roxml_mem.c \
+	src/roxml_nav.c \
+	src/roxml_parser.c \
+	src/roxml_stub.c \
+	src/roxml_xpath.c
+
 unittest_libroxml_test_tiny_a_CFLAGS = \
 	$(TEST_CFLAGS) \
 	-UHAVE_CONFIG_H \
@@ -162,7 +200,9 @@ unittest_roxml_mem_LDADD = unittest/libroxml_test.a
 unittest_roxml_mem_CFLAGS = $(TEST_CFLAGS)
 
 # roxml.tiny.unitC
-nodist_unittest_roxml_tiny_unitC_SOURCES = unittest/unittest.c
+nodist_unittest_roxml_tiny_unitC_SOURCES = \
+	unittest/unittest.c \
+	unittest/roxml.test.c
 unittest_roxml_tiny_unitC_LDADD = unittest/libroxml_test_tiny.a
 unittest_roxml_tiny_unitC_CFLAGS = $(TEST_CFLAGS)
 

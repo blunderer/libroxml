@@ -1,6 +1,14 @@
 
+#include <stdio.h>
+#include <string.h>
+#include <fcntl.h>
+
 #include "unittest.h"		
-#include "roxml-internal.h"
+#include "roxml_internal.h"
+#include "roxml_mem.h"
+#include "roxml_edit.h"
+#include "roxml_core.h"
+#include "roxml_xpath.h"
 
 int test_load_doc(void)
 {
