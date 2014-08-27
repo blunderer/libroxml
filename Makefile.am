@@ -40,18 +40,26 @@ EXTRA_DIST += src/roxml_doxy.h.in
 lib_LTLIBRARIES = libroxml.la
 
 # The libroxml library
-libroxml_la_SOURCES = \
-	src/roxml_buff.c \
-	src/roxml_commit.c \
-	src/roxml_content.c \
-	src/roxml_core.c \
-	src/roxml_edit.c \
-	src/roxml_file.c \
-	src/roxml_mem.c \
-	src/roxml_nav.c \
-	src/roxml_parser.c \
-	src/roxml_stub.c \
-	src/roxml_xpath.c
+libroxml_la_SOURCES = src/roxml_core.c \
+			src/roxml_parser.c \
+			src/roxml_buff.c \
+			src/roxml_nav.c \
+			src/roxml_content.c \
+			src/roxml_mem.c \
+			src/roxml_stub.c
+
+if CONFIG_XML_COMMIT
+libroxml_la_SOURCES += src/roxml_commit.c
+endif
+if CONFIG_XML_EDIT
+libroxml_la_SOURCES += src/roxml_edit.c
+endif
+if CONFIG_XML_FILE
+libroxml_la_SOURCES += src/roxml_file.c
+endif
+if CONFIG_XML_XPATH
+libroxml_la_SOURCES += src/roxml_xpath.c
+endif
 
 libroxml_la_LDFLAGS = $(VERSION_INFO)
 
@@ -189,8 +197,7 @@ unittest_roxml_unitC_LDADD = unittest/libroxml_test.a
 unittest_roxml_unitC_CFLAGS = $(TEST_CFLAGS)
 
 # roxml.perf
-nodist_unittest_roxml_perf_SOURCES = \
-	unittest/roxml.perf.c
+nodist_unittest_roxml_perf_SOURCES = unittest/roxml.perf.c
 unittest_roxml_perf_LDADD = unittest/libroxml_test.a
 unittest_roxml_perf_CFLAGS = -O3 -DREENTRANT -DLINUX -DIGNORE_EMPTY_TEXT_NODES -Wall
 

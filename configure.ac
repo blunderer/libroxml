@@ -59,6 +59,8 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
 
 AC_SUBST(AM_TEST_CFLAGS)
 
+AC_CHECK_FILE(unittest/unittest.c, , AC_MSG_RESULT([wARNING: building unittest will not be available]); enable_tests=no)
+
 AC_MSG_NOTICE()
 AC_MSG_NOTICE(Configuration is:)
 AC_MSG_NOTICE()
@@ -102,9 +104,6 @@ AC_ARG_ENABLE(tests,
 	      [Enable unit tests build (only available from git repository)[default=no]])],
 	      [],
 	      [enable_tests=no])
-if test x$enable_tests != xno; then
-	AC_CHECK_FILE(unittest/unittest.c, , enable_tests=no)
-fi
 AM_CONDITIONAL(ENABLE_TESTS,test x$enable_tests != xno)
 
 AC_MSG_NOTICE(Unittests             ......... $enable_tests)
@@ -177,62 +176,71 @@ AC_DEFUN([AC_ROXML_TUNE],
 	AC_MSG_NOTICE([$6 ......... $8])
     fi
     AC_DEFINE_UNQUOTED([$5], [$roxml_tune], [$4 [default=$2]])
+    AM_CONDITIONAL([$5], [ test $roxml_tune -eq 1])
 ])
 
 # CONFIG_XML_THREAD_SAFE
-AC_ROXML_TUNE(xml_thread_safe,
+AC_ROXML_TUNE(threadsafe,
               [yes],
-              [--disable-xml-thread-safe],
+              [--disable-threadsafe],
               [Is the target library thread safe or not.],
               [CONFIG_XML_THREAD_SAFE],
 	      Thread safety        ,yes,no)
 
 # CONFIG_XML_HEAP_BUFFERS
-AC_ROXML_TUNE(xml_heap_buffers,
+AC_ROXML_TUNE(heapbuffers,
               [no],
-              [--enable-xml-heap-buffers],
+              [--enable-heapbuffers],
               [Is the target library uses stack for internal buffers or heap. This is not compatible with thread safety.],
               [CONFIG_XML_HEAP_BUFFERS],
 	      Buffers type         ,stack,heap)
 
 # CONFIG_XML_SMALL_BUFFER
-AC_ROXML_TUNE(xml_small_buffer,
+AC_ROXML_TUNE(smallbuffer,
               [no],
-              [--enable-xml-small-buffer],
+              [--enable-smallbuffer],
               [Define the size of internal buffer. For very small systems, large internal buffers can cause the systeml the behave strangely.],
               [CONFIG_XML_SMALL_BUFFER],
 	      Internal buffers     ,small,standard)
 
 # CONFIG_XML_SMALL_INPUT_FILE
-AC_ROXML_TUNE(xml_small_input_file,
+AC_ROXML_TUNE(smallinputfile,
               [no],
-              [--enable-xml-small-input-file],
+              [--enable-smallinputfile],
               [Limit the size of input XML libroxml can handle to 64kb instead of 4Gb. Setting this option will reduce the size of RAM loaded tree.],
               [CONFIG_XML_SMALL_INPUT_FILE],
 	      Input file           ,small (< 64kB),large (> 64kB))
 
-# CONFIG_XML_READ_WRITE
-AC_ROXML_TUNE(xml_read_write,
+# CONFIG_XML_FILE
+AC_ROXML_TUNE(file,
               [yes],
-              [--disable-xml-read-write],
+              [--disable-file],
+              [Can the target library parse file documents. When set to 0, this result in smaller binary.],
+              [CONFIG_XML_FILE],
+	      File parsing support ,yes,no)
+
+# CONFIG_XML_EDIT
+AC_ROXML_TUNE(edit,
+              [yes],
+              [--disable-edit],
               [Can the target library modify XML tree. When set to 0, this result in smaller binary (this saves about 3kb).],
-              [CONFIG_XML_READ_WRITE],
+              [CONFIG_XML_EDIT],
 	      Write support        ,yes,no)
 
-# CONFIG_XML_COMMIT_XML_TREE
-AC_ROXML_TUNE(xml_commit_xml_tree,
+# CONFIG_XML_COMMIT
+AC_ROXML_TUNE(commit,
               [yes],
-              [--disable-xml-commit-xml-tree],
+              [--disable-commit],
               [Can the target library commit a tree. When set to 0, this result in smaller binary (this saves about 5kb).],
-              [CONFIG_XML_COMMIT_XML_TREE],
+              [CONFIG_XML_COMMIT],
 	      Commit support       ,yes,no)
 
-# CONFIG_XML_XPATH_ENGINE
-AC_ROXML_TUNE(xml_xpath_engine,
+# CONFIG_XML_XPATH
+AC_ROXML_TUNE(xpath,
               [yes],
-              [--disable-xml-xpath-engine],
+              [--disable-xpath],
               [Can the target library perform xpath queries. When set to 0, this result in smaller binary (this saves about 20kb).],
-              [CONFIG_XML_XPATH_ENGINE],
+              [CONFIG_XML_XPATH],
 	      Xpath support        ,yes,no)
 
 ################################
