@@ -167,16 +167,13 @@ unittest_libroxml_test_a_CFLAGS = $(TEST_CFLAGS)
 # Test library libroxml_test_tiny.a
 unittest_libroxml_test_tiny_a_SOURCES = \
 	src/roxml_buff.c \
-	src/roxml_commit.c \
 	src/roxml_content.c \
 	src/roxml_core.c \
-	src/roxml_edit.c \
 	src/roxml_file.c \
 	src/roxml_mem.c \
 	src/roxml_nav.c \
 	src/roxml_parser.c \
-	src/roxml_stub.c \
-	src/roxml_xpath.c
+	src/roxml_stub.c
 
 unittest_libroxml_test_tiny_a_CFLAGS = \
 	$(TEST_CFLAGS) \
@@ -185,9 +182,10 @@ unittest_libroxml_test_tiny_a_CFLAGS = \
 	-DCONFIG_XML_SMALL_BUFFER=1 \
 	-DCONFIG_XML_SMALL_INPUT_FILE=1 \
 	-DCONFIG_XML_THREAD_SAFE=0 \
-	-DCONFIG_XML_READ_WRITE=0 \
-	-DCONFIG_XML_COMMIT_XML_TREE=0 \
-	-DCONFIG_XML_XPATH_ENGINE=0
+	-DCONFIG_XML_COMMIT=0 \
+	-DCONFIG_XML_EDIT=0 \
+	-DCONFIG_XML_FILE=0 \
+	-DCONFIG_XML_XPATH=0
 
 # roxml.unitC
 nodist_unittest_roxml_unitC_SOURCES = \
@@ -211,7 +209,16 @@ nodist_unittest_roxml_tiny_unitC_SOURCES = \
 	unittest/unittest.c \
 	unittest/roxml.test.c
 unittest_roxml_tiny_unitC_LDADD = unittest/libroxml_test_tiny.a
-unittest_roxml_tiny_unitC_CFLAGS = $(TEST_CFLAGS)
+unittest_roxml_tiny_unitC_CFLAGS = $(TEST_CFLAGS) \
+	-UHAVE_CONFIG_H \
+	-DCONFIG_XML_HEAP_BUFFERS=1 \
+	-DCONFIG_XML_SMALL_BUFFER=1 \
+	-DCONFIG_XML_SMALL_INPUT_FILE=1 \
+	-DCONFIG_XML_THREAD_SAFE=0 \
+	-DCONFIG_XML_COMMIT=0 \
+	-DCONFIG_XML_EDIT=0 \
+	-DCONFIG_XML_FILE=0 \
+	-DCONFIG_XML_XPATH=0
 
 CLEANFILES += \
 		unittest/out.xml.copy \

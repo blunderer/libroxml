@@ -44,12 +44,16 @@ ROXML_STUB node_t *roxml_set_ns(node_t *n, node_t * ns)
 
 ROXML_STUB node_t **roxml_xpath(node_t *n, char *path, int *nb_ans)
 {
+	if (nb_ans)
+		*nb_ans = 0;
 	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
 	return NULL;
 }
 
 ROXML_STUB char *roxml_get_content(node_t *n, char *buffer, int bufsize, int *size)
 {
+	if (size)
+		*size = 0;
 	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
 	return NULL;
 }
