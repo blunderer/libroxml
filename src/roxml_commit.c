@@ -1,236 +1,216 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <roxml_core.h>
 #include <roxml_commit.h>
 
-ROXML_INT void roxml_print_space(FILE * f, char **buf, int *offset, int *len, int lvl)
+ROXML_INT void roxml_realloc_buf(char **buf, int *len, int min_len)
 {
-	if (lvl > 0) {
-		int i = 0;
+	int append = (min_len & (ROXML_BASE_LEN-1)) + 1;
+	*buf = realloc(*buf, *len + append);
+	memset(*buf + *len, 0, append);
+	*len += append;
+}
 
-		if (buf && *buf) {
-			int pos = *offset + lvl;
-			if (pos >= *len) {
-				*buf = realloc(*buf, *len + ROXML_BASE_LEN);
-				memset(*buf + *len, 0, ROXML_BASE_LEN);
-				*len += ROXML_BASE_LEN;
-			}
-			for (; i < lvl; i++) {
-				strcat(*buf, " ");
-			}
-			*offset = pos;
-		}
-		if (f) {
-			for (; i < lvl; i++) {
-				fwrite(" ", 1, 1, f);
-			}
-		}
+ROXML_INT void roxml_print_spaces(FILE * f, char **buf, int *offset, int *len, int lvl)
+{
+	int i;
+
+	if (f) {
+		if ((*offset)++ > 0)
+			fwrite("\n", 1, 1, f);
+		for (i = 0; i < lvl; i++)
+			fwrite(" ", 1, 1, f);
+	} else if (buf && *buf) {
+		if (*offset + lvl + 1 >= *len)
+			roxml_realloc_buf(buf, len, lvl);
+		if (*offset > 0)
+			*(*buf + (*offset)++) = '\n';
+		for (i = 0; i < lvl; i++)
+			*(*buf + (*offset)++) = ' ';
 	}
 }
 
-ROXML_INT void roxml_write_string(char **buf, FILE * f, char *str, int *offset, int *len)
+ROXML_INT void roxml_write_string(FILE *f, char **buf, int *offset, int *len, char *str, ...)
 {
-	int min_len = strlen(str);
-	int pos = *offset + min_len;
-	int appended_space = ROXML_BASE_LEN * ((int)(min_len / ROXML_BASE_LEN) + 1);
+	va_list args;
+	int min_len;
 
-	if ((pos >= *len) && (buf) && (*buf)) {
-		*buf = realloc(*buf, *len + appended_space);
-		memset(*buf + *len, 0, appended_space);
-		*len += appended_space;
-	}
+	va_start(args, str);
+	min_len = vsnprintf(NULL, 0, str, args);
+	va_end(args);
+
+	va_start(args, str);
+
 	if (f) {
-		fprintf(f, "%s", str);
+		vfprintf(f, str, args);
+	} else if (buf && *buf) {
+		if (*offset + min_len >= *len)
+			roxml_realloc_buf(buf, len, min_len);
+		*offset += vsprintf(*buf + *offset, str, args);
 	}
-	if (buf && *buf) {
-		strcat(*buf + (*offset), str);
+
+	va_end(args);
+}
+
+ROXML_INT static void roxml_write_other_node(node_t *n, FILE * f, char **buf, int *offset, int *len, char *name)
+{
+	char *value;
+	int status;
+	char head[8] = "\0";
+	char tail[8] = "\0";
+	char cdata_head[16] = "\0";
+	char cdata_tail[8] = "\0";
+
+	ROXML_GET_BASE_BUFFER(val);
+
+	if ((n->type & ROXML_NODE_TYPES) == ROXML_CMT_NODE) {
+		strcpy(head, "<!--");
+		strcpy(tail, "-->");
+	} else if ((n->type & ROXML_NODE_TYPES) == ROXML_DOCTYPE_NODE) {
+		strcpy(head, "<");
+		strcpy(tail, ">");
+	} else if ((n->type & ROXML_NODE_TYPES) == ROXML_PI_NODE) {
+		strcpy(head, "<?");
+		strcpy(tail, "?>");
 	}
-	*offset = pos;
+
+
+	value = roxml_get_content(n, val, ROXML_BASE_LEN, &status);
+	if (status >= ROXML_BASE_LEN)
+		value = roxml_get_content(n, NULL, 0, &status);
+
+	if ((n->type & ROXML_CDATA_NODE) == ROXML_CDATA_NODE) {
+		strcpy(cdata_head, "<![CDATA[");
+		strcpy(cdata_tail, "]]>");
+	}
+
+	roxml_write_string(f, buf, offset, len, "%s%s%s%s%s%s%s", head,
+			name[0] ? name : "", name[0] ? " " : "",
+			cdata_head, value, cdata_tail, tail);
+	roxml_release(value);
+
+	ROXML_PUT_BASE_BUFFER(val);
+}
+
+ROXML_INT static void roxml_write_elm_name_open(node_t *n, FILE * f, char **buf, int *offset, int *len, char *name, char *ns)
+{
+	if (!n->prnt)
+		return;
+
+	if (n->ns)
+		roxml_get_name(n->ns, ns, ROXML_BASE_LEN);
+	roxml_write_string(f, buf, offset, len, "<%s%s%s", n->ns ? ns : "",
+						n->ns ? ":" : "", name);
+}
+
+ROXML_INT static void roxml_write_elm_name_close(node_t *n, FILE * f, char **buf, int *offset, int *len, char *name, char *ns)
+{
+	char head[8] = "\0";
+	char tail[8] = "/>";
+
+	if (n->chld) {
+		strcpy(head, "</");
+		strcpy(tail, ">");
+	}
+
+	roxml_write_string(f, buf, offset, len, "%s%s%s%s%s", head,
+				n->chld && n->ns ? ns : "",
+				n->chld && n->ns ? ":" : "",
+				n->chld ? name : "", tail);
+}
+
+ROXML_INT static void roxml_write_elm_attr(node_t *n, FILE * f, char **buf, int *offset, int *len)
+{
+	node_t *attr = n->attr;
+
+	while (attr) {
+		int ns_node_attr = attr->type & ROXML_NS_NODE;
+		int status = 0;
+		char arg[ROXML_BASE_LEN];
+		char val[ROXML_BASE_LEN];
+		char *value;
+
+		ROXML_GET_BASE_BUFFER(ns);
+
+		roxml_get_name(attr, arg, ROXML_BASE_LEN);
+
+		value = roxml_get_content(attr, val, ROXML_BASE_LEN, &status);
+		if (status >= ROXML_BASE_LEN)
+			value = roxml_get_content(attr, NULL, 0, &status);
+
+		if (attr->ns)
+			roxml_get_name(attr->ns, ns, ROXML_BASE_LEN);
+
+		roxml_write_string(f, buf, offset, len, " %s%s%s%s%s=\"%s\"",
+					ns_node_attr ? "xmlns" : "",
+					ns_node_attr && arg[0] ? ":" : "" ,
+					attr->ns ? ns : "",
+					attr->ns ? ":" : "",
+					arg, value);
+
+		attr = attr->sibl;
+		roxml_release(value);
+
+		ROXML_PUT_BASE_BUFFER(ns);
+	}
 }
 
 ROXML_INT void roxml_write_node(node_t *n, FILE * f, char **buf, int human, int lvl, int *offset, int *len)
 {
+	ROXML_GET_BASE_BUFFER(ns);
 	ROXML_GET_BASE_BUFFER(name);
-
 	roxml_get_name(n, name, ROXML_BASE_LEN);
-	if (human) {
-		roxml_print_space(f, buf, offset, len, lvl);
-	}
-	if ((n->type & ROXML_NODE_TYPES) == ROXML_ELM_NODE) {
-		ROXML_GET_BASE_BUFFER(ns);
-		node_t *attr = n->attr;
-		if (n->prnt) {
-			roxml_write_string(buf, f, "<", offset, len);
-			if (n->ns) {
-				roxml_get_name(n->ns, ns, ROXML_BASE_LEN);
-				if (ns[0] != '\0') {
-					roxml_write_string(buf, f, ns, offset, len);
-					roxml_write_string(buf, f, ":", offset, len);
-				}
-			}
-			roxml_write_string(buf, f, name, offset, len);
-		}
-		while (attr) {
-			int status = 0;
-			char *value;
-			char arg[ROXML_BASE_LEN];
-			char val[ROXML_BASE_LEN];
 
-			roxml_get_name(attr, arg, ROXML_BASE_LEN);
-			value = roxml_get_content(attr, val, ROXML_BASE_LEN, &status);
-			if (status >= ROXML_BASE_LEN) {
-				value = roxml_get_content(attr, NULL, 0, &status);
-			}
-			roxml_write_string(buf, f, " ", offset, len);
-			if (attr->type & ROXML_NS_NODE) {
-				roxml_write_string(buf, f, "xmlns", offset, len);
-				if (arg[0] != '\0') {
-					roxml_write_string(buf, f, ":", offset, len);
-				}
-			}
-			if (attr->ns) {
-				ROXML_GET_BASE_BUFFER(arg_ns);
-				roxml_get_name(attr->ns, arg_ns, ROXML_BASE_LEN);
-				if (arg_ns[0] != '\0') {
-					roxml_write_string(buf, f, arg_ns, offset, len);
-					roxml_write_string(buf, f, ":", offset, len);
-				}
-				ROXML_PUT_BASE_BUFFER(arg_ns);
-			}
-			roxml_write_string(buf, f, arg, offset, len);
-			roxml_write_string(buf, f, "=\"", offset, len);
-			roxml_write_string(buf, f, value, offset, len);
-			roxml_write_string(buf, f, "\"", offset, len);
-			attr = attr->sibl;
-			roxml_release(value);
-		}
-		if (n->chld) {
-			node_t *chld = n->chld;
-			if (n->prnt) {
-				roxml_write_string(buf, f, ">", offset, len);
-				if (human) {
-					roxml_write_string(buf, f, "\n", offset, len);
-				}
-			}
+	if (n->type & ROXML_ELM_NODE) {
+		node_t *chld = n->chld;
+
+		if (human)
+			roxml_print_spaces(f, buf, offset, len, lvl);
+		roxml_write_elm_name_open(n, f, buf, offset, len, name, ns);
+		roxml_write_elm_attr(n, f, buf, offset, len);
+
+		if (chld) {
+			int keep_human;
+			node_t *prev = chld;
+
+			roxml_write_string(f, buf, offset, len, ">");
+		
 			while (chld) {
-				if (chld->type & ROXML_TXT_NODE) {
-					ROXML_GET_BASE_BUFFER(val);
-					char *value;
-					int status;
-					if (human) {
-						roxml_print_space(f, buf, offset, len, lvl + 1);
-					}
-					value = roxml_get_content(chld, val, ROXML_BASE_LEN, &status);
-					if (status >= ROXML_BASE_LEN) {
-						value = roxml_get_content(chld, NULL, 0, &status);
-					}
-					if ((chld->type & ROXML_CDATA_NODE) == ROXML_CDATA_NODE) {
-						roxml_write_string(buf, f, "<![CDATA[", offset, len);
-						roxml_write_string(buf, f, value, offset, len);
-						roxml_write_string(buf, f, "]]>", offset, len);
-					} else {
-						char *end = value + status - 2;
-						char *strip = value;
-						while (roxml_is_separator(end[0])) {
-							end[0] = '\0';
-							end--;
-						}
-						while (roxml_is_separator(strip[0])) {
-							strip++;
-						}
+				keep_human = human;
 
-						roxml_write_string(buf, f, strip, offset, len);
-					}
-					if (human) {
-						roxml_write_string(buf, f, "\n", offset, len);
-					}
-					chld = chld->sibl;
-					roxml_release(value);
-					ROXML_PUT_BASE_BUFFER(val);
-				} else {
-					roxml_write_node(chld, f, buf, human, lvl + 1, offset, len);
-					chld = chld->sibl;
-				}
+				if ((chld->type | prev->type) & ROXML_TXT_NODE)
+					keep_human = 0;
+
+				roxml_write_node(chld, f, buf, keep_human, lvl + 1, offset, len);
+
+				prev = chld;
+				chld = chld->sibl;
+
 			}
-			if (n->prnt) {
-				if (human) {
-					roxml_print_space(f, buf, offset, len, lvl);
-				}
-				roxml_write_string(buf, f, "</", offset, len);
-				if (n->ns) {
-					if (ns[0] != '\0') {
-						roxml_write_string(buf, f, ns, offset, len);
-						roxml_write_string(buf, f, ":", offset, len);
-					}
-				}
-				roxml_write_string(buf, f, name, offset, len);
-				roxml_write_string(buf, f, ">", offset, len);
-				if (human) {
-					roxml_write_string(buf, f, "\n", offset, len);
-				}
-			}
-		} else {
-			roxml_write_string(buf, f, "/>", offset, len);
-			if (human) {
-				roxml_write_string(buf, f, "\n", offset, len);
-			}
+			if (human && !(prev->type & ROXML_TXT_NODE))
+				roxml_print_spaces(f, buf, offset, len, lvl);
 		}
-		ROXML_PUT_BASE_BUFFER(ns);
+
+		roxml_write_elm_name_close(n, f, buf, offset, len, name, ns);
 	} else {
-		char *value;
-		int status;
-		char head[8];
-		char tail[8];
-
-		ROXML_GET_BASE_BUFFER(val);
-
-		if ((n->type & ROXML_NODE_TYPES) == ROXML_CMT_NODE) {
-			strcpy(head, "<!--");
-			strcpy(tail, "-->");
-		} else if ((n->type & ROXML_NODE_TYPES) == ROXML_DOCTYPE_NODE) {
-			strcpy(head, "<");
-			strcpy(tail, ">");
-		} else if ((n->type & ROXML_NODE_TYPES) == ROXML_PI_NODE) {
-			strcpy(head, "<?");
-			strcpy(tail, "?>");
-		} else {
-			head[0] = '\0';
-			tail[0] = '\0';
-		}
-
-		roxml_write_string(buf, f, head, offset, len);
-
-		if (name[0]) {
-			roxml_write_string(buf, f, name, offset, len);
-		}
-
-		value = roxml_get_content(n, val, ROXML_BASE_LEN, &status);
-		if (status >= ROXML_BASE_LEN) {
-			value = roxml_get_content(n, NULL, 0, &status);
-		}
-		if (name[0] && value && value[0]) {
-			roxml_write_string(buf, f, " ", offset, len);
-		}
-		roxml_write_string(buf, f, value, offset, len);
-		roxml_release(value);
-
-		roxml_write_string(buf, f, tail, offset, len);
-
-		if (human) {
-			roxml_write_string(buf, f, "\n", offset, len);
-		}
-		ROXML_PUT_BASE_BUFFER(val);
+		if (human)
+			roxml_print_spaces(f, buf, offset, len, lvl);
+		roxml_write_other_node(n, f, buf, offset, len, name);
 	}
+
 	ROXML_PUT_BASE_BUFFER(name);
+	ROXML_PUT_BASE_BUFFER(ns);
 }
 
 ROXML_API int roxml_commit_changes(node_t *n, char *dest, char **buffer, int human)
 {
-	int len = 0;
 	int size = 0;
+	int len = ROXML_BASE_LEN;
 
 	if (n) {
 		FILE *fout = NULL;
+		node_t fakeroot;
 
 		if (dest) {
 			fout = fopen(dest, "w");
@@ -239,33 +219,34 @@ ROXML_API int roxml_commit_changes(node_t *n, char *dest, char **buffer, int hum
 			memset(*buffer, 0, ROXML_BASE_LEN);
 		}
 
-		if (fout || buffer) {
-			len = ROXML_BASE_LEN;
+		if (dest && !fout)
+			return 0;
+		else if (!dest && ! buffer)
+			return 0;
 
-			if ((n->prnt == NULL) || (n->prnt && n->prnt->prnt == NULL)) {
-				if (n->prnt) {
-					n = n->prnt->chld;
-				} else {
-					n = n->chld;
-				}
-				while (n) {
-					roxml_write_node(n, fout, buffer, human, 0, &size, &len);
-					n = n->sibl;
-				}
-			} else {
-				roxml_write_node(n, fout, buffer, human, 0, &size, &len);
-			}
-			if (buffer) {
-				char *ptr = NULL;
-				len -= ROXML_BASE_LEN;
-				ptr = *buffer + len;
-				len += strlen(ptr);
-			} else if (fout) {
-				len = ftell(fout);
-				fclose(fout);
-			}
+		if (n->prnt == NULL) {
+			/* Get the first child since we do not write the docroot */
+			n = n->chld;
+		} else if (n->prnt->prnt == NULL) {
+			/* Get the first sibling since it might be a PI */
+			n = n->prnt->chld;
+		} else {
+			/* The root is a subtree: simulate a real root */
+			memcpy(&fakeroot, n, sizeof(node_t));
+			fakeroot.sibl = NULL;
+			n = &fakeroot;
+		}
+
+		while (n) {
+			roxml_write_node(n, fout, buffer, human, 0, &size, &len);
+			n = n->sibl;
+		}
+
+		if (dest) {
+			size = ftell(fout);
+			fclose(fout);
 		}
 	}
 
-	return len;
+	return size;
 }

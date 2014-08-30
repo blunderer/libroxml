@@ -5,7 +5,7 @@
 
 /** \brief space printing function
  *
- * \fn roxml_print_space(FILE *f, char ** buf, int * offset, int * len, int lvl);
+ * \fn roxml_print_spaces(FILE *f, char ** buf, int * offset, int * len, int lvl);
  * this function add some space to output when committing change in human format
  * \param f the file pointer if any
  * \param buf the pointer to string if any
@@ -14,11 +14,11 @@
  * \param lvl the level in the tree
  * \return
  */
-ROXML_INT void roxml_print_space(FILE * f, char **buf, int *offset, int *len, int lvl);
+ROXML_INT void roxml_print_spaces(FILE * f, char **buf, int *offset, int *len, int lvl);
 
 /** \brief string writter function
  *
- * \fn roxml_write_string(char ** buf, FILE * f, char * str, int *offset, int * len);
+ * \fn void roxml_write_string(FILE *f, char **buf, int *offset, int *len, char *str, ...);
  * this function write a string to output when committing change
  * \param f the file pointer if any
  * \param buf the pointer to string if any
@@ -27,7 +27,7 @@ ROXML_INT void roxml_print_space(FILE * f, char **buf, int *offset, int *len, in
  * \param len the total len of buffer if any
  * \return
  */
-ROXML_INT void roxml_write_string(char **buf, FILE * f, char *str, int *offset, int *len);
+ROXML_INT void roxml_write_string(FILE *f, char **buf, int *offset, int *len, char *str, ...);
 
 /** \brief tree write function
  *
