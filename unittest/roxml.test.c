@@ -1362,20 +1362,20 @@ int test_del_node(void)
 #endif /* CONFIG_XML_EDIT */
 
 	node_t **node_set = roxml_xpath(root, "//*", &nb);
-#if(CONFIG_XML_XPATH_ENGINE==1)
+#if(CONFIG_XML_XPATH==1)
 	ASSERT_EQUAL(nb, 9);
-#else /* CONFIG_XML_XPATH_ENGINE==0 */
+#else /* CONFIG_XML_XPATH==0 */
 	ASSERT_EQUAL(nb, 0);
-#endif /* CONFIG_XML_XPATH_ENGINE */
+#endif /* CONFIG_XML_XPATH */
 	
 	roxml_del_node(node2);
 
 	node_set = roxml_xpath(root, "//*", &nb);
-#if(CONFIG_XML_XPATH_ENGINE==1)
+#if(CONFIG_XML_XPATH==1)
 	ASSERT_EQUAL(nb, 4);
-#else /* CONFIG_XML_XPATH_ENGINE==0 */
+#else /* CONFIG_XML_XPATH==0 */
 	ASSERT_EQUAL(nb, 0);
-#endif /* CONFIG_XML_XPATH_ENGINE */
+#endif /* CONFIG_XML_XPATH */
 
 	node_t * text = roxml_get_txt(node1, 0);
 	ASSERT_NOT_NULL(text);
@@ -1469,7 +1469,7 @@ int test_parse_xpath(void)
 {
 	INIT
 
-#if(CONFIG_XML_XPATH_ENGINE==1)
+#if(CONFIG_XML_XPATH==1)
 	xpath_node_t *ptr;
 	char mypath[256] = "/node/item[12]/title";
 	int ret = roxml_parse_xpath(mypath, &ptr, 0);	
@@ -1731,7 +1731,7 @@ int test_parse_xpath(void)
 
 	roxml_free_xpath(ptr, ret);
 
-#endif /* CONFIG_XML_XPATH_ENGINE */
+#endif /* CONFIG_XML_XPATH */
 	RETURN
 }
 
@@ -1739,7 +1739,7 @@ int test_xpath(void)
 {
 	INIT
 
-#if(CONFIG_XML_XPATH_ENGINE==1)
+#if(CONFIG_XML_XPATH==1)
 	int nbans;
 	node_t *node0;
 	node_t *node2;
@@ -2479,7 +2479,7 @@ int test_xpath(void)
 	roxml_close(root);
 
 	roxml_release(RELEASE_ALL);
-#endif /* CONFIG_XML_XPATH_ENGINE */
+#endif /* CONFIG_XML_XPATH */
 
 	RETURN
 }
@@ -2560,7 +2560,7 @@ int test_spec_nodes(void)
 	ASSERT_STRING_EQUAL(content, " <node2></node2> ")
 
 	// test xpath
-#if (CONFIG_XML_XPATH_ENGINE==1)
+#if (CONFIG_XML_XPATH==1)
 	node_t **node_set = roxml_xpath(root, "//comment()", &nbans);
 	ASSERT_EQUAL(nbans, 2)
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "this is a comment")
@@ -2589,7 +2589,7 @@ int test_spec_nodes(void)
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[4], NULL, 0, NULL), "value=\"2\"")
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[5], NULL, 0, NULL), " <node2></node2> ")
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[6], NULL, 0, NULL), " <toto/> ")
-#endif /* CONFIG_XML_XPATH_ENGINE */
+#endif /* CONFIG_XML_XPATH */
 
 	roxml_release(RELEASE_ALL);
 	roxml_close(root);
@@ -2838,7 +2838,7 @@ int test_write_namespaces(void)
 #if (CONFIG_XML_COMMIT==1)
 	root = roxml_load_doc("out.xml.ns.generated");
 	len = roxml_commit_changes(root, "out.xml.ns.generated2", NULL, 1);
-	ASSERT_EQUAL(len, 345);
+	ASSERT_EQUAL(len, 344);
 
 	roxml_close(root);
 #endif /* CONFIG_XML_COMMIT */
@@ -2970,7 +2970,7 @@ int test_write_tree(void)
 	node = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "this was a test XML file");
 	len = roxml_commit_changes(root, "out.xml.copy", NULL, 1);
 
-	ASSERT_EQUAL(len, 361) 
+	ASSERT_EQUAL(len, 313) 
 
 	roxml_close(root);
 
@@ -2983,7 +2983,7 @@ int test_write_tree(void)
 	node = roxml_add_node(root, 0, ROXML_PI_NODE, "test", NULL);
 	len = roxml_commit_changes(root, "out.xml.spec.copy", NULL, 1);
 
-	ASSERT_EQUAL(len, 264) 
+	ASSERT_EQUAL(len, 260) 
 
 	roxml_close(root);
 
@@ -3026,10 +3026,10 @@ int test_write_tree(void)
 	ASSERT_EQUAL(len, 176)
 
 	len = roxml_commit_changes(root, "out.xml.human", NULL, 1);
-	ASSERT_EQUAL(len, 219)
+	ASSERT_EQUAL(len, 185)
 
 	len = roxml_commit_changes(node2, "out.xml.human.sub", NULL, 1);
-	ASSERT_EQUAL(len, 40)
+	ASSERT_EQUAL(len, 34)
 
 	len = roxml_commit_changes(root, NULL, &buffer, 0);
 	ASSERT_EQUAL(len, 176)
@@ -3041,7 +3041,7 @@ int test_write_tree(void)
 
 	fout = fopen("out.buf.xml.human", "w");
 	len = roxml_commit_changes(root, NULL, &buffer, 1);
-	ASSERT_EQUAL(len, 219)
+	ASSERT_EQUAL(len, 185)
 
 	fwrite(buffer, 1, len, fout);
 	fclose(fout);
@@ -3065,28 +3065,28 @@ int test_write_tree(void)
 	roxml_add_node(node, 0, ROXML_ELM_NODE, "item", NULL);
 
 	len = roxml_commit_changes(root, "out.xml.valid.human", NULL, 1);
-	ASSERT_EQUAL(len, 96)
+	ASSERT_EQUAL(len, 91)
 
 	attr = roxml_add_node(node, 0, ROXML_ATTR_NODE, "id", "1234");
 	len = roxml_commit_changes(root, "out.xml.modattr", NULL, 1);
-	ASSERT_EQUAL(len, 106)
+	ASSERT_EQUAL(len, 101)
 
 	text = roxml_get_txt(attr, 0);
 	roxml_del_node(text);
 	roxml_add_node(attr, 0, ROXML_TXT_NODE, "id", "246");
 	len = roxml_commit_changes(root, "out.xml.modattr", NULL, 1);
-	ASSERT_EQUAL(len, 105)
+	ASSERT_EQUAL(len, 100)
 
 	attr = roxml_add_node(node, 0, ROXML_NSDEF_NODE, "xsd", "http://www.xsd.fr");
 	len = roxml_commit_changes(root, "out.xml.modattr", NULL, 1);
 
-	ASSERT_EQUAL(len, 135)
+	ASSERT_EQUAL(len, 130)
 
 	text = roxml_get_txt(attr, 0);
 	roxml_del_node(text);
 	len = roxml_commit_changes(root, "out.xml.modattr", NULL, 1);
 
-	ASSERT_EQUAL(len, 118)
+	ASSERT_EQUAL(len, 113)
 
 	roxml_add_node(attr, 0, ROXML_TXT_NODE, "xsd", "http://www.xsd.org");
 	len = roxml_commit_changes(root, "out.xml.modattr", NULL, 0);
@@ -3105,7 +3105,7 @@ int test_write_tree(void)
 	text = roxml_add_node(attr, 0, ROXML_TXT_NODE, "xsd", "http://www.default/xsd.org");
 	len = roxml_commit_changes(root, "out.xml.modattr2", NULL, 1);
 
-	ASSERT_EQUAL(len, 144)
+	ASSERT_EQUAL(len, 139)
 
 	roxml_close(root);
 
@@ -3122,7 +3122,7 @@ int test_write_tree(void)
 
 	len = roxml_commit_changes(root, "out.xml.valid.raw", NULL, 0);
 	len = roxml_commit_changes(root, "out.xml.valid.xpath", NULL, 1);
-	ASSERT_EQUAL(len, 97);
+	ASSERT_EQUAL(len, 91);
 
 	roxml_close(root);
 
@@ -3141,15 +3141,15 @@ int test_write_tree(void)
 
 	root = roxml_load_doc("out.xml.valid.xpath");
 	len = roxml_commit_changes(root, "out.xml.valid.xpath2", NULL, 1);
-	ASSERT_EQUAL(len, 97);
+	ASSERT_EQUAL(len, 91);
 	roxml_close(root);
 	root = roxml_load_doc("out.xml.valid.xpath2");
 	len = roxml_commit_changes(root, "out.xml.valid.xpath3", NULL, 1);
-	ASSERT_EQUAL(len, 97);
+	ASSERT_EQUAL(len, 91);
 	roxml_close(root);
 	root = roxml_load_doc("out.xml.valid.xpath3");
 	len = roxml_commit_changes(root, "out.xml.valid.xpath4", NULL, 1);
-	ASSERT_EQUAL(len, 97);
+	ASSERT_EQUAL(len, 91);
 	roxml_close(root);
 
 #endif /* CONFIG_XML_COMMIT */
