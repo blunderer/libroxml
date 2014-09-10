@@ -70,7 +70,6 @@ ROXML_API node_t *roxml_load_fd(int fd)
 		return NULL;
 
 	current_node = roxml_create_node(0, file, ROXML_ELM_NODE | ROXML_FILE);
-	current_node = roxml_append_node(NULL, current_node);
 
 	return roxml_load(current_node, file, NULL);
 }
@@ -83,7 +82,6 @@ ROXML_API node_t *roxml_load_doc(char *filename)
 	if (file == NULL)
 		return NULL;
 	current_node = roxml_create_node(0, file, ROXML_ELM_NODE | ROXML_FILE);
-	current_node = roxml_append_node(NULL, current_node);
 
 	return roxml_load(current_node, file, NULL);
 }

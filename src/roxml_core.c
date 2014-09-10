@@ -159,9 +159,9 @@ ROXML_INT void roxml_process_begin_node(roxml_load_ctx_t * context, int position
 ROXML_INT node_t *roxml_load(node_t *current_node, FILE * file, char *buffer)
 {
 	int error = 0;
+	node_t *root = current_node;
 	roxml_load_ctx_t context;
 	roxml_parser_item_t *parser = NULL;
-	xpath_tok_table_t *table = (xpath_tok_table_t *) calloc(1, sizeof(xpath_tok_table_t));
 
 	memset(&context, 0, sizeof(roxml_load_ctx_t));
 	context.empty_text_node = 1;
@@ -194,26 +194,27 @@ ROXML_INT node_t *roxml_load(node_t *current_node, FILE * file, char *buffer)
 
 	if (context.empty_text_node == 1)
 		roxml_free_node(context.candidat_txt);
+	current_node = NULL;
 
-	if (!error) {
-		node_t *virtroot = NULL;
-		current_node = roxml_get_root(current_node);
-		virtroot = current_node;
-		while (virtroot->prnt) {
-			virtroot = virtroot->prnt;
-		}
-
-		table->id = ROXML_REQTABLE_ID;
-		table->ids[ROXML_REQTABLE_ID] = 1;
-		pthread_mutex_init(&table->mut, NULL);
-		virtroot->priv = (void *)table;
-	} else {
-		free(table);
-		roxml_close(current_node);
-		return NULL;
-	}
+	if (!error)
+		current_node = roxml_create_root(root);
+	else
+		roxml_close(root);
 
 	return current_node;
+}
+
+ROXML_INT node_t *roxml_create_root(node_t *n)
+{
+	xpath_tok_table_t *table = (xpath_tok_table_t *) calloc(1, sizeof(xpath_tok_table_t));
+
+	table->id = ROXML_REQTABLE_ID;
+	table->ids[ROXML_REQTABLE_ID] = 1;
+
+	pthread_mutex_init(&table->mut, NULL);
+	n->priv = (void *)table;
+
+	return n;
 }
 
 ROXML_INT node_t *roxml_lookup_nsdef(node_t *nsdef, char *ns)
@@ -239,10 +240,10 @@ ROXML_INT inline void roxml_set_type(node_t *n, int type)
 	n->type |= type;
 }
 
-ROXML_INT node_t *roxml_append_node(node_t *parent, node_t * n)
+ROXML_INT node_t *roxml_set_parent(node_t *parent, node_t *n)
 {
 	if (parent == NULL)
-		return n;
+		return NULL;
 
 	n->prnt = parent;
 
@@ -251,23 +252,43 @@ ROXML_INT node_t *roxml_append_node(node_t *parent, node_t * n)
 		if (n->ns == NULL)
 			n->ns = parent->ns;
 	}
+	return n;
+}
 
-	if (n->type & ROXML_ATTR_NODE) {
-		if (parent->attr) {
-			node_t *attr = parent->attr;
-			while (attr->sibl)
-				attr = attr->sibl;
-			attr->sibl = n;
-		} else {
-			parent->attr = n;
-		}
+ROXML_INT node_t *roxml_append_attr(node_t *parent, node_t *n)
+{
+	if (parent->attr) {
+		node_t *attr = parent->attr;
+		while (attr->sibl)
+			attr = attr->sibl;
+		attr->sibl = n;
 	} else {
-		if (parent->next)
-			parent->next->sibl = n;
-		else
-			parent->chld = n;
-		parent->next = n;
+		parent->attr = n;
 	}
+
+	return n;
+}
+
+ROXML_INT node_t *roxml_append_other(node_t *parent, node_t *n)
+{
+	if (parent->next)
+		parent->next->sibl = n;
+	else
+		parent->chld = n;
+	parent->next = n;
+
+	return n;
+}
+
+ROXML_INT node_t *roxml_append_node(node_t *parent, node_t *n)
+{
+	if (!roxml_set_parent(parent, n))
+		return n;
+
+	if (n->type & ROXML_ATTR_NODE)
+		roxml_append_attr(parent, n);
+	else
+		roxml_append_other(parent, n);
 
 	return n;
 }

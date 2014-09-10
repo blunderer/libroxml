@@ -38,7 +38,6 @@ ROXML_API node_t *roxml_load_buf(char *buffer)
 		return NULL;
 
 	current_node = roxml_create_node(0, buffer, ROXML_ELM_NODE | ROXML_BUFF);
-	current_node = roxml_append_node(NULL, current_node);
 
 	return roxml_load(current_node, NULL, buffer);
 }

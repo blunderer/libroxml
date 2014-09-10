@@ -49,6 +49,16 @@ ROXML_INT void roxml_free_node(node_t *n);
  */
 ROXML_INT void roxml_del_tree(node_t *n);
 
+/** \brief internal function
+ *
+ * \fn ROXML_INT node_t *roxml_create_root(node_t *n);
+ * This function initialize the root node with xpath table 
+ * \param n is the node to initialize
+ * \return void
+ * see roxml_close
+ */
+ROXML_INT node_t *roxml_create_root(node_t *n);
+
 /** \brief separator tester
  *
  * \fn roxml_is_separator(char sep);
@@ -110,6 +120,17 @@ ROXML_INT node_t *roxml_lookup_nsdef(node_t *nsdef, char *ns);
  * \return
  */
 ROXML_INT void roxml_set_type(node_t *n, int type);
+
+/** \brief node parenting function
+ *
+ * \fn node_t *roxml_set_parent(node_t *parent, node_t *n);
+ * this function updates a node to set its parent and namespace if
+ * necessary.
+ * \param parent the parent node
+ * \param n the node to parent
+ * \return
+ */
+ROXML_INT node_t *roxml_set_parent(node_t *parent, node_t *n);
 
 /** \brief node append function
  *
