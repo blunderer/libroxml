@@ -3,9 +3,18 @@
 #include <roxml_mem.h>
 #include <roxml_file.h>
 #include <roxml_buff.h>
-#include <roxml_content.h>
 
-ROXML_INT inline int roxml_read(int pos, int size, char *buffer, node_t *node)
+/** \brief read xml doc function
+ *
+ * \fn roxml_read(int pos, int size, char * buffer, node_t *node)
+ * this function read inside a xml doc (file or buffer) and fill the given buffer
+ * \param pos the pos in the xml document
+ * \param size the size of the data to read
+ * \param buffer the destination buffer
+ * \param node the node that belong to the tree we want to read to
+ * \return the number of bytes read
+ */
+ROXML_STATIC ROXML_INT inline int roxml_read(int pos, int size, char *buffer, node_t *node)
 {
 	int len = 0;
 
@@ -19,7 +28,7 @@ ROXML_INT inline int roxml_read(int pos, int size, char *buffer, node_t *node)
 	return len;
 }
 
-ROXML_INT inline int roxml_content_size(node_t *n, int *offset)
+ROXML_STATIC ROXML_INT inline int roxml_content_size(node_t *n, int *offset)
 {
 	int total = 0;
 
@@ -65,7 +74,7 @@ ROXML_INT inline int roxml_content_size(node_t *n, int *offset)
 	return total;
 }
 
-ROXML_INT inline char *roxml_prepare_buffer(node_t *n, char *buffer, int contentsize, int size)
+ROXML_STATIC ROXML_INT inline char *roxml_prepare_buffer(node_t *n, char *buffer, int contentsize, int size)
 {
 	if (n == NULL) {
 		if (buffer)
@@ -125,7 +134,7 @@ ROXML_API char *roxml_get_content(node_t *n, char *buffer, int bufsize, int *siz
 	return content;
 }
 
-ROXML_INT inline int roxml_name_size(node_t *n, int size, int *offset)
+ROXML_STATIC ROXML_INT inline int roxml_name_size(node_t *n, int size, int *offset)
 {
 	int total = 0;
 
@@ -253,7 +262,7 @@ ROXML_API int roxml_get_nodes_nb(node_t *n, int type)
 	return nb;
 }
 
-ROXML_INT inline node_t *roxml_get_nodes_by_name(node_t *n, int type, char *name)
+ROXML_STATIC ROXML_INT inline node_t *roxml_get_nodes_by_name(node_t *n, int type, char *name)
 {
 	node_t *ptr;
 
@@ -274,7 +283,7 @@ ROXML_INT inline node_t *roxml_get_nodes_by_name(node_t *n, int type, char *name
 	return NULL;
 }
 
-ROXML_INT inline node_t *roxml_get_nodes_by_nth(node_t *n, int type, int nth)
+ROXML_STATIC ROXML_INT inline node_t *roxml_get_nodes_by_nth(node_t *n, int type, int nth)
 {
 	node_t *ptr;
 	int count = 0;

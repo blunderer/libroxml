@@ -5,7 +5,14 @@
 #include <roxml_xpath.h>
 #include <roxml_parser.h>
 
-ROXML_INT int roxml_is_number(char *input)
+/** \brief number tester
+ *
+ * \fn int roxml_is_number(char *input);
+ * This function tells if a string is a number
+ * \param input string to test
+ * \return 1 if the string was a number else 0
+ */
+ROXML_STATIC ROXML_INT int roxml_is_number(char *input)
 {        
 	char *end;                  
 	int is_number = 0;        
@@ -24,149 +31,291 @@ ROXML_INT int roxml_is_number(char *input)
 	return is_number; 
 }
 
-ROXML_API node_t **roxml_xpath(node_t *n, char *path, int *nb_ans)
+/** \brief xpath condition free function
+ *
+ * \fn roxml_free_xcond(xpath_cond_t *xcond);
+ * this function frees an xpath_cond_t cell
+ * \param xcond the xcond to free
+ * \return
+ */
+ROXML_STATIC ROXML_INT void roxml_free_xcond(xpath_cond_t * xcond)
 {
-	int count = 0;
-	node_t **node_set = NULL;
-	int index = 0;
-	xpath_node_t *xpath = NULL;
-	node_t *root = n;
-	char *full_path_to_find;
-
-	if (n == NULL) {
-		if (nb_ans) {
-			*nb_ans = 0;
-		}
-		return NULL;
-	}
-
-	root = roxml_get_root(n);
-
-	full_path_to_find = strdup(path);
-
-	index = roxml_parse_xpath(full_path_to_find, &xpath, 0);
-
-	if (index >= 0) {
-		node_set = roxml_exec_xpath(root, n, xpath, index, &count);
-
-		roxml_free_xpath(xpath, index);
-		free(full_path_to_find);
-
-		if (count == 0) {
-			roxml_release(node_set);
-			node_set = NULL;
-		}
-	}
-	if (nb_ans) {
-		*nb_ans = count;
-	}
-
-	return node_set;
+	if (xcond->next)
+		roxml_free_xcond(xcond->next);
+	if (xcond->xp)
+		roxml_free_xpath(xcond->xp, xcond->func2);
+	free(xcond);
 }
 
-ROXML_INT xpath_node_t *roxml_set_axes(xpath_node_t *node, char *axes, int *offset)
+ROXML_INT void roxml_free_xpath(xpath_node_t *xpath, int nb)
 {
-	struct _xpath_axes {
-		char id;
-		char *name;
-	};
-
-	struct _xpath_axes xpath_axes[14] = {
-		{ROXML_ID_PARENT, ROXML_L_PARENT},
-		{ROXML_ID_PARENT, ROXML_S_PARENT},
-		{ROXML_ID_SELF, ROXML_L_SELF},
-		{ROXML_ID_SELF, ROXML_S_SELF},
-		{ROXML_ID_ATTR, ROXML_L_ATTR},
-		{ROXML_ID_ATTR, ROXML_S_ATTR},
-		{ROXML_ID_ANC, ROXML_L_ANC},
-		{ROXML_ID_ANC_O_SELF, ROXML_L_ANC_O_SELF},
-		{ROXML_ID_NEXT_SIBL, ROXML_L_NEXT_SIBL},
-		{ROXML_ID_PREV_SIBL, ROXML_L_PREV_SIBL},
-		{ROXML_ID_NEXT, ROXML_L_NEXT},
-		{ROXML_ID_PREV, ROXML_L_PREV},
-		{ROXML_ID_NS, ROXML_L_NS},
-		{ROXML_ID_CHILD, ROXML_L_CHILD},
-	};
-
-	xpath_node_t *tmp_node;
-	if (axes[0] == '/') {
-		axes[0] = '\0';
-		*offset += 1;
-		axes++;
+	int i = 0;
+	for (i = 0; i < nb; i++) {
+		if (xpath[i].next)
+			roxml_free_xpath(xpath[i].next, 1);
+		if (xpath[i].cond)
+			roxml_free_xcond(xpath[i].cond);
+		free(xpath[i].xp_cond);
 	}
-	if (axes[0] == '/') {
-		// ROXML_S_DESC_O_SELF
-		node->axes = ROXML_ID_DESC_O_SELF;
-		node->name = axes + 1;
-		tmp_node = (xpath_node_t *) calloc(1, sizeof(xpath_node_t));
-		tmp_node->axes = ROXML_ID_CHILD;
-		node->next = tmp_node;
-		if (strlen(node->name) > 0) {
-			tmp_node = (xpath_node_t *) calloc(1, sizeof(xpath_node_t));
-			node->next->next = tmp_node;
-			node = roxml_set_axes(tmp_node, axes + 1, offset);
-		}
-	} else if (strncmp(ROXML_L_DESC_O_SELF, axes, strlen(ROXML_L_DESC_O_SELF)) == 0) {
-		// ROXML_L_DESC_O_SELF
-		node->axes = ROXML_ID_DESC_O_SELF;
-		node->name = axes + strlen(ROXML_L_DESC_O_SELF);
-		*offset += strlen(ROXML_L_DESC_O_SELF);
-		tmp_node = (xpath_node_t *) calloc(1, sizeof(xpath_node_t));
-		tmp_node->axes = ROXML_ID_CHILD;
-		node->next = tmp_node;
-		node = roxml_set_axes(tmp_node, axes + strlen(ROXML_L_DESC_O_SELF), offset);
-	} else if (strncmp(ROXML_L_DESC, axes, strlen(ROXML_L_DESC)) == 0) {
-		// ROXML_L_DESC
-		node->axes = ROXML_ID_DESC;
-		node->name = axes + strlen(ROXML_L_DESC);
-		*offset += strlen(ROXML_L_DESC);
-		tmp_node = (xpath_node_t *) calloc(1, sizeof(xpath_node_t));
-		tmp_node->axes = ROXML_ID_CHILD;
-		node->next = tmp_node;
-		node = roxml_set_axes(tmp_node, axes + strlen(ROXML_L_DESC), offset);
-	} else {
-		int i = 0;
+	free(xpath);
+}
 
-		// ROXML_S_CHILD is default
-		node->axes = ROXML_ID_CHILD;
-		node->name = axes;
+/** \brief node pool presence tester function
+ *
+ * \fn roxml_in_pool(node_t *root, node_t *n, int req_id);
+ * this function test is a node is in a pool
+ * \param root the root of the tree
+ * \param n the node to test
+ * \param req_id the pool id
+ * \return
+ */
+ROXML_STATIC ROXML_INT int roxml_in_pool(node_t *root, node_t * n, int req_id)
+{
+	xpath_tok_table_t *table;
 
-		for (i = 0; i < 14; i++) {
-			int len = strlen(xpath_axes[i].name);
-			if (strncmp(xpath_axes[i].name, axes, len) == 0) {
-				node->axes = xpath_axes[i].id;
-				node->name = axes + len;
-				break;
+	while (root->prnt) {
+		root = root->prnt;
+	}
+
+	table = (xpath_tok_table_t *) root->priv;
+
+	pthread_mutex_lock(&table->mut);
+	if (n->priv) {
+		xpath_tok_t *tok = (xpath_tok_t *) n->priv;
+		if (tok->id == req_id) {
+			pthread_mutex_unlock(&table->mut);
+			return 1;
+		} else {
+			while (tok) {
+				if (tok->id == req_id) {
+					pthread_mutex_unlock(&table->mut);
+					return 1;
+				}
+				tok = tok->next;
 			}
 		}
 	}
-	return node;
+	pthread_mutex_unlock(&table->mut);
+	return 0;
 }
 
-ROXML_INT int roxml_get_node_internal_position(node_t *n)
+/** \brief pool node delete function
+ *
+ * \fn roxml_del_from_pool(node_t *root, node_t *n, int req_id);
+ * this function remove one node from a pool
+ * \param root the root of the tree
+ * \param n the node to remove
+ * \param req_id the pool id
+ * \return
+ */
+ROXML_STATIC ROXML_INT void roxml_del_from_pool(node_t *root, node_t * n, int req_id)
 {
-	int idx = 1;
-	node_t *prnt;
-	node_t *first;
-	if (n == NULL) {
-		return 0;
+	xpath_tok_table_t *table = NULL;
+
+	while (root->prnt) {
+		root = root->prnt;
 	}
 
-	prnt = n->prnt;
-	if (!prnt) {
+	table = (xpath_tok_table_t *) root->priv;
+
+	pthread_mutex_lock(&table->mut);
+	if (n->priv) {
+		xpath_tok_t *prev = (xpath_tok_t *) n->priv;
+		xpath_tok_t *tok = (xpath_tok_t *) n->priv;
+		if (tok->id == req_id) {
+			n->priv = (void *)tok->next;
+			free(tok);
+		} else {
+			while (tok) {
+				if (tok->id == req_id) {
+					prev->next = tok->next;
+					free(tok);
+					break;
+				}
+				prev = tok;
+				tok = tok->next;
+			}
+		}
+	}
+	pthread_mutex_unlock(&table->mut);
+}
+
+/** \brief add a token top node function
+ *
+ * \fn roxml_add_to_pool(node_t *root, node_t *n, int req_id);
+ * this function add a token to target node. This token is used to garanty
+ * unicity in xpath results
+ * \param root the root node
+ * \param n the node to mark
+ * \param req_id the id to use
+ * \return 0 if already in the pool, else 1
+ */
+ROXML_STATIC ROXML_INT int roxml_add_to_pool(node_t *root, node_t * n, int req_id)
+{
+	xpath_tok_table_t *table;
+	xpath_tok_t *tok;
+	xpath_tok_t *last_tok = NULL;
+
+	while (root->prnt) {
+		root = root->prnt;
+	}
+
+	if (req_id == 0) {
 		return 1;
 	}
-	first = prnt->chld;
+	table = (xpath_tok_table_t *) root->priv;
 
-	while ((first) && (first != n)) {
-		idx++;
-		first = first->sibl;
+	pthread_mutex_lock(&table->mut);
+	tok = (xpath_tok_t *) n->priv;
+
+	while (tok) {
+		if (tok->id == req_id) {
+			pthread_mutex_unlock(&table->mut);
+			return 0;
+		}
+		last_tok = tok;
+		tok = (xpath_tok_t *) tok->next;
 	}
+	if (last_tok == NULL) {
+		n->priv = calloc(1, sizeof(xpath_tok_t));
+		last_tok = (xpath_tok_t *) n->priv;
+	} else {
+		last_tok->next = (xpath_tok_t *) calloc(1, sizeof(xpath_tok_t));
+		last_tok = last_tok->next;
+	}
+	last_tok->id = req_id;
+	pthread_mutex_unlock(&table->mut);
 
-	return idx;
+	return 1;
 }
 
-ROXML_INT int roxml_parse_xpath(char *path, xpath_node_t **xpath, int context)
+/** \brief release id function
+ *
+ * \fn roxml_release_id(node_t *root, node_t **pool, int pool_len, int req_id);
+ * this function release a previously required id and remove all id token from the pool
+ * \param root the root of the tree that was used for id request
+ * \param pool the result from xpath search using this id
+ * \param pool_len the number of node in pool
+ * \param req_id the id to release
+ * \return
+ */
+ROXML_STATIC ROXML_INT void roxml_release_id(node_t *root, node_t **pool, int pool_len, int req_id)
+{
+	int i = 0;
+	xpath_tok_table_t *table = NULL;
+
+	while (root->prnt) {
+		root = root->prnt;
+	}
+
+	table = (xpath_tok_table_t *) root->priv;
+
+	for (i = 0; i < pool_len; i++) {
+		roxml_del_from_pool(root, pool[i], req_id);
+	}
+	pthread_mutex_lock(&table->mut);
+	table->ids[req_id] = 0;
+	pthread_mutex_unlock(&table->mut);
+}
+
+/** \brief id reservation function
+ *
+ * \fn roxml_request_id(node_t *root);
+ * this function request an available id for a new xpath search on the tree
+ * \param root the root of the tree where id table is stored
+ * \return the id between 1 - 255 or -1 if failed
+ */
+ROXML_STATIC ROXML_INT int roxml_request_id(node_t *root)
+{
+	int i = 0;
+	xpath_tok_table_t *table;
+
+	while (root->prnt) {
+		root = root->prnt;
+	}
+
+	table = (xpath_tok_table_t *) root->priv;
+
+	pthread_mutex_lock(&table->mut);
+	for (i = ROXML_XPATH_FIRST_ID; i < 255; i++) {
+		if (table->ids[i] == 0) {
+			table->ids[i]++;
+			pthread_mutex_unlock(&table->mut);
+			return i;
+		}
+	}
+	pthread_mutex_unlock(&table->mut);
+	return -1;
+}
+
+/** \brief node set and function
+ *
+ * \fn roxml_compute_and(node_t *root, node_t **node_set, int *count, int cur_req_id, int prev_req_id);
+ * this function computes the AND of two node pools. The resulting pool will have the same ID as cur_req_id.
+ * \param root the root of the tree
+ * \param node_set the node set containing the 2 pools
+ * \param count number of node in the node set
+ * \param cur_req_id the id of the first group
+ * \param prev_req_id the id of the second group
+ */
+ROXML_STATIC ROXML_INT void roxml_compute_and(node_t *root, node_t **node_set, int *count, int cur_req_id, int prev_req_id)
+{
+	int i = 0;
+	int limit = *count;
+	int pool1 = 0, pool2 = 0;
+
+	for (i = 0; i < limit; i++) {
+		if (pool1 == 0)
+			if (roxml_in_pool(root, node_set[i], cur_req_id))
+				pool1++;
+		if (pool2 == 0)
+			if (roxml_in_pool(root, node_set[i], prev_req_id))
+				pool2++;
+		if (pool1 && pool2)
+			break;
+	}
+
+	if (!pool1 || !pool2) {
+		for (i = 0; i < limit; i++) {
+			roxml_del_from_pool(root, node_set[i], cur_req_id);
+			roxml_del_from_pool(root, node_set[i], prev_req_id);
+		}
+		*count = 0;
+	}
+}
+
+/** \brief node set or function
+ *
+ * \fn roxml_compute_or(node_t *root, node_t **node_set, int *count, int req_id, int glob_id);
+ * this function computes the OR of two node pools. The resulting pool will have the same ID as glob_id.
+ * \param root the root of the tree
+ * \param node_set the node set containing the 2 pools
+ * \param count number of node in the node set
+ * \param req_id the id of the first group
+ * \param glob_id the id of the second group
+ * \return
+ */
+ROXML_STATIC ROXML_INT void roxml_compute_or(node_t *root, node_t **node_set, int *count, int req_id, int glob_id)
+{
+	int i = 0;
+	for (i = 0; i < *count; i++) {
+		if (roxml_in_pool(root, node_set[i], req_id)) {
+			roxml_add_to_pool(root, node_set[i], glob_id);
+			roxml_del_from_pool(root, node_set[i], req_id);
+		}
+	}
+}
+
+/** \brief xpath parsing function
+ *
+ * \fn roxml_parse_xpath(char *path, xpath_node_t **xpath, int context);
+ * this function convert an xpath string to a table of list of xpath_node_t
+ * \param path the xpath string
+ * \param xpath the parsed xpath
+ * \param context 0 for a real xpath, 1 for a xpath in predicat
+ * \return the number of xpath list in the table
+ */
+ROXML_STATIC ROXML_INT int roxml_parse_xpath(char *path, xpath_node_t **xpath, int context)
 {
 	int ret = 0;
 	roxml_xpath_ctx_t ctx;
@@ -239,33 +388,46 @@ ROXML_INT int roxml_parse_xpath(char *path, xpath_node_t **xpath, int context)
 	return -1;
 }
 
-ROXML_INT void roxml_free_xcond(xpath_cond_t * xcond)
+/** \brief node absolute position get
+ *
+ * \fn roxml_get_node_internal_position(node_t *n);
+ * this function returns the absolute position of the node between siblings
+ * \param n the node
+ * \return the absolute position starting at 1
+ */
+ROXML_STATIC ROXML_INT int roxml_get_node_internal_position(node_t *n)
 {
-	if (xcond->next) {
-		roxml_free_xcond(xcond->next);
+	int idx = 1;
+	node_t *prnt;
+	node_t *first;
+	if (n == NULL) {
+		return 0;
 	}
-	if (xcond->xp) {
-		roxml_free_xpath(xcond->xp, xcond->func2);
+
+	prnt = n->prnt;
+	if (!prnt) {
+		return 1;
 	}
-	free(xcond);
+	first = prnt->chld;
+
+	while ((first) && (first != n)) {
+		idx++;
+		first = first->sibl;
+	}
+
+	return idx;
 }
 
-ROXML_INT void roxml_free_xpath(xpath_node_t *xpath, int nb)
-{
-	int i = 0;
-	for (i = 0; i < nb; i++) {
-		if (xpath[i].next) {
-			roxml_free_xpath(xpath[i].next, 1);
-		}
-		if (xpath[i].cond) {
-			roxml_free_xcond(xpath[i].cond);
-		}
-		free(xpath[i].xp_cond);
-	}
-	free(xpath);
-}
-
-ROXML_INT double roxml_double_oper(double a, double b, int op)
+/** \brief double operation function
+ *
+ * \fn roxml_double_oper(double a, double b, int op);
+ * this function  compare two doubles using one defined operator
+ * \param a first operand
+ * \param b second operand
+ * \param op the operator to use
+ * \return 1 if comparison is ok, esle 0
+ */
+ROXML_STATIC ROXML_INT double roxml_double_oper(double a, double b, int op)
 {
 	if (op == ROXML_OPERATOR_ADD) {
 		return (a + b);
@@ -279,7 +441,16 @@ ROXML_INT double roxml_double_oper(double a, double b, int op)
 	return 0;
 }
 
-ROXML_INT int roxml_double_cmp(double a, double b, int op)
+/** \brief  double comparison function
+ *
+ * \fn roxml_double_cmp(double a, double b, int op);
+ * this function  compare two doubles using one defined operator
+ * \param a first operand
+ * \param b second operand
+ * \param op the operator to use
+ * \return 1 if comparison is ok, esle 0
+ */
+ROXML_STATIC ROXML_INT int roxml_double_cmp(double a, double b, int op)
 {
 	if (op == ROXML_OPERATOR_DIFF) {
 		return (a != b);
@@ -297,7 +468,16 @@ ROXML_INT int roxml_double_cmp(double a, double b, int op)
 	return 0;
 }
 
-ROXML_INT int roxml_string_cmp(char *sa, char *sb, int op)
+/** \brief  string comparison function
+ *
+ * \fn roxml_string_cmp(char *sa, char *sb, int op);
+ * this function compare two strings using one defined operator
+ * \param sa first operand
+ * \param sb second operand
+ * \param op the operator to use
+ * \return 1 if comparison is ok, else 0
+ */
+ROXML_STATIC ROXML_INT int roxml_string_cmp(char *sa, char *sb, int op)
 {
 	int result;
 
@@ -319,7 +499,15 @@ ROXML_INT int roxml_string_cmp(char *sa, char *sb, int op)
 	return 0;
 }
 
-ROXML_INT int roxml_validate_predicat(xpath_node_t *xn, node_t * candidat)
+/** \brief predicat validation function
+ *
+ * \fn roxml_validate_predicat(xpath_node_t *xn, node_t *candidat);
+ * this function check for predicat validity. predicat is part between brackets
+ * \param xn the xpath node containing the predicat to test
+ * \param candidat the node to test
+ * \return 1 if predicat is validated, else 0
+ */
+ROXML_STATIC ROXML_INT int roxml_validate_predicat(xpath_node_t *xn, node_t * candidat)
 {
 	int first = 1;
 	int valid = 0;
@@ -462,150 +650,20 @@ ROXML_INT int roxml_validate_predicat(xpath_node_t *xn, node_t * candidat)
 	return valid;
 }
 
-ROXML_INT int roxml_request_id(node_t *root)
-{
-	int i = 0;
-	xpath_tok_table_t *table;
-
-	while (root->prnt) {
-		root = root->prnt;
-	}
-
-	table = (xpath_tok_table_t *) root->priv;
-
-	pthread_mutex_lock(&table->mut);
-	for (i = ROXML_XPATH_FIRST_ID; i < 255; i++) {
-		if (table->ids[i] == 0) {
-			table->ids[i]++;
-			pthread_mutex_unlock(&table->mut);
-			return i;
-		}
-	}
-	pthread_mutex_unlock(&table->mut);
-	return -1;
-}
-
-ROXML_INT int roxml_in_pool(node_t *root, node_t * n, int req_id)
-{
-	xpath_tok_table_t *table;
-
-	while (root->prnt) {
-		root = root->prnt;
-	}
-
-	table = (xpath_tok_table_t *) root->priv;
-
-	pthread_mutex_lock(&table->mut);
-	if (n->priv) {
-		xpath_tok_t *tok = (xpath_tok_t *) n->priv;
-		if (tok->id == req_id) {
-			pthread_mutex_unlock(&table->mut);
-			return 1;
-		} else {
-			while (tok) {
-				if (tok->id == req_id) {
-					pthread_mutex_unlock(&table->mut);
-					return 1;
-				}
-				tok = tok->next;
-			}
-		}
-	}
-	pthread_mutex_unlock(&table->mut);
-	return 0;
-}
-
-ROXML_INT void roxml_release_id(node_t *root, node_t **pool, int pool_len, int req_id)
-{
-	int i = 0;
-	xpath_tok_table_t *table = NULL;
-
-	while (root->prnt) {
-		root = root->prnt;
-	}
-
-	table = (xpath_tok_table_t *) root->priv;
-
-	for (i = 0; i < pool_len; i++) {
-		roxml_del_from_pool(root, pool[i], req_id);
-	}
-	pthread_mutex_lock(&table->mut);
-	table->ids[req_id] = 0;
-	pthread_mutex_unlock(&table->mut);
-}
-
-ROXML_INT void roxml_del_from_pool(node_t *root, node_t * n, int req_id)
-{
-	xpath_tok_table_t *table = NULL;
-
-	while (root->prnt) {
-		root = root->prnt;
-	}
-
-	table = (xpath_tok_table_t *) root->priv;
-
-	pthread_mutex_lock(&table->mut);
-	if (n->priv) {
-		xpath_tok_t *prev = (xpath_tok_t *) n->priv;
-		xpath_tok_t *tok = (xpath_tok_t *) n->priv;
-		if (tok->id == req_id) {
-			n->priv = (void *)tok->next;
-			free(tok);
-		} else {
-			while (tok) {
-				if (tok->id == req_id) {
-					prev->next = tok->next;
-					free(tok);
-					break;
-				}
-				prev = tok;
-				tok = tok->next;
-			}
-		}
-	}
-	pthread_mutex_unlock(&table->mut);
-}
-
-ROXML_INT int roxml_add_to_pool(node_t *root, node_t * n, int req_id)
-{
-	xpath_tok_table_t *table;
-	xpath_tok_t *tok;
-	xpath_tok_t *last_tok = NULL;
-
-	while (root->prnt) {
-		root = root->prnt;
-	}
-
-	if (req_id == 0) {
-		return 1;
-	}
-	table = (xpath_tok_table_t *) root->priv;
-
-	pthread_mutex_lock(&table->mut);
-	tok = (xpath_tok_t *) n->priv;
-
-	while (tok) {
-		if (tok->id == req_id) {
-			pthread_mutex_unlock(&table->mut);
-			return 0;
-		}
-		last_tok = tok;
-		tok = (xpath_tok_t *) tok->next;
-	}
-	if (last_tok == NULL) {
-		n->priv = calloc(1, sizeof(xpath_tok_t));
-		last_tok = (xpath_tok_t *) n->priv;
-	} else {
-		last_tok->next = (xpath_tok_t *) calloc(1, sizeof(xpath_tok_t));
-		last_tok = last_tok->next;
-	}
-	last_tok->id = req_id;
-	pthread_mutex_unlock(&table->mut);
-
-	return 1;
-}
-
-ROXML_INT int roxml_validate_axes(node_t *root, node_t * candidat, node_t *** ans, int *nb, int *max, xpath_node_t *xn, int req_id)
+/** \brief axe validation function
+ *
+ * \fn roxml_validate_axes(node_t *root, node_t *candidat, node_t ***ans, int *nb, int *max, xpath_node_t *xn, int req_id);
+ * this function validate if an axe is matching the current node
+ * \param root the root node
+ * \param candidat the node to test
+ * \param ans the pointer to answers pool
+ * \param nb the number of answers in pool
+ * \param max the current size of the pool
+ * \param xn the xpath node to test
+ * \param req_id the pool id
+ * \return 1 if axe is validated, else 0
+ */
+ROXML_STATIC ROXML_INT int roxml_validate_axes(node_t *root, node_t * candidat, node_t *** ans, int *nb, int *max, xpath_node_t *xn, int req_id)
 {
 
 	int valid = 0;
@@ -735,7 +793,21 @@ ROXML_INT int roxml_validate_axes(node_t *root, node_t * candidat, node_t *** an
 	return valid;
 }
 
-ROXML_INT void roxml_check_node(xpath_node_t *xp, node_t * root, node_t * context, node_t *** ans, int *nb, int *max, int ignore, int req_id)
+/** \brief real xpath validation function
+ *
+ * \fn roxml_check_node(xpath_node_t *xp, node_t *root, node_t *context, node_t ***ans, int *nb, int *max, int ignore, int req_id);
+ * this function perform the xpath test on a tree
+ * \param xp the xpath nodes to test
+ * \param root the root node
+ * \param context the current context node
+ * \param ans the pointer to answers pool
+ * \param nb the number of answers in pool
+ * \param max the current size of the pool
+ * \param ignore a flag for some axes that are going thru all document
+ * \param req_id the pool id
+ * \return
+ */
+ROXML_STATIC ROXML_INT void roxml_check_node(xpath_node_t *xp, node_t * root, node_t * context, node_t *** ans, int *nb, int *max, int ignore, int req_id)
 {
 	int validate_node = 0;
 
@@ -923,43 +995,6 @@ ROXML_INT void roxml_check_node(xpath_node_t *xp, node_t * root, node_t * contex
 	return;
 }
 
-ROXML_INT void roxml_compute_and(node_t *root, node_t **node_set, int *count, int cur_req_id, int prev_req_id)
-{
-	int i = 0;
-	int limit = *count;
-	int pool1 = 0, pool2 = 0;
-
-	for (i = 0; i < limit; i++) {
-		if (pool1 == 0)
-			if (roxml_in_pool(root, node_set[i], cur_req_id))
-				pool1++;
-		if (pool2 == 0)
-			if (roxml_in_pool(root, node_set[i], prev_req_id))
-				pool2++;
-		if (pool1 && pool2)
-			break;
-	}
-
-	if (!pool1 || !pool2) {
-		for (i = 0; i < limit; i++) {
-			roxml_del_from_pool(root, node_set[i], cur_req_id);
-			roxml_del_from_pool(root, node_set[i], prev_req_id);
-		}
-		*count = 0;
-	}
-}
-
-ROXML_INT void roxml_compute_or(node_t *root, node_t **node_set, int *count, int req_id, int glob_id)
-{
-	int i = 0;
-	for (i = 0; i < *count; i++) {
-		if (roxml_in_pool(root, node_set[i], req_id)) {
-			roxml_add_to_pool(root, node_set[i], glob_id);
-			roxml_del_from_pool(root, node_set[i], req_id);
-		}
-	}
-}
-
 ROXML_INT node_t **roxml_exec_xpath(node_t *root, node_t * n, xpath_node_t * xpath, int index, int *count)
 {
 	int path_id;
@@ -1035,6 +1070,134 @@ ROXML_INT node_t **roxml_exec_xpath(node_t *root, node_t * n, xpath_node_t * xpa
 	free(req_ids);
 
 	return node_set;
+}
+
+ROXML_API node_t **roxml_xpath(node_t *n, char *path, int *nb_ans)
+{
+	int count = 0;
+	node_t **node_set = NULL;
+	int index = 0;
+	xpath_node_t *xpath = NULL;
+	node_t *root = n;
+	char *full_path_to_find;
+
+	if (n == NULL) {
+		if (nb_ans) {
+			*nb_ans = 0;
+		}
+		return NULL;
+	}
+
+	root = roxml_get_root(n);
+
+	full_path_to_find = strdup(path);
+
+	index = roxml_parse_xpath(full_path_to_find, &xpath, 0);
+
+	if (index >= 0) {
+		node_set = roxml_exec_xpath(root, n, xpath, index, &count);
+
+		roxml_free_xpath(xpath, index);
+		free(full_path_to_find);
+
+		if (count == 0) {
+			roxml_release(node_set);
+			node_set = NULL;
+		}
+	}
+	if (nb_ans) {
+		*nb_ans = count;
+	}
+
+	return node_set;
+}
+
+/** \brief axes setter function
+ *
+ * \fn roxml_set_axes(xpath_node_t *node, char *axes, int *offset);
+ * this function set the axe to a xpath node from xpath string
+ * \param node the xpath node to fill
+ * \param axes the string where axe is extracted from
+ * \param offset the detected offset in axe string
+ * \return the filled xpath_node
+ */
+ROXML_STATIC ROXML_INT xpath_node_t *roxml_set_axes(xpath_node_t *node, char *axes, int *offset)
+{
+	struct _xpath_axes {
+		char id;
+		char *name;
+	};
+
+	struct _xpath_axes xpath_axes[14] = {
+		{ROXML_ID_PARENT, ROXML_L_PARENT},
+		{ROXML_ID_PARENT, ROXML_S_PARENT},
+		{ROXML_ID_SELF, ROXML_L_SELF},
+		{ROXML_ID_SELF, ROXML_S_SELF},
+		{ROXML_ID_ATTR, ROXML_L_ATTR},
+		{ROXML_ID_ATTR, ROXML_S_ATTR},
+		{ROXML_ID_ANC, ROXML_L_ANC},
+		{ROXML_ID_ANC_O_SELF, ROXML_L_ANC_O_SELF},
+		{ROXML_ID_NEXT_SIBL, ROXML_L_NEXT_SIBL},
+		{ROXML_ID_PREV_SIBL, ROXML_L_PREV_SIBL},
+		{ROXML_ID_NEXT, ROXML_L_NEXT},
+		{ROXML_ID_PREV, ROXML_L_PREV},
+		{ROXML_ID_NS, ROXML_L_NS},
+		{ROXML_ID_CHILD, ROXML_L_CHILD},
+	};
+
+	xpath_node_t *tmp_node;
+	if (axes[0] == '/') {
+		axes[0] = '\0';
+		*offset += 1;
+		axes++;
+	}
+	if (axes[0] == '/') {
+		// ROXML_S_DESC_O_SELF
+		node->axes = ROXML_ID_DESC_O_SELF;
+		node->name = axes + 1;
+		tmp_node = (xpath_node_t *) calloc(1, sizeof(xpath_node_t));
+		tmp_node->axes = ROXML_ID_CHILD;
+		node->next = tmp_node;
+		if (strlen(node->name) > 0) {
+			tmp_node = (xpath_node_t *) calloc(1, sizeof(xpath_node_t));
+			node->next->next = tmp_node;
+			node = roxml_set_axes(tmp_node, axes + 1, offset);
+		}
+	} else if (strncmp(ROXML_L_DESC_O_SELF, axes, strlen(ROXML_L_DESC_O_SELF)) == 0) {
+		// ROXML_L_DESC_O_SELF
+		node->axes = ROXML_ID_DESC_O_SELF;
+		node->name = axes + strlen(ROXML_L_DESC_O_SELF);
+		*offset += strlen(ROXML_L_DESC_O_SELF);
+		tmp_node = (xpath_node_t *) calloc(1, sizeof(xpath_node_t));
+		tmp_node->axes = ROXML_ID_CHILD;
+		node->next = tmp_node;
+		node = roxml_set_axes(tmp_node, axes + strlen(ROXML_L_DESC_O_SELF), offset);
+	} else if (strncmp(ROXML_L_DESC, axes, strlen(ROXML_L_DESC)) == 0) {
+		// ROXML_L_DESC
+		node->axes = ROXML_ID_DESC;
+		node->name = axes + strlen(ROXML_L_DESC);
+		*offset += strlen(ROXML_L_DESC);
+		tmp_node = (xpath_node_t *) calloc(1, sizeof(xpath_node_t));
+		tmp_node->axes = ROXML_ID_CHILD;
+		node->next = tmp_node;
+		node = roxml_set_axes(tmp_node, axes + strlen(ROXML_L_DESC), offset);
+	} else {
+		int i = 0;
+
+		// ROXML_S_CHILD is default
+		node->axes = ROXML_ID_CHILD;
+		node->name = axes;
+
+		for (i = 0; i < 14; i++) {
+			int len = strlen(xpath_axes[i].name);
+			if (strncmp(xpath_axes[i].name, axes, len) == 0) {
+				node->axes = xpath_axes[i].id;
+				node->name = axes + len;
+				break;
+			}
+		}
+	}
+	return node;
 }
 
 ROXML_INT int _func_xpath_ignore(char *chunk, void *data)

@@ -28,7 +28,7 @@
 #define ROXML_H
 
 /**
- * \def ROXML_API
+ * \def ROXML_API  
  * 
  * part of the public API
  */
@@ -200,7 +200,7 @@ typedef struct node node_t;
 
 /** \brief load function for buffers
  *
- * \fn node_t* ROXML_API roxml_load_buf(char *buffer);
+ * \fn node_t*  roxml_load_buf(char *buffer);
  * This function load a document by parsing all the corresponding nodes.
  * The document must be contained inside the char * buffer given in parameter
  * and remain valid until the roxml_close() function is called
@@ -210,11 +210,11 @@ typedef struct node node_t;
  * \see roxml_load_fd
  * \see roxml_load_doc
  */
-node_t *ROXML_API roxml_load_buf(char *buffer);
+ROXML_API node_t * roxml_load_buf(char *buffer);
 
 /** \brief load function for files
  *
- * \fn node_t* ROXML_API roxml_load_doc(char *filename);
+ * \fn node_t*  roxml_load_doc(char *filename);
  * This function load a file document by parsing all the corresponding nodes
  * \warning the file is not fully copied and thus, it should stay untouched until roxml_close is called on the corresponding XML tree.
  * \param filename the XML document to load
@@ -223,11 +223,11 @@ node_t *ROXML_API roxml_load_buf(char *buffer);
  * \see roxml_load_fd
  * \see roxml_load_buf
  */
-node_t *ROXML_API roxml_load_doc(char *filename);
+ROXML_API node_t * roxml_load_doc(char *filename);
 
 /** \brief load function for file descriptors
  *
- * \fn node_t* ROXML_API roxml_load_fd(int fd);
+ * \fn node_t*  roxml_load_fd(int fd);
  * This function load a document by parsing all the corresponding nodes
  * \param fd the opened fiel descriptor to XML document to load
  * \return the root node or NULL
@@ -235,11 +235,11 @@ node_t *ROXML_API roxml_load_doc(char *filename);
  * \see roxml_load_doc
  * \see roxml_load_buf
  */
-node_t *ROXML_API roxml_load_fd(int fd);
+ROXML_API node_t * roxml_load_fd(int fd);
 
 /** \brief unload function
  *
- * \fn void ROXML_API roxml_close(node_t *n);
+ * \fn void  roxml_close(node_t *n);
  * This function clear a document and all the corresponding nodes
  * It release all memory allocated during roxml_load_doc or roxml_load_file or roxml_add_node.
  * All nodes from the tree are not available anymore.
@@ -249,38 +249,38 @@ node_t *ROXML_API roxml_load_fd(int fd);
  * \see roxml_load_buf
  * \see roxml_add_node
  */
-void ROXML_API roxml_close(node_t *n);
+ROXML_API void  roxml_close(node_t *n);
 
 /** \brief next sibling getter function
  *
- * \fn node_t* ROXML_API roxml_get_next_sibling(node_t *n);
+ * \fn node_t*  roxml_get_next_sibling(node_t *n);
  * This function returns the next sibling of a given node
  * \param n is one node of the tree
  * \return the next sibling node
  */
-node_t *ROXML_API roxml_get_next_sibling(node_t *n);
+ROXML_API node_t * roxml_get_next_sibling(node_t *n);
 
 /** \brief prev sibling getter function
  *
- * \fn node_t* ROXML_API roxml_get_prev_sibling(node_t *n);
+ * \fn node_t*  roxml_get_prev_sibling(node_t *n);
  * This function returns the prev sibling of a given node
  * \param n is one node of the tree
  * \return the prev sibling node
  */
-node_t *ROXML_API roxml_get_prev_sibling(node_t *n);
+ROXML_API node_t * roxml_get_prev_sibling(node_t *n);
 
 /** \brief parent getter function
  *
- * \fn node_t* ROXML_API roxml_get_parent(node_t *n);
+ * \fn node_t*  roxml_get_parent(node_t *n);
  * This function returns the parent of a given node
  * \param n is one node of the tree
  * \return the parent node
  */
-node_t *ROXML_API roxml_get_parent(node_t *n);
+ROXML_API node_t * roxml_get_parent(node_t *n);
 
 /** \brief root getter function
  *
- * \fn node_t* ROXML_API roxml_get_root(node_t *n);
+ * \fn node_t*  roxml_get_root(node_t *n);
  * This function returns the root of a tree containing the given node
  * The root is defined as a virtual node that contains all first rank nodes if document is
  * not a valid xml document:
@@ -320,11 +320,11 @@ node_t *ROXML_API roxml_get_parent(node_t *n);
  * \param n is one node of the tree
  * \return the root node
  */
-node_t *ROXML_API roxml_get_root(node_t *n);
+ROXML_API node_t * roxml_get_root(node_t *n);
 
 /** \brief namespace getter function
  *
- * \fn node_t* ROXML_API roxml_get_ns(node_t *n);
+ * \fn node_t*  roxml_get_ns(node_t *n);
  * This function returns the namespace of a node
  *
  * \param n is one node of the tree
@@ -374,11 +374,11 @@ node_t *ROXML_API roxml_get_root(node_t *n);
  * 
  * \endcode
  */
-node_t *ROXML_API roxml_get_ns(node_t *n);
+ROXML_API node_t * roxml_get_ns(node_t *n);
 
 /** \brief namespace setter function
  *
- * \fn node_t* ROXML_API roxml_set_ns(node_t *n, node_t *ns);
+ * \fn node_t*  roxml_set_ns(node_t *n, node_t *ns);
  * This function set the namespace of a node to the given namespace definition.
  * The namespace must be previously defined in the xml tree in an ancestor of node n.
  *
@@ -393,11 +393,11 @@ node_t *ROXML_API roxml_get_ns(node_t *n);
  * - it will update all element and attribute that are descendant from current node
  * - namespace will be applied to all new node added as descendant as current node
  */
-node_t *ROXML_API roxml_set_ns(node_t *n, node_t * ns);
+ROXML_API node_t * roxml_set_ns(node_t *n, node_t * ns);
 
 /** \brief comment getter function
  *
- * \fn node_t* ROXML_API roxml_get_cmt(node_t *n, int nth);
+ * \fn node_t*  roxml_get_cmt(node_t *n, int nth);
  * This function returns the nth comment of a node
  *
  * \param n is one node of the tree
@@ -443,22 +443,22 @@ node_t *ROXML_API roxml_set_ns(node_t *n, node_t * ns);
  * 
  * \endcode
  */
-node_t *ROXML_API roxml_get_cmt(node_t *n, int nth);
+ROXML_API node_t * roxml_get_cmt(node_t *n, int nth);
 
 /** \brief comments number getter function
  *
- * \fn int ROXML_API roxml_get_cmt_nb(node_t *n);
+ * \fn int  roxml_get_cmt_nb(node_t *n);
  * This function return the number of comments for a given node
  * \param n is one node of the tree
  * \return the number of comments
  * \see roxml_get_cmt_nb
  * \see roxml_get_nodes
  */
-int ROXML_API roxml_get_cmt_nb(node_t *n);
+ROXML_API int  roxml_get_cmt_nb(node_t *n);
 
 /** \brief chld getter function
  *
- * \fn node_t* ROXML_API roxml_get_chld(node_t *n, char * name, int nth);
+ * \fn node_t*  roxml_get_chld(node_t *n, char * name, int nth);
  * This function returns a given chld of a node etheir by name, or the nth child.
  *
  * \param n is one node of the tree
@@ -497,20 +497,20 @@ int ROXML_API roxml_get_cmt_nb(node_t *n);
  * }
  * \endcode
  */
-node_t *ROXML_API roxml_get_chld(node_t *n, char *name, int nth);
+ROXML_API node_t * roxml_get_chld(node_t *n, char *name, int nth);
 
 /** \brief chlds number getter function
  *
- * \fn int ROXML_API roxml_get_chld_nb(node_t *n);
+ * \fn int  roxml_get_chld_nb(node_t *n);
  * This function return the number of chlidren for a given node
  * \param n is one node of the tree
  * \return  the number of chlildren
  */
-int ROXML_API roxml_get_chld_nb(node_t *n);
+ROXML_API int  roxml_get_chld_nb(node_t *n);
 
 /** \brief process-instruction getter function
  *
- * \fn node_t* ROXML_API roxml_get_pi(node_t *n, int nth);
+ * \fn node_t*  roxml_get_pi(node_t *n, int nth);
  * This function returns the nth process-instruction of a node.
  *
  * \param n is one node of the tree
@@ -556,22 +556,22 @@ int ROXML_API roxml_get_chld_nb(node_t *n);
  * 
  * \endcode
  */
-node_t *ROXML_API roxml_get_pi(node_t *n, int nth);
+ROXML_API node_t * roxml_get_pi(node_t *n, int nth);
 
 /** \brief process-instruction number getter function
  *
- * \fn int ROXML_API roxml_get_pi_nb(node_t *n);
+ * \fn int  roxml_get_pi_nb(node_t *n);
  * This function return the number of process-instruction in a given node
  * \param n is one node of the tree
  * \return  the number of process-instructions 
  * \see roxml_get_pi
  * \see roxml_get_nodes_nb
  */
-int ROXML_API roxml_get_pi_nb(node_t *n);
+ROXML_API int  roxml_get_pi_nb(node_t *n);
 
 /** \brief name getter function
  *
- * \fn char* ROXML_API roxml_get_name(node_t *n, char * buffer, int size);
+ * \fn char*  roxml_get_name(node_t *n, char * buffer, int size);
  * This function return the name of the node or fill the current buffer with it if not NULL.
  * if name is NULL, the function will allocate a buffer that user should free using
  * roxml_release when no longer needed.
@@ -591,11 +591,11 @@ int ROXML_API roxml_get_pi_nb(node_t *n);
  * \return the name of the node (return our buffer pointer if it wasn't NULL)
  * \see roxml_release
  */
-char *ROXML_API roxml_get_name(node_t *n, char *buffer, int size);
+ROXML_API char * roxml_get_name(node_t *n, char *buffer, int size);
 
 /** \brief content getter function
  *
- * \fn char * ROXML_API roxml_get_content(node_t *n, char * buffer, int bufsize, int * size);
+ * \fn char *  roxml_get_content(node_t *n, char * buffer, int bufsize, int * size);
  *
  * This function returns the content of a node.;
  * if the returned pointer is NULL then the node either has no content or this function is irrelevant for this kind of node.
@@ -617,11 +617,11 @@ char *ROXML_API roxml_get_name(node_t *n, char *buffer, int size);
  * \return the text content
  * \see roxml_release
  */
-char *ROXML_API roxml_get_content(node_t *n, char *buffer, int bufsize, int *size);
+ROXML_API char * roxml_get_content(node_t *n, char *buffer, int bufsize, int *size);
 
 /** \brief number of nodes getter function
  *
- * \fn int ROXML_API roxml_get_nodes_nb(node_t *n, int type);
+ * \fn int  roxml_get_nodes_nb(node_t *n, int type);
  * 
  * This function returns the number of nodes matching type flag contained in a given node
  * all other roxml_get_*_nb are wrapper to this
@@ -680,11 +680,11 @@ char *ROXML_API roxml_get_content(node_t *n, char *buffer, int bufsize, int *siz
  * }
  * \endcode
  */
-int ROXML_API roxml_get_nodes_nb(node_t *n, int type);
+ROXML_API int  roxml_get_nodes_nb(node_t *n, int type);
 
 /** \brief nodes getter function
  *
- * \fn char* ROXML_API roxml_get_nodes(node_t *n, int type, char * name, int nth);
+ * \fn char*  roxml_get_nodes(node_t *n, int type, char * name, int nth);
  * This function get the nth node matching type contained in a node, or the first node named name.
  * All other roxml_get_* are wrapper to this function.
  * When asking for several node type (let say ROXML_ALL_NODES), all ROXML_ATTR_NODE will be 
@@ -701,21 +701,21 @@ int ROXML_API roxml_get_nodes_nb(node_t *n, int type);
  * \see roxml_get_cmt
  * \see roxml_get_pi
  */
-node_t *ROXML_API roxml_get_nodes(node_t *n, int type, char *name, int nth);
+ROXML_API node_t * roxml_get_nodes(node_t *n, int type, char *name, int nth);
 
 /** \brief number of attribute getter function
  *
- * \fn int ROXML_API roxml_get_attr_nb(node_t *n);
+ * \fn int  roxml_get_attr_nb(node_t *n);
  * 
  * This function returns the number of attributes for a given node
  * \param n is one node of the tree
  * \return the number of attributes in node
  */
-int ROXML_API roxml_get_attr_nb(node_t *n);
+ROXML_API int  roxml_get_attr_nb(node_t *n);
 
 /** \brief attribute getter function
  *
- * \fn node_t* ROXML_API roxml_get_attr(node_t *n, char * name, int nth);
+ * \fn node_t*  roxml_get_attr(node_t *n, char * name, int nth);
  * This function get the nth attribute of a node.
  * \param n is one node of the tree
  * \param name is the name of the attribute to get
@@ -752,7 +752,7 @@ int ROXML_API roxml_get_attr_nb(node_t *n);
  * }
  * \endcode
  */
-node_t *ROXML_API roxml_get_attr(node_t *n, char *name, int nth);
+ROXML_API node_t * roxml_get_attr(node_t *n, char *name, int nth);
 
 /** \brief exec path function
  *
@@ -766,7 +766,7 @@ node_t *ROXML_API roxml_get_attr(node_t *n, char *name, int nth);
  *
  * handled xpath are described in \ref xpath
  */
-node_t **ROXML_API roxml_xpath(node_t *n, char *path, int *nb_ans);
+ROXML_API node_t ** roxml_xpath(node_t *n, char *path, int *nb_ans);
 
 /** \brief node type function
  *
@@ -776,7 +776,7 @@ node_t **ROXML_API roxml_xpath(node_t *n, char *path, int *nb_ans);
  * \param n is the node to test
  * \return the node type
  */
-int ROXML_API roxml_get_type(node_t *n);
+ROXML_API int  roxml_get_type(node_t *n);
 
 /** \brief node get position function
  *
@@ -785,7 +785,7 @@ int ROXML_API roxml_get_type(node_t *n);
  * \param n is the node to test
  * \return the postion between 1 and N
  */
-int ROXML_API roxml_get_node_position(node_t *n);
+ROXML_API int  roxml_get_node_position(node_t *n);
 
 /** \brief memory cleanning function
  *
@@ -802,7 +802,7 @@ int ROXML_API roxml_get_node_position(node_t *n);
  * \param data the pointer to delete or NULL or \ref RELEASE_ALL or \ref RELEASE_LAST
  * \return void
  */
-void ROXML_API roxml_release(void *data);
+ROXML_API void  roxml_release(void *data);
 
 /** \brief add a node to the tree
  *
@@ -906,7 +906,7 @@ void ROXML_API roxml_release(void *data);
  * }
  * \endcode
  */
-node_t *ROXML_API roxml_add_node(node_t *parent, int position, int type, char *name, char *value);
+ROXML_API node_t * roxml_add_node(node_t *parent, int position, int type, char *name, char *value);
 
 /** \brief text node getter function
  *
@@ -961,7 +961,7 @@ node_t *ROXML_API roxml_add_node(node_t *parent, int position, int type, char *n
  * }
  * \endcode
  */
-node_t *ROXML_API roxml_get_txt(node_t *n, int nth);
+ROXML_API node_t * roxml_get_txt(node_t *n, int nth);
 
 /** \brief text node number getter function
  *
@@ -972,7 +972,7 @@ node_t *ROXML_API roxml_get_txt(node_t *n, int nth);
  * \return the number of text node
  * \see roxml_get_txt
  */
-int ROXML_API roxml_get_txt_nb(node_t *n);
+ROXML_API int  roxml_get_txt_nb(node_t *n);
 
 /** \brief node deletion function
  *
@@ -987,7 +987,7 @@ int ROXML_API roxml_get_txt_nb(node_t *n);
  *
  * \warning when removing a nsdef node, all node using this namespace will be updated and inherit their parent namespace
  */
-void ROXML_API roxml_del_node(node_t *n);
+ROXML_API void  roxml_del_node(node_t *n);
 
 /** \brief sync function
  *
@@ -1083,6 +1083,6 @@ void ROXML_API roxml_del_node(node_t *n);
 <root><!-- sample XML file --><item id="42"><price>24</price></item></root>
 \endverbatim
  */
-int ROXML_API roxml_commit_changes(node_t *n, char *dest, char **buffer, int human);
+ROXML_API int  roxml_commit_changes(node_t *n, char *dest, char **buffer, int human);
 
 #endif /* ROXML_H */

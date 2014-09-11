@@ -29,7 +29,14 @@ ROXML_INT void roxml_parser_free(roxml_parser_item_t * head)
 	free(head);
 }
 
-ROXML_INT void roxml_parser_clear(roxml_parser_item_t * head)
+/** \brief parser list deletion
+ *
+ * \fn roxml_parser_clear(roxml_parser_item_t *head);
+ * this function delete a parser list (when not yet prepared)
+ * \param head the parser object
+ * \return
+ */
+ROXML_STATIC ROXML_INT void roxml_parser_clear(roxml_parser_item_t * head)
 {
 	roxml_parser_item_t *item = head;
 

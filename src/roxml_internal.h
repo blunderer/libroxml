@@ -2,6 +2,11 @@
 #define ROXML_INTERNAL_H
 
 #define ROXML_INT
+#ifdef __DEBUG
+#define ROXML_STATIC
+#else
+#define ROXML_STATIC static
+#endif
 
 /* STUB function are here to provide a consistent libroxml binary no matter 
  * what the configuration. They are located in a specific section that can be 

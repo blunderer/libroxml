@@ -2,9 +2,8 @@
 #include <string.h>
 #include <stdarg.h>
 #include <roxml_core.h>
-#include <roxml_commit.h>
 
-ROXML_INT void roxml_realloc_buf(char **buf, int *len, int min_len)
+ROXML_STATIC ROXML_INT void roxml_realloc_buf(char **buf, int *len, int min_len)
 {
 	int append = (min_len & (ROXML_BASE_LEN-1)) + 1;
 	*buf = realloc(*buf, *len + append);
@@ -12,7 +11,18 @@ ROXML_INT void roxml_realloc_buf(char **buf, int *len, int min_len)
 	*len += append;
 }
 
-ROXML_INT void roxml_print_spaces(FILE * f, char **buf, int *offset, int *len, int lvl)
+/** \brief space printing function
+ *
+ * \fn roxml_print_spaces(FILE *f, char ** buf, int * offset, int * len, int lvl);
+ * this function add some space to output when committing change in human format
+ * \param f the file pointer if any
+ * \param buf the pointer to string if any
+ * \param offset the current offset in stream
+ * \param len the total len of buffer if any
+ * \param lvl the level in the tree
+ * \return
+ */
+ROXML_STATIC ROXML_INT void roxml_print_spaces(FILE * f, char **buf, int *offset, int *len, int lvl)
 {
 	int i;
 
@@ -31,7 +41,18 @@ ROXML_INT void roxml_print_spaces(FILE * f, char **buf, int *offset, int *len, i
 	}
 }
 
-ROXML_INT void roxml_write_string(FILE *f, char **buf, int *offset, int *len, char *str, ...)
+/** \brief string writter function
+ *
+ * \fn void roxml_write_string(FILE *f, char **buf, int *offset, int *len, char *str, ...);
+ * this function write a string to output when committing change
+ * \param f the file pointer if any
+ * \param buf the pointer to string if any
+ * \param str the string to write
+ * \param offset the current offset in stream
+ * \param len the total len of buffer if any
+ * \return
+ */
+ROXML_STATIC ROXML_INT void roxml_write_string(FILE *f, char **buf, int *offset, int *len, char *str, ...)
 {
 	va_list args;
 	int min_len;
@@ -53,7 +74,7 @@ ROXML_INT void roxml_write_string(FILE *f, char **buf, int *offset, int *len, ch
 	va_end(args);
 }
 
-ROXML_INT static void roxml_write_other_node(node_t *n, FILE * f, char **buf, int *offset, int *len, char *name)
+ROXML_STATIC ROXML_INT void roxml_write_other_node(node_t *n, FILE * f, char **buf, int *offset, int *len, char *name)
 {
 	char *value;
 	int status;
@@ -93,7 +114,7 @@ ROXML_INT static void roxml_write_other_node(node_t *n, FILE * f, char **buf, in
 	ROXML_PUT_BASE_BUFFER(val);
 }
 
-ROXML_INT static void roxml_write_elm_name_open(node_t *n, FILE * f, char **buf, int *offset, int *len, char *name, char *ns)
+ROXML_STATIC ROXML_INT void roxml_write_elm_name_open(node_t *n, FILE * f, char **buf, int *offset, int *len, char *name, char *ns)
 {
 	if (!n->prnt)
 		return;
@@ -104,7 +125,7 @@ ROXML_INT static void roxml_write_elm_name_open(node_t *n, FILE * f, char **buf,
 						n->ns ? ":" : "", name);
 }
 
-ROXML_INT static void roxml_write_elm_name_close(node_t *n, FILE * f, char **buf, int *offset, int *len, char *name, char *ns)
+ROXML_STATIC ROXML_INT void roxml_write_elm_name_close(node_t *n, FILE * f, char **buf, int *offset, int *len, char *name, char *ns)
 {
 	char head[8] = "\0";
 	char tail[8] = "/>";
@@ -120,7 +141,7 @@ ROXML_INT static void roxml_write_elm_name_close(node_t *n, FILE * f, char **buf
 				n->chld ? name : "", tail);
 }
 
-ROXML_INT static void roxml_write_elm_attr(node_t *n, FILE * f, char **buf, int *offset, int *len)
+ROXML_STATIC ROXML_INT void roxml_write_elm_attr(node_t *n, FILE * f, char **buf, int *offset, int *len)
 {
 	node_t *attr = n->attr;
 
@@ -156,7 +177,20 @@ ROXML_INT static void roxml_write_elm_attr(node_t *n, FILE * f, char **buf, int 
 	}
 }
 
-ROXML_INT void roxml_write_node(node_t *n, FILE * f, char **buf, int human, int lvl, int *offset, int *len)
+/** \brief tree write function
+ *
+ * \fn roxml_write_node(node_t *n, FILE *f, char ** buf, int human, int lvl, int *offset, int *len);
+ * this function write each node of the tree to output
+ * \param n the node to write
+ * \param f the file pointer if any
+ * \param buf the pointer to the buffer string if any
+ * \param human 1 to use the human format else 0
+ * \param lvl the current level in tree
+ * \param offset the current offset in stream
+ * \param len the total len of buffer if any
+ * \return
+ */
+ROXML_STATIC ROXML_INT void roxml_write_node(node_t *n, FILE * f, char **buf, int human, int lvl, int *offset, int *len)
 {
 	ROXML_GET_BASE_BUFFER(ns);
 	ROXML_GET_BASE_BUFFER(name);

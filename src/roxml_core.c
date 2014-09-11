@@ -43,7 +43,15 @@ ROXML_INT node_t *roxml_create_node(int pos, void *src, int type)
 	return n;
 }
 
-ROXML_INT void roxml_close_node(node_t *n, node_t * close)
+/** \brief internal function
+ *
+ * \fn void ROXML_STATIC ROXML_INT roxml_close_node(node_t *n, node_t *close);
+ * This function close the node (add the end offset) and parent the node
+ * \param n is the node to close
+ * \param close is the node that close node n
+ * \return void
+ */
+ROXML_STATIC ROXML_INT void roxml_close_node(node_t *n, node_t * close)
 {
 	if (n) {
 		n->end = close->pos;
@@ -112,7 +120,14 @@ ROXML_INT inline int roxml_is_separator(char sep)
 	return 0;
 }
 
-ROXML_INT void roxml_process_unaliased_ns(roxml_load_ctx_t * context)
+/** \brief namespace without alias name creation during parsing
+ *
+ * \fn roxml_process_unaliased_ns(roxml_load_ctx_t *context);
+ * this function create a new namespace without alias (default ns or remove ns)
+ * \param context the parsing context
+ * \return
+ */
+ROXML_STATIC ROXML_INT void roxml_process_unaliased_ns(roxml_load_ctx_t * context)
 {
 	if (context->nsdef) {
 		context->nsdef = 0;
@@ -135,7 +150,15 @@ ROXML_INT void roxml_process_unaliased_ns(roxml_load_ctx_t * context)
 	}
 }
 
-ROXML_INT void roxml_process_begin_node(roxml_load_ctx_t * context, int position)
+/** \brief node creation during parsing
+ *
+ * \fn roxml_process_begin_node(roxml_load_ctx_t *context, int position);
+ * this function create a new node upon finding new opening sign. It closes previous node if necessary
+ * \param context the parsing context
+ * \param position the position in the file
+ * \return
+ */
+ROXML_STATIC ROXML_INT void roxml_process_begin_node(roxml_load_ctx_t * context, int position)
 {
 	if (context->candidat_txt) {
 #ifdef IGNORE_EMPTY_TEXT_NODES
@@ -217,7 +240,15 @@ ROXML_INT node_t *roxml_create_root(node_t *n)
 	return n;
 }
 
-ROXML_INT node_t *roxml_lookup_nsdef(node_t *nsdef, char *ns)
+/** \brief name space lookup in list
+ *
+ * \fn roxml_lookup_nsdef(node_t *nsdef, char * ns);
+ * this function look for requested name space in nsdef list
+ * \param nsdef the nsdef list
+ * \param ns the namespace to find
+ * \return the nsdef node or NULL
+ */
+ROXML_STATIC ROXML_INT node_t *roxml_lookup_nsdef(node_t *nsdef, char *ns)
 {
 	int len = 0;
 	char namespace[MAX_NS_LEN];
@@ -234,7 +265,15 @@ ROXML_INT node_t *roxml_lookup_nsdef(node_t *nsdef, char *ns)
 	return nsdef;
 }
 
-ROXML_INT inline void roxml_set_type(node_t *n, int type)
+/** \brief node type setter function
+ *
+ * \fn roxml_set_type(node_t *n, int type);
+ * this function change the type of a node
+ * \param n the node to modify
+ * \param type the new type to set
+ * \return
+ */
+ROXML_STATIC ROXML_INT inline void roxml_set_type(node_t *n, int type)
 {
 	n->type &= ~(ROXML_ATTR_NODE | ROXML_ELM_NODE | ROXML_TXT_NODE | ROXML_CMT_NODE | ROXML_PI_NODE);
 	n->type |= type;
@@ -255,7 +294,7 @@ ROXML_INT node_t *roxml_set_parent(node_t *parent, node_t *n)
 	return n;
 }
 
-ROXML_INT node_t *roxml_append_attr(node_t *parent, node_t *n)
+ROXML_STATIC ROXML_INT node_t *roxml_append_attr(node_t *parent, node_t *n)
 {
 	if (parent->attr) {
 		node_t *attr = parent->attr;
@@ -269,7 +308,7 @@ ROXML_INT node_t *roxml_append_attr(node_t *parent, node_t *n)
 	return n;
 }
 
-ROXML_INT node_t *roxml_append_other(node_t *parent, node_t *n)
+ROXML_STATIC ROXML_INT node_t *roxml_append_other(node_t *parent, node_t *n)
 {
 	if (parent->next)
 		parent->next->sibl = n;

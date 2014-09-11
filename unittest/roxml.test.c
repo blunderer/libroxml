@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
@@ -6,9 +5,12 @@
 #include "unittest.h"		
 #include "roxml_internal.h"
 #include "roxml_mem.h"
-#include "roxml_edit.h"
 #include "roxml_core.h"
 #include "roxml_xpath.h"
+
+extern void roxml_close_node(node_t *n, node_t * close);
+extern node_t *roxml_parent_node(node_t *parent, node_t * n, int position);
+extern int roxml_parse_xpath(char *path, xpath_node_t **xpath, int context);
 
 int test_load_doc(void)
 {

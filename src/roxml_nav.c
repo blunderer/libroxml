@@ -1,4 +1,4 @@
-#include <roxml_nav.h>
+#include <roxml_internal.h>
 
 ROXML_API node_t *roxml_get_prev_sibling(node_t *n)
 {
@@ -50,18 +50,4 @@ ROXML_API node_t *roxml_get_root(node_t *n)
 			root = root->prnt;
 	}
 	return root;
-}
-
-/* do not call this function if n->prnt == NULL */
-ROXML_INT node_t *roxml_get_real_prev_sibling(node_t *n)
-{
-	node_t *current = n->prnt->chld;
-	node_t *prev = NULL;
-
-	while (current != n) {
-		prev = current;
-		current = current->sibl;
-	}
-
-	return prev;
 }

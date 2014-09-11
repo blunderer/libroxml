@@ -22,16 +22,6 @@ ROXML_INT node_t *roxml_create_node(int pos, void *src, int type);
 
 /** \brief internal function
  *
- * \fn void ROXML_INT roxml_close_node(node_t *n, node_t *close);
- * This function close the node (add the end offset) and parent the node
- * \param n is the node to close
- * \param close is the node that close node n
- * \return void
- */
-ROXML_INT void roxml_close_node(node_t *n, node_t * close);
-
-/** \brief internal function
- *
  * \fn void ROXML_INT roxml_free_node(node_t *n);
  * This function delete a node without handling its tree
  * \param n is one node of the tree
@@ -68,28 +58,9 @@ ROXML_INT node_t *roxml_create_root(node_t *n);
  */
 ROXML_INT int roxml_is_separator(char sep);
 
-/** \brief namespace without alias name creation during parsing
- *
- * \fn roxml_process_unaliased_ns(roxml_load_ctx_t *context);
- * this function create a new namespace without alias (default ns or remove ns)
- * \param context the parsing context
- * \return
- */
-ROXML_INT void roxml_process_unaliased_ns(roxml_load_ctx_t * context);
-
-/** \brief node creation during parsing
- *
- * \fn roxml_process_begin_node(roxml_load_ctx_t *context, int position);
- * this function create a new node upon finding new opening sign. It closes previous node if necessary
- * \param context the parsing context
- * \param position the position in the file
- * \return
- */
-ROXML_INT void roxml_process_begin_node(roxml_load_ctx_t * context, int position);
-
 /** \brief generic load function
  *
- * \fn node_t* ROXML_API roxml_load(node_t *current_node, FILE *file, char *buffer);
+ * \fn node_t*  roxml_load(node_t *current_node, FILE *file, char *buffer);
  * This function load a document and all the corresponding nodes
  * file and buffer params are exclusive. You usualy want to load
  * either a file OR a buffer
@@ -100,26 +71,6 @@ ROXML_INT void roxml_process_begin_node(roxml_load_ctx_t * context, int position
  * see roxml_close
  */
 ROXML_INT node_t *roxml_load(node_t *current_node, FILE * file, char *buffer);
-
-/** \brief name space lookup in list
- *
- * \fn roxml_lookup_nsdef(node_t *nsdef, char * ns);
- * this function look for requested name space in nsdef list
- * \param nsdef the nsdef list
- * \param ns the namespace to find
- * \return the nsdef node or NULL
- */
-ROXML_INT node_t *roxml_lookup_nsdef(node_t *nsdef, char *ns);
-
-/** \brief node type setter function
- *
- * \fn roxml_set_type(node_t *n, int type);
- * this function change the type of a node
- * \param n the node to modify
- * \param type the new type to set
- * \return
- */
-ROXML_INT void roxml_set_type(node_t *n, int type);
 
 /** \brief node parenting function
  *
