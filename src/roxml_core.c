@@ -287,10 +287,9 @@ ROXML_INT node_t *roxml_set_parent(node_t *parent, node_t *n)
 	n->prnt = parent;
 
 	if (parent->ns && ((parent->ns->type & ROXML_INVALID) != ROXML_INVALID)
-	    && parent->ns->priv && ((roxml_ns_t *) parent->ns->priv)->alias[0] == '\0') {
+	    && parent->ns->priv && ((roxml_ns_t *) parent->ns->priv)->alias[0] == '\0')
 		if (n->ns == NULL)
 			n->ns = parent->ns;
-	}
 	return n;
 }
 
