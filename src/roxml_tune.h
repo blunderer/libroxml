@@ -97,36 +97,6 @@
 #define CONFIG_XML_SMALL_INPUT_FILE	0
 #endif /* CONFIG_XML_SMALL_INPUT_FILE */
 
-/* Can the target library modify XML tree
- * When set to 0, this result in smaller binary.
- * (this saves about 3kb)
- * This option should be activated.
- * If unsure, set to 1
- */
-#ifndef CONFIG_XML_READ_WRITE
-#define CONFIG_XML_READ_WRITE		1
-#endif /* CONFIG_XML_READ_WRITE */
-
-/* Can the target library commit a tree
- * When set to 0, this result in smaller binary.
- * (this saves about 5kb)
- * This option should be activated.
- * If unsure, set to 1
- */
-#ifndef CONFIG_XML_COMMIT_XML_TREE
-#define CONFIG_XML_COMMIT_XML_TREE	1
-#endif /* CONFIG_XML_COMMIT_XML_TREE */
-
-/* Can the target library perform xpath queries
- * When set to 0, this result in smaller binary.
- * (this saves about 20kb)
- * This option should be activated.
- * If unsure, set to 1
- */
-#ifndef CONFIG_XML_XPATH_ENGINE
-#define CONFIG_XML_XPATH_ENGINE	1
-#endif /* CONFIG_XML_XPATH_ENGINE */
-
 /*************** Implement HEAP/STACK BUFFERS **********************/
 #if(CONFIG_XML_HEAP_BUFFERS==1)
 	#define ROXML_GET_BASE_BUFFER(name) char *name = malloc(ROXML_BASE_LEN)

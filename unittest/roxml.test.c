@@ -1011,7 +1011,7 @@ int test_create_node(void)
 	ASSERT_NULL(node->chld)
 	ASSERT_NULL(node->attr)
 
-#if(CONFIG_XML_EDIT==1)
+#ifdef CONFIG_XML_EDIT
 	roxml_parent_node(cnode, node, 0);
 	roxml_parent_node(node, anode, 0);
 	ASSERT_EQUAL(node->prnt, cnode)
@@ -1355,27 +1355,27 @@ int test_del_node(void)
 	roxml_del_node(attr1);
 	
 	nb = roxml_get_attr_nb(node1);
-#if(CONFIG_XML_EDIT==1)
+#ifdef CONFIG_XML_EDIT
 	ASSERT_EQUAL(nb, 1);
 	attr1 = roxml_get_attr(node1, NULL, 0);
 	ASSERT_STRING_EQUAL(roxml_get_name(attr1, NULL, 0), "value")
-#else /* CONFIG_XML_EDIT==0 */
+#else /* CONFIG_XML_EDIT */
 	ASSERT_EQUAL(nb, 2);
 #endif /* CONFIG_XML_EDIT */
 
 	node_t **node_set = roxml_xpath(root, "//*", &nb);
-#if(CONFIG_XML_XPATH==1)
+#ifdef CONFIG_XML_XPATH
 	ASSERT_EQUAL(nb, 9);
-#else /* CONFIG_XML_XPATH==0 */
+#else /* CONFIG_XML_XPATH */
 	ASSERT_EQUAL(nb, 0);
 #endif /* CONFIG_XML_XPATH */
 	
 	roxml_del_node(node2);
 
 	node_set = roxml_xpath(root, "//*", &nb);
-#if(CONFIG_XML_XPATH==1)
+#ifdef CONFIG_XML_XPATH
 	ASSERT_EQUAL(nb, 4);
-#else /* CONFIG_XML_XPATH==0 */
+#else /* CONFIG_XML_XPATH */
 	ASSERT_EQUAL(nb, 0);
 #endif /* CONFIG_XML_XPATH */
 
@@ -1385,9 +1385,9 @@ int test_del_node(void)
 
 	roxml_del_node(text);
 
-#if(CONFIG_XML_EDIT==1)
+#ifdef CONFIG_XML_EDIT
 	ASSERT_STRING_EQUAL(roxml_get_content(node1, NULL, 0, NULL), "");
-#else /* CONFIG_XML_EDIT==0 */
+#else /* CONFIG_XML_EDIT */
 	ASSERT_STRING_EQUAL(roxml_get_content(node1, NULL, 0, NULL), "text1");
 #endif /* CONFIG_XML_EDIT */
 
@@ -1471,7 +1471,7 @@ int test_parse_xpath(void)
 {
 	INIT
 
-#if(CONFIG_XML_XPATH==1)
+#ifdef CONFIG_XML_XPATH
 	xpath_node_t *ptr;
 	char mypath[256] = "/node/item[12]/title";
 	int ret = roxml_parse_xpath(mypath, &ptr, 0);	
@@ -1741,7 +1741,7 @@ int test_xpath(void)
 {
 	INIT
 
-#if(CONFIG_XML_XPATH==1)
+#ifdef CONFIG_XML_XPATH
 	int nbans;
 	node_t *node0;
 	node_t *node2;
@@ -2562,7 +2562,7 @@ int test_spec_nodes(void)
 	ASSERT_STRING_EQUAL(content, " <node2></node2> ")
 
 	// test xpath
-#if (CONFIG_XML_XPATH==1)
+#ifdef CONFIG_XML_XPATH
 	node_t **node_set = roxml_xpath(root, "//comment()", &nbans);
 	ASSERT_EQUAL(nbans, 2)
 	ASSERT_STRING_EQUAL(roxml_get_content(node_set[0], NULL, 0, NULL), "this is a comment")
@@ -2802,7 +2802,7 @@ int test_write_namespaces(void)
 	attr3 = roxml_add_node(node8, 0, ROXML_ATTR_NODE, "val", "3");
 	attr4 = roxml_add_node(node4, 0, ROXML_ATTR_NODE, "val", "4");
 
-#if (CONFIG_XML_EDIT==1)
+#ifdef CONFIG_XML_EDIT
 	ASSERT_NULL(test);
 	ASSERT_NOT_NULL(node0);
 	ASSERT_NOT_NULL(node4);
@@ -2831,13 +2831,13 @@ int test_write_namespaces(void)
 	test = roxml_set_ns(node3, ns2);
 #endif /* CONFIG_XML_EDIT */ 
 
-#if (CONFIG_XML_COMMIT==1)
+#ifdef CONFIG_XML_COMMIT
 	len = roxml_commit_changes(root, "out.xml.ns.generated", NULL, 1);
 #endif /* CONFIG_XML_COMMIT */
 
 	roxml_close(root);
 
-#if (CONFIG_XML_COMMIT==1)
+#ifdef CONFIG_XML_COMMIT
 	root = roxml_load_doc("out.xml.ns.generated");
 	len = roxml_commit_changes(root, "out.xml.ns.generated2", NULL, 1);
 	ASSERT_EQUAL(len, 344);
@@ -2852,7 +2852,7 @@ int test_del_namespaces(void)
 {
 	INIT /* init context macro */
 
-#if (CONFIG_XML_EDIT==1)
+#ifdef CONFIG_XML_EDIT
 	node_t * ns1 = NULL;
 	node_t * ns2 = NULL;
 	node_t * attr0 = NULL;
@@ -2964,7 +2964,7 @@ int test_write_tree(void)
 	char * buffer;
 	INIT /* init context macro */
 
-#if (CONFIG_XML_COMMIT==1)
+#ifdef CONFIG_XML_COMMIT
 	node_t * text = NULL;
 	node_t * attr = NULL;
 	node_t *root = roxml_load_doc("roxml.test.xml");

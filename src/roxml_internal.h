@@ -11,7 +11,7 @@
 /* STUB function are here to provide a consistent libroxml binary no matter 
  * what the configuration. They are located in a specific section that can be 
  * easily optimized out if necessary */
-#define ROXML_STUB __attribute__((weak)) __attribute__((section("__stub")))
+#define ROXML_STUB __attribute__((section("__stub")))
 
 /* must be included first */
 #include <roxml_tune.h>

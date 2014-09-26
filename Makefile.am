@@ -44,17 +44,26 @@ libroxml_la_SOURCES = src/roxml_core.c \
 			src/roxml_mem.c \
 			src/roxml_stub.c
 
+libroxml_la_CFLAGS = -DIGNORE_EMPTY_TEXT_NODES \
+			-DCONFIG_XML_CONTENT \
+			-DCONFIG_XML_NAV \
+			-DCONFIG_XML_BUFF
+
 if CONFIG_XML_COMMIT
 libroxml_la_SOURCES += src/roxml_commit.c
+libroxml_la_CFLAGS += -DCONFIG_XML_COMMIT
 endif
 if CONFIG_XML_EDIT
 libroxml_la_SOURCES += src/roxml_edit.c
+libroxml_la_CFLAGS += -DCONFIG_XML_EDIT
 endif
 if CONFIG_XML_FILE
 libroxml_la_SOURCES += src/roxml_file.c
+libroxml_la_CFLAGS += -DCONFIG_XML_FILE
 endif
 if CONFIG_XML_XPATH
 libroxml_la_SOURCES += src/roxml_xpath.c
+libroxml_la_CFLAGS += -DCONFIG_XML_XPATH
 endif
 
 libroxml_la_LDFLAGS = $(VERSION_INFO)
@@ -142,7 +151,14 @@ noinst_LIBRARIES = \
 		unittest/libroxml_test.a \
 		unittest/libroxml_test_tiny.a
 
-TEST_CFLAGS = -DUNITTEST -DREENTRANT -DLINUX -D__DEBUG -DIGNORE_EMPTY_TEXT_NODES -Wall -Wextra @AM_TEST_CFLAGS@
+TEST_CFLAGS = -DUNITTEST -DREENTRANT -DLINUX -D__DEBUG -DIGNORE_EMPTY_TEXT_NODES -Wall -Wextra @AM_TEST_CFLAGS@ \
+			-DCONFIG_XML_CONTENT \
+			-DCONFIG_XML_NAV \
+			-DCONFIG_XML_BUFF \
+			-DCONFIG_XML_COMMIT \
+			-DCONFIG_XML_EDIT \
+			-DCONFIG_XML_FILE \
+			-DCONFIG_XML_XPATH
 
 # Test library libroxml_test.a
 unittest_libroxml_test_a_SOURCES = \
@@ -155,8 +171,8 @@ unittest_libroxml_test_a_SOURCES = \
 	src/roxml_mem.c \
 	src/roxml_nav.c \
 	src/roxml_parser.c \
-	src/roxml_stub.c \
-	src/roxml_xpath.c
+	src/roxml_xpath.c \
+	src/roxml_stub.c
 
 unittest_libroxml_test_a_CFLAGS = $(TEST_CFLAGS)
 
@@ -178,10 +194,9 @@ unittest_libroxml_test_tiny_a_CFLAGS = \
 	-DCONFIG_XML_SMALL_BUFFER=1 \
 	-DCONFIG_XML_SMALL_INPUT_FILE=1 \
 	-DCONFIG_XML_THREAD_SAFE=0 \
-	-DCONFIG_XML_COMMIT=0 \
-	-DCONFIG_XML_EDIT=0 \
-	-DCONFIG_XML_FILE=0 \
-	-DCONFIG_XML_XPATH=0
+	-UCONFIG_XML_COMMIT \
+	-UCONFIG_XML_EDIT \
+	-UCONFIG_XML_XPATH
 
 # roxml.unitC
 nodist_unittest_roxml_unitC_SOURCES = \
@@ -193,7 +208,7 @@ unittest_roxml_unitC_CFLAGS = $(TEST_CFLAGS)
 # roxml.perf
 nodist_unittest_roxml_perf_SOURCES = unittest/roxml.perf.c
 unittest_roxml_perf_LDADD = unittest/libroxml_test.a
-unittest_roxml_perf_CFLAGS = -O3 -DREENTRANT -DLINUX -DIGNORE_EMPTY_TEXT_NODES -Wall
+unittest_roxml_perf_CFLAGS = -O3 -DREENTRANT -DLINUX -Wall
 
 # roxml.mem
 nodist_unittest_roxml_mem_SOURCES = unittest/roxml.mem.c
@@ -211,10 +226,9 @@ unittest_roxml_tiny_unitC_CFLAGS = $(TEST_CFLAGS) \
 	-DCONFIG_XML_SMALL_BUFFER=1 \
 	-DCONFIG_XML_SMALL_INPUT_FILE=1 \
 	-DCONFIG_XML_THREAD_SAFE=0 \
-	-DCONFIG_XML_COMMIT=0 \
-	-DCONFIG_XML_EDIT=0 \
-	-DCONFIG_XML_FILE=0 \
-	-DCONFIG_XML_XPATH=0
+	-UCONFIG_XML_COMMIT \
+	-UCONFIG_XML_EDIT \
+	-UCONFIG_XML_XPATH
 
 CLEANFILES += \
 		unittest/out.xml.copy \

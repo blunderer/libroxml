@@ -171,11 +171,11 @@ AC_DEFUN([AC_ROXML_TUNE],
     if test x$$1 != xno; then
         roxml_tune=1
 	AC_MSG_NOTICE([$6 ......... $7])
+	AC_DEFINE_UNQUOTED([$5], [$roxml_tune], [$4 [default=$2]])
     else
         roxml_tune=0
 	AC_MSG_NOTICE([$6 ......... $8])
     fi
-    AC_DEFINE_UNQUOTED([$5], [$roxml_tune], [$4 [default=$2]])
     AM_CONDITIONAL([$5], [ test $roxml_tune -eq 1])
 ])
 

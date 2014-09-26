@@ -1,29 +1,14 @@
 #include <roxml_internal.h>
 
-ROXML_STUB node_t *roxml_load_fd(int fd)
-{
-	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
-	return NULL;
-}
-
-ROXML_STUB node_t *roxml_load_doc(char *filename)
-{
-	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
-	return NULL;
-}
-
-ROXML_STUB node_t *roxml_load_buf(char *buffer)
-{
-	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
-	return NULL;
-}
-
+#ifndef CONFIG_XML_COMMIT
 ROXML_STUB int roxml_commit_changes(node_t *n, char *dest, char **buffer, int human)
 {
 	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
 	return -1;
 }
+#endif /* CONFIG_XML_COMMIT */
 
+#ifndef CONFIG_XML_EDIT
 ROXML_STUB void roxml_del_node(node_t *n)
 {
 	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
@@ -41,15 +26,9 @@ ROXML_STUB node_t *roxml_set_ns(node_t *n, node_t * ns)
 	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
 	return NULL;
 }
+#endif /* CONFIG_XML_EDIT */
 
-ROXML_STUB node_t **roxml_xpath(node_t *n, char *path, int *nb_ans)
-{
-	if (nb_ans)
-		*nb_ans = 0;
-	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
-	return NULL;
-}
-
+#ifndef CONFIG_XML_CONTENT
 ROXML_STUB char *roxml_get_content(node_t *n, char *buffer, int bufsize, int *size)
 {
 	if (size)
@@ -153,7 +132,19 @@ ROXML_STUB int roxml_get_node_position(node_t *n)
 	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
 	return -1;
 }
+#endif /* CONFIG_XML_CONTENT */
 
+#ifndef CONFIG_XML_XPATH
+ROXML_STUB node_t **roxml_xpath(node_t *n, char *path, int *nb_ans)
+{
+	if (nb_ans)
+		*nb_ans = 0;
+	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
+	return NULL;
+}
+#endif /* CONFIG_XML_XPATH */
+
+#ifndef CONFIG_XML_NAV
 ROXML_STUB node_t *roxml_get_prev_sibling(node_t *n)
 {
 	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
@@ -177,6 +168,20 @@ ROXML_STUB node_t *roxml_get_root(node_t *n)
 	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
 	return NULL;
 }
+#endif /* CONFIG_XML_NAV */
+
+#ifndef CONFIG_XML_FILE
+ROXML_STUB node_t *roxml_load_fd(int fd)
+{
+	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
+	return NULL;
+}
+
+ROXML_STUB node_t *roxml_load_doc(char *filename)
+{
+	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
+	return NULL;
+}
 
 ROXML_STUB int roxml_read_file(int pos, int size, char *buffer, node_t *node)
 {
@@ -194,6 +199,14 @@ ROXML_STUB int roxml_parse_file(roxml_load_ctx_t *context, roxml_parser_item_t *
 {
 	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
 	return -1;
+}
+#endif /* CONFIG_XML_FILE */
+
+#ifndef CONFIG_XML_BUFF
+ROXML_STUB node_t *roxml_load_buf(char *buffer)
+{
+	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
+	return NULL;
 }
 
 ROXML_STUB int roxml_read_buff(int pos, int size, char *buffer, node_t *node)
@@ -213,3 +226,4 @@ ROXML_STUB int roxml_parse_buff(roxml_load_ctx_t *context, roxml_parser_item_t *
 	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
 	return -1;
 }
+#endif /* CONFIG_XML_BUFF */
