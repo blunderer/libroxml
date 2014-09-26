@@ -42,6 +42,6 @@ ROXML_INT roxml_parser_item_t *roxml_parser_prepare(roxml_parser_item_t * head);
  * \param ctx user data passed to the callbacks
  * \return the number of bytes processed
  */
-ROXML_INT int roxml_parse_line(roxml_parser_item_t * head, char *line, int len, void *ctx);
+ROXML_INT ROXML_PARSE int roxml_parse_line(roxml_parser_item_t * head, char *line, int len, void *ctx);
 
 #endif /* ROXML_PARSER_H */

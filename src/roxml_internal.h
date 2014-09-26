@@ -13,6 +13,11 @@
  * easily optimized out if necessary */
 #define ROXML_STUB __attribute__((section("__stub")))
 
+/* PARSE functions are used when doing the parsing of document. This is a time
+ * sensitive section and all concerned function are stored inside a same section
+ */
+#define ROXML_PARSE __attribute__((section("__parse")))
+
 /* must be included first */
 #include <roxml_tune.h>
 
