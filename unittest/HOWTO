@@ -23,52 +23,52 @@ will output a file named test.xml about 12Mbytes
 #
 # Performances results
 # 
-stats for 'test-27K.xml':
-	load_doc (26713 bytes):		 0.010201 sec
-	xpath processed 383 nodes:	 0.000359 sec
-	release result:			 0.000002 sec
-	close_doc:			 0.000171 sec
-	total node:			 314
-	total attr:			 80
-	total text:			 316
-	ram tree:			 31240 bytes
-	ram total:			 520192 bytes
-	ram ratio:			 1.169468
+This numbers are obtained on a core i7 
+stats for 'test-27K.xml':		 v2.x			v3.x
+	load_doc (26713 bytes):		 0.010201 sec		0.000708 sec
+	xpath processed 383 nodes:	 0.000359 sec		0.000443 sec
+	release result:			 0.000002 sec		0.000001 sec
+	close_doc:			 0.000171 sec		0.000075 sec
+	total node:			 314			314
+	total attr:			 80			78
+	total text:			 316			314
+	ram tree:			 31240 bytes		56480 bytes
+	ram total:			 520192 bytes		512000 bytes
+	ram ratio:			 1.169468		2.114326
 
-stats for 'test-1200K.xml':
-	load_doc (1161615 bytes):	 0.025416 sec
-	xpath processed 17132 nodes:	 0.004772 sec
-	release result:			 0.000011 sec
-	close_doc:			 0.002305 sec
-	total node:			 13981
-	total attr:			 3919
-	total text:			 15923
-	ram tree:			 1488212 bytes
-	ram total:			 2256896 bytes
-	ram ratio:			 1.281158
+stats for 'test-1200K.xml':		 v2.x			v3.x
+	load_doc (1161615 bytes):	 0.025416 sec		0.028083 sec
+	xpath processed 17132 nodes:	 0.004772 sec		0.013793 sec
+	release result:			 0.000011 sec		0.000023 sec
+	close_doc:			 0.002305 sec		0.001944 sec
+	total node:			 13981			13981
+	total attr:			 3919			3917
+	total text:			 15923			15921
+	ram tree:			 1488212 bytes		2705520 bytes
+	ram total:			 2256896 bytes		4018176 bytes
+	ram ratio:			 1.281158		2.329102
 
-stats for 'test-12M.xml':
-	load_doc (11669705 bytes):	 0.401268 sec
-	xpath processed 167865 nodes:	 0.052178 sec
-	release result:			 0.000049 sec
-	close_doc:			 0.023391 sec
-	total node:			 137215
-	total attr:			 38268
-	total text:			 156409
-	ram tree:			 14603248 bytes
-	ram total:			 17883136 bytes
-	ram ratio:			 1.251381
+stats for 'test-12M.xml':		 v2.x			v3.x
+	load_doc (11669705 bytes):	 0.401268 sec		0.166223 sec
+	xpath processed 167865 nodes:	 0.052178 sec		0.065431 sec
+	release result:			 0.000049 sec		0.000088 sec
+	close_doc:			 0.023391 sec		0.009477 sec
+	total node:			 137215			137215
+	total attr:			 38268			38266
+	total text:			 156409			156407
+	ram tree:			 14603248 bytes		26551040 bytes
+	ram total:			 17883136 bytes		35381248 bytes
+	ram ratio:			 1.251381		2.275211
 
 
-stats for 'test-112M.xml':
-	load_doc (116517075 bytes):	 4.1433327 sec
-	xpath processed 1666311 nodes:	 0.525555 sec
-	release result:			 0.000399 sec
-	close_doc:			 2.1761393 sec
-	total node:			 1360721
-	total attr:			 381872
-	total text:			 1555605
-	ram tree:			 145120712 bytes
-	ram total:			 173465600 bytes
-	ram ratio:			 1.245489
-
+stats for 'test-112M.xml':		 v2.x			v3.x
+	load_doc (116517075 bytes):	 4.1433327 sec		2.1195290 sec
+	xpath processed 1666311 nodes:	 0.525555 sec		0.468895 sec
+	release result:			 0.000399 sec		0.000716 sec
+	close_doc:			 2.1761393 sec		0.081984 sec
+	total node:			 1360721		1360721
+	total attr:			 381872			381870
+	total text:			 1555605		1555603
+	ram tree:			 145120712 bytes	263855520 bytes
+	ram total:			 173465600 bytes	346537984 bytes
+	ram ratio:			 1.245489		2.264522
