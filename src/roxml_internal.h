@@ -1,3 +1,14 @@
+/**
+ * \file roxml_internal.h
+ * \brief internal header required by all libroxml sources
+ *
+ * (c) copyright 2014
+ * tristan lelong <tristan.lelong@libroxml.net>
+ *
+ * SPDX-Licence-Identifier:     lgpl-2.1+
+ * the author added a static linking exception, see license.txt.
+ */
+
 #ifndef ROXML_INTERNAL_H
 #define ROXML_INTERNAL_H
 

@@ -1,3 +1,14 @@
+/**
+ * \file roxml_core.h
+ * \brief XML parsing core module
+ *
+ * (C) Copyright 2014
+ * Tristan Lelong <tristan.lelong@libroxml.net>
+ *
+ * SPDX-Licence-Identifier:     LGPL-2.1+
+ * The author added a static linking exception, see License.txt.
+ */
+
 #ifndef ROXML_CORE_H
 #define ROXML_CORE_H
 

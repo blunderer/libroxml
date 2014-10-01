@@ -1,3 +1,14 @@
+/**
+ * \file roxml_mem.c
+ * \brief XML internal memory management module
+ *
+ * (C) Copyright 2014
+ * Tristan Lelong <tristan.lelong@libroxml.net>
+ *
+ * SPDX-Licence-Identifier:	LGPL-2.1+
+ * The author added a static linking exception, see License.txt.
+ */
+
 #include <stdlib.h>
 #include <roxml_mem.h>
 

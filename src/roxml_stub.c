@@ -1,3 +1,14 @@
+/**
+ * \file roxml_stub.c
+ * \brief API consistency module
+ *
+ * (C) Copyright 2014
+ * Tristan Lelong <tristan.lelong@libroxml.net>
+ *
+ * SPDX-Licence-Identifier:	LGPL-2.1+
+ * The author added a static linking exception, see License.txt.
+ */
+
 #include <roxml_internal.h>
 
 #ifndef CONFIG_XML_COMMIT

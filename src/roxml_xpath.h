@@ -1,3 +1,14 @@
+/**
+ * \file roxml_xpath.h
+ * \brief xpath execution module
+ *
+ * (C) Copyright 2014
+ * Tristan Lelong <tristan.lelong@libroxml.net>
+ *
+ * SPDX-Licence-Identifier:     LGPL-2.1+
+ * The author added a static linking exception, see License.txt.
+ */
+
 #ifndef ROXML_XPATH_H
 #define ROXML_XPATH_H
 

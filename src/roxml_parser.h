@@ -1,3 +1,14 @@
+/**
+ * \file roxml_parser.h
+ * \brief Parsing engine
+ *
+ * (c) copyright 2014
+ * tristan lelong <tristan.lelong@libroxml.net>
+ *
+ * SPDX-Licence-Identifier:     lgpl-2.1+
+ * the author added a static linking exception, see license.txt.
+ */
+
 #ifndef ROXML_PARSER_H
 #define ROXML_PARSER_H
 

@@ -1,3 +1,14 @@
+/**
+ * \file roxml_content.c
+ * \brief XML content access module
+ *
+ * (C) Copyright 2014
+ * Tristan Lelong <tristan.lelong@libroxml.net>
+ *
+ * SPDX-Licence-Identifier:	LGPL-2.1+
+ * The author added a static linking exception, see License.txt.
+ */
+
 #include <string.h>
 #include <stdlib.h>
 #include <roxml_mem.h>

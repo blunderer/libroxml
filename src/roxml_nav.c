@@ -1,3 +1,14 @@
+/**
+ * \file roxml_nav.c
+ * \brief XML document navigation module
+ *
+ * (C) Copyright 2014
+ * Tristan Lelong <tristan.lelong@libroxml.net>
+ *
+ * SPDX-Licence-Identifier:	LGPL-2.1+
+ * The author added a static linking exception, see License.txt.
+ */
+
 #include <roxml_internal.h>
 
 ROXML_API node_t *roxml_get_prev_sibling(node_t *n)

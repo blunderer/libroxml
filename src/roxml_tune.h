@@ -1,29 +1,12 @@
-/** \file roxml_tune.h
- *  \brief header for libroxml.so
- *         
- * This is the header file used to tune libroxml.
- * It contains the default options taht should fit
- * all standard systems.
- * Change this file only if you *really* know what you are doing.
- * \author blunderer <blunderer@blunderer.org>
- * \date 11 May 2012
+/**
+ * \file roxml_tune.c
+ * \brief Tuning of libroxml behavior for embedded systems
  *
- * Copyright (C) 2012 blunderer
+ * (C) Copyright 2014
+ * Tristan Lelong <tristan.lelong@libroxml.net>
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * SPDX-Licence-Identifier:     LGPL-2.1+
  * The author added a static linking exception, see License.txt.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
 /** \page roxml_tune tuning libroxml

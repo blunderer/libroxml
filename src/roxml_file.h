@@ -1,3 +1,14 @@
+/**
+ * \file roxml_file.h
+ * \brief File XML document backend
+ *
+ * (C) Copyright 2014
+ * Tristan Lelong <tristan.lelong@libroxml.net>
+ *
+ * SPDX-Licence-Identifier:     LGPL-2.1+
+ * The author added a static linking exception, see License.txt.
+ */
+
 #ifndef ROXML_FILE_H
 #define ROXML_FILE_H
 
