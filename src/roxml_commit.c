@@ -198,11 +198,11 @@ ROXML_STATIC ROXML_INT void roxml_write_elm_attr(node_t *n, FILE *f, char **buf,
  */
 ROXML_STATIC ROXML_INT void roxml_write_node(node_t *n, FILE *f, char **buf, int human, int lvl, int *offset, int *len)
 {
-	ROXML_GET_BASE_BUFFER(ns);
 	ROXML_GET_BASE_BUFFER(name);
 	roxml_get_name(n, name, ROXML_BASE_LEN);
 
 	if (n->type & ROXML_ELM_NODE) {
+		ROXML_GET_BASE_BUFFER(ns);
 		node_t *chld = n->chld;
 
 		if (human)
@@ -211,13 +211,12 @@ ROXML_STATIC ROXML_INT void roxml_write_node(node_t *n, FILE *f, char **buf, int
 		roxml_write_elm_attr(n, f, buf, offset, len);
 
 		if (chld) {
-			int keep_human;
 			node_t *prev = chld;
 
 			roxml_write_string(f, buf, offset, len, ">");
 
 			while (chld) {
-				keep_human = human;
+				int keep_human = human;
 
 				if ((chld->type | prev->type) & ROXML_TXT_NODE)
 					keep_human = 0;
@@ -233,6 +232,7 @@ ROXML_STATIC ROXML_INT void roxml_write_node(node_t *n, FILE *f, char **buf, int
 		}
 
 		roxml_write_elm_name_close(n, f, buf, offset, len, name, ns);
+		ROXML_PUT_BASE_BUFFER(ns);
 	} else {
 		if (human)
 			roxml_print_spaces(f, buf, offset, len, lvl);
@@ -240,7 +240,6 @@ ROXML_STATIC ROXML_INT void roxml_write_node(node_t *n, FILE *f, char **buf, int
 	}
 
 	ROXML_PUT_BASE_BUFFER(name);
-	ROXML_PUT_BASE_BUFFER(ns);
 }
 
 ROXML_API int roxml_commit_changes(node_t *n, char *dest, char **buffer, int human)
