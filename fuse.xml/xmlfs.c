@@ -107,13 +107,14 @@ static int xmlfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, of
 {
 	DEBUG("here")
 	DEBUG("trying '%s'",path);
-	int i;
 	int nb;
-	node_t *n = NULL;
 	node_t *root = fuse_get_context()->private_data;
 	node_t **ans = roxml_xpath(root, (char*)path, &nb);
 
 	if(ans)	{
+		int i;
+		node_t *n;
+
 		n = ans[0];
 		roxml_release(ans);
 
@@ -162,13 +163,13 @@ static int xmlfs_readdir(const char *path, void *buf, fuse_fill_dir_t filler, of
 		if(nb > 0)	{
 			DEBUG("content file")
 			char fname[512];
-			sprintf(fname, "%s", NODE_CONTENT, i);
+			sprintf(fname, "%s", NODE_CONTENT);
 			filler(buf, fname, NULL, 0);
 		}
 		if((roxml_get_type(n) == ROXML_PI_NODE)||(roxml_get_type(n) == ROXML_CMT_NODE)) {
 			DEBUG("specnode file")
 			char fname[512];
-			sprintf(fname, "%s", NODE_CONTENT, i);
+			sprintf(fname, "%s", NODE_CONTENT);
 			filler(buf, fname, NULL, 0);
 		}
 
@@ -213,7 +214,6 @@ static int xmlfs_create(const char *path, mode_t mode, struct fuse_file_info *fi
 static int xmlfs_open(const char *path, struct fuse_file_info *fi)
 {
 	DEBUG("here")
-	int i = 0;
 	int nb;
 	node_t *root = fuse_get_context()->private_data;
 	char newpath[512];
@@ -226,6 +226,7 @@ static int xmlfs_open(const char *path, struct fuse_file_info *fi)
 	node_t **ans = roxml_xpath(root, (char*)newpath, &nb);
 
 	if(ans)	{
+		int i = 0;
 		node_t *n = ans[0];
 		roxml_release(ans);
 		while((i < MAX_ENTRIES)&&(opened_files[i]))	{ i++; } 
@@ -416,7 +417,6 @@ static int xmlfs_opt_proc(void *data, const char *arg, int key, struct fuse_args
 int main(int argc, char *argv[])
 {
 	DEBUG("here")
-	int i, j;
 	char mount_src[512] = "";
 	struct fuse_args args = FUSE_ARGS_INIT(argc, argv);
 
