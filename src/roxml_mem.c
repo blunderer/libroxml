@@ -127,7 +127,7 @@ ROXML_INT void *roxml_malloc(int size, int num, int type)
 	while (cell->next != NULL)
 		cell = cell->next;
 
-	cell->next = (memory_cell_t *) malloc(sizeof(memory_cell_t));
+	cell->next = malloc(sizeof(memory_cell_t));
 	if (!cell->next)
 		return NULL;
 

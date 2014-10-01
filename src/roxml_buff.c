@@ -33,9 +33,9 @@ ROXML_INT inline void roxml_close_buff(node_t *n)
 
 ROXML_INT int roxml_parse_buff(roxml_load_ctx_t *context, roxml_parser_item_t *parser, char *buffer)
 {
-	int ret = 0;                                                                                                                                           
+	int ret = 0;
 
-	context->type = ROXML_BUFF;                                                                                                                             
+	context->type = ROXML_BUFF;
 	context->src = (void *)buffer;
 	ret = roxml_parse_line(parser, buffer, 0, context);
 

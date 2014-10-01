@@ -23,22 +23,22 @@
  * \return 1 if the string was a number else 0
  */
 ROXML_STATIC ROXML_INT int roxml_is_number(char *input)
-{        
-	char *end;                  
-	int is_number = 0;        
+{
+	char *end;
+	int is_number = 0;
 
 	/*
 	 * we don't need the value per se and some compiler will
 	 * complain about an initialized but unused variable if we
 	 * get it.                                    
-	 */                           
+	 */
 	strtod(input, &end);
 
 	if ((end == NULL) || (roxml_is_separator(end[0])) || (end[0] == '"') || (end[0] == '\'') || (end[0] == '\0')) {
 		is_number = 1;
-	}                              
+	}
 
-	return is_number; 
+	return is_number;
 }
 
 /** \brief xpath condition free function
@@ -48,7 +48,7 @@ ROXML_STATIC ROXML_INT int roxml_is_number(char *input)
  * \param xcond the xcond to free
  * \return
  */
-ROXML_STATIC ROXML_INT void roxml_free_xcond(xpath_cond_t * xcond)
+ROXML_STATIC ROXML_INT void roxml_free_xcond(xpath_cond_t *xcond)
 {
 	if (xcond->next)
 		roxml_free_xcond(xcond->next);
@@ -79,7 +79,7 @@ ROXML_INT void roxml_free_xpath(xpath_node_t *xpath, int nb)
  * \param req_id the pool id
  * \return
  */
-ROXML_STATIC ROXML_INT int roxml_in_pool(node_t *root, node_t * n, int req_id)
+ROXML_STATIC ROXML_INT int roxml_in_pool(node_t *root, node_t *n, int req_id)
 {
 	xpath_tok_table_t *table;
 
@@ -87,11 +87,11 @@ ROXML_STATIC ROXML_INT int roxml_in_pool(node_t *root, node_t * n, int req_id)
 		root = root->prnt;
 	}
 
-	table = (xpath_tok_table_t *) root->priv;
+	table = (xpath_tok_table_t *)root->priv;
 
 	pthread_mutex_lock(&table->mut);
 	if (n->priv) {
-		xpath_tok_t *tok = (xpath_tok_t *) n->priv;
+		xpath_tok_t *tok = (xpath_tok_t *)n->priv;
 		if (tok->id == req_id) {
 			pthread_mutex_unlock(&table->mut);
 			return 1;
@@ -118,7 +118,7 @@ ROXML_STATIC ROXML_INT int roxml_in_pool(node_t *root, node_t * n, int req_id)
  * \param req_id the pool id
  * \return
  */
-ROXML_STATIC ROXML_INT void roxml_del_from_pool(node_t *root, node_t * n, int req_id)
+ROXML_STATIC ROXML_INT void roxml_del_from_pool(node_t *root, node_t *n, int req_id)
 {
 	xpath_tok_table_t *table = NULL;
 
@@ -126,12 +126,12 @@ ROXML_STATIC ROXML_INT void roxml_del_from_pool(node_t *root, node_t * n, int re
 		root = root->prnt;
 	}
 
-	table = (xpath_tok_table_t *) root->priv;
+	table = (xpath_tok_table_t *)root->priv;
 
 	pthread_mutex_lock(&table->mut);
 	if (n->priv) {
-		xpath_tok_t *prev = (xpath_tok_t *) n->priv;
-		xpath_tok_t *tok = (xpath_tok_t *) n->priv;
+		xpath_tok_t *prev = (xpath_tok_t *)n->priv;
+		xpath_tok_t *tok = (xpath_tok_t *)n->priv;
 		if (tok->id == req_id) {
 			n->priv = (void *)tok->next;
 			free(tok);
@@ -160,7 +160,7 @@ ROXML_STATIC ROXML_INT void roxml_del_from_pool(node_t *root, node_t * n, int re
  * \param req_id the id to use
  * \return 0 if already in the pool, else 1
  */
-ROXML_STATIC ROXML_INT int roxml_add_to_pool(node_t *root, node_t * n, int req_id)
+ROXML_STATIC ROXML_INT int roxml_add_to_pool(node_t *root, node_t *n, int req_id)
 {
 	xpath_tok_table_t *table;
 	xpath_tok_t *tok;
@@ -173,10 +173,10 @@ ROXML_STATIC ROXML_INT int roxml_add_to_pool(node_t *root, node_t * n, int req_i
 	if (req_id == 0) {
 		return 1;
 	}
-	table = (xpath_tok_table_t *) root->priv;
+	table = (xpath_tok_table_t *)root->priv;
 
 	pthread_mutex_lock(&table->mut);
-	tok = (xpath_tok_t *) n->priv;
+	tok = (xpath_tok_t *)n->priv;
 
 	while (tok) {
 		if (tok->id == req_id) {
@@ -184,13 +184,13 @@ ROXML_STATIC ROXML_INT int roxml_add_to_pool(node_t *root, node_t * n, int req_i
 			return 0;
 		}
 		last_tok = tok;
-		tok = (xpath_tok_t *) tok->next;
+		tok = (xpath_tok_t *)tok->next;
 	}
 	if (last_tok == NULL) {
 		n->priv = calloc(1, sizeof(xpath_tok_t));
-		last_tok = (xpath_tok_t *) n->priv;
+		last_tok = (xpath_tok_t *)n->priv;
 	} else {
-		last_tok->next = (xpath_tok_t *) calloc(1, sizeof(xpath_tok_t));
+		last_tok->next = (xpath_tok_t *)calloc(1, sizeof(xpath_tok_t));
 		last_tok = last_tok->next;
 	}
 	last_tok->id = req_id;
@@ -218,7 +218,7 @@ ROXML_STATIC ROXML_INT void roxml_release_id(node_t *root, node_t **pool, int po
 		root = root->prnt;
 	}
 
-	table = (xpath_tok_table_t *) root->priv;
+	table = (xpath_tok_table_t *)root->priv;
 
 	for (i = 0; i < pool_len; i++) {
 		roxml_del_from_pool(root, pool[i], req_id);
@@ -244,7 +244,7 @@ ROXML_STATIC ROXML_INT int roxml_request_id(node_t *root)
 		root = root->prnt;
 	}
 
-	table = (xpath_tok_table_t *) root->priv;
+	table = (xpath_tok_table_t *)root->priv;
 
 	pthread_mutex_lock(&table->mut);
 	for (i = ROXML_XPATH_FIRST_ID; i < 255; i++) {
@@ -268,7 +268,8 @@ ROXML_STATIC ROXML_INT int roxml_request_id(node_t *root)
  * \param cur_req_id the id of the first group
  * \param prev_req_id the id of the second group
  */
-ROXML_STATIC ROXML_INT void roxml_compute_and(node_t *root, node_t **node_set, int *count, int cur_req_id, int prev_req_id)
+ROXML_STATIC ROXML_INT void roxml_compute_and(node_t *root, node_t **node_set, int *count, int cur_req_id,
+					      int prev_req_id)
 {
 	int i = 0;
 	int limit = *count;
@@ -341,7 +342,7 @@ ROXML_STATIC ROXML_INT int roxml_parse_xpath(char *path, xpath_node_t **xpath, i
 	ctx.wait_first_node = 1;
 	ctx.shorten_cond = 0;
 	ctx.context = context;
-	ctx.first_node = (xpath_node_t *) calloc(1, sizeof(xpath_node_t));
+	ctx.first_node = (xpath_node_t *)calloc(1, sizeof(xpath_node_t));
 	ctx.new_node = ctx.first_node;
 	ctx.new_cond = NULL;
 	ctx.first_node->rel = ROXML_OPERATOR_OR;
@@ -517,7 +518,7 @@ ROXML_STATIC ROXML_INT int roxml_string_cmp(char *sa, char *sb, int op)
  * \param candidat the node to test
  * \return 1 if predicat is validated, else 0
  */
-ROXML_STATIC ROXML_INT int roxml_validate_predicat(xpath_node_t *xn, xpath_cond_t *condition, node_t * candidat)
+ROXML_STATIC ROXML_INT int roxml_validate_predicat(xpath_node_t *xn, xpath_cond_t *condition, node_t *candidat)
 {
 	int valid;
 
@@ -525,7 +526,7 @@ ROXML_STATIC ROXML_INT int roxml_validate_predicat(xpath_node_t *xn, xpath_cond_
 		return 1;
 
 	valid = (condition->rel == ROXML_OPERATOR_AND);
-	
+
 	while (condition) {
 		int status = 0;
 		double iarg2 = 1;
@@ -536,7 +537,7 @@ ROXML_STATIC ROXML_INT int roxml_validate_predicat(xpath_node_t *xn, xpath_cond_
 
 		if (xn->name[0] == '*')
 			iarg1 = roxml_get_node_internal_position(candidat);
-		else    
+		else
 			iarg1 = roxml_get_node_position(candidat);
 
 		switch (condition->func) {
@@ -580,7 +581,7 @@ ROXML_STATIC ROXML_INT int roxml_validate_predicat(xpath_node_t *xn, xpath_cond_
 			val = roxml_get_root(candidat);
 			node_set = roxml_exec_xpath(val, candidat, condition->xp, condition->func2, &status);
 			roxml_release(node_set);
-			status = !!status;
+			status = ! !status;
 			break;
 		default:
 			break;
@@ -599,7 +600,8 @@ ROXML_STATIC ROXML_INT int roxml_validate_predicat(xpath_node_t *xn, xpath_cond_
 	return valid;
 }
 
-ROXML_STATIC ROXML_INT void roxml_add_to_set(node_t *root, node_t * candidat, node_t *** ans, int *nb, int *max, int req_id)
+ROXML_STATIC ROXML_INT void roxml_add_to_set(node_t *root, node_t *candidat, node_t ***ans, int *nb, int *max,
+					     int req_id)
 {
 	if (roxml_add_to_pool(root, candidat, req_id)) {
 		if (ans) {
@@ -652,7 +654,7 @@ ROXML_STATIC ROXML_INT int roxml_validate_axe_func(node_t *root, node_t **candid
 	return valid;
 }
 
-ROXML_STATIC ROXML_INT int roxml_validate_axe_name(node_t * candidat, xpath_node_t *xn)
+ROXML_STATIC ROXML_INT int roxml_validate_axe_name(node_t *candidat, xpath_node_t *xn)
 {
 	int valid = 0;
 	int ns_len;
@@ -692,7 +694,8 @@ ROXML_STATIC ROXML_INT int roxml_validate_axe_name(node_t * candidat, xpath_node
  * \param req_id the pool id
  * \return 1 if axe is validated, else 0
  */
-ROXML_STATIC ROXML_INT int roxml_validate_axes(node_t *root, node_t * candidat, node_t *** ans, int *nb, int *max, xpath_node_t *xn, int req_id)
+ROXML_STATIC ROXML_INT int roxml_validate_axes(node_t *root, node_t *candidat, node_t ***ans, int *nb, int *max,
+					       xpath_node_t *xn, int req_id)
 {
 	int valid = 0;
 	int path_end = 0;
@@ -740,7 +743,8 @@ ROXML_STATIC ROXML_INT int roxml_validate_axes(node_t *root, node_t * candidat, 
  * \param req_id the pool id
  * \return
  */
-ROXML_STATIC ROXML_INT void roxml_check_node(xpath_node_t *xp, node_t * root, node_t * context, node_t *** ans, int *nb, int *max, int ignore, int req_id)
+ROXML_STATIC ROXML_INT void roxml_check_node(xpath_node_t *xp, node_t *root, node_t *context, node_t ***ans,
+					     int *nb, int *max, int ignore, int req_id)
 {
 	int validate_node = 0;
 
@@ -760,7 +764,7 @@ ROXML_STATIC ROXML_INT void roxml_check_node(xpath_node_t *xp, node_t * root, no
 	}
 
 	switch (xp->axes) {
-	case ROXML_ID_CHILD: {
+	case ROXML_ID_CHILD:{
 			node_t *current = context->chld;
 			while (current) {
 				validate_node = roxml_validate_axes(root, current, ans, nb, max, xp, req_id);
@@ -785,11 +789,11 @@ ROXML_STATIC ROXML_INT void roxml_check_node(xpath_node_t *xp, node_t * root, no
 			}
 		}
 		break;
-	case ROXML_ID_DESC: {
+	case ROXML_ID_DESC:{
 			roxml_check_node(xp->next, root, context, ans, nb, max, ROXML_DESC_ONLY, req_id);
 		}
 		break;
-	case ROXML_ID_DESC_O_SELF: {
+	case ROXML_ID_DESC_O_SELF:{
 			xp = xp->next;
 			validate_node = roxml_validate_axes(root, context, ans, nb, max, xp, req_id);
 			if (validate_node)
@@ -797,12 +801,12 @@ ROXML_STATIC ROXML_INT void roxml_check_node(xpath_node_t *xp, node_t * root, no
 			roxml_check_node(xp, root, context, ans, nb, max, ROXML_DESC_ONLY, req_id);
 		}
 		break;
-	case ROXML_ID_SELF: {
+	case ROXML_ID_SELF:{
 			validate_node = roxml_validate_axes(root, context, ans, nb, max, xp, req_id);
 			roxml_check_node(xp->next, root, context, ans, nb, max, ROXML_DIRECT, req_id);
 		}
 		break;
-	case ROXML_ID_PARENT: {
+	case ROXML_ID_PARENT:{
 			if (context->prnt) {
 				validate_node = roxml_validate_axes(root, context->prnt, ans, nb, max, xp, req_id);
 				roxml_check_node(xp->next, root, context->prnt, ans, nb, max, ROXML_DIRECT, req_id);
@@ -811,7 +815,7 @@ ROXML_STATIC ROXML_INT void roxml_check_node(xpath_node_t *xp, node_t * root, no
 			}
 		}
 		break;
-	case ROXML_ID_ATTR: {
+	case ROXML_ID_ATTR:{
 			node_t *attribute = context->attr;
 			while (attribute) {
 				validate_node = roxml_validate_axes(root, attribute, ans, nb, max, xp, req_id);
@@ -821,7 +825,7 @@ ROXML_STATIC ROXML_INT void roxml_check_node(xpath_node_t *xp, node_t * root, no
 			}
 		}
 		break;
-	case ROXML_ID_ANC: {
+	case ROXML_ID_ANC:{
 			node_t *current = context->prnt;
 			while (current) {
 				validate_node = roxml_validate_axes(root, current, ans, nb, max, xp, req_id);
@@ -831,7 +835,7 @@ ROXML_STATIC ROXML_INT void roxml_check_node(xpath_node_t *xp, node_t * root, no
 			}
 		}
 		break;
-	case ROXML_ID_NEXT_SIBL: {
+	case ROXML_ID_NEXT_SIBL:{
 			node_t *current = context->sibl;
 			while (current) {
 				validate_node = roxml_validate_axes(root, current, ans, nb, max, xp, req_id);
@@ -841,7 +845,7 @@ ROXML_STATIC ROXML_INT void roxml_check_node(xpath_node_t *xp, node_t * root, no
 			}
 		}
 		break;
-	case ROXML_ID_PREV_SIBL: {
+	case ROXML_ID_PREV_SIBL:{
 			node_t *current = context->prnt->chld;
 			while (current != context) {
 				validate_node = roxml_validate_axes(root, current, ans, nb, max, xp, req_id);
@@ -851,7 +855,7 @@ ROXML_STATIC ROXML_INT void roxml_check_node(xpath_node_t *xp, node_t * root, no
 			}
 		}
 		break;
-	case ROXML_ID_NEXT: {
+	case ROXML_ID_NEXT:{
 			node_t *current = context;
 			while (current) {
 				node_t *following = current->sibl;
@@ -875,7 +879,7 @@ ROXML_STATIC ROXML_INT void roxml_check_node(xpath_node_t *xp, node_t * root, no
 			}
 		}
 		break;
-	case ROXML_ID_PREV: {
+	case ROXML_ID_PREV:{
 			node_t *current = context;
 			while (current && current->prnt) {
 				node_t *preceding = current->prnt->chld;
@@ -896,13 +900,13 @@ ROXML_STATIC ROXML_INT void roxml_check_node(xpath_node_t *xp, node_t * root, no
 			}
 		}
 		break;
-	case ROXML_ID_NS: {
+	case ROXML_ID_NS:{
 			validate_node = roxml_validate_axes(root, context->ns, ans, nb, max, xp, req_id);
 			if (validate_node)
 				roxml_check_node(xp->next, root, context, ans, nb, max, ROXML_DIRECT, req_id);
 		}
 		break;
-	case ROXML_ID_ANC_O_SELF: {
+	case ROXML_ID_ANC_O_SELF:{
 			node_t *current = context;
 			while (current) {
 				validate_node = roxml_validate_axes(root, current, ans, nb, max, xp, req_id);
@@ -917,7 +921,7 @@ ROXML_STATIC ROXML_INT void roxml_check_node(xpath_node_t *xp, node_t * root, no
 	return;
 }
 
-ROXML_INT node_t **roxml_exec_xpath(node_t *root, node_t * n, xpath_node_t * xpath, int index, int *count)
+ROXML_INT node_t **roxml_exec_xpath(node_t *root, node_t *n, xpath_node_t *xpath, int index, int *count)
 {
 	int path_id;
 	int max_answers = 1;
@@ -1068,11 +1072,11 @@ ROXML_STATIC ROXML_INT xpath_node_t *roxml_set_axes(xpath_node_t *node, char *ax
 		/* ROXML_S_DESC_O_SELF */
 		node->axes = ROXML_ID_DESC_O_SELF;
 		node->name = axes + 1;
-		tmp_node = (xpath_node_t *) calloc(1, sizeof(xpath_node_t));
+		tmp_node = (xpath_node_t *)calloc(1, sizeof(xpath_node_t));
 		tmp_node->axes = ROXML_ID_CHILD;
 		node->next = tmp_node;
 		if (strlen(node->name) > 0) {
-			tmp_node = (xpath_node_t *) calloc(1, sizeof(xpath_node_t));
+			tmp_node = (xpath_node_t *)calloc(1, sizeof(xpath_node_t));
 			node->next->next = tmp_node;
 			node = roxml_set_axes(tmp_node, axes + 1, offset);
 		}
@@ -1081,7 +1085,7 @@ ROXML_STATIC ROXML_INT xpath_node_t *roxml_set_axes(xpath_node_t *node, char *ax
 		node->axes = ROXML_ID_DESC_O_SELF;
 		node->name = axes + strlen(ROXML_L_DESC_O_SELF);
 		*offset += strlen(ROXML_L_DESC_O_SELF);
-		tmp_node = (xpath_node_t *) calloc(1, sizeof(xpath_node_t));
+		tmp_node = (xpath_node_t *)calloc(1, sizeof(xpath_node_t));
 		tmp_node->axes = ROXML_ID_CHILD;
 		node->next = tmp_node;
 		node = roxml_set_axes(tmp_node, axes + strlen(ROXML_L_DESC_O_SELF), offset);
@@ -1090,7 +1094,7 @@ ROXML_STATIC ROXML_INT xpath_node_t *roxml_set_axes(xpath_node_t *node, char *ax
 		node->axes = ROXML_ID_DESC;
 		node->name = axes + strlen(ROXML_L_DESC);
 		*offset += strlen(ROXML_L_DESC);
-		tmp_node = (xpath_node_t *) calloc(1, sizeof(xpath_node_t));
+		tmp_node = (xpath_node_t *)calloc(1, sizeof(xpath_node_t));
 		tmp_node->axes = ROXML_ID_CHILD;
 		node->next = tmp_node;
 		node = roxml_set_axes(tmp_node, axes + strlen(ROXML_L_DESC), offset);
@@ -1124,13 +1128,13 @@ ROXML_INT int _func_xpath_ignore(char *chunk, void *data)
 ROXML_INT int _func_xpath_new_node(char *chunk, void *data)
 {
 	int cur = 0;
-	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *)data;
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
 #endif /* DEBUG_PARSING */
 	if (!ctx->quoted && !ctx->dquoted && !ctx->parenthesys && !ctx->bracket) {
 		int offset = 0;
-		xpath_node_t *tmp_node = (xpath_node_t *) calloc(1, sizeof(xpath_node_t));
+		xpath_node_t *tmp_node = (xpath_node_t *)calloc(1, sizeof(xpath_node_t));
 		if ((chunk[cur] == '/') && (ctx->is_first_node)) {
 			free(tmp_node);
 			ctx->new_node = ctx->first_node;
@@ -1156,7 +1160,7 @@ ROXML_INT int _func_xpath_new_node(char *chunk, void *data)
 
 ROXML_INT int _func_xpath_quote(char *chunk, void *data)
 {
-	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *)data;
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
 #endif /* DEBUG_PARSING */
@@ -1173,7 +1177,7 @@ ROXML_INT int _func_xpath_quote(char *chunk, void *data)
 
 ROXML_INT int _func_xpath_dquote(char *chunk, void *data)
 {
-	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *)data;
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
 #endif /* DEBUG_PARSING */
@@ -1190,7 +1194,7 @@ ROXML_INT int _func_xpath_dquote(char *chunk, void *data)
 
 ROXML_INT int _func_xpath_open_parenthesys(char *chunk, void *data)
 {
-	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *)data;
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
 #endif /* DEBUG_PARSING */
@@ -1202,7 +1206,7 @@ ROXML_INT int _func_xpath_open_parenthesys(char *chunk, void *data)
 
 ROXML_INT int _func_xpath_close_parenthesys(char *chunk, void *data)
 {
-	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *)data;
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
 #endif /* DEBUG_PARSING */
@@ -1219,13 +1223,13 @@ ROXML_INT int _func_xpath_open_brackets(char *chunk, void *data)
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
 #endif /* DEBUG_PARSING */
-	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *)data;
 	if (!ctx->quoted && !ctx->dquoted) {
 		ctx->bracket = (ctx->bracket + 1) % 2;
 		chunk[0] = '\0';
 
 		ctx->shorten_cond = 1;
-		tmp_cond = (xpath_cond_t *) calloc(1, sizeof(xpath_cond_t));
+		tmp_cond = (xpath_cond_t *)calloc(1, sizeof(xpath_cond_t));
 		ctx->new_node->cond = tmp_cond;
 		ctx->new_cond = tmp_cond;
 		ctx->new_cond->arg1 = chunk + cur + 1;
@@ -1239,7 +1243,7 @@ ROXML_INT int _func_xpath_open_brackets(char *chunk, void *data)
 ROXML_INT int _func_xpath_close_brackets(char *chunk, void *data)
 {
 	int cur = 0;
-	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *)data;
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
 #endif /* DEBUG_PARSING */
@@ -1265,7 +1269,7 @@ ROXML_INT int _func_xpath_close_brackets(char *chunk, void *data)
 ROXML_INT int _func_xpath_condition_or(char *chunk, void *data)
 {
 	xpath_node_t *tmp_node;
-	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *)data;
 	int cur = 0;
 	int len = 0;
 	xpath_cond_t *tmp_cond;
@@ -1283,7 +1287,7 @@ ROXML_INT int _func_xpath_condition_or(char *chunk, void *data)
 				}
 				chunk[-1] = '\0';
 				cur += strlen(ROXML_COND_OR);
-				tmp_node = (xpath_node_t *) calloc(ctx->nbpath + 1, sizeof(xpath_node_t));
+				tmp_node = (xpath_node_t *)calloc(ctx->nbpath + 1, sizeof(xpath_node_t));
 				memcpy(tmp_node, ctx->first_node, ctx->nbpath * sizeof(xpath_node_t));
 				free(ctx->first_node);
 				ctx->first_node = tmp_node;
@@ -1295,7 +1299,7 @@ ROXML_INT int _func_xpath_condition_or(char *chunk, void *data)
 				if (ctx->new_cond->func != ROXML_FUNC_XPATH) {
 					chunk[-1] = '\0';
 					cur += strlen(ROXML_COND_OR);
-					tmp_cond = (xpath_cond_t *) calloc(1, sizeof(xpath_cond_t));
+					tmp_cond = (xpath_cond_t *)calloc(1, sizeof(xpath_cond_t));
 					if (ctx->new_cond) {
 						ctx->new_cond->next = tmp_cond;
 					}
@@ -1313,7 +1317,7 @@ ROXML_INT int _func_xpath_condition_or(char *chunk, void *data)
 
 ROXML_INT int _func_xpath_condition_and(char *chunk, void *data)
 {
-	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *)data;
 	int cur = 0;
 	int len = 0;
 	xpath_node_t *tmp_node;
@@ -1331,7 +1335,7 @@ ROXML_INT int _func_xpath_condition_and(char *chunk, void *data)
 					return 0;
 				chunk[-1] = '\0';
 				cur += strlen(ROXML_COND_AND);
-				tmp_node = (xpath_node_t *) calloc(ctx->nbpath + 1, sizeof(xpath_node_t));
+				tmp_node = (xpath_node_t *)calloc(ctx->nbpath + 1, sizeof(xpath_node_t));
 				memcpy(tmp_node, ctx->first_node, ctx->nbpath * sizeof(xpath_node_t));
 				free(ctx->first_node);
 				ctx->first_node = tmp_node;
@@ -1343,7 +1347,7 @@ ROXML_INT int _func_xpath_condition_and(char *chunk, void *data)
 				if (ctx->new_cond->func != ROXML_FUNC_XPATH) {
 					chunk[-1] = '\0';
 					cur += strlen(ROXML_COND_AND);
-					tmp_cond = (xpath_cond_t *) calloc(1, sizeof(xpath_cond_t));
+					tmp_cond = (xpath_cond_t *)calloc(1, sizeof(xpath_cond_t));
 					if (ctx->new_cond) {
 						ctx->new_cond->next = tmp_cond;
 					}
@@ -1361,7 +1365,7 @@ ROXML_INT int _func_xpath_condition_and(char *chunk, void *data)
 
 ROXML_INT int _func_xpath_path_or(char *chunk, void *data)
 {
-	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *)data;
 	int cur = 0;
 	xpath_node_t *tmp_node;
 #ifdef DEBUG_PARSING
@@ -1371,7 +1375,7 @@ ROXML_INT int _func_xpath_path_or(char *chunk, void *data)
 	if (!ctx->bracket && !ctx->quoted && !ctx->dquoted) {
 		chunk[-1] = '\0';
 		cur += strlen(ROXML_PATH_OR);
-		tmp_node = (xpath_node_t *) calloc(ctx->nbpath + 1, sizeof(xpath_node_t));
+		tmp_node = (xpath_node_t *)calloc(ctx->nbpath + 1, sizeof(xpath_node_t));
 		memcpy(tmp_node, ctx->first_node, ctx->nbpath * sizeof(xpath_node_t));
 		free(ctx->first_node);
 		ctx->first_node = tmp_node;
@@ -1386,11 +1390,11 @@ ROXML_INT int _func_xpath_path_or(char *chunk, void *data)
 
 ROXML_INT int _func_xpath_operators(char *chunk, void *data, int operator, int operator_bis)
 {
-	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *)data;
 	int cur = 0;
 	if (!ctx->bracket && !ctx->quoted && !ctx->dquoted) {
 		xpath_node_t *xp_root = ctx->new_node;
-		xpath_cond_t *xp_cond = (xpath_cond_t *) calloc(1, sizeof(xpath_cond_t));
+		xpath_cond_t *xp_cond = (xpath_cond_t *)calloc(1, sizeof(xpath_cond_t));
 		xp_root->xp_cond = xp_cond;
 		chunk[cur] = '\0';
 		xp_cond->op = operator;
@@ -1486,7 +1490,7 @@ ROXML_INT int _func_xpath_number(char *chunk, void *data)
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
 #endif /* DEBUG_PARSING */
-	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *)data;
 	int cur = 0;
 	if (ctx->bracket && !ctx->quoted && !ctx->dquoted) {
 		if ((ctx->new_cond->func != ROXML_FUNC_XPATH) && (ctx->shorten_cond)) {
@@ -1507,7 +1511,7 @@ ROXML_INT int _func_xpath_funcs(char *chunk, void *data, int func, char *name)
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
 #endif /* DEBUG_PARSING */
-	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *)data;
 	int cur = 0;
 
 	if (strncmp(chunk, name, strlen(name)) == 0) {
@@ -1566,7 +1570,7 @@ ROXML_INT int _func_xpath_operator_add(char *chunk, void *data)
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
 #endif /* DEBUG_PARSING */
-	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *)data;
 	int cur = 0;
 	if (ctx->bracket && !ctx->quoted && !ctx->dquoted) {
 		if (ctx->new_cond->func != ROXML_FUNC_XPATH) {
@@ -1587,7 +1591,7 @@ ROXML_INT int _func_xpath_operator_subs(char *chunk, void *data)
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
 #endif /* DEBUG_PARSING */
-	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *)data;
 	int cur = 0;
 	if (ctx->bracket && !ctx->quoted && !ctx->dquoted) {
 		if (ctx->new_cond->func != ROXML_FUNC_XPATH) {
@@ -1609,12 +1613,12 @@ ROXML_INT int _func_xpath_default(char *chunk, void *data)
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
 #endif /* DEBUG_PARSING */
 	int cur = 0;
-	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *) data;
+	roxml_xpath_ctx_t *ctx = (roxml_xpath_ctx_t *)data;
 
 	if ((ctx->is_first_node) || (ctx->wait_first_node)) {
 		if (!ctx->quoted && !ctx->dquoted && !ctx->parenthesys && !ctx->bracket) {
 			int offset = 0;
-			xpath_node_t *tmp_node = (xpath_node_t *) calloc(1, sizeof(xpath_node_t));
+			xpath_node_t *tmp_node = (xpath_node_t *)calloc(1, sizeof(xpath_node_t));
 			if ((chunk[cur] == '/') && (ctx->is_first_node)) {
 				free(tmp_node);
 				ctx->new_node = ctx->first_node;

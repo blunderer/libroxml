@@ -15,18 +15,18 @@
 
 /* #define DEBUG_PARSING */
 
-ROXML_INT roxml_parser_item_t *roxml_append_parser_item(roxml_parser_item_t * head, char *key, roxml_parse_func func)
+ROXML_INT roxml_parser_item_t *roxml_append_parser_item(roxml_parser_item_t *head, char *key, roxml_parse_func func)
 {
 	roxml_parser_item_t *item = head;
 
 	if (head == NULL) {
-		item = (roxml_parser_item_t *) calloc(1, sizeof(roxml_parser_item_t));
+		item = (roxml_parser_item_t *)calloc(1, sizeof(roxml_parser_item_t));
 		head = item;
 	} else {
 		item = head;
 		while (item->next)
 			item = item->next;
-		item->next = (roxml_parser_item_t *) calloc(1, sizeof(roxml_parser_item_t));
+		item->next = (roxml_parser_item_t *)calloc(1, sizeof(roxml_parser_item_t));
 		item = item->next;
 	}
 	item->chunk = key ? key[0] : 0;
@@ -35,7 +35,7 @@ ROXML_INT roxml_parser_item_t *roxml_append_parser_item(roxml_parser_item_t * he
 	return head;
 }
 
-ROXML_INT void roxml_parser_free(roxml_parser_item_t * head)
+ROXML_INT void roxml_parser_free(roxml_parser_item_t *head)
 {
 	free(head);
 }
@@ -47,7 +47,7 @@ ROXML_INT void roxml_parser_free(roxml_parser_item_t * head)
  * \param head the parser object
  * \return
  */
-ROXML_STATIC ROXML_INT void roxml_parser_clear(roxml_parser_item_t * head)
+ROXML_STATIC ROXML_INT void roxml_parser_clear(roxml_parser_item_t *head)
 {
 	roxml_parser_item_t *item = head;
 
@@ -60,7 +60,7 @@ ROXML_STATIC ROXML_INT void roxml_parser_clear(roxml_parser_item_t * head)
 	return;
 }
 
-ROXML_INT roxml_parser_item_t *roxml_parser_prepare(roxml_parser_item_t * head)
+ROXML_INT roxml_parser_item_t *roxml_parser_prepare(roxml_parser_item_t *head)
 {
 	roxml_parser_item_t *item = head;
 	roxml_parser_item_t *table = NULL;
@@ -76,7 +76,7 @@ ROXML_INT roxml_parser_item_t *roxml_parser_prepare(roxml_parser_item_t * head)
 		item = item->next;
 	}
 
-	table = (roxml_parser_item_t *) malloc(sizeof(roxml_parser_item_t) * (head->def_count));
+	table = malloc(sizeof(roxml_parser_item_t) * (head->def_count));
 
 	item = head;
 
@@ -90,7 +90,7 @@ ROXML_INT roxml_parser_item_t *roxml_parser_prepare(roxml_parser_item_t * head)
 	return table;
 }
 
-ROXML_INT int roxml_parse_line(roxml_parser_item_t * head, char *line, int len, void *ctx)
+ROXML_INT int roxml_parse_line(roxml_parser_item_t *head, char *line, int len, void *ctx)
 {
 	int count = head->count;
 	int def_count = head->def_count;

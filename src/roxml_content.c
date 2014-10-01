@@ -62,7 +62,7 @@ ROXML_STATIC ROXML_INT inline int roxml_content_size(node_t *n, int *offset)
 		}
 	} else {
 		int name_len = 0;
-		
+
 		ROXML_GET_BASE_BUFFER(name);
 
 		roxml_get_name(n, name, ROXML_BASE_LEN);
@@ -93,7 +93,7 @@ ROXML_STATIC ROXML_INT inline char *roxml_prepare_buffer(node_t *n, char *buffer
 		return NULL;
 	}
 	if (buffer == NULL)
-		buffer = roxml_malloc(sizeof(char), contentsize+1, PTR_CHAR);
+		buffer = roxml_malloc(sizeof(char), contentsize + 1, PTR_CHAR);
 	memset(buffer, 0, size);
 
 	return buffer;
@@ -156,7 +156,7 @@ ROXML_STATIC ROXML_INT inline int roxml_name_size(node_t *n, int size, int *offs
 
 	if ((n->type & ROXML_TXT_NODE) || (n->type & ROXML_CMT_NODE)) {
 		total = 0;
-	} else  {
+	} else {
 		*offset = n->pos;
 
 		if (n->type & ROXML_PI_NODE)
@@ -190,7 +190,7 @@ ROXML_API char *roxml_get_name(node_t *n, char *buffer, int size)
 	if (n->prnt == NULL) {
 		strcpy(content, "documentRoot");
 	} else if (n->type & ROXML_NS_NODE) {
-		roxml_ns_t *ns = (roxml_ns_t *) n->priv;
+		roxml_ns_t *ns = (roxml_ns_t *)n->priv;
 		if (ns)
 			strncpy(content, ns->alias, size);
 		else
@@ -226,11 +226,11 @@ ROXML_API char *roxml_get_name(node_t *n, char *buffer, int size)
 				if (ROXML_WHITE(begin[count]))
 					break;
 				else if (begin[count] == '=')
-				      break;
+					break;
 				else if (begin[count] == '>')
-				      break;
+					break;
 				else if ((begin[count] == '/') && (begin[count + 1] == '>'))
-				      break;
+					break;
 			}
 		} else if (n->type & ROXML_DOCTYPE_NODE) {
 			for (; count < total; count++) {
@@ -343,7 +343,7 @@ ROXML_API node_t *roxml_get_nodes(node_t *n, int type, char *name, int nth)
 
 ROXML_API inline node_t *roxml_get_ns(node_t *n)
 {
-        return roxml_get_nodes(n, ROXML_NS_NODE, NULL, 0);
+	return roxml_get_nodes(n, ROXML_NS_NODE, NULL, 0);
 }
 
 ROXML_API inline int roxml_get_pi_nb(node_t *n)

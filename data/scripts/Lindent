@@ -15,7 +15,7 @@ elif [ $V1 -eq 2 ]; then
     fi
   fi
 fi
-indent $PARAM "$@"
-sed -i 's/*ROXML_INT /ROXML_INT */' $@
-sed -i 's/node_t \* /node_t \*/' $@
-sed -i 's/node_t \*\* /node_t \*\*/' $@
+
+TYPES="-T FILE -T memory_cell_t -T xpath_cond_t -T xpath_node_t -T xpath_tok_table_t -T xpath_tok_t -T roxml_ns_t -T node_t -T roxml_load_ctx_t -T roxml_xpath_ctx_t -T roxml_parser_item_t"
+
+indent $PARAM $TYPES "$@"

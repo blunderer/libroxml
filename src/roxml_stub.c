@@ -32,7 +32,7 @@ ROXML_STUB node_t *roxml_add_node(node_t *parent, int position, int type, char *
 	return NULL;
 }
 
-ROXML_STUB node_t *roxml_set_ns(node_t *n, node_t * ns)
+ROXML_STUB node_t *roxml_set_ns(node_t *n, node_t *ns)
 {
 	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
 	return NULL;
