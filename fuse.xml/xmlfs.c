@@ -299,12 +299,6 @@ void xmlfs_cleanup(void *data)
 	free(opened_files);
 }
 
-int xmlfs_flush(const char *path, struct fuse_file_info *fi)
-{
-	DEBUG("here")
-	return -ENOENT;
-}
-
 int xmlfs_statfs(const char *path, struct statvfs *stats)
 {
 	DEBUG("here")
