@@ -14,12 +14,12 @@
 
 #include <stdio.h>
 
-/** \typedef roxml_parse_func 
+/** \typedef roxml_parse_func
  *
  * \brief parser callback functions
- * 
+ *
  * This is the prototype for a parser callback function. It receive as argument
- * the chunk that matched the key, and the context as a void. It should return the 
+ * the chunk that matched the key, and the context as a void. It should return the
  * number of handled bytes or 0 if doesn't want to handle this key
  */
 typedef int (*roxml_parse_func) (char *chunk, void *data);
@@ -27,7 +27,7 @@ typedef int (*roxml_parse_func) (char *chunk, void *data);
 /** \typedef roxml_pos_t
  *
  * \brief type for node indexes in raw tree
- * 
+ *
  * this is the type used for node indexes in raw tree.
  * this type induce a maximum size for XML document
  * that can be handled (both from file or buffer)
@@ -41,7 +41,7 @@ typedef unsigned int roxml_pos_t;
 /** \struct memory_cell_t
  *
  * \brief memory cell structure
- * 
+ *
  * This is the structure for a memory cell. It contains the
  * pointer info and type. It also contains the caller id so that
  * it can free without reference to a specific pointer
@@ -58,7 +58,7 @@ typedef struct memory_cell {
 /** \struct xpath_cond_t
  *
  * \brief xpath cond structure
- * 
+ *
  * This is the structure for a xpath cond. It contains the
  * node condition
  */
@@ -78,7 +78,7 @@ typedef struct _xpath_cond {
 /** \struct xpath_node_t
  *
  * \brief xpath node structure
- * 
+ *
  * This is the structure for a xpath node. It contains the
  * node axes and conditions
  */
@@ -95,7 +95,7 @@ typedef struct _xpath_node {
 /** \struct xpath_tok_table_t
  *
  * \brief xpath token structure
- * 
+ *
  * This is the structure for a xpath token. It contains the
  * xpath id
  */
@@ -109,7 +109,7 @@ typedef struct _xpath_tok_table {
 /** \struct xpath_tok_t
  *
  * \brief xpath token structure
- * 
+ *
  * This is the structure for a xpath token. It contains the
  * xpath id
  */
@@ -121,7 +121,7 @@ typedef struct _xpath_tok {
 /** \struct roxml_ns_t
  *
  * \brief namespace structure
- * 
+ *
  * This is the structure for a namespace. It contains the
  * namespace alias
  */
@@ -134,7 +134,7 @@ typedef struct _roxml_ns {
 /** \struct node_t
  *
  * \brief node_t structure
- * 
+ *
  * This is the structure for a node. This struct is very
  * little as it only contains offset for node in file and
  * tree links
@@ -160,7 +160,7 @@ typedef struct node {
 /** \struct roxml_load_ctx_t
  *
  * \brief xml parsing context
- * 
+ *
  * obscure structure that contains all the xml
  * parsing variables
  */
@@ -190,7 +190,7 @@ typedef struct _roxml_load_ctx {
 
 /** \struct roxml_xpath_ctx_t
  * \brief xpath parsing context
- * 
+ *
  * obscure structure that contains all the xapth
  * parsing variables
  */
@@ -214,7 +214,7 @@ typedef struct _roxml_xpath_ctx {
 /** \struct roxml_parser_item_t
  *
  * \brief the parser item struct
- * 
+ *
  * this struct contains the key and callback.
  */
 typedef struct _roxml_parser_item {

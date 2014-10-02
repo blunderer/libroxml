@@ -60,14 +60,14 @@
 
 /**
  * \def MAX_NS_LEN
- * 
+ *
  * constant for namespace lenght
  */
 #define MAX_NS_LEN		128
 
 /**
  * \def ROXML_BULK_READ
- * 
+ *
  * This is the internal buffer size for chunk of xml files
  */
 #if(CONFIG_XML_SMALL_BUFFER==1)
@@ -78,7 +78,7 @@
 
 /**
  * \def ROXML_BASE_LEN
- * 
+ *
  * This is the max size for XML objects (node name, attribute name and values...)
  * It is caused by the split of the XML file for parsing:
  * 512 bytes are reserved as security to handle splitting inside an XML object.
@@ -281,7 +281,7 @@
 #define STATE_NODE_ARGVAL	6
 
 /**
- * \def STATE_NODE_SEP	
+ * \def STATE_NODE_SEP
  *
  * state for the state machine for separator reading
  */
@@ -323,14 +323,14 @@
 #define STATE_NODE_COMMENT_BEG		12
 
 /**
- * \def STATE_NODE_COMMENT	
+ * \def STATE_NODE_COMMENT
  *
  * state for the state machine for separator reading
  */
 #define STATE_NODE_COMMENT		14
 
 /**
- * \def STATE_NODE_COMMENT_END	
+ * \def STATE_NODE_COMMENT_END
  *
  * state for the state machine for separator reading
  */

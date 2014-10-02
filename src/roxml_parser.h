@@ -25,7 +25,7 @@
  */
 ROXML_INT roxml_parser_item_t *roxml_append_parser_item(roxml_parser_item_t * head, char *key, roxml_parse_func func);
 
-/** \brief parser table deletion 
+/** \brief parser table deletion
  *
  * \fn roxml_parser_free(roxml_parser_item_t *head);
  * this function delete a prepared parser object

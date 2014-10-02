@@ -30,7 +30,7 @@ ROXML_STATIC ROXML_INT int roxml_is_number(char *input)
 	/*
 	 * we don't need the value per se and some compiler will
 	 * complain about an initialized but unused variable if we
-	 * get it.                                    
+	 * get it.
 	 */
 	strtod(input, &end);
 

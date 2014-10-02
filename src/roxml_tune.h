@@ -13,12 +13,12 @@
  *
  * Being dedicated to embedded systems, libroxml include the ability to tune its behaviour.
  * files \file roxml_tune.h, \file roxml_tiny.h and \file site.in are used for that purpose.
- * 
+ *
  * \section tune <roxml_tune>
  * This file describe all options that can be used. Each consist of a #define CONFIG_XML_xxx set to
- * either 0 or 1. This file describes default values and should not be modified but to had options. 
+ * either 0 or 1. This file describes default values and should not be modified but to had options.
  *
- * The configure mecanism will be used to select which files needs to be compiled in. The roxml_stub 
+ * The configure mecanism will be used to select which files needs to be compiled in. The roxml_stub
  * will provide an empty stub API when function is disabled to make sure the library interface stays
  * consistent.
  *

@@ -53,7 +53,7 @@ ROXML_INT void roxml_del_tree(node_t *n);
 /** \brief internal function
  *
  * \fn ROXML_INT node_t *roxml_create_root(node_t *n);
- * This function initialize the root node with xpath table 
+ * This function initialize the root node with xpath table
  * \param n is the node to initialize
  * \return void
  * see roxml_close
