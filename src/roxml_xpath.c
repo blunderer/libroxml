@@ -10,10 +10,10 @@
  */
 #include <stdlib.h>
 #include <string.h>
-#include <roxml_mem.h>
-#include <roxml_core.h>
-#include <roxml_xpath.h>
-#include <roxml_parser.h>
+#include "roxml_mem.h"
+#include "roxml_core.h"
+#include "roxml_xpath.h"
+#include "roxml_parser.h"
 
 /** \brief number tester
  *

@@ -12,7 +12,7 @@
 #ifndef ROXML_XPATH_H
 #define ROXML_XPATH_H
 
-#include <roxml_internal.h>
+#include "roxml_internal.h"
 
 /** \brief xpath free function
  *

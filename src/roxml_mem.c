@@ -10,7 +10,7 @@
  */
 
 #include <stdlib.h>
-#include <roxml_mem.h>
+#include "roxml_mem.h"
 
 /** \brief head of memory manager */
 memory_cell_t head_cell = { PTR_NONE, 0, NULL, 0, NULL, NULL };

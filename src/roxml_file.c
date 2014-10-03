@@ -11,9 +11,9 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <roxml_core.h>
-#include <roxml_parser.h>
-#include <roxml_internal.h>
+#include "roxml_core.h"
+#include "roxml_parser.h"
+#include "roxml_internal.h"
 
 ROXML_INT inline int roxml_read_file(int pos, int size, char *buffer, node_t *node)
 {

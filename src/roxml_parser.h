@@ -12,7 +12,7 @@
 #ifndef ROXML_PARSER_H
 #define ROXML_PARSER_H
 
-#include <roxml_internal.h>
+#include "roxml_internal.h"
 
 /** \brief parser item creation function
  *

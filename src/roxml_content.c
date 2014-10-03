@@ -11,9 +11,9 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <roxml_mem.h>
-#include <roxml_file.h>
-#include <roxml_buff.h>
+#include "roxml_mem.h"
+#include "roxml_file.h"
+#include "roxml_buff.h"
 
 /** \brief read xml doc function
  *

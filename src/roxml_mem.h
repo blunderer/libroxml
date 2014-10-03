@@ -12,7 +12,7 @@
 #ifndef ROXML_MEMORY_H
 #define ROXML_MEMORY_H
 
-#include <roxml_internal.h>
+#include "roxml_internal.h"
 
 memory_cell_t head_cell;
 

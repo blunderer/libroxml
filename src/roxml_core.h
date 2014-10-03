@@ -12,7 +12,7 @@
 #ifndef ROXML_CORE_H
 #define ROXML_CORE_H
 
-#include <roxml_internal.h>
+#include "roxml_internal.h"
 
 #ifdef __DEBUG
 unsigned int _nb_node;

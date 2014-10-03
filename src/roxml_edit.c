@@ -11,7 +11,7 @@
 
 #include <string.h>
 #include <stdlib.h>
-#include <roxml_core.h>
+#include "roxml_core.h"
 
 /** \brief get real sibling
  *

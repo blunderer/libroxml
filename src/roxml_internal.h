@@ -30,10 +30,10 @@
 #define ROXML_PARSE __attribute__((section("__parse")))
 
 /* must be included first */
-#include <roxml_tune.h>
+#include "roxml_tune.h"
 
-#include <roxml_types.h>
-#include <roxml_defines.h>
+#include "roxml_types.h"
+#include "roxml_defines.h"
 
 /* must be included last */
 #include <roxml.h>

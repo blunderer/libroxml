@@ -9,7 +9,7 @@
  * The author added a static linking exception, see License.txt.
  */
 
-#include <roxml_internal.h>
+#include "roxml_internal.h"
 
 ROXML_API node_t *roxml_get_prev_sibling(node_t *n)
 {
