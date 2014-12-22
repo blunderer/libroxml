@@ -264,8 +264,12 @@ ROXML_STATIC ROXML_INT node_t *roxml_lookup_nsdef(node_t *nsdef, char *ns)
 	int len = 0;
 	char namespace[MAX_NAME_LEN];
 
-	for (len = 0; ns[len] != '\0' && ns[len] != ':'; len++)
+	for (len = 0; ns[len] != '\0' && ns[len] != ':' && len < MAX_NAME_LEN; len++)
 		namespace[len] = ns[len];
+
+	if (len == MAX_NAME_LEN)
+		return NULL; /* truncated */
+
 	namespace[len] = '\0';
 
 	while (nsdef) {
