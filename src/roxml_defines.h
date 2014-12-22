@@ -59,11 +59,11 @@
 #define ROXML_FUNC_PI_STR	"processing-instruction()"
 
 /**
- * \def MAX_NS_LEN
+ * \def MAX_NAME_LEN
  *
  * constant for namespace lenght
  */
-#define MAX_NS_LEN		128
+#define MAX_NAME_LEN		128
 
 /**
  * \def ROXML_BULK_READ

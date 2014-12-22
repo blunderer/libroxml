@@ -13,6 +13,7 @@
 #define ROXML_TYPES_H
 
 #include <stdio.h>
+#include <roxml_defines.h>
 
 /** \typedef roxml_parse_func
  *
@@ -165,27 +166,27 @@ typedef struct node {
  * parsing variables
  */
 typedef struct _roxml_load_ctx {
-	int pos;		/*!< position in file */
-	int empty_text_node;	/*!< if text node is empty (only contains tabs, spaces, carriage return and line feed */
-	int state;		/*!< state (state machine main var) */
-	int previous_state;	/*!< previous state */
-	int mode;		/*!< mode quoted or normal */
-	int inside_node_state;	/*!< sub state for attributes */
-	int content_quoted;	/*!< content of attribute was quoted */
-	int type;		/*!< source type (file or buffer) */
-	int nsdef;		/*!< indicate if this is a nsdef */
-	int ns;			/*!< indicate if a ns is used for this node */
-	void *src;		/*!< source (file or buffer) */
-	node_t *candidat_node;	/*!< node being processed */
-	node_t *candidat_txt;	/*!< text node being processed */
-	node_t *candidat_arg;	/*!< attr node being processed */
-	node_t *candidat_val;	/*!< attr value being processed */
-	node_t *current_node;	/*!< current node */
-	node_t *namespaces;	/*!< available namespaces */
-	node_t *last_ns;	/*!< last declared namespaces */
-	char *curr_name;	/*!< current node name (attr or elm) */
-	int curr_name_len;	/*!< current node name (attr or elm) lenght */
-	int doctype;		/*!< nested doctype count */
+	int pos;			/*!< position in file */
+	int empty_text_node;		/*!< if text node is empty (only contains tabs, spaces, carriage return and line feed */
+	int state;			/*!< state (state machine main var) */
+	int previous_state;		/*!< previous state */
+	int mode;			/*!< mode quoted or normal */
+	int inside_node_state;		/*!< sub state for attributes */
+	int content_quoted;		/*!< content of attribute was quoted */
+	int type;			/*!< source type (file or buffer) */
+	int nsdef;			/*!< indicate if this is a nsdef */
+	int ns;				/*!< indicate if a ns is used for this node */
+	void *src;			/*!< source (file or buffer) */
+	node_t *candidat_node;		/*!< node being processed */
+	node_t *candidat_txt;		/*!< text node being processed */
+	node_t *candidat_arg;		/*!< attr node being processed */
+	node_t *candidat_val;		/*!< attr value being processed */
+	node_t *current_node;		/*!< current node */
+	node_t *namespaces;		/*!< available namespaces */
+	node_t *last_ns;		/*!< last declared namespaces */
+	char curr_name[MAX_NAME_LEN];	/*!< current node name (attr or elm) */
+	int curr_name_len;		/*!< current node name (attr or elm) lenght */
+	int doctype;			/*!< nested doctype count */
 } roxml_load_ctx_t;
 
 /** \struct roxml_xpath_ctx_t

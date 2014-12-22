@@ -262,7 +262,7 @@ ROXML_INT node_t *roxml_create_root(node_t *n)
 ROXML_STATIC ROXML_INT node_t *roxml_lookup_nsdef(node_t *nsdef, char *ns)
 {
 	int len = 0;
-	char namespace[MAX_NS_LEN];
+	char namespace[MAX_NAME_LEN];
 
 	for (len = 0; ns[len] != '\0' && ns[len] != ':'; len++)
 		namespace[len] = ns[len];
@@ -742,7 +742,7 @@ ROXML_INT int _func_load_default(char *chunk, void *data)
 		}
 		context->ns = 0;
 		context->state = STATE_NODE_NAME;
-		context->curr_name = chunk;
+		strncpy(context->curr_name, chunk, MAX_NAME_LEN);
 		while (!ROXML_WHITE(chunk[cur]) && (chunk[cur] != '>') && (chunk[cur] != '/') && (chunk[cur] != ':')
 		       && (chunk[cur] != '\0')) {
 			cur++;
@@ -767,7 +767,7 @@ ROXML_INT int _func_load_default(char *chunk, void *data)
 			}
 			context->ns = 0;
 			context->inside_node_state = STATE_INSIDE_ARG;
-			context->curr_name = chunk;
+			strncpy(context->curr_name, chunk, MAX_NAME_LEN);
 			while ((chunk[cur] != '=') && (chunk[cur] != '>') && (chunk[cur] != ':')
 			       && (chunk[cur] != '\0')) {
 				cur++;
