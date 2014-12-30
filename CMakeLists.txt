@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.6)
 
-project (roxml)
+project (roxml C)
 
 set (VERSION "2")
 set (SOVERSION "2.3.0")
@@ -9,6 +9,17 @@ option(CONFIG_XML_FILE   "Can the target library parse file documents. When set 
 option(CONFIG_XML_EDIT   "Can the target library modify XML tree. When set to OFF, this result in smaller binary (this saves about 3kb)" ON)
 option(CONFIG_XML_COMMIT "Can the target library commit a tree. When set to OFF, this result in smaller binary (this saves about 5kb)." ON)
 option(CONFIG_XML_XPATH  "Can the target library perform xpath queries. When set to 0, this result in smaller binary (this saves about 20kb)." ON)
+
+# Enable UnitTest and CDash support
+# This also adds the option BUILD_TESTING
+include(CTest)
+if (BUILD_TESTING)
+    add_subdirectory(unittest)
+endif()
+
+if ("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+    add_definitions(-DLINUX)
+endif()
 
 include_directories(src)
 
@@ -94,4 +105,3 @@ set_target_properties (roxml-tool
 install (TARGETS roxml-dynamic roxml-static DESTINATION lib)
 install (TARGETS roxml-tool DESTINATION bin)
 install (FILES "src/roxml.h" DESTINATION include)
-
