@@ -112,7 +112,8 @@ ROXML_INT void roxml_free_node(node_t *n)
 
 ROXML_INT void roxml_del_tree(node_t *n)
 {
-	if (n == NULL)
+	if ((n == NULL) ||
+	    (n == n->prnt))
 		return;
 	roxml_del_tree(n->chld);
 	roxml_del_tree(n->sibl);
