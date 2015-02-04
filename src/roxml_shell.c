@@ -83,7 +83,8 @@ int main(int argc, char **argv)
 	root = roxml_load_doc(argv[optind]);
 	cur = root;
 	if (root == NULL) {
-		fprintf(stdout, "no such file '%s'\n", argv[optind]);
+		perror("error parsing xml file");
+		goto error;
 	}
 
 	ans = roxml_xpath(cur, argv[optind + 1], &max);
@@ -124,5 +125,7 @@ int main(int argc, char **argv)
 	roxml_release(RELEASE_ALL);
 
 	roxml_close(root);
+
+error:
 	return 0;
 }

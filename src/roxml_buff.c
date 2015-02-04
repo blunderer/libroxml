@@ -45,8 +45,10 @@ ROXML_INT int roxml_parse_buff(roxml_load_ctx_t *context, roxml_parser_item_t *p
 ROXML_API node_t *roxml_load_buf(char *buffer)
 {
 	node_t *current_node = NULL;
-	if (buffer == NULL)
+	if (buffer == NULL) {
+		errno = ENODATA;
 		return NULL;
+	}
 
 	current_node = roxml_create_node(0, buffer, ROXML_ELM_NODE | ROXML_BUFF);
 

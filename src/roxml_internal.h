@@ -12,6 +12,8 @@
 #ifndef ROXML_INTERNAL_H
 #define ROXML_INTERNAL_H
 
+#include <errno.h>
+
 #define ROXML_INT
 #ifdef __DEBUG
 #define ROXML_STATIC
@@ -28,6 +30,13 @@
  * sensitive section and all concerned function are stored inside a same section
  */
 #define ROXML_PARSE __attribute__((section("__parse")))
+
+/* PARSE_ERROR macro will raise an parsing error along with its reason */
+#ifdef VERBOSE_PARSING
+#define ROXML_PARSE_ERROR(str)        do { fprintf(stderr, "Parsing error at offset %d: %s\n", context->pos, str); errno = EINVAL; return -1; } while (0)
+#else /* VERBOSE_PARSING */
+#define ROXML_PARSE_ERROR(str)        do { errno = EINVAL; return -1; } while (0);
+#endif /* VERBOSE_PARSING */
 
 /* must be included first */
 #include "roxml_tune.h"

@@ -149,6 +149,18 @@ AM_CONDITIONAL(DEBUG,test x$enable_debug = xyes)
 AC_MSG_NOTICE(Debug                 ......... $enable_debug)
 
 ################################
+# Verbose XML checking
+################################
+AC_ARG_ENABLE(verbose,
+              [AS_HELP_STRING([--enable-verbose],
+              [Turn off verbose parsing on errors [default=no]])],
+              [],
+              [enable_verbose=no])
+AM_CONDITIONAL(VERBOSE_PARSING,test x$enable_verbose = xyes)
+
+AC_MSG_NOTICE(Verbose parsing      .......... $enable_verbose)
+
+################################
 # Tune options
 ################################
 AC_MSG_NOTICE()

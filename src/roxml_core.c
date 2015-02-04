@@ -223,9 +223,9 @@ ROXML_INT node_t *roxml_load(node_t *current_node, FILE *file, char *buffer)
 	parser = roxml_parser_prepare(parser);
 
 	if (file)
-		roxml_parse_file(&context, parser, file);
+		error = roxml_parse_file(&context, parser, file);
 	else
-		roxml_parse_buff(&context, parser, buffer);
+		error = roxml_parse_buff(&context, parser, buffer);
 
 	roxml_parser_free(parser);
 
@@ -233,10 +233,12 @@ ROXML_INT node_t *roxml_load(node_t *current_node, FILE *file, char *buffer)
 		roxml_free_node(context.candidat_txt);
 	current_node = NULL;
 
-	if (!error)
+	if (error == 0) {
 		current_node = roxml_create_root(root);
-	else
+	} else {
 		roxml_close(root);
+		current_node = ROXML_INVALID_DOC;
+	}
 
 	return current_node;
 }

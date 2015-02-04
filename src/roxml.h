@@ -36,7 +36,7 @@ typedef struct node node_t;
  *
  * constant for invalid nodes
  */
-#define ROXML_INVALID_NODE	0x00
+#define ROXML_INVALID_NODE	0x000
 
 /**
  * \def ROXML_ATTR_NODE
@@ -182,6 +182,13 @@ typedef struct node node_t;
  * \endcode
  */
 #define RELEASE_LAST	(void*)-2
+
+/**
+ * \def ROXML_INVALID_DOC
+ *
+ * constant for invalid documents
+ */
+#define ROXML_INVALID_DOC	(node_t*)0
 
 /** \brief load function for buffers
  *

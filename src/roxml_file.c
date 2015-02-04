@@ -78,7 +78,7 @@ ROXML_API node_t *roxml_load_fd(int fd)
 
 	file = fdopen(fd, "r");
 	if (file == NULL)
-		return NULL;
+		return ROXML_INVALID_DOC;
 
 	current_node = roxml_create_node(0, file, ROXML_ELM_NODE | ROXML_FILE);
 
@@ -91,7 +91,8 @@ ROXML_API node_t *roxml_load_doc(char *filename)
 	FILE *file = fopen(filename, "rb");
 
 	if (file == NULL)
-		return NULL;
+		return ROXML_INVALID_DOC;
+
 	current_node = roxml_create_node(0, file, ROXML_ELM_NODE | ROXML_FILE);
 
 	return roxml_load(current_node, file, NULL);

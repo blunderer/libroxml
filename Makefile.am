@@ -49,6 +49,9 @@ libroxml_la_CFLAGS = -DIGNORE_EMPTY_TEXT_NODES \
 			-DCONFIG_XML_NAV \
 			-DCONFIG_XML_BUFF
 
+if VERBOSE_PARSING
+libroxml_la_CFLAGS += -DVERBOSE_PARSING
+endif
 if CONFIG_XML_COMMIT
 libroxml_la_SOURCES += src/roxml_commit.c
 libroxml_la_CFLAGS += -DCONFIG_XML_COMMIT
