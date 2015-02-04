@@ -16,7 +16,10 @@ ROXML_API node_t *roxml_get_prev_sibling(node_t *n)
 	node_t *prev = NULL;
 	node_t *prev_elm = NULL;
 
-	if (n && n->prnt) {
+	if (n == ROXML_INVALID_DOC)
+		return ROXML_INVALID_DOC;
+
+	if (n->prnt) {
 		prev = n->prnt->chld;
 		while (prev && prev != n) {
 			if ((prev->type & ROXML_NODE_TYPES) == ROXML_ELM_NODE) {
@@ -30,35 +33,34 @@ ROXML_API node_t *roxml_get_prev_sibling(node_t *n)
 
 ROXML_API node_t *roxml_get_next_sibling(node_t *n)
 {
-	if (n) {
-		while (n->sibl && (n->sibl->type & ROXML_NODE_TYPES) != ROXML_ELM_NODE) {
-			n = n->sibl;
-		}
-		return n->sibl;
+	if (n == ROXML_INVALID_DOC)
+		return ROXML_INVALID_DOC;
+
+	while (n->sibl && (n->sibl->type & ROXML_NODE_TYPES) != ROXML_ELM_NODE) {
+		n = n->sibl;
 	}
-	return NULL;
+	return n->sibl;
 }
 
 ROXML_API node_t *roxml_get_parent(node_t *n)
 {
-	if (n) {
-		if (n->prnt == NULL) {
-			return n;
-		} else {
-			return n->prnt;
-		}
-	}
-	return NULL;
+	if (n == ROXML_INVALID_DOC)
+		return ROXML_INVALID_DOC;
+
+	if (n->prnt == NULL)
+		return n;
+	return n->prnt;
 }
 
 ROXML_API node_t *roxml_get_root(node_t *n)
 {
-	node_t *root = NULL;
-	if (n) {
-		root = n;
+	node_t *root;
 
-		while (root->prnt)
-			root = root->prnt;
-	}
+	if (n == ROXML_INVALID_DOC)
+		return ROXML_INVALID_DOC;
+
+	root = n;
+	while (root->prnt)
+		root = root->prnt;
 	return root;
 }

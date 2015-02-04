@@ -26,7 +26,7 @@ ROXML_API void roxml_close(node_t *n)
 {
 	node_t *root = n;
 
-	if (root == NULL)
+	if (root == ROXML_INVALID_DOC)
 		return;
 
 	while (root->prnt != NULL)

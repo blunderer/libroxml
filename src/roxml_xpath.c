@@ -1001,7 +1001,7 @@ ROXML_API node_t **roxml_xpath(node_t *n, char *path, int *nb_ans)
 	node_t *root = n;
 	char *full_path_to_find;
 
-	if (n == NULL) {
+	if (n == ROXML_INVALID_DOC) {
 		if (nb_ans)
 			*nb_ans = 0;
 		return NULL;

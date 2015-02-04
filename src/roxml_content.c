@@ -45,7 +45,7 @@ ROXML_STATIC ROXML_INT inline int roxml_content_size(node_t *n, int *offset)
 
 	*offset = 0;
 
-	if (n == NULL)
+	if (!n)
 		return 0;
 
 	if (n->type & ROXML_ELM_NODE) {
@@ -103,8 +103,14 @@ ROXML_API char *roxml_get_content(node_t *n, char *buffer, int bufsize, int *siz
 {
 	int total = 0;
 	int content_offset;
-	int content_size = roxml_content_size(n, &content_offset);
-	char *content = roxml_prepare_buffer(n, buffer, content_size, bufsize);
+	int content_size;
+	char *content;
+
+	if (n == ROXML_INVALID_DOC)
+		return NULL;
+
+	content_size = roxml_content_size(n, &content_offset);
+	content = roxml_prepare_buffer(n, buffer, content_size, bufsize);
 
 	if (buffer != content)
 		bufsize = content_size + 1;
@@ -173,8 +179,14 @@ ROXML_STATIC ROXML_INT inline int roxml_name_size(node_t *n, int size, int *offs
 ROXML_API char *roxml_get_name(node_t *n, char *buffer, int size)
 {
 	int content_offset;
-	int content_size = roxml_name_size(n, size, &content_offset);
-	char *content = roxml_prepare_buffer(n, buffer, content_size, size);
+	int content_size;
+	char *content;
+
+	if (n == ROXML_INVALID_DOC)
+		return NULL;
+
+	content_size = roxml_name_size(n, size, &content_offset);
+	content = roxml_prepare_buffer(n, buffer, content_size, size);
 
 	if (buffer != content)
 		size = content_size + 1;
@@ -250,24 +262,26 @@ ROXML_API char *roxml_get_name(node_t *n, char *buffer, int size)
 ROXML_API int roxml_get_nodes_nb(node_t *n, int type)
 {
 	node_t *ptr = n;
-	int nb = -1;
-	if (n) {
-		nb = 0;
-		if (ptr->chld) {
-			ptr = ptr->chld;
-			do {
-				if (ptr->type & type)
-					nb++;
-				ptr = ptr->sibl;
-			} while (ptr);
-		}
+	int nb;
 
-		if (type & ROXML_ATTR_NODE) {
-			ptr = n->attr;
-			while (ptr) {
+	if (n == ROXML_INVALID_DOC)
+		return -1;
+
+	nb = 0;
+	if (ptr->chld) {
+		ptr = ptr->chld;
+		do {
+			if (ptr->type & type)
 				nb++;
-				ptr = ptr->sibl;
-			}
+			ptr = ptr->sibl;
+		} while (ptr);
+	}
+
+	if (type & ROXML_ATTR_NODE) {
+		ptr = n->attr;
+		while (ptr) {
+			nb++;
+			ptr = ptr->sibl;
 		}
 	}
 	return nb;
@@ -333,8 +347,8 @@ ROXML_STATIC ROXML_INT inline node_t *roxml_get_nodes_by_nth(node_t *n, int type
 
 ROXML_API node_t *roxml_get_nodes(node_t *n, int type, char *name, int nth)
 {
-	if (n == NULL)
-		return NULL;
+	if (n == ROXML_INVALID_DOC)
+		return ROXML_INVALID_DOC;
 	else if (name == NULL)
 		return roxml_get_nodes_by_nth(n, type, nth);
 	else
@@ -398,9 +412,9 @@ ROXML_API inline node_t *roxml_get_chld(node_t *n, char *name, int nth)
 
 ROXML_API inline int roxml_get_type(node_t *n)
 {
-	if (n)
-		return (n->type & ROXML_NODE_TYPES);
-	return 0;
+	if (n == ROXML_INVALID_DOC)
+		return ROXML_INVALID_NODE;
+	return (n->type & ROXML_NODE_TYPES);
 }
 
 ROXML_API int roxml_get_node_position(node_t *n)
@@ -410,7 +424,7 @@ ROXML_API int roxml_get_node_position(node_t *n)
 	node_t *prnt;
 	node_t *first;
 
-	if (n == NULL)
+	if (n == ROXML_INVALID_DOC)
 		return 0;
 
 	roxml_get_name(n, name, 256);

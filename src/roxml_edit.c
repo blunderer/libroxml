@@ -202,7 +202,7 @@ ROXML_STATIC ROXML_INT node_t *roxml_parent_node(node_t *parent, node_t *n, int 
 
 ROXML_API void roxml_del_node(node_t *n)
 {
-	if (n == NULL)
+	if (n == ROXML_INVALID_DOC)
 		return;
 
 	if ((n->type & ROXML_ELM_NODE) ||
@@ -309,7 +309,7 @@ ROXML_STATIC ROXML_INT void roxml_generate_attr_node(node_t *n, int type, char *
 	roxml_append_node(n, new_txt);
 }
 
-ROXML_API int roxml_add_node_check(node_t *parent, int type, char *name, char *content)
+ROXML_INT int roxml_add_node_check(node_t *parent, int type, char *name, char *content)
 {
 	int valid = 1;
 
@@ -385,8 +385,8 @@ ROXML_API node_t *roxml_set_ns(node_t *n, node_t *ns)
 	node_t *attr = NULL;
 	node_t *chld = NULL;
 
-	if (!n)
-		return NULL;
+	if (n == ROXML_INVALID_DOC)
+		return ROXML_INVALID_DOC;
 
 	if (ns) {
 		node_t *common_parent = n;
