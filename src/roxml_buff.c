@@ -39,6 +39,8 @@ ROXML_INT int roxml_parse_buff(roxml_load_ctx_t *context, roxml_parser_item_t *p
 	context->src = (void *)buffer;
 	ret = roxml_parse_line(parser, buffer, 0, context);
 
+	if (ret >= 0 && context->lvl != 0)
+		ROXML_PARSE_ERROR("mismatch in open/close nodes");
 	return (ret < 0) ? 1 : 0;
 }
 

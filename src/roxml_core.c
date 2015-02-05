@@ -621,10 +621,14 @@ ROXML_INT int _func_load_end_node(char *chunk, void *data)
 
 	switch (context->state) {
 	case STATE_NODE_BEG:
+		context->lvl--;
 		roxml_process_begin_node(context, context->pos - 1);
 		context->state = STATE_NODE_END;
+		if (context->lvl < 0)
+			ROXML_PARSE_ERROR("missing opening node");
 		break;
 	case STATE_NODE_NAME:
+		context->lvl--;
 		context->state = STATE_NODE_SINGLE;
 		break;
 	case STATE_NODE_ATTR:
@@ -645,6 +649,7 @@ ROXML_INT int _func_load_end_node(char *chunk, void *data)
 			}
 			context->inside_node_state = STATE_INSIDE_ARG_BEG;
 			context->state = STATE_NODE_SINGLE;
+			context->lvl--;
 		}
 		break;
 	}
@@ -747,6 +752,7 @@ ROXML_INT int _func_load_default(char *chunk, void *data)
 		break;
 	case STATE_NODE_BEG:
 		if (context->ns == 0) {
+			context->lvl++;
 			roxml_process_begin_node(context, context->pos - 1);
 		}
 		context->ns = 0;
