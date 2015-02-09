@@ -396,7 +396,11 @@ ROXML_INT int _func_load_open_node(char *chunk, void *data)
 	switch (context->state) {
 	case STATE_NODE_CDATA:
 	case STATE_NODE_COMMENT:
+		break;
 	case STATE_NODE_ATTR:
+	case STATE_NODE_BEG:
+		if (context->mode == MODE_COMMENT_NONE)
+			ROXML_PARSE_ERROR("unexpected '<' within node definition");
 		break;
 	default:
 		context->state = STATE_NODE_BEG;
