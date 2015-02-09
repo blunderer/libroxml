@@ -197,7 +197,7 @@ typedef struct node node_t;
  * The document must be contained inside the char * buffer given in parameter
  * and remain valid until the roxml_close() function is called
  * \param buffer the XML buffer to load
- * \return the root node or NULL
+ * \return the root node or ROXML_INVALID_DOC (NULL). errno is set to EINVAL in case of parsing error
  * \see roxml_close
  * \see roxml_load_fd
  * \see roxml_load_doc
@@ -210,7 +210,7 @@ ROXML_API node_t * roxml_load_buf(char *buffer);
  * This function load a file document by parsing all the corresponding nodes
  * \warning the file is not fully copied and thus, it should stay untouched until roxml_close is called on the corresponding XML tree.
  * \param filename the XML document to load
- * \return the root node or NULL
+ * \return the root node or ROXML_INVALID_DOC (NULL). errno is set to EINVAL in case of parsing error
  * \see roxml_close
  * \see roxml_load_fd
  * \see roxml_load_buf
@@ -221,8 +221,8 @@ ROXML_API node_t * roxml_load_doc(char *filename);
  *
  * \fn node_t*  roxml_load_fd(int fd);
  * This function load a document by parsing all the corresponding nodes
- * \param fd the opened fiel descriptor to XML document to load
- * \return the root node or NULL
+ * \param fd the opened file descriptor to XML document to load
+ * \return the root node or ROXML_INVALID_DOC (NULL). errno is set to EINVAL in case of parsing error
  * \see roxml_close
  * \see roxml_load_doc
  * \see roxml_load_buf
@@ -376,7 +376,7 @@ ROXML_API node_t * roxml_get_ns(node_t *n);
  *
  * \param n is one node of the tree
  * \param ns is one nsdef node of the tree
- * \return the node or NULL if ns cannot be set
+ * \return the node or ROXML_INVALID_DOC (NULL) if ns cannot be set
  * \see roxml_add_node
  * \see roxml_get_ns
  * \see roxml_get_nodes
@@ -907,7 +907,7 @@ ROXML_API node_t * roxml_add_node(node_t *parent, int position, int type, char *
  * the content of the text node can be read using the roxml_get_content function
  * \param n the node that contains text
  * \param nth the nth text node to retrieve
- * \return the text node or NULL
+ * \return the text node or ROXML_INVALID_DOC (NULL)
  * \see roxml_get_txt_nb
  * \see roxml_get_nodes
  * \see roxml_get_content

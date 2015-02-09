@@ -27,12 +27,12 @@
 /** \mainpage libroxml homepage
  *
  * \section intro_sec <introduction>
- * This library is minimum, easy-to-use, C implementation for xml file parsing
+ * This library is minimum, easy-to-use, C implementation for XML file parsing
  * It includes:
  * <ul>
- * <li>the library \b libroxml for xml parsing inside applications.</li>
+ * <li>the library \b libroxml for XML parsing inside applications.</li>
  * <li>the binary \b roxml, an xpath resolver that can be used from shell.</li>
- * <li>the module \b fuse.xml that can be used to mount an XML file as a filesystem.</li>
+ * <li>the module \b fuse.XML that can be used to mount an XML file as a filesystem.</li>
  * <li>the full \ref public-api and \ref priv-api documentation.</li>
  * </ul>
  *
@@ -54,24 +54,24 @@
  * 
  * \section dl_end </downloads>
  * \section what_sec <why libroxml>
- * Because XML parsing is always hard to reinvent, and because very often xml lib are 
+ * Because XML parsing is always hard to reinvent, and because very often XML lib are 
  * too big to fit with very little application. Libroxml target mainly embedded software and environment, but you can use it whenever you need to deal with XML since libroxml is ligth and fast. 
  * libroxml is now provided in buildroot (http://buildroot.uclibc.org).
  *
  * libroxml allow you to easily:
  * <ul>
  * <li> load / unload XML document from buffers or files.</li>
- * <li> navigate thru an xml tree using simple getter API.</li>
+ * <li> navigate throughout an XML tree using simple getter API.</li>
  * <li> handle namespace.</li>
  * <li> use xpath syntax to access some nodes in the XML tree.</li>
  * <li> read nodes contents (text, attributes, comments ...)</li>
- * <li> create/modify xml trees and save them to a file or buffer.</li>
+ * <li> create/modify XML trees and save them to a file or buffer.</li>
  *</ul>
  *
- * \note libroxml work with both strict XML documents but also with xml like formatted documents (without any <?xml?> definition...)
- * \warning libroxml may behave strangely when dealing with node names or attribute values bigger than 512 bytes. FOr those who really need it, they can increase this limit by modifying the ROXML_BASE_LEN define in roxml_defines.h.
- * \warning libroxml do not handle DOCTYPE nodes. However, it will nicely ignore them during parsing and will still return the xml tree.
- * \warning libroxml is not thread safe for all write operations (roxml_set_ns, roxml_add_node, roxml_del_node) therefore, those functions must be granted exclusiv access to the xml tree when called. On the other hand, all other functions can be safely called simultaneously.
+ * \note libroxml work with both strict XML documents but also with XML like formatted documents (without any <?XML?> definition...)
+ * \warning libroxml may behave strangely when dealing with node names or attribute values bigger than 512 bytes. For those who really need it, they can increase this limit by modifying the ROXML_BASE_LEN define in roxml_defines.h.
+ * \warning libroxml do not handle DOCTYPE nodes. However, it will nicely ignore them during parsing and will still return the XML tree.
+ * \warning libroxml is not thread safe for all write operations (roxml_set_ns, roxml_add_node, roxml_del_node) therefore, those functions must be granted exclusive access to the XML tree when called. On the other hand, all other functions can be safely called simultaneously.
  *
  * \section what_end </why libroxml>
  * \section how_sec <how does it work>
@@ -80,12 +80,44 @@
  * there are several groups of functions in public API: 
  * <ul>
  * <li> Load and close XML data from different sources.</li>
- * <li> Get nodes and navigate into the loaded xml tree.</li>
- * <li> Get the xml content of nodes, attributes...</li>
+ * <li> Get nodes and navigate into the loaded XML tree.</li>
+ * <li> Get the XML content of nodes, attributes...</li>
  * <li> Create and delete nodes, export tree.</li>
  * <li> Some libroxml specific functions for memory handling</li>
  * </ul>
  * \section how_end </how does it work>
+ *
+ * \section build_sec <building libroxml>
+ * libroxml is a cross-platform library. It is developed on Linux OS, but is pretty much standalone and only depends of pthread mutexes in case it is compiled with thread safety enabled.
+ * This should make the library work on any platform that is POSIX compliant.
+ * Libroxml also works on Microsoft, the pthread API being converted to CriticalSection using basic macros.
+ *
+ * Libroxml build system relies on autotool to guaranty the best compatibility on all machines. A CMakeList.txt is also provided in order to ease the native build on Windows machines, but this one provides less options for tuning the behavior of library.
+ *
+ * Libroxml can be tuned to make it full-featured or minimalistic, in order to fit most usage:
+ * <h2>Development options</h2>
+ * <ul>
+ * <li> --enable-docs           Enable building documentation.
+ * <li> --enable-tests          Enable building unit tests (only available from git repository).
+ * <li> --enable-debug          Turn on debugging.
+ * </ul>
+ * <h2>Feature options</h2>
+ * <ul>
+ * <li> --disable-file          Remove support for parsing a file, only parses char buffer containing the XML stream.
+ * <li> --disable-edit          Disable the edition of the XML tree: read only XML.
+ * <li> --disable-commit        Disable the ability to serialize the modified XML tree back to the disk or to a buffer.
+ * <li> --disable-xpath		Disable support for Xpath handling
+ * <li> --disable-roxml         Disable building roxml binary (xpath shell solver).
+ * <li> --enable-verbose        Enable verbose parsing on errors (printf on stderr of parsing error as they come).
+ * </ul>
+ * <h2>Fine tuning for small systems</h2>
+ * <ul>
+ * <li> --disable-threadsafe    Make the library not threadsafe (but remove dependency on mutex).
+ * <li> --enable-heapbuffers    Force all buffers to be allocated on the heap rather than on the stack for tiny systems with small stacks.
+ * <li> --enable-smallbuffer    Force using smaller buffer for all XML operations. Useful for small systems, but limits the size of text objects.
+ * <li> --enable-smallinputfile Disable support of files bigger than 64kiB. This reduces the tree footprint. Useful for small systems.
+ * </ul>
+ * \section build_end </building libroxml>
  */
 
 /** \page public-api public API
@@ -94,7 +126,7 @@
  * <table>
  * <tr>
  * <td>
- * <h2>Manage xml source</h2>
+ * <h2>Manage XML source</h2>
  * <ul>
  * <li>\ref roxml_load_fd</li>
  * <li>\ref roxml_load_doc</li>
@@ -102,7 +134,7 @@
  * <li>\ref roxml_close</li>
  * </ul>
  * 
- * <h2>Access xml content</h2>
+ * <h2>Access XML content</h2>
  * <ul>
  * <li>\ref roxml_get_type</li>
  * <li>\ref roxml_get_node_position</li>
@@ -111,7 +143,7 @@
  * </ul>
  * </td>
  * <td>
- * <h2>Navigate into xml tree</h2>
+ * <h2>Navigate into XML tree</h2>
  * <ul>
  * <li>\ref roxml_get_root</li>
  * <li>\ref roxml_get_parent</li>
@@ -134,7 +166,7 @@
  * </ul>
  * </td>
  * <td>
- * <h2>Modify xml tree</h2>
+ * <h2>Modify XML tree</h2>
  * <ul>
  * <li>\ref roxml_set_ns</li>
  * <li>\ref roxml_add_node</li>
