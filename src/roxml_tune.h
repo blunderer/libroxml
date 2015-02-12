@@ -89,22 +89,4 @@
 	#define ROXML_PUT_BASE_BUFFER(name)
 #endif /* CONFIG_XML_HEAP_BUFFERS */
 
-/**************** Implement THREAD SAFETY **************************/
-#if(CONFIG_XML_THREAD_SAFE==0)
-	#define pthread_t			char
-	#define pthread_mutex_t			char
-
-	#define pthread_self()			0
-	#define pthread_mutex_init(a, b)
-	#define pthread_mutex_lock(a)		*(a) = 0
-	#define pthread_mutex_unlock(a)		*(a) = 0
-	#define pthread_mutex_destroy(a)
-#else /* CONFIG_XML_THREAD_SAFE==1 */
-	#if defined(_WIN32)
-		#include "roxml_win32_native.h"
-	#else
-		#include <pthread.h>
-	#endif
-#endif /* CONFIG_XML_THREAD_SAFE */
-
 #endif /* ROXML_TUNE_H */

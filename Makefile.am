@@ -29,6 +29,7 @@ noinst_HEADERS = \
 	src/roxml.h \
 	src/roxml_mem.h \
 	src/roxml_xpath.h \
+	src/roxml_utils.h \
 	src/roxml_win32_native.h
 EXTRA_DIST += src/roxml_doxy.h.in
 

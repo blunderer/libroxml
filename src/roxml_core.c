@@ -94,8 +94,10 @@ ROXML_INT void roxml_free_node(node_t *n)
 		if (id == ROXML_REQTABLE_ID) {
 			xpath_tok_t *tok;
 			xpath_tok_table_t *table = (xpath_tok_table_t *)n->priv;
+
+			roxml_lock_destroy(n);
+
 			tok = table->next;
-			pthread_mutex_destroy(&table->mut);
 			free(table);
 			while (tok) {
 				xpath_tok_t *to_delete = tok;
@@ -250,8 +252,9 @@ ROXML_INT node_t *roxml_create_root(node_t *n)
 	table->id = ROXML_REQTABLE_ID;
 	table->ids[ROXML_REQTABLE_ID] = 1;
 
-	pthread_mutex_init(&table->mut, NULL);
 	n->priv = (void *)table;
+
+	roxml_lock_init(n);
 
 	return n;
 }

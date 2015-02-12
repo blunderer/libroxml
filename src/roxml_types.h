@@ -51,7 +51,7 @@ typedef struct memory_cell {
 	int type;		/*!< pointer type from PTR_NODE, PTR_CHAR... */
 	int occ;		/*!< number of element */
 	void *ptr;		/*!< pointer */
-	pthread_t id;		/*!< thread id of allocator */
+	unsigned long int id;	/*!< thread id of allocator */
 	struct memory_cell *next;	/*!< next memory cell */
 	struct memory_cell *prev;	/*!< prev memory cell */
 } memory_cell_t;
@@ -103,7 +103,7 @@ typedef struct _xpath_node {
 typedef struct _xpath_tok_table {
 	unsigned char id;	/*!< token id == ROXML_REQTABLE_ID */
 	unsigned char ids[256];	/*!< token id table */
-	pthread_mutex_t mut;	/*!< token table allocation mutex */
+	void *lock;		/*!< token table allocation mutex */
 	struct _xpath_tok *next;	/*!< next xpath token */
 } xpath_tok_table_t;
 
