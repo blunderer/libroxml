@@ -33,7 +33,6 @@ int main(int argc, char **argv)
 	int quiet = 0;
 	int j, max;
 	node_t *root;
-	node_t *cur;
 	node_t **ans;
 
 	for (optind = 1; optind < argc; optind++) {
@@ -81,13 +80,12 @@ int main(int argc, char **argv)
 	}
 
 	root = roxml_load_doc(argv[optind]);
-	cur = root;
 	if (root == NULL) {
 		perror("error parsing xml file");
 		goto error;
 	}
 
-	ans = roxml_xpath(cur, argv[optind + 1], &max);
+	ans = roxml_xpath(root, argv[optind + 1], &max);
 
 	for (j = 0; j < max; j++) {
 		char *c = NULL;
