@@ -2209,27 +2209,49 @@ int test_xpath(void)
 	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "5")
 
 	node_set = roxml_xpath(root, "/node0/item[@val > 2 and @val < 4]", &nbans);
+#ifdef CONFIG_XML_FLOAT
+	ASSERT_EQUAL(nbans, 2)
+	attr = roxml_get_attr(node_set[0], "id", 0);
+	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "3")
+	attr = roxml_get_attr(node_set[1], "id", 0);
+	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "4")
+#else
 	ASSERT_EQUAL(nbans, 1)
 	attr = roxml_get_attr(node_set[0], "id", 0);
 	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "4")
+#endif
 
 	node_set = roxml_xpath(root, "/node0/item[@val > 2.1]", &nbans);
+#ifdef CONFIG_XML_FLOAT
+	ASSERT_EQUAL(nbans, 3)
+	attr = roxml_get_attr(node_set[0], "id", 0);
+	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "3")
+	attr = roxml_get_attr(node_set[1], "id", 0);
+	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "4")
+	attr = roxml_get_attr(node_set[2], "id", 0);
+	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "5")
+#else
 	ASSERT_EQUAL(nbans, 2)
 	attr = roxml_get_attr(node_set[0], "id", 0);
 	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "4")
 	attr = roxml_get_attr(node_set[1], "id", 0);
 	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "5")
+#endif
 
 	node_set = roxml_xpath(root, "/node0/item[@val <= 2]", &nbans);
+#ifdef CONFIG_XML_FLOAT
+	ASSERT_EQUAL(nbans, 3)
+#else
 	ASSERT_EQUAL(nbans, 4)
+	attr = roxml_get_attr(node_set[3], "id", 0);
+	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "3")
+#endif
 	attr = roxml_get_attr(node_set[0], "id", 0);
 	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "0")
 	attr = roxml_get_attr(node_set[1], "id", 0);
 	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "1")
 	attr = roxml_get_attr(node_set[2], "id", 0);
 	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "2")
-	attr = roxml_get_attr(node_set[3], "id", 0);
-	ASSERT_STRING_EQUAL(roxml_get_content(attr, NULL, 0, NULL), "3")
 
 	node_set = roxml_xpath(root, "/node0/item[@val >= 2]", &nbans);
 	ASSERT_EQUAL(nbans, 5)

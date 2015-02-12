@@ -86,3 +86,26 @@ ROXML_STATIC_INLINE ROXML_INT int roxml_unlock(node_t *n)
 	return pthread_mutex_unlock(table->lock);
 }
 #endif /* CONFIG_XML_THREAD_SAFE */
+
+#ifdef CONFIG_XML_FLOAT
+ROXML_STATIC_INLINE ROXML_INT double roxml_strtonum(const char *str, char **end)
+{
+	return strtod(str, end);
+}
+#else /* CONFIG_XML_FLOAT */
+ROXML_STATIC_INLINE ROXML_INT double roxml_strtonum(const char *str, char **end)
+{
+	int value = strtol(str, end, 0);
+
+	/* if the value is a float:
+	 * it must be considered a number and we floor it
+	 */
+	if (end && *end && **end == '.')
+		strtol(*(end+1), end, 0);
+
+	return value;
+
+}
+#endif /* CONFIG_XML_FLOAT */
+
+#endif /* ROXML_UTILS */

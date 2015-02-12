@@ -112,6 +112,7 @@
  * </ul>
  * <h2>Fine tuning for small systems</h2>
  * <ul>
+ * <li> --disable-float		Remove support for float values in xpath comparisons (if any float is still parsed, it will be floor-ed)
  * <li> --disable-threadsafe    Make the library not threadsafe (but remove dependency on mutex).
  * <li> --enable-heapbuffers    Force all buffers to be allocated on the heap rather than on the stack for tiny systems with small stacks.
  * <li> --enable-smallbuffer    Force using smaller buffer for all XML operations. Useful for small systems, but limits the size of text objects.

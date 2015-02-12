@@ -191,6 +191,14 @@ AC_DEFUN([AC_ROXML_TUNE],
     AM_CONDITIONAL([$5], [ test $roxml_tune -eq 1])
 ])
 
+# CONFIG_XML_FLOAT
+AC_ROXML_TUNE(float,
+              [yes],
+              [--disable-float],
+              [Does the target library support float XML values.],
+              [CONFIG_XML_FLOAT],
+	      Support float        ,yes,no)
+
 # CONFIG_XML_THREAD_SAFE
 AC_ROXML_TUNE(threadsafe,
               [yes],

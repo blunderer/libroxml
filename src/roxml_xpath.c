@@ -32,9 +32,13 @@ ROXML_STATIC ROXML_INT int roxml_is_number(char *input)
 	 * complain about an initialized but unused variable if we
 	 * get it.
 	 */
-	strtod(input, &end);
+	roxml_strtonum(input, &end);
 
-	if ((end == NULL) || (roxml_is_separator(end[0])) || (end[0] == '"') || (end[0] == '\'') || (end[0] == '\0')) {
+	if ((end == NULL) ||
+	    (roxml_is_separator(end[0])) ||
+	    (end[0] == '"') ||
+	    (end[0] == '\'') ||
+	    (end[0] == '\0')) {
 		is_number = 1;
 	}
 
@@ -509,22 +513,22 @@ ROXML_STATIC ROXML_INT int roxml_validate_predicat(xpath_node_t *xn, xpath_cond_
 
 		switch (condition->func) {
 		case ROXML_FUNC_POS:
-			iarg2 = atof(condition->arg2);
+			iarg2 = roxml_strtonum(condition->arg2, NULL);
 			status = roxml_double_cmp(iarg1, iarg2, condition->op);
 			break;
 		case ROXML_FUNC_LAST:
 			iarg2 = roxml_get_chld_nb(candidat->prnt);
 		case ROXML_FUNC_FIRST:
 			if (condition->op > 0)
-				iarg2 = roxml_double_oper(iarg2, atof(condition->arg2), condition->op);
+				iarg2 = roxml_double_oper(iarg2, roxml_strtonum(condition->arg2, NULL), condition->op);
 			status = roxml_double_cmp(iarg1, iarg2, ROXML_OPERATOR_EQU);
 			break;
 		case ROXML_FUNC_INTCOMP:
 			if (condition->arg1)
 				val = roxml_get_attr(candidat, condition->arg1 + 1, 0);
 			sarg1 = roxml_get_content(val, NULL, 0, &status);
-			iarg1 = atof(sarg1);
-			iarg2 = atof(condition->arg2);
+			iarg1 = roxml_strtonum(sarg1, NULL);
+			iarg2 = roxml_strtonum(condition->arg2, NULL);
 			status = roxml_double_cmp(iarg1, iarg2, condition->op);
 			roxml_release(sarg1);
 			break;
