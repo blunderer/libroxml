@@ -81,6 +81,13 @@ if ENABLE_ROXML
   roxml_LDADD = libroxml.la
 endif
 
+# The rocat utility
+if ENABLE_ROCAT
+  bin_PROGRAMS += rocat
+  rocat_SOURCES = src/roxml_cat.c
+  rocat_LDADD = libroxml.la
+endif
+
 # mount.fuse.xml helper
 if WITH_FUSE
   bin_PROGRAMS += mount.fuse.xml

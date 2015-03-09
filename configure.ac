@@ -79,6 +79,19 @@ AM_CONDITIONAL(ENABLE_ROXML,test x$enable_roxml != xno)
 AC_MSG_NOTICE(Roxml shell parser    ......... $enable_roxml)
 
 ################################
+# Build rocat binary
+################################
+
+AC_ARG_ENABLE(rocat,
+              [AS_HELP_STRING([--disable-rocat],
+              [Disable rocat binary build [default=yes]])],
+              [],
+              [enable_rocat=yes])
+AM_CONDITIONAL(ENABLE_ROCAT,test x$enable_rocat != xno)
+
+AC_MSG_NOTICE(Rocat shell tool      ......... $enable_rocat)
+
+################################
 # Documentation
 ################################
 AC_ARG_ENABLE(docs,
