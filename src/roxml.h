@@ -1007,6 +1007,10 @@ ROXML_API void  roxml_del_node(node_t *n);
  * \see roxml_commit_buffer
  * \see roxml_commit_file
  *
+ * This is a legacy function that proposes the same functionnalities as both
+ * \c roxml_commit_file and \c roxml_commit_buffer. New code should use the
+ * latter functions when needed.
+ *
  * One should do:
  * \code
  * #include <roxml.h>
@@ -1083,6 +1087,8 @@ ROXML_API void  roxml_del_node(node_t *n);
 \verbatim
 <root><!-- sample XML file --><item id="42"><price>24</price></item></root>
 \endverbatim
+ * \see roxml_commit_file
+ * \see roxml_commit_buffer
  */
 ROXML_API int  roxml_commit_changes(node_t *n, char *dest, char **buffer, int human);
 
