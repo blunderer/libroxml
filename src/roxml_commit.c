@@ -310,6 +310,46 @@ ROXML_API int roxml_commit_buffer(node_t *n, char **buffer, int human)
 	return size;
 }
 
+ROXML_API int roxml_commit_fd(node_t *n, int fd, int human)
+{
+	int fd2;
+	FILE *fout;
+	int size = 0;
+	int len = ROXML_BASE_LEN;
+
+	if (n == ROXML_INVALID_DOC)
+		return 0;
+
+	if (fd <= 0)
+		return 0;
+
+	/* in order to avoid accidental close of fd, we need dup() it */
+	fd2 = dup(fd);
+	if (fd2 < 0)
+		return 0;
+
+	/*
+	 * fdopen(fd, "w") does not truncate the file - so the user
+	 * must have called ftruncate() before calling this function
+	 * if needed ; otherwise, data will be appended to the file.
+	 */
+
+	fout = fdopen(fd2, "w");
+	if (!fout)
+		return 0;
+
+	roxml_commit_nodes(n, fout, NULL, human, &size, &len);
+
+	/* since we pass a fd to this function, we expect it to not be
+	 * buffered, so flush everything before doing anything else */
+	fflush(fout);
+
+	size = ftell(fout);
+	fclose(fout);
+
+	return size;
+}
+
 ROXML_API int roxml_commit_changes(node_t *n, char *dest, char **buffer, int human)
 {
 	if (dest)
