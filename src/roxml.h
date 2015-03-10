@@ -811,6 +811,8 @@ ROXML_API void  roxml_release(void *data);
  * \param value the text content (mandatory for \ref ROXML_TXT_NODE, \ref ROXML_CDATA_NODE, \ref ROXML_CMT_NODE, \ref ROXML_ATTR_NODE and \ref ROXML_NSDEF_NODE optional for \ref ROXML_ELM_NODE, \ref ROXML_PI_NODE). The text content for an attribute is the attribute value
  * \return the newly created node
  * \see roxml_commit_changes
+ * \see roxml_commit_buffer
+ * \see roxml_commit_file
  * \see roxml_del_node
  * \see roxml_close
  *
@@ -976,6 +978,8 @@ ROXML_API int  roxml_get_txt_nb(node_t *n);
  * \return
  * \see roxml_add_node
  * \see roxml_commit_changes
+ * \see roxml_commit_buffer
+ * \see roxml_commit_file
  *
  * \warning when removing a nsdef node, all node using this namespace will be updated and inherit their parent namespace
  */
@@ -984,6 +988,7 @@ ROXML_API void  roxml_del_node(node_t *n);
 /** \brief sync function
  *
  * \fn roxml_commit_changes(node_t *n, char * dest, char ** buffer, int human);
+ * \deprecated
  * this function sync changes from the RAM tree to the given buffer or file in human or one-line format
  * The tree will be processed starting with the root node 'n' and following with all its children or if n is the root, all its siblings and children.
  * The tree will be dumped to a file if 'dest' is not null and contains a valid path.
@@ -992,11 +997,15 @@ ROXML_API void  roxml_del_node(node_t *n);
  * \warning in the case of a tree loaded using roxml_load_doc, the roxml_commit_changes cannot be done to that same file
  * since it may override datas it need. This usually result in a new file filled with garbages. The solution is to write it to a temporary file and rename it after roxml_close the current tree.
  *
+ * This function is now deprecated and one should use roxml_commit_buffer or roxml_commit_file that achieves the exact same goal.
+ *
  * \param n the root node of the tree to write
  * \param dest the path to a file to write tree to
  * \param buffer the address of a buffer where the tree will be written. This buffer have to be freed after use
  * \param human 0 for one-line tree, or 1 for human format (using tabs, newlines...)
  * \return the number of bytes written to file or buffer
+ * \see roxml_commit_buffer
+ * \see roxml_commit_file
  *
  * One should do:
  * \code
@@ -1076,5 +1085,138 @@ ROXML_API void  roxml_del_node(node_t *n);
 \endverbatim
  */
 ROXML_API int  roxml_commit_changes(node_t *n, char *dest, char **buffer, int human);
+
+/** \brief sync to named file function
+ *
+ * \fn roxml_commit_file(node_t *n, char * dest, int human);
+ * this function sync changes from the RAM tree to the given file in human or one-line format
+ * The tree will be processed starting with the root node 'n' and following with all its children or if n is the root, all its siblings and children.
+ * The tree will be dumped to a file if 'dest' is not null and contains a valid path.
+ * \warning in the case of a tree loaded using roxml_load_doc, the roxml_commit_file cannot be done to that same file
+ * since it may override datas it needs. This usually resultis in a new file filled with garbage. The solution is to write it to a temporary file and rename it after roxml_close the current tree.
+ *
+ * \param n the root node of the tree to write
+ * \param dest the path to a file to write tree to
+ * \param human 0 for one-line tree, or 1 for human format (using tabs, newlines...)
+ * \return the number of bytes written to file or buffer
+ *
+ * One should do:
+ * \code
+ * #include <roxml.h>
+ *
+ * int main(void)
+ * {
+ * 	node_t *root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
+ * 	node_t *tmp = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample XML file");
+ * 	tmp = roxml_add_node(root, 0, ROXML_ELM_NODE, "item", NULL);
+ * 	roxml_add_node(tmp, 0, ROXML_ATTR_NODE, "id", "42");
+ * 	tmp = roxml_add_node(tmp, 0, ROXML_ELM_NODE, "price", "24");
+ * 	roxml_commit_file(root, "/tmp/test.xml", 1);
+ * 	roxml_close(root);
+ * 	return 0;
+ * }
+ * \endcode
+ * to generate the following xml bloc:
+\verbatim
+<root>
+ <!-- sample XML file -->
+ <item id="42">
+  <price>
+   24
+  </price>
+ </item>
+</root>
+\endverbatim
+ * or also
+ * \code
+ * #include <roxml.h>
+ *
+ * int main(void)
+ * {
+ * 	node_t *root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
+ * 	node_t *tmp = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample XML file");
+ * 	tmp = roxml_add_node(root, 0, ROXML_ELM_NODE, "item", NULL);
+ * 	roxml_add_node(tmp, 0, ROXML_ATTR_NODE, "id", "42");
+ * 	tmp = roxml_add_node(tmp, 0, ROXML_ELM_NODE, "price", "24");
+ * 	roxml_commit_file(root, "/tmp/test.xml", 0);
+ *	roxml_close(root);
+ * 	return 0;
+ * }
+ * \endcode
+ * to generate the following xml bloc:
+\verbatim
+<root><!-- sample XML file --><item id="42"><price>24</price></item></root>
+\endverbatim
+ * \see roxml_commit_changes
+ * \see roxml_commit_buffer
+ */
+ROXML_API int  roxml_commit_file(node_t *n, char *dest, int human);
+
+/** \brief sync to a memory buffer function
+ *
+ * \fn roxml_commit_buffer(node_t *n, char ** buffer, int human);
+ * this function syncs changes from the RAM tree to the given buffer in human or one-line format
+ * The tree will be processed starting with the root node 'n' and following with all its children or if n is the root, all its siblings and children.
+ * The tree will be dumped to a buffer if 'buffer' is not null. the buffer is allocated by the library
+ * and a pointer to it will be stored into 'buffer'. The allocated buffer can be freed using free()
+ *
+ * \param n the root node of the tree to write
+ * \param buffer the address of a buffer where the tree will be written. This buffer have to be freed after use
+ * \param human 0 for one-line tree, or 1 for human format (using indentation, newlines...)
+ * \return the number of bytes written to file or buffer
+ *
+ * One should do:
+ * \code
+ * #include <roxml.h>
+ *
+ * int main(void)
+ * {
+ * 	char *buffer = NULL;
+ * 	node_t *root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
+ * 	node_t *tmp = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample XML file");
+ * 	tmp = roxml_add_node(root, 0, ROXML_ELM_NODE, "item", NULL);
+ * 	roxml_add_node(tmp, 0, ROXML_ATTR_NODE, "id", "42");
+ * 	tmp = roxml_add_node(tmp, 0, ROXML_ELM_NODE, "price", "24");
+ * 	roxml_commit_changes(root, &buffer, 1);
+ * 	roxml_close(root);
+ * 	return 0;
+ * }
+ * \endcode
+ * to generate the following xml bloc:
+\verbatim
+<root>
+ <!-- sample XML file -->
+ <item id="42">
+  <price>
+   24
+  </price>
+ </item>
+</root>
+\endverbatim
+ * or also
+ * \code
+ * #include <roxml.h>
+ *
+ * int main(void)
+ * {
+ * 	char *buffer = NULL;
+ * 	node_t *root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "xml", NULL);
+ * 	node_t *tmp = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "sample XML file");
+ * 	tmp = roxml_add_node(root, 0, ROXML_ELM_NODE, "item", NULL);
+ * 	roxml_add_node(tmp, 0, ROXML_ATTR_NODE, "id", "42");
+ * 	tmp = roxml_add_node(tmp, 0, ROXML_ELM_NODE, "price", "24");
+ * 	roxml_commit_buffer(root, &buffer, 0);
+ *	roxml_close(root);
+ * 	return 0;
+ * }
+ * \endcode
+ * to generate the following xml bloc:
+\verbatim
+<root><!-- sample XML file --><item id="42"><price>24</price></item></root>
+\endverbatim
+ * \see roxml_commit_changes
+ * \see roxml_commit_file
+ */
+ROXML_API int  roxml_commit_buffer(node_t *n, char **buffer, int human);
 
 #endif /* ROXML_H */

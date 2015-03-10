@@ -173,6 +173,8 @@
  * <li>\ref roxml_add_node</li>
  * <li>\ref roxml_del_node</li>
  * <li>\ref roxml_commit_changes</li>
+ * <li>\ref roxml_commit_buffer</li>
+ * <li>\ref roxml_commit_file</li>
  * </ul>
  *
  * <h2>Libroxml specifics</h2>

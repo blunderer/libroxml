@@ -17,6 +17,18 @@ ROXML_STUB int roxml_commit_changes(node_t *n, char *dest, char **buffer, int hu
 	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
 	return -1;
 }
+
+ROXML_STUB int roxml_commit_file(node_t *n, char *dest, int human)
+{
+	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
+	return -1;
+}
+
+ROXML_STUB int roxml_commit_buffer(node_t *n, char **buffer, int human)
+{
+	fprintf(stderr, "** %s: function not implemented. You may need to reconfigure libroxml. **\n", __func__);
+	return -1;
+}
 #endif /* CONFIG_XML_COMMIT */
 
 #ifndef CONFIG_XML_EDIT

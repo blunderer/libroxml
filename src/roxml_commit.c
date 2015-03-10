@@ -242,6 +242,74 @@ ROXML_STATIC ROXML_INT void roxml_write_node(node_t *n, FILE *f, char **buf, int
 	ROXML_PUT_BASE_BUFFER(name);
 }
 
+ROXML_STATIC ROXML_INT void roxml_commit_nodes(node_t *n, FILE *f, char **buf, int human, int *size, int *len)
+{
+	node_t fakeroot;
+
+	if (n->prnt == NULL) {
+		/* Get the first child since we do not write the docroot */
+		n = n->chld;
+	} else if (n->prnt->prnt == NULL) {
+		/* Get the first sibling since it might be a PI */
+		n = n->prnt->chld;
+	} else {
+		/* The root is a subtree: simulate a real root */
+		memcpy(&fakeroot, n, sizeof(node_t));
+		fakeroot.sibl = NULL;
+		n = &fakeroot;
+	}
+
+	while (n) {
+		roxml_write_node(n, f, buf, human, 0, size, len);
+		n = n->sibl;
+	}
+}
+
+ROXML_API int roxml_commit_file(node_t *n, char *dest, int human)
+{
+	FILE *fout;
+	int size = 0;
+	int len = ROXML_BASE_LEN;
+
+	if (n == ROXML_INVALID_DOC)
+		return 0;
+
+	if (!dest)
+		return 0;
+
+	fout = fopen(dest, "w");
+	if (!fout)
+		return 0;
+
+	roxml_commit_nodes(n, fout, NULL, human, &size, &len);
+
+	size = ftell(fout);
+	fclose(fout);
+
+	return size;
+}
+
+ROXML_API int roxml_commit_buffer(node_t *n, char **buffer, int human)
+{
+	int size = 0;
+	int len = ROXML_BASE_LEN;
+
+	if (n == ROXML_INVALID_DOC)
+		return 0;
+
+	if (!buffer)
+		return 0;
+
+	*buffer = malloc(ROXML_BASE_LEN);
+	if (!*buffer)
+		return 0;
+	memset(*buffer, 0, ROXML_BASE_LEN);
+
+	roxml_commit_nodes(n, NULL, buffer, human, &size, &len);
+
+	return size;
+}
+
 ROXML_API int roxml_commit_changes(node_t *n, char *dest, char **buffer, int human)
 {
 	int size = 0;
