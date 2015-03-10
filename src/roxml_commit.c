@@ -16,7 +16,7 @@
 
 ROXML_STATIC ROXML_INT void roxml_realloc_buf(char **buf, int *len, int min_len)
 {
-	int append = (min_len & (ROXML_BASE_LEN - 1)) + 1;
+	int append = (min_len | (ROXML_BASE_LEN - 1)) + 1;
 	*buf = realloc(*buf, *len + append);
 	memset(*buf + *len, 0, append);
 	*len += append;
