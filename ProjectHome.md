@@ -23,7 +23,7 @@ Currently 22 functions are part of the public API and library binary is about 50
 see [libroxml performances](RoxmlPerfs.md)
 
 ## What's happening Now ##
-  * **2015-03-18** Goggle code [http://google-opensource.blogspot.com/2015/03/farewell-to-google-code.html announced the end of the service]. libroxml git repository has been migrated to my github account. Don't forget to [https://help.github.com/articles/changing-a-remote-s-url update your git remotes].
+  * **2015-03-18** Goggle code [announced the end of the service](http://google-opensource.blogspot.com/2015/03/farewell-to-google-code.html). libroxml git repository has been migrated to my github account. Don't forget to [update your git remotes](https://help.github.com/articles/changing-a-remote-s-url).
 
   * 2014-09-29 git HEAD is now pointing to 3.0 beta libroxml version. This version doesn't change behavior, but includes a massive reorganization of the source code, as well a refactoring of some functions. This result in a faster and smaller libroxml:
     * 48KB for the full libary
