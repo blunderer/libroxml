@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Libroxml by blunderer</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Libroxml</h1>
+          <h2>very light C xml parser library</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/blunderer/libroxml/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/blunderer/libroxml/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/blunderer/libroxml" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a id="this-library-is-minimum-easy-to-use-c-implementation-for-xml-file-parsing" class="anchor" href="#this-library-is-minimum-easy-to-use-c-implementation-for-xml-file-parsing" aria-hidden="true"><span class="octicon octicon-link"></span></a>This library is minimum, easy-to-use, C implementation for xml file parsing.</h1>
+
+<p>contact: <a href="mailto:tristan.lelong@libroxml.net">tristan.lelong@libroxml.net</a></p>
+
+<p>Official webpage and documentation is available at <a href="http://www.libroxml.net">http://www.libroxml.net</a></p>
+
+<p>Official downloads are available at <a href="http://download.libroxml.net">http://download.libroxml.net</a></p>
+
+<p>Official source code is now hosted on <a href="https://github.com/blunderer/libroxml">https://github.com/blunderer/libroxml</a></p>
+
+<p>Debian user can go to <a href="http://debian.libroxml.net">http://debian.libroxml.net</a> for debian mirror and packages</p>
+
+<h2>
+<a id="why-libroxml" class="anchor" href="#why-libroxml" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why libroxml?</h2>
+
+<p>Because XML parsing is always hard to reinvent</p>
+
+<p>Because very often, xml libraries are too big to fit with little application</p>
+
+<p>To be sure libroxml will stay easy to use, I'll limit the public API to 30 functions.
+This is quite enought for basic needs, and most of the time, we don't need more.</p>
+
+<p>Currently 22 functions are part of the public API and library binary is about 50Ko.</p>
+
+<p>see <a href="RoxmlPerfs.md">libroxml performances</a></p>
+
+<h2>
+<a id="whats-happening-now" class="anchor" href="#whats-happening-now" aria-hidden="true"><span class="octicon octicon-link"></span></a>What's happening Now</h2>
+
+<ul>
+<li><p><strong>2015-03-18</strong> Goggle code <a href="http://google-opensource.blogspot.com/2015/03/farewell-to-google-code.html">announced the end of the service</a>. libroxml git repository has been migrated to my github account. Don't forget to <a href="https://help.github.com/articles/changing-a-remote-s-url">update your git remotes</a>.</p></li>
+<li>
+<p>2014-09-29 git HEAD is now pointing to 3.0 beta libroxml version. This version doesn't change behavior, but includes a massive reorganization of the source code, as well a refactoring of some functions. This result in a faster and smaller libroxml:</p>
+
+<ul>
+<li>48KB for the full libary</li>
+<li>24KB for the minimal version</li>
+</ul>
+</li>
+<li><p>2014-09-02 Server up again: I switched to a backup server and only lost download statistics for the last 2 month.</p></li>
+<li><p>Since 2014-09-02 server down: libroxml download is not reachable because of the HDD being dead. Recovery of the server is in progress, but this might take a few days before the server is up again.</p></li>
+<li><p>Since 2013-12-16 autotools are now the default build system for libroxml.</p></li>
+<li><p>Since 2013-12-04 it is possible to configure the features of libroxml by defining a site.mk file. This allow to make libroxml smaller and an even better fit for deeply embedded systems: with only core parsing libroxml.so is smaller than 30kB.</p></li>
+<li><p>Since 2013-07-15 an exception to LGPL v2.1 for static linking was added. This should makes it easier for people wanting to integrate the library into iOS / android packages. Read the <a href="RoxmlLicense.md">License.txt</a> file for more informations.</p></li>
+<li><p>googlecode is deprecating its download section, and starting January 2014, it will not be possible to post any new downloads. To address this, Libroxml downloads are now officially hosted at <a href="http://download.libroxml.net">http://download.libroxml.net</a>. The download page on googlecode will stay available, but all newer versions will be exclusively available on the new server after version 2.2.2. All previous downloads are also ported to the new server.</p></li>
+<li><p>Since 2012-03-09 Libroxml source code is using GIT</p></li>
+<li><p>Since 2011-09-22 Libroxml is packaged in openembedded.</p></li>
+<li><p>Since 2011-07-13 Libroxml is packaged in buildroot.</p></li>
+<li><p>libroxml is now quite stabilized. SVN version should not break everything. It is of course always more carefull to use packages from download section, but SVN checkout gives you the benefits of lastest bug fixes.</p></li>
+</ul>
+
+<h2>
+<a id="what-can-do-libroxml-version-1x-" class="anchor" href="#what-can-do-libroxml-version-1x-" aria-hidden="true"><span class="octicon octicon-link"></span></a>What can do libroxml version 1.x ?</h2>
+
+<p>It allow you to easily:</p>
+
+<ul>
+<li>load / unload document from files</li>
+<li>load / unload document from buffer</li>
+<li>navigate thru the xml tree using libroxml <a href="PublicAPI.md">C/C++ API</a>
+</li>
+<li>read attributes and attributes' values for nodes</li>
+<li>get content of nodes</li>
+<li>use basic XPath expressions (more to come)</li>
+</ul>
+
+<h2>
+<a id="what-do-libroxml-version-2x-add-" class="anchor" href="#what-do-libroxml-version-2x-add-" aria-hidden="true"><span class="octicon octicon-link"></span></a>What do libroxml version 2.x add ?</h2>
+
+<p>It allow you to easily:</p>
+
+<ul>
+<li>use more XPath expressions, <a href="XpathList.md">see xpath list</a> (and still more to come)</li>
+<li>modifications on the loaded XML tree</li>
+<li>applying modification from the loaded XML tree to a file or buffer</li>
+</ul>
+
+<h2>
+<a id="what-more-do-libroxml-provide" class="anchor" href="#what-more-do-libroxml-provide" aria-hidden="true"><span class="octicon octicon-link"></span></a>What more do libroxml provide?</h2>
+
+<p>It also includes:</p>
+
+<ul>
+<li>a mini XPath resolver <strong>roxml</strong> to parse xml files from shell scripts directly.</li>
+<li>unit tests for all of the API functions</li>
+<li>binary for performance measure</li>
+</ul>
+
+<h2>
+<a id="more" class="anchor" href="#more" aria-hidden="true"><span class="octicon octicon-link"></span></a>MORE</h2>
+
+<p>libroxml now provide a fuse module that allow you to attach an XML file to a mount point and navigate inside as if you were on a real file system.</p>
+
+<ul>
+<li>each node is a directory</li>
+<li>each attribute is a file</li>
+<li>text content of a node is a special file named content.data</li>
+</ul>
+
+<p>This allow you to navigate using XPath syntax such as:</p>
+
+<p><code>cd /rss[@version=2.0]/channel/item["last()"]/title</code></p>
+
+<p>I'm not sure it's very usefull yet, but at least it's funny. If anyone find something to do with it, please contact me...xml</p>
+        </section>
+
+        <footer>
+          Libroxml is maintained by <a href="https://github.com/blunderer">blunderer</a><br>
+          This page was generated by <a href="https://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+                  <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-7043483-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+      </div>
+    </div>
+  </body>
+</html>
