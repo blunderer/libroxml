@@ -6,6 +6,8 @@ Official webpage and documentation is available at http://www.libroxml.net
 
 Official downloads are available at http://download.libroxml.net
 
+Official source code is now hosted on https://github.com/blunderer/libroxml
+
 Debian user can go to http://debian.libroxml.net for debian mirror and packages
 
 ## Why libroxml? ##
@@ -21,8 +23,9 @@ Currently 22 functions are part of the public API and library binary is about 50
 see [libroxml performances](RoxmlPerfs.md)
 
 ## What's happening Now ##
+  * **2015-03-18** Goggle code [http://google-opensource.blogspot.com/2015/03/farewell-to-google-code.html announced the end of the service]. libroxml git repository has been migrated to my github account. Don't forget to [https://help.github.com/articles/changing-a-remote-s-url update your git remotes].
 
-  * **2014-09-29** git HEAD is now pointing to 3.0 beta libroxml version. This version doesn't change behavior, but includes a massive reorganization of the source code, as well a refactoring of some functions. This result in a faster and smaller libroxml:
+  * 2014-09-29 git HEAD is now pointing to 3.0 beta libroxml version. This version doesn't change behavior, but includes a massive reorganization of the source code, as well a refactoring of some functions. This result in a faster and smaller libroxml:
     * 48KB for the full libary
     * 24KB for the minimal version
 
@@ -76,4 +79,4 @@ This allow you to navigate using XPath syntax such as:
 
 `cd /rss[@version=2.0]/channel/item["last()"]/title`
 
-I'm not sure it's very usefull yet, but at least it's funny. If anyone find something to do with it, please contact me...
+I'm not sure it's very usefull yet, but at least it's funny. If anyone find something to do with it, please contact me...xml
