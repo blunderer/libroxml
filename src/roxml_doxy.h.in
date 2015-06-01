@@ -43,8 +43,8 @@
  * 
  * \section intro_end </introduction>
  * \section dl_sec <downloads>
- * The source code is available from google project GIT repository: 
- * \verbatim $> git clone https://code.google.com/p/libroxml \endverbatim
+ * The source code is available from github project GIT repository: 
+ * \verbatim $> git clone https://github.com/blunderer/libroxml.git \endverbatim
  *
  * You can download source packages:
  * <ul>
