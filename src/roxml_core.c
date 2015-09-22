@@ -220,7 +220,7 @@ ROXML_INT node_t *roxml_load(node_t *current_node, FILE *file, char *buffer)
 	parser = roxml_append_parser_item(parser, "-", _func_load_close_comment);
 	parser = roxml_append_parser_item(parser, "?", _func_load_close_pi);
 	parser = roxml_append_parser_item(parser, ":", _func_load_colon);
-	parser = roxml_append_parser_item(parser, NULL, _func_load_default);
+	parser = roxml_append_parser_item(parser, "", _func_load_default);
 
 	parser = roxml_parser_prepare(parser);
 
@@ -354,7 +354,7 @@ ROXML_INT node_t *roxml_append_node(node_t *parent, node_t *n)
 	return n;
 }
 
-ROXML_INT int _func_load_quoted(char *chunk, void *data)
+ROXML_INT int _func_load_quoted(roxml_parser_item_t *parser, char *chunk, void *data)
 {
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
@@ -371,7 +371,7 @@ ROXML_INT int _func_load_quoted(char *chunk, void *data)
 	return 0;
 }
 
-ROXML_INT int _func_load_dquoted(char *chunk, void *data)
+ROXML_INT int _func_load_dquoted(roxml_parser_item_t *parser, char *chunk, void *data)
 {
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
@@ -388,7 +388,7 @@ ROXML_INT int _func_load_dquoted(char *chunk, void *data)
 	return 0;
 }
 
-ROXML_INT int _func_load_open_node(char *chunk, void *data)
+ROXML_INT int _func_load_open_node(roxml_parser_item_t *parser, char *chunk, void *data)
 {
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
@@ -415,7 +415,7 @@ ROXML_INT int _func_load_open_node(char *chunk, void *data)
 	return cur;
 }
 
-ROXML_INT int _func_load_close_node(char *chunk, void *data)
+ROXML_INT int _func_load_close_node(roxml_parser_item_t *parser, char *chunk, void *data)
 {
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
@@ -511,7 +511,7 @@ ROXML_INT int _func_load_close_node(char *chunk, void *data)
 	return cur;
 }
 
-ROXML_INT int _func_load_open_spec_node(char *chunk, void *data)
+ROXML_INT int _func_load_open_spec_node(roxml_parser_item_t *parser, char *chunk, void *data)
 {
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
@@ -549,7 +549,7 @@ ROXML_INT int _func_load_open_spec_node(char *chunk, void *data)
 	return cur;
 }
 
-ROXML_INT int _func_load_close_comment(char *chunk, void *data)
+ROXML_INT int _func_load_close_comment(roxml_parser_item_t *parser, char *chunk, void *data)
 {
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
@@ -569,7 +569,7 @@ ROXML_INT int _func_load_close_comment(char *chunk, void *data)
 	return cur;
 }
 
-ROXML_INT int _func_load_close_cdata(char *chunk, void *data)
+ROXML_INT int _func_load_close_cdata(roxml_parser_item_t *parser, char *chunk, void *data)
 {
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
@@ -590,7 +590,7 @@ ROXML_INT int _func_load_close_cdata(char *chunk, void *data)
 	return cur;
 }
 
-ROXML_INT int _func_load_close_pi(char *chunk, void *data)
+ROXML_INT int _func_load_close_pi(roxml_parser_item_t *parser, char *chunk, void *data)
 {
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
@@ -618,7 +618,7 @@ ROXML_INT int _func_load_close_pi(char *chunk, void *data)
 	return cur;
 }
 
-ROXML_INT int _func_load_end_node(char *chunk, void *data)
+ROXML_INT int _func_load_end_node(roxml_parser_item_t *parser, char *chunk, void *data)
 {
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
@@ -665,7 +665,7 @@ ROXML_INT int _func_load_end_node(char *chunk, void *data)
 	return cur;
 }
 
-ROXML_INT int _func_load_white(char *chunk, void *data)
+ROXML_INT int _func_load_white(roxml_parser_item_t *parser, char *chunk, void *data)
 {
 #ifdef DEBUG_PARSING
 	fprintf(stderr, "calling func %s chunk %c\n", __func__, chunk[0]);
@@ -706,7 +706,7 @@ ROXML_INT int _func_load_white(char *chunk, void *data)
 	return cur;
 }
 
-ROXML_INT int _func_load_colon(char *chunk, void *data)
+ROXML_INT int _func_load_colon(roxml_parser_item_t *parser, char *chunk, void *data)
 {
 	int cur = 1;
 	roxml_load_ctx_t *context = (roxml_load_ctx_t *)data;
@@ -745,7 +745,7 @@ ROXML_INT int _func_load_colon(char *chunk, void *data)
 	return cur;
 }
 
-ROXML_INT int _func_load_default(char *chunk, void *data)
+ROXML_INT int _func_load_default(roxml_parser_item_t *parser, char *chunk, void *data)
 {
 	int cur = 1;
 	roxml_load_ctx_t *context = (roxml_load_ctx_t *)data;

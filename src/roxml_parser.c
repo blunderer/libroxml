@@ -14,116 +14,167 @@
 #include "roxml_parser.h"
 
 /* #define DEBUG_PARSING */
+#define ROXML_PARSER_NCELLS	256
+#define ROXML_PARSER_NCELLS_MAX	512
 
-ROXML_INT roxml_parser_item_t *roxml_append_parser_item(roxml_parser_item_t *head, char *key, roxml_parse_func func)
+#define ROXML_PARSER_ITEM(parser, item)	(parser + item)
+
+ROXML_INT int roxml_parser_multiple(roxml_parser_item_t *parser, char *chunk, void *data)
 {
-	roxml_parser_item_t *item = head;
+	roxml_parser_item_t *item = ROXML_PARSER_ITEM(parser, *chunk)->next;
 
-	if (head == NULL) {
-		item = (roxml_parser_item_t *)calloc(1, sizeof(roxml_parser_item_t));
-		head = item;
+	/* collision can only occurs on callbacks
+	 * that verify the chunk value so we can
+	 * just call all cb in turns */
+	while (item) {
+		int ret = item->func(parser, chunk, data);
+
+		if (ret > 0)
+			return ret;
+		else if (ret < 0)
+			return -1;
+		item = item->next;
+	}
+	return 0;
+}
+
+ROXML_INT roxml_parser_item_t *roxml_append_parser_item(roxml_parser_item_t *parser, char *key, roxml_parse_func func)
+{
+	if (!parser)
+		parser = roxml_parser_allocate();
+
+	if (!ROXML_PARSER_ITEM(parser, *key)->func) {
+		/* first callback registered */
+		ROXML_PARSER_ITEM(parser, *key)->func = func;
+	} else if (!ROXML_PARSER_ITEM(parser, *key)->next){
+		/* second callback registered:
+		 * 1) find free cells in collision pool
+		 * 2) initialize cells
+		 * 3) enable multiple callbacks.
+		 */
+		roxml_parser_item_t *collision = parser + ROXML_PARSER_NCELLS;
+
+		while (collision->func)
+			collision++;
+
+		/* relocate existing callback in collision pool */
+		ROXML_PARSER_ITEM(parser, *key)->next = collision;
+		collision->func = ROXML_PARSER_ITEM(parser, *key)->func;
+		collision->next = collision + 1;
+
+		/* next available callback is right after (since we do not free single entries) */
+		collision++;
+		collision->func = func;
+		collision->next = NULL;
+
+		ROXML_PARSER_ITEM(parser, *key)->func = roxml_parser_multiple;
 	} else {
-		item = head;
-		while (item->next)
-			item = item->next;
-		item->next = (roxml_parser_item_t *)calloc(1, sizeof(roxml_parser_item_t));
-		item = item->next;
-	}
-	item->chunk = key ? key[0] : 0;
-	item->func = func;
-
-	return head;
-}
-
-ROXML_INT void roxml_parser_free(roxml_parser_item_t *head)
-{
-	free(head);
-}
-
-/** \brief parser list deletion
- *
- * \fn roxml_parser_clear(roxml_parser_item_t *head);
- * this function delete a parser list (when not yet prepared)
- * \param head the parser object
- * \return
- */
-ROXML_STATIC ROXML_INT void roxml_parser_clear(roxml_parser_item_t *head)
-{
-	roxml_parser_item_t *item = head;
-
-	while (item) {
-		roxml_parser_item_t *to_delete = item;
-		item = item->next;
-		free(to_delete);
+		/* third or more callback registered: just append */
+		roxml_parser_item_t *last;
+		roxml_parser_item_t *collision = ROXML_PARSER_ITEM(parser, *key);
+		while (collision->next)
+			collision = collision->next;
+		last = collision;
+		while (collision->func)
+			collision++;
+		last->next = collision;
+		collision->func = func;
+		collision->next = NULL;
 	}
 
-	return;
+	return parser;
 }
 
-ROXML_INT roxml_parser_item_t *roxml_parser_prepare(roxml_parser_item_t *head)
+ROXML_INT roxml_parser_item_t *roxml_parser_allocate(void)
 {
-	roxml_parser_item_t *item = head;
-	roxml_parser_item_t *table = NULL;
-	int count = 0;
+	roxml_parser_item_t *parser;
 
-	head->count = 0;
-	head->def_count = 0;
-	while (item) {
-		if (item->chunk != 0) {
-			head->count++;
+	/* allocate a new parser.
+	 * 512 cells allow up to 256 collisions. */
+	parser = malloc(sizeof(roxml_parser_item_t) * ROXML_PARSER_NCELLS_MAX);
+	memset(parser, 0 , sizeof(roxml_parser_item_t) * ROXML_PARSER_NCELLS_MAX);
+
+	return parser;
+}
+
+ROXML_INT void roxml_parser_free(roxml_parser_item_t *parser)
+{
+	free(parser);
+}
+
+ROXML_INT roxml_parser_item_t *roxml_parser_prepare(roxml_parser_item_t *parser)
+{
+	int i, j;
+	roxml_parser_item_t *new;
+	roxml_parser_item_t *collision;
+
+	new = roxml_parser_allocate();
+	collision = new + ROXML_PARSER_NCELLS;
+
+	for (i = 0; i < ROXML_PARSER_NCELLS; i++) {
+		/* copy parser and assign default */
+		if (parser[i].func) {
+			new[i].func = parser[i].func;
+
+			if (parser[i].next) {
+				roxml_parser_item_t *item = parser[i].next;
+
+				new[i].next = collision;
+
+				/* group all collision callbacks in collision pool */
+				while (1) {
+					collision->func = item->func;
+
+					if (item->next)
+						collision->next = collision + 1;
+					else
+						break;
+
+					collision = collision->next;
+					item = item->next;
+				}
+				collision++;
+			}
+		} else {
+			new[i].func = parser[0].func;
+			new[i].next = parser[0].next;
 		}
-		head->def_count++;
-		item = item->next;
 	}
 
-	table = malloc(sizeof(roxml_parser_item_t) * (head->def_count));
+	roxml_parser_free(parser);
 
-	item = head;
-
-	while (item) {
-		memcpy(&table[count], item, sizeof(roxml_parser_item_t));
-		item = item->next;
-		count++;
-	}
-	roxml_parser_clear(head);
-
-	return table;
+	return new;
 }
 
-ROXML_INT int roxml_parse_line(roxml_parser_item_t *head, char *line, int len, void *ctx)
+ROXML_INT int roxml_parse_line(roxml_parser_item_t *parser, char *line, int len, void *ctx)
 {
-	int count = head->count;
-	int def_count = head->def_count;
 	char *line_end = line;
 	char *chunk = line;
 
-	if (len > 0) {
+	if (len > 0)
 		line_end = line + len;
-	} else {
+	else
 		line_end = line + strlen(line);
-	}
 
 	while (chunk < line_end) {
-		int i = 0;
-		for (; i < count; i++) {
-			if (chunk[0] == head[i].chunk) {
-				int ret = head[i].func(chunk, ctx);
-				if (ret > 0) {
-					chunk += ret;
-					break;
-				} else if (ret < 0) {
-					return -1;
-				}
-			}
+		/* main callbacks */
+		int ret = ROXML_PARSER_ITEM(parser, *chunk)->func(parser, chunk, ctx);
+
+		if (ret > 0) {
+			chunk += ret;
+			continue;
+		} else if (ret < 0) {
+			return ret;
 		}
-		for (; i >= count && i < def_count; i++) {
-			int ret = head[i].func(chunk, ctx);
-			if (ret > 0) {
-				chunk += ret;
-				break;
-			} else if (ret < 0) {
-				return -1;
-			}
+
+		/* default callbacks */
+		ret = ROXML_PARSER_ITEM(parser, 0)->func(parser, chunk, ctx);
+
+		if (ret > 0) {
+			chunk += ret;
+			continue;
+		} else if (ret < 0) {
+			return ret;
 		}
 	}
 

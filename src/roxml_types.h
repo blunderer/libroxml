@@ -15,16 +15,6 @@
 #include <stdio.h>
 #include <roxml_defines.h>
 
-/** \typedef roxml_parse_func
- *
- * \brief parser callback functions
- *
- * This is the prototype for a parser callback function. It receive as argument
- * the chunk that matched the key, and the context as a void. It should return the
- * number of handled bytes or 0 if doesn't want to handle this key
- */
-typedef int (*roxml_parse_func) (char *chunk, void *data);
-
 /** \typedef roxml_pos_t
  *
  * \brief type for node indexes in raw tree
@@ -213,18 +203,26 @@ typedef struct _roxml_xpath_ctx {
 	xpath_cond_t *new_cond;	/*!< current xpath cond */
 } roxml_xpath_ctx_t;
 
+/** \typedef roxml_parse_func
+ *
+ * \brief parser callback functions
+ *
+ * This is the prototype for a parser callback function. It receive as argument
+ * the chunk that matched the key, and the context as a void. It should return the
+ * number of handled bytes or 0 if doesn't want to handle this key
+ */
+typedef struct _roxml_parser_item roxml_parser_item_t;
+typedef int (*roxml_parse_func) (roxml_parser_item_t *parser, char *chunk, void *data);
+
 /** \struct roxml_parser_item_t
  *
  * \brief the parser item struct
  *
  * this struct contains the key and callback.
  */
-typedef struct _roxml_parser_item {
-	int count;		/*!< number of parser item with non null key (only for head) */
-	int def_count;		/*!< total number of parser item (only for head) */
-	char chunk;		/*!< key to match */
-	roxml_parse_func func;	/*!< callback function */
-	struct _roxml_parser_item *next;	/*!< next item */
-} roxml_parser_item_t;
+struct _roxml_parser_item {
+	roxml_parse_func func;			/*!< callback function */
+	struct _roxml_parser_item *next;	/*!< next item (default or multiple) */
+};
 
 #endif /* ROXML_TYPES_H */
