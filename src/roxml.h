@@ -190,6 +190,10 @@ typedef struct node node_t;
  */
 #define ROXML_INVALID_DOC	(node_t*)0
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** \brief load function for buffers
  *
  * \fn node_t*  roxml_load_buf(char *buffer);
@@ -1301,5 +1305,8 @@ ROXML_API int  roxml_commit_buffer(node_t *n, char **buffer, int human);
  */
 ROXML_API int  roxml_commit_fd(node_t *n, int fd, int human);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ROXML_H */
