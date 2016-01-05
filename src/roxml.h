@@ -12,6 +12,10 @@
 #ifndef ROXML_H
 #define ROXML_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * \def ROXML_API
  *
@@ -1301,5 +1305,8 @@ ROXML_API int  roxml_commit_buffer(node_t *n, char **buffer, int human);
  */
 ROXML_API int  roxml_commit_fd(node_t *n, int fd, int human);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ROXML_H */
