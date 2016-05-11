@@ -37,7 +37,7 @@
  * </ul>
  *
  * The stripped binary is about 50K. The public API defines less than 30 functions to do all you need, making it very easy to start with.
- * For bug reporting, you can check the google code dedicated project: http://libroxml.googlecode.com
+ * For bug reporting, you can check the github dedicated project: https://github.com/blunderer/libroxml
  *
  * Libroxml is distributed under the terms of the <a href="http://www.gnu.org/licenses/lgpl.html">GNU Lesser General Public License</a>.
  * 
