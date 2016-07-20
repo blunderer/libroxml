@@ -132,7 +132,10 @@ ROXML_STATIC ROXML_INT void roxml_write_elm_name_open(node_t *n, FILE *f, char *
 
 	if (n->ns)
 		roxml_get_name(n->ns, ns, ROXML_BASE_LEN);
-	roxml_write_string(f, buf, offset, len, "<%s%s%s", n->ns ? ns : "", n->ns ? ":" : "", name);
+	else
+		ns[0] = '\0';
+
+	roxml_write_string(f, buf, offset, len, "<%s%s%s", ns[0] ? ns : "", ns[0] ? ":" : "", name);
 }
 
 ROXML_STATIC ROXML_INT void roxml_write_elm_name_close(node_t *n, FILE *f, char **buf, int *offset, int *len,
@@ -147,7 +150,7 @@ ROXML_STATIC ROXML_INT void roxml_write_elm_name_close(node_t *n, FILE *f, char 
 	}
 
 	roxml_write_string(f, buf, offset, len, "%s%s%s%s%s", head,
-			   n->chld && n->ns ? ns : "", n->chld && n->ns ? ":" : "", n->chld ? name : "", tail);
+			   n->chld && ns[0] ? ns : "", n->chld && ns[0] ? ":" : "", n->chld ? name : "", tail);
 }
 
 ROXML_STATIC ROXML_INT void roxml_write_elm_attr(node_t *n, FILE *f, char **buf, int *offset, int *len)
