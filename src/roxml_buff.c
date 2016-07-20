@@ -13,7 +13,7 @@
 #include "roxml_parser.h"
 #include "roxml_internal.h"
 
-ROXML_INT inline int roxml_read_buff(int pos, int size, char *buffer, node_t *node)
+ROXML_INT int roxml_read_buff(int pos, int size, char *buffer, node_t *node)
 {
 	int ret_len = 0;
 	char *r1 = buffer;
@@ -26,7 +26,7 @@ ROXML_INT inline int roxml_read_buff(int pos, int size, char *buffer, node_t *no
 	return ret_len;
 }
 
-ROXML_INT inline void roxml_close_buff(node_t *n)
+ROXML_INT void roxml_close_buff(node_t *n)
 {
 	return;
 }

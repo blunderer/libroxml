@@ -15,7 +15,7 @@
 #include "roxml_parser.h"
 #include "roxml_internal.h"
 
-ROXML_INT inline int roxml_read_file(int pos, int size, char *buffer, node_t *node)
+ROXML_INT int roxml_read_file(int pos, int size, char *buffer, node_t *node)
 {
 	int ret_len = 0;
 
@@ -25,7 +25,7 @@ ROXML_INT inline int roxml_read_file(int pos, int size, char *buffer, node_t *no
 	return ret_len;
 }
 
-ROXML_INT inline void roxml_close_file(node_t *root)
+ROXML_INT void roxml_close_file(node_t *root)
 {
 	fclose(root->src.fil);
 }
