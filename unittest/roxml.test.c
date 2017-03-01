@@ -2768,6 +2768,10 @@ int test_parse_namespaces(void)
 	roxml_release(RELEASE_ALL);
 	roxml_close(root);
 
+	root = roxml_load_buf("<test:node xmlns='http://test'><test:node>");
+	roxml_release(RELEASE_ALL);
+	roxml_close(root);
+
 	RETURN /* close context macro */
 }
 

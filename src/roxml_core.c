@@ -149,6 +149,9 @@ ROXML_STATIC ROXML_INT void roxml_process_unaliased_ns(roxml_load_ctx_t *context
 		context->nsdef = 0;
 		context->candidat_arg->type |= ROXML_NS_NODE;
 
+		if (context->candidat_node->ns && ((context->candidat_node->ns->type & ROXML_INVALID) == ROXML_INVALID))
+			roxml_free_node(context->candidat_node->ns);
+
 		if (context->candidat_val->pos == context->candidat_val->end) {
 			context->candidat_node->ns = NULL;
 			context->candidat_arg->ns = NULL;
