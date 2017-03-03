@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 2.6)
 project (roxml C)
 
 set (VERSION "2")
-set (SOVERSION "2.3.0")
+set (SOVERSION "3.0.0")
 
 option(CONFIG_XML_FILE   "Can the target library parse file documents. When set to OFF, this result in smaller binary." ON)
 option(CONFIG_XML_EDIT   "Can the target library modify XML tree. When set to OFF, this result in smaller binary (this saves about 3kb)" ON)

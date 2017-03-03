@@ -1,3 +1,30 @@
+libroxml (3.0.0-1) unstable; urgency=low
+  * Add
+      External linkage support for c++ projects
+      Replace list parse engine with map based one
+      Roxml_commit_file(), roxml_commit_fd() and roxml_commit_buffer() helpers
+      Subtree display too roxml tool
+      Rocat tool
+      Optional disabling support of float XML values
+      Basic XML validation during parsing
+      Header for all the source files updated to SPDX
+      Parser function locality
+      Global code refactor
+      Add support for XPath function local-name()
+      Update documentation
+
+  * Bugfixes
+      Fix tests
+      Fix various compilation warnings
+      Fix potential overflow and memory-leak related to namespace parsing
+      Fix CMake builds
+      Fix recursive delete of malformed tree
+      Fix wrong calculation for buffer realloc during commit
+      Fix spurious colon in default namespace
+
+
+ -- Tristan Lelong <tristan.lelong@libroxml.net>  Fri, 03 Mar 2017 23:22:18 +0000
+
 libroxml (2.3.0-1) unstable; urgency=low
   * Add
       switch to autotools
