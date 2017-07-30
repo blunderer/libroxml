@@ -282,3 +282,4 @@ AC_ROXML_TUNE(xpath,
 AC_MSG_NOTICE()
 AC_CONFIG_FILES(Makefile libroxml.pc docs/doxy.cfg docs/man.cfg src/roxml_doxy.h)
 AC_OUTPUT
+
