@@ -59,7 +59,13 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
 
 AC_SUBST(AM_TEST_CFLAGS)
 
-AC_CHECK_FILE(unittest/unittest.c, , AC_MSG_RESULT([wARNING: building unittest will not be available]); enable_tests=no)
+AC_MSG_CHECKING([whether unittest sources are available])
+if test -f unittest/unittest.c; then
+	AC_MSG_RESULT([yes])
+else
+	AC_MSG_RESULT([no])
+	enable_tests=no
+fi
 
 AC_MSG_NOTICE()
 AC_MSG_NOTICE(Configuration is:)
