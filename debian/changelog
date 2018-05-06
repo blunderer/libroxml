@@ -1,3 +1,10 @@
+libroxml (3.0.1-1) unstable; urgency=low
+
+  * Bugfixes
+      Fix cross compilation
+
+ -- Tristan Lelong <tristan.lelong@libroxml.net>  Sun, 06 May 2018 13:21:25 +0200
+
 libroxml (3.0.0-1) unstable; urgency=low
   * Add
       External linkage support for c++ projects

@@ -1,5 +1,5 @@
 %define name libroxml
-%define version 3.0.0
+%define version 3.0.1
 %define release 1
 
 Summary: a light and powerful C xml parsing library
