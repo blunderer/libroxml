@@ -333,6 +333,7 @@ ROXML_INT int roxml_add_node_check(node_t *parent, int type, char *name, char *c
 		break;
 	case ROXML_TXT_NODE:
 	case ROXML_CMT_NODE:
+	case ROXML_CDATA_NODE:
 		if (!content)
 			valid = 0;
 		break;
