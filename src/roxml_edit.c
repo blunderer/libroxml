@@ -12,6 +12,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "roxml_core.h"
+#include "roxml_mem.h"
 
 /** \brief get real sibling
  *
@@ -325,7 +326,7 @@ ROXML_INT int roxml_add_node_check(node_t *parent, int type, char *name, char *c
 		}
 	}
 
-	switch (type) {
+	switch (type & ~ROXML_ESCAPED_MOD) {
 	case ROXML_ATTR_NODE | ROXML_NS_NODE:
 	case ROXML_ATTR_NODE:
 		if (!name || !content)
@@ -347,6 +348,16 @@ ROXML_INT int roxml_add_node_check(node_t *parent, int type, char *name, char *c
 	}
 
 	return valid;
+}
+
+ROXML_API char *roxml_auto_escape(int type, char *buf)
+{
+	if (!buf || ((type & ROXML_NON_ESCAPABLE_NODES) != 0))
+		return buf;
+	int size = roxml_escape(buf, ENCODE, NULL);
+	char *out = roxml_malloc(size + 1, 1, PTR_CHAR);
+	roxml_escape(buf, ENCODE, out);
+	return out;
 }
 
 ROXML_API node_t *roxml_add_node(node_t *parent, int position, int type, char *name, char *content)
@@ -377,6 +388,9 @@ ROXML_API node_t *roxml_add_node(node_t *parent, int position, int type, char *n
 		roxml_generate_txt_node(new_node, content);
 	else if (type & ROXML_ELM_NODE)
 		roxml_generate_elm_node(new_node, name, content);
+
+	if (((type & ROXML_NON_ESCAPABLE_NODES) == 0) && (type & ROXML_ESCAPED_MOD))
+		roxml_release(content);
 
 	return roxml_parent_node(parent, new_node, position);
 }

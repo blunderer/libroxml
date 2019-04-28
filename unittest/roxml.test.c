@@ -2984,6 +2984,67 @@ int test_del_namespaces(void)
 	RETURN /* close context macro */
 }
 
+int test_escape(void)
+{
+	INIT /* init context macro */
+
+	// Test encoding
+	char buf[32];
+	ASSERT_EQUAL(roxml_escape("foo", ENCODE, buf), 3);
+	ASSERT_STRING_EQUAL(buf, "foo");
+	ASSERT_EQUAL(roxml_escape("'foo'", ENCODE, buf), 15);
+	ASSERT_STRING_EQUAL(buf, "&apos;foo&apos;");
+	ASSERT_EQUAL(roxml_escape("\"foo\"", ENCODE, buf), 15);
+	ASSERT_STRING_EQUAL(buf, "&quot;foo&quot;");
+	ASSERT_EQUAL(roxml_escape("<foo>", ENCODE, buf), 11);
+	ASSERT_STRING_EQUAL(buf, "&lt;foo&gt;");
+	ASSERT_EQUAL(roxml_escape("&foo", ENCODE, buf), 8);
+	ASSERT_STRING_EQUAL(buf, "&amp;foo");
+
+	// Test decoding
+	ASSERT_EQUAL(roxml_escape("foo", DECODE, buf), 3);
+	ASSERT_STRING_EQUAL(buf, "foo");
+	ASSERT_EQUAL(roxml_escape("&apos;foo&apos;", DECODE, buf), 5);
+	ASSERT_STRING_EQUAL(buf, "'foo'");
+	ASSERT_EQUAL(roxml_escape("&quot;foo&quot;", DECODE, buf), 5);
+	ASSERT_STRING_EQUAL(buf, "\"foo\"");
+	ASSERT_EQUAL(roxml_escape("&lt;foo&gt;", DECODE, buf), 5);
+	ASSERT_STRING_EQUAL(buf, "<foo>");
+	ASSERT_EQUAL(roxml_escape("&amp;foo", DECODE, buf), 4);
+	ASSERT_STRING_EQUAL(buf, "&foo");
+
+#ifdef CONFIG_XML_EDIT
+	// Test node creations
+	node_t *root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "foo", "&bar1");
+	ASSERT_STRING_EQUAL(roxml_get_content(root, buf, 32, NULL), "&bar1");
+	node_t *n = roxml_add_node(root, 0, ROXML_ESCAPED(ROXML_ELM_NODE, "foo", "&bar2"));
+	ASSERT_STRING_EQUAL(roxml_get_content(n, buf, 32, NULL), "&amp;bar2");
+	node_t *attr = roxml_add_node(n, 0, ROXML_ATTR_NODE, "foo", "&bar3");
+	ASSERT_STRING_EQUAL(roxml_get_content(attr, buf, 32, NULL), "&bar3");
+	attr = roxml_add_node(n, 0, ROXML_ESCAPED(ROXML_ATTR_NODE, "foo", "&bar4"));
+	ASSERT_STRING_EQUAL(roxml_get_content(attr, buf, 32, NULL), "&amp;bar4");
+	n = roxml_add_node(root, 0, ROXML_TXT_NODE, NULL, "&bar5");
+	ASSERT_STRING_EQUAL(roxml_get_content(n, buf, 32, NULL), "&bar5");
+	n = roxml_add_node(root, 0, ROXML_ESCAPED(ROXML_TXT_NODE, NULL, "&bar6"));
+	ASSERT_STRING_EQUAL(roxml_get_content(n, buf, 32, NULL), "&amp;bar6");
+	n = roxml_add_node(root, 0, ROXML_CDATA_NODE, NULL, "&bar7");
+	ASSERT_STRING_EQUAL(roxml_get_content(n, buf, 32, NULL), "&bar7");
+	n = roxml_add_node(root, 0, ROXML_ESCAPED(ROXML_CDATA_NODE, NULL, "&bar8"));
+	ASSERT_STRING_EQUAL(roxml_get_content(n, buf, 32, NULL), "&bar8");
+	n = roxml_add_node(root, 0, ROXML_PI_NODE, "target", "&bar9");
+	ASSERT_STRING_EQUAL(roxml_get_content(n, buf, 32, NULL), "&bar9");
+	n = roxml_add_node(root, 0, ROXML_ESCAPED(ROXML_PI_NODE, "target", "&bar10"));
+	ASSERT_STRING_EQUAL(roxml_get_content(n, buf, 32, NULL), "&bar10");
+	n = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "&bar11");
+	ASSERT_STRING_EQUAL(roxml_get_content(n, buf, 32, NULL), "&bar11");
+	n = roxml_add_node(root, 0, ROXML_ESCAPED(ROXML_CMT_NODE, NULL, "&bar12"));
+	ASSERT_STRING_EQUAL(roxml_get_content(n, buf, 32, NULL), "&bar12");
+	roxml_close(root);
+#endif /* CONFIG_XML_EDIT */
+
+	RETURN /* close context macro */
+}
+
 int test_write_tree(void)
 {
 	int len;
@@ -3221,6 +3282,7 @@ int main(int argc, char ** argv)	{
 	TEST_FUNC(test_parse_namespaces)
 	TEST_FUNC(test_write_namespaces)
 	TEST_FUNC(test_del_namespaces)
+	TEST_FUNC(test_escape)
 
 	EXEC_UNITTEST /* exec tests depending on command line option see available options with --help */
 

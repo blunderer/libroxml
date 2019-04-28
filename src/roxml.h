@@ -110,12 +110,20 @@ typedef struct node node_t;
 #define ROXML_NSDEF_NODE	(ROXML_NS_NODE | ROXML_ATTR_NODE)
 
 /**
+ * \def ROXML_CDATA_MOD
+ *
+ * constant for cdata nodes modifier applied to ROXML_TXT_NODE.
+ * \see roxml_add_node
+ */
+#define ROXML_CDATA_MOD		0x200
+
+/**
  * \def ROXML_CDATA_NODE
  *
  * constant for cdata nodes
  * \see roxml_add_node
  */
-#define ROXML_CDATA_NODE	(ROXML_TXT_NODE | 0x200)
+#define ROXML_CDATA_NODE	(ROXML_TXT_NODE | ROXML_CDATA_MOD)
 
 /**
  * \def ROXML_DOCTYPE_NODE
@@ -148,6 +156,38 @@ typedef struct node node_t;
  * \see roxml_get_types
  */
 #define ROXML_NODE_TYPES	0x05f8
+
+/**
+ * \def ROXML_ESCAPED_MOD
+ *
+ * constant for node modifier use to indicate escaped text.
+ * \see roxml_add_node
+ */
+#define ROXML_ESCAPED_MOD 0x800
+
+/**
+ * \def ROXML_NON_ESCAPABLE_NODES
+ *
+ * constant for nodes that should not be escaped.
+ * \see roxml_add_node
+ */
+#define ROXML_NON_ESCAPABLE_NODES (ROXML_CMT_NODE | ROXML_PI_NODE | ROXML_NS_NODE | ROXML_CDATA_MOD | ROXML_DOCTYPE_NODE)
+
+/**
+ * \def ENCODE
+ *
+ * constant for requesting escape of a string.
+ * \see roxml_escape
+ */
+#define ENCODE 0
+
+/**
+ * \def DECODE
+ *
+ * constant for requesting unescape of a string.
+ * \see roxml_escape
+ */
+#define DECODE 1
 
 /**
  * \def RELEASE_ALL
@@ -193,6 +233,34 @@ typedef struct node node_t;
  * constant for invalid documents
  */
 #define ROXML_INVALID_DOC	(node_t*)0
+
+/**
+ * \def ROXML_ESCAPED
+ *
+ * modifier to roxml_add_node to indicate name and content should be escaped if necessary.
+ * example:
+ * \code
+ * roxml_add_node(NULL, 0, ROXML_ESCAPE(ROXML_ELM_NODE, "node1", "content <that> needs escaping"));
+ * \endcode
+ * Will create a node that exports as:
+ * \verbatim
+ * <node1>content &lt;that&gt; needs escaping</node1>
+ * \endverbatim
+ * \see roxml_add_node
+ * \see roxml_auto_escape 
+ */
+#define ROXML_ESCAPED(type, name, content) ((type) | ROXML_ESCAPED_MOD), (name), roxml_auto_escape((type), (content))
+
+/**
+ * \brief internal escaping function to be used only via ROXML_ESCAPED macro.
+ *
+ * \fn char *roxml_auto_escape(int type, char *buf)
+ * This function should not be used directly but instead via the ROXML_ESCAPED macro within
+ * a roxml_add_node function call.
+ * \see roxml_add_node
+ * \see ROXML_ESCAPED 
+ */
+ROXML_API char *roxml_auto_escape(int type, char *buf);
 
 /** \brief load function for buffers
  *
@@ -615,6 +683,20 @@ ROXML_API char * roxml_get_name(node_t *n, char *buffer, int size);
  */
 ROXML_API char * roxml_get_content(node_t *n, char *buffer, int bufsize, int *size);
 
+/** \brief XML encoding/decoding function
+ *
+ * \fn roxml_escape(const char *buf, int decode, char *out)
+ * this function converts the escape codes into ascii char or special carachers in escape codes.
+ * \param buf the bytes to be converted
+ * \param decode indicates whether to encde or decode escape caracteres.
+ * \param out is filled with the encoded/decoded data if not null.
+ * \return the size of encoded/decoded data
+ * \see roxml_add_node
+ * \see ENCODE
+ * \see DECODE
+ */
+ROXML_API int roxml_escape(const char *buf, int decode, char *out);
+
 /** \brief number of nodes getter function
  *
  * \fn int  roxml_get_nodes_nb(node_t *n, int type);
@@ -819,6 +901,15 @@ ROXML_API void  roxml_release(void *data);
  * \see roxml_commit_file
  * \see roxml_del_node
  * \see roxml_close
+ *
+ * Escaping the as per XML specifications can be done by wrapping the node definition with ROXML_ESCAPED as showed below:
+ * \code
+ * roxml_add_node(NULL, 0, ROXML_ESCAPE(ROXML_ELM_NODE, "node1", "content <that> needs escaping"));
+ * \endcode
+ * This will create a node that exports as:
+ * \verbatim
+ * <node1>content &lt;that&gt; needs escaping</node1>
+ * \endverbatim
  *
  * paramaters name and value depending on node type:
  * - \ref ROXML_ELM_NODE take at least a node name. the parameter value is optional and represents the text content.

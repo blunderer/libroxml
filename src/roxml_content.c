@@ -15,6 +15,52 @@
 #include "roxml_file.h"
 #include "roxml_buff.h"
 
+struct roxml_escape_char {
+	char code;
+	char *escape;
+};
+
+struct roxml_escape_char specials[5] = {
+	{ .code = '"', .escape = "&quot;" },
+	{ .code = '\'', .escape = "&apos;" },
+	{ .code = '<', .escape = "&lt;"},
+	{ .code = '>', .escape = "&gt;"},
+	{ .code = '&', .escape = "&amp;"}
+};
+
+ROXML_API int roxml_escape(const char *buf, int decode, char *out)
+{
+	size_t i = 0;
+	size_t l = 0;
+	for (; i < strlen(buf); ) {
+		int s = 0;
+		for (; s < 5; s++) {
+			if (decode && (strncmp(specials[s].escape, buf+i, strlen(specials[s].escape)) == 0)) {
+				if (out)
+					out[l] = specials[s].code;
+				l += 1;
+				i += strlen(specials[s].escape);
+				break;
+			} else if (!decode && (buf[i] == specials[s].code)) {
+				if (out)
+					strcpy(out+l, specials[s].escape);
+				l += strlen(specials[s].escape);
+				i += 1;
+				break;
+			}
+		}
+		if (s == 5) {
+			if (out)
+				out[l] = buf[i];
+			l += 1;
+			i += 1;
+		}
+	}
+	if (out)
+		out[l] = '\0';
+	return l;
+}
+
 /** \brief read xml doc function
  *
  * \fn roxml_read(int pos, int size, char * buffer, node_t *node)
