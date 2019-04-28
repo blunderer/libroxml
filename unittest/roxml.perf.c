@@ -22,7 +22,7 @@ int main(int argc, char ** argv)
 	if(argc < 2)	{
 		printf("no input file use '%s'\n", input);
 	} else	{
-		strncpy(input, argv[1], 128);
+		strncpy(input, argv[1], 127);
 	}
 
 	FILE * f = fopen(input, "r");

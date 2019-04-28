@@ -518,6 +518,7 @@ ROXML_STATIC ROXML_INT int roxml_validate_predicat(xpath_node_t *xn, xpath_cond_
 			break;
 		case ROXML_FUNC_LAST:
 			iarg2 = roxml_get_chld_nb(candidat->prnt);
+			  // fall through
 		case ROXML_FUNC_FIRST:
 			if (condition->op > 0)
 				iarg2 = roxml_double_oper(iarg2, roxml_strtonum(condition->arg2, NULL), condition->op);

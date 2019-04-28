@@ -175,7 +175,7 @@ typedef struct _roxml_load_ctx {
 	node_t *current_node;		/*!< current node */
 	node_t *namespaces;		/*!< available namespaces */
 	node_t *last_ns;		/*!< last declared namespaces */
-	char curr_name[MAX_NAME_LEN];	/*!< current node name (attr or elm) */
+	char curr_name[MAX_NAME_LEN+1];	/*!< current node name (attr or elm) */
 	int curr_name_len;		/*!< current node name (attr or elm) lenght */
 	int doctype;			/*!< nested doctype count */
 } roxml_load_ctx_t;
