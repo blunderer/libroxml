@@ -234,34 +234,6 @@ typedef struct node node_t;
  */
 #define ROXML_INVALID_DOC	(node_t*)0
 
-/**
- * \def ROXML_ESCAPED
- *
- * modifier to roxml_add_node to indicate name and content should be escaped if necessary.
- * example:
- * \code
- * roxml_add_node(NULL, 0, ROXML_ESCAPE(ROXML_ELM_NODE, "node1", "content <that> needs escaping"));
- * \endcode
- * Will create a node that exports as:
- * \verbatim
- * <node1>content &lt;that&gt; needs escaping</node1>
- * \endverbatim
- * \see roxml_add_node
- * \see roxml_auto_escape 
- */
-#define ROXML_ESCAPED(type, name, content) ((type) | ROXML_ESCAPED_MOD), (name), roxml_auto_escape((type), (content))
-
-/**
- * \brief internal escaping function to be used only via ROXML_ESCAPED macro.
- *
- * \fn char *roxml_auto_escape(int type, char *buf)
- * This function should not be used directly but instead via the ROXML_ESCAPED macro within
- * a roxml_add_node function call.
- * \see roxml_add_node
- * \see ROXML_ESCAPED 
- */
-ROXML_API char *roxml_auto_escape(int type, char *buf);
-
 /** \brief load function for buffers
  *
  * \fn node_t*  roxml_load_buf(char *buffer);
@@ -902,9 +874,9 @@ ROXML_API void  roxml_release(void *data);
  * \see roxml_del_node
  * \see roxml_close
  *
- * Escaping the as per XML specifications can be done by wrapping the node definition with ROXML_ESCAPED as showed below:
+ * Escaping the as per XML specifications can be done by adding the ROXML_ESCAPED_MOD modifier to node type as showed below:
  * \code
- * roxml_add_node(NULL, 0, ROXML_ESCAPE(ROXML_ELM_NODE, "node1", "content <that> needs escaping"));
+ * roxml_add_node(NULL, 0, ROXML_ESCAPE_MODE | ROXML_ELM_NODE, "node1", "content <that> needs escaping");
  * \endcode
  * This will create a node that exports as:
  * \verbatim

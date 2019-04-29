@@ -3017,27 +3017,29 @@ int test_escape(void)
 	// Test node creations
 	node_t *root = roxml_add_node(NULL, 0, ROXML_ELM_NODE, "foo", "&bar1");
 	ASSERT_STRING_EQUAL(roxml_get_content(root, buf, 32, NULL), "&bar1");
-	node_t *n = roxml_add_node(root, 0, ROXML_ESCAPED(ROXML_ELM_NODE, "foo", "&bar2"));
+	node_t *n = roxml_add_node(root, 0, ROXML_ESCAPED_MOD | ROXML_ELM_NODE, "foo", "&bar2");
 	ASSERT_STRING_EQUAL(roxml_get_content(n, buf, 32, NULL), "&amp;bar2");
+	n = roxml_add_node(root, 0, ROXML_ESCAPED_MOD | ROXML_ELM_NODE, "foo", NULL);
+	ASSERT_STRING_EQUAL(roxml_get_content(n, buf, 32, NULL), "");
 	node_t *attr = roxml_add_node(n, 0, ROXML_ATTR_NODE, "foo", "&bar3");
 	ASSERT_STRING_EQUAL(roxml_get_content(attr, buf, 32, NULL), "&bar3");
-	attr = roxml_add_node(n, 0, ROXML_ESCAPED(ROXML_ATTR_NODE, "foo", "&bar4"));
+	attr = roxml_add_node(n, 0, ROXML_ESCAPED_MOD | ROXML_ATTR_NODE, "foo", "&bar4");
 	ASSERT_STRING_EQUAL(roxml_get_content(attr, buf, 32, NULL), "&amp;bar4");
 	n = roxml_add_node(root, 0, ROXML_TXT_NODE, NULL, "&bar5");
 	ASSERT_STRING_EQUAL(roxml_get_content(n, buf, 32, NULL), "&bar5");
-	n = roxml_add_node(root, 0, ROXML_ESCAPED(ROXML_TXT_NODE, NULL, "&bar6"));
+	n = roxml_add_node(root, 0, ROXML_ESCAPED_MOD | ROXML_TXT_NODE, NULL, "&bar6");
 	ASSERT_STRING_EQUAL(roxml_get_content(n, buf, 32, NULL), "&amp;bar6");
 	n = roxml_add_node(root, 0, ROXML_CDATA_NODE, NULL, "&bar7");
 	ASSERT_STRING_EQUAL(roxml_get_content(n, buf, 32, NULL), "&bar7");
-	n = roxml_add_node(root, 0, ROXML_ESCAPED(ROXML_CDATA_NODE, NULL, "&bar8"));
+	n = roxml_add_node(root, 0, ROXML_ESCAPED_MOD | ROXML_CDATA_NODE, NULL, "&bar8");
 	ASSERT_STRING_EQUAL(roxml_get_content(n, buf, 32, NULL), "&bar8");
 	n = roxml_add_node(root, 0, ROXML_PI_NODE, "target", "&bar9");
 	ASSERT_STRING_EQUAL(roxml_get_content(n, buf, 32, NULL), "&bar9");
-	n = roxml_add_node(root, 0, ROXML_ESCAPED(ROXML_PI_NODE, "target", "&bar10"));
+	n = roxml_add_node(root, 0, ROXML_ESCAPED_MOD | ROXML_PI_NODE, "target", "&bar10");
 	ASSERT_STRING_EQUAL(roxml_get_content(n, buf, 32, NULL), "&bar10");
 	n = roxml_add_node(root, 0, ROXML_CMT_NODE, NULL, "&bar11");
 	ASSERT_STRING_EQUAL(roxml_get_content(n, buf, 32, NULL), "&bar11");
-	n = roxml_add_node(root, 0, ROXML_ESCAPED(ROXML_CMT_NODE, NULL, "&bar12"));
+	n = roxml_add_node(root, 0, ROXML_ESCAPED_MOD | ROXML_CMT_NODE, NULL, "&bar12");
 	ASSERT_STRING_EQUAL(roxml_get_content(n, buf, 32, NULL), "&bar12");
 	roxml_close(root);
 #endif /* CONFIG_XML_EDIT */
