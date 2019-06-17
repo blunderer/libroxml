@@ -537,12 +537,14 @@ ROXML_STATIC ROXML_INT int roxml_validate_predicat(xpath_node_t *xn, xpath_cond_
 			val = roxml_get_ns(candidat);
 			sarg1 = roxml_get_content(val, NULL, 0, &status);
 			status = roxml_string_cmp(sarg1, condition->arg2, condition->op);
+			roxml_release(sarg1);
 			break;
 		case ROXML_FUNC_STRCOMP:
 			if (condition->arg1)
 				val = roxml_get_attr(candidat, condition->arg1 + 1, 0);
 			sarg1 = roxml_get_content(val, NULL, 0, &status);
 			status = roxml_string_cmp(sarg1, condition->arg2, condition->op);
+			roxml_release(sarg1);
 			break;
 		case ROXML_FUNC_LNAME:
 			sarg1 = roxml_get_name(candidat, NULL, 0);

@@ -1787,6 +1787,9 @@ int test_xpath(void)
 	ASSERT_EQUAL(nbans, 1)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node1")
 
+	node_set = roxml_xpath(root, "//*[namespace-uri() = 'name2']", &nbans);
+	ASSERT_EQUAL(nbans, 0)
+
 	node_set = roxml_xpath(root, "/node0/node2", &nbans);
 	ASSERT_EQUAL(nbans, 1)
 	ASSERT_STRING_EQUAL(roxml_get_name(node_set[0], NULL, 0), "node2")
