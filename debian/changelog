@@ -1,3 +1,12 @@
+libroxml (3.0.2-1) unstable; urgency=low
+  * Add
+      Escaping of XML characters
+
+  * Bugfixes
+      fix cdata node creation
+      build warnings
+      memory leak on xpath predicates
+
 libroxml (3.0.1-1) unstable; urgency=low
 
   * Bugfixes
