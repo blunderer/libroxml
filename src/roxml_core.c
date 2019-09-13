@@ -496,20 +496,22 @@ ROXML_INT int _func_load_close_node(roxml_parser_item_t *parser, char *chunk, vo
 	context->state = STATE_NODE_CONTENT;
 	context->previous_state = STATE_NODE_CONTENT;
 	context->candidat_txt = roxml_create_node(context->pos + 1, context->src, ROXML_TXT_NODE | context->type);
-#ifdef IGNORE_EMPTY_TEXT_NODES
-	while (chunk[cur] != '\0') {
-		if (chunk[cur] == '<') {
-			break;
-		} else if (!ROXML_WHITE(chunk[cur])) {
-			context->empty_text_node = 0;
-			break;
-		}
-		cur++;
-	}
-#endif /* IGNORE_EMPTY_TEXT_NODES */
-	while ((chunk[cur] != '<') && (chunk[cur] != '\0'))
-		cur++;
 
+	if (strstr(chunk, "<") != NULL) {
+#ifdef IGNORE_EMPTY_TEXT_NODES
+		while (chunk[cur] != '\0') {
+			if (chunk[cur] == '<') {
+				break;
+			} else if (!ROXML_WHITE(chunk[cur])) {
+				context->empty_text_node = 0;
+				break;
+			}
+			cur++;
+		}
+#endif /* IGNORE_EMPTY_TEXT_NODES */
+		while ((chunk[cur] != '<') && (chunk[cur] != '\0'))
+			cur++;
+	}
 	context->pos += cur;
 	return cur;
 }
