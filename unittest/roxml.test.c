@@ -3050,6 +3050,25 @@ int test_escape(void)
 	RETURN /* close context macro */
 }
 
+int test_garbage_txt(void)
+{
+	INIT /* init context macro */
+
+	char buf[32];
+	char *xml_input = "<node1></node>garbage";
+
+	node_t *xml = roxml_load_buf(xml_input);
+	ASSERT_EQUAL(roxml_get_chld_nb(xml), 1);
+	ASSERT_EQUAL(roxml_get_txt_nb(xml), 1);
+	node_t *node1 = roxml_get_chld(xml, NULL, 0);
+	ASSERT_STRING_EQUAL(roxml_get_name(node1, buf, sizeof(buf)), "node1");
+	node_t *txt = roxml_get_txt(xml, 0);
+	ASSERT_STRING_EQUAL(roxml_get_content(txt, buf, sizeof(buf), NULL), "garbage");
+	roxml_close(xml);
+
+	RETURN /* close context macro */
+}
+
 int test_write_tree(void)
 {
 	int len;
@@ -3288,6 +3307,7 @@ int main(int argc, char ** argv)	{
 	TEST_FUNC(test_write_namespaces)
 	TEST_FUNC(test_del_namespaces)
 	TEST_FUNC(test_escape)
+	TEST_FUNC(test_garbage_txt)
 
 	EXEC_UNITTEST /* exec tests depending on command line option see available options with --help */
 

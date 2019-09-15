@@ -234,8 +234,13 @@ ROXML_INT node_t *roxml_load(node_t *current_node, FILE *file, char *buffer)
 
 	roxml_parser_free(parser);
 
-	if (context.empty_text_node == 1)
+	if (context.empty_text_node == 1) {
 		roxml_free_node(context.candidat_txt);
+	} else if (context.candidat_txt) {
+		node_t *to_be_closed = roxml_create_node(context.pos, context.src, ROXML_TXT_NODE | context.type);
+		context.candidat_txt = roxml_append_node(context.current_node, context.candidat_txt);
+		roxml_close_node(context.candidat_txt, to_be_closed);
+	}
 	current_node = NULL;
 
 	if (error == 0) {
