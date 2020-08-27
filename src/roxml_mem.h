@@ -14,7 +14,7 @@
 
 #include "roxml_internal.h"
 
-memory_cell_t head_cell;
+extern memory_cell_t head_cell;
 
 /** \brief alloc memory function
  *
