@@ -104,7 +104,7 @@ ROXML_INT void roxml_parser_free(roxml_parser_item_t *parser)
 
 ROXML_INT roxml_parser_item_t *roxml_parser_prepare(roxml_parser_item_t *parser)
 {
-	int i, j;
+	int i;
 	roxml_parser_item_t *new;
 	roxml_parser_item_t *collision;
 

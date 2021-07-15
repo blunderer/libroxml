@@ -25,10 +25,14 @@
 typedef HANDLE pthread_t;
 typedef CRITICAL_SECTION pthread_mutex_t;
 
-#define pthread_self()                 GetCurrentThread()
-#define pthread_mutex_init(a, b)       InitializeCriticalSection(a)
-#define pthread_mutex_lock(a)          EnterCriticalSection(a)
-#define pthread_mutex_unlock(a)                LeaveCriticalSection(a)
-#define pthread_mutex_destroy(a)       DeleteCriticalSection(a)
+#define pthread_self()                 ((unsigned long int) GetCurrentThread())
+#define pthread_mutex_init(a, b)       ({int ret = 0; InitializeCriticalSection(a); ret;})
+#define pthread_mutex_lock(a)          ({int ret = 0; EnterCriticalSection(a); ret;})
+#define pthread_mutex_unlock(a)        ({int ret = 0; LeaveCriticalSection(a); ret;})
+#define pthread_mutex_destroy(a)       ({int ret = 0; DeleteCriticalSection(a); ret; })
+
+#ifndef ENODATA
+#define ENODATA 61
+#endif
 
 #endif /* ROXML_WIN32_NATIVE_THREAD_H */
