@@ -15,9 +15,9 @@
 #include "roxml_internal.h"
 
 #ifdef __DEBUG
-unsigned int _nb_node;
-unsigned int _nb_attr;
-unsigned int _nb_text;
+extern unsigned int _nb_node;
+extern unsigned int _nb_attr;
+extern unsigned int _nb_text;
 #endif
 
 /** \brief internal function
