@@ -90,7 +90,10 @@ ROXML_STATIC_INLINE ROXML_INT int roxml_unlock(node_t *n)
 #ifdef CONFIG_XML_FLOAT
 ROXML_STATIC_INLINE ROXML_INT double roxml_strtonum(const char *str, char **end)
 {
-	return strtod(str, end);
+//	Fix the bug when the letter "e" is given in str.
+//	This letter is considered an exponential, returning mistakenly a number alike value.
+//	return strtod(str, end);
+	return strtoull(str, end);
 }
 #else /* CONFIG_XML_FLOAT */
 ROXML_STATIC_INLINE ROXML_INT double roxml_strtonum(const char *str, char **end)
