@@ -369,7 +369,7 @@ ROXML_INT int _func_load_quoted(roxml_parser_item_t *parser, char *chunk, void *
 #endif /* DEBUG_PARSING */
 	roxml_load_ctx_t *context = (roxml_load_ctx_t *)data;
 
-	if (context->state != STATE_NODE_CONTENT && context->state != STATE_NODE_COMMENT) {
+	if (context->state != STATE_NODE_CONTENT && context->state != STATE_NODE_COMMENT && context->state != STATE_NODE_CDATA) {
 		if (context->mode == MODE_COMMENT_NONE)
 			context->mode = MODE_COMMENT_QUOTE;
 		else if (context->mode == MODE_COMMENT_QUOTE)
@@ -386,7 +386,7 @@ ROXML_INT int _func_load_dquoted(roxml_parser_item_t *parser, char *chunk, void 
 #endif /* DEBUG_PARSING */
 	roxml_load_ctx_t *context = (roxml_load_ctx_t *)data;
 
-	if (context->state != STATE_NODE_CONTENT && context->state != STATE_NODE_COMMENT) {
+	if (context->state != STATE_NODE_CONTENT && context->state != STATE_NODE_COMMENT && context->state != STATE_NODE_CDATA) {
 		if (context->mode == MODE_COMMENT_NONE)
 			context->mode = MODE_COMMENT_DQUOTE;
 		else if (context->mode == MODE_COMMENT_DQUOTE)
