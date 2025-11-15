@@ -48,7 +48,7 @@ ROXML_STATIC_INLINE ROXML_INT int roxml_unlock(node_t *n)
 #else /* CONFIG_XML_THREAD_SAFE==1 */
 ROXML_STATIC_INLINE ROXML_INT unsigned long int roxml_thread_id(node_t *n)
 {
-	return pthread_self();
+	return (unsigned long)pthread_self();
 }
 
 ROXML_STATIC_INLINE ROXML_INT int roxml_lock_init(node_t *n)
