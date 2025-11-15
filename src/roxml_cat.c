@@ -5,6 +5,7 @@
 #include <getopt.h>
 #include <string.h>
 #include <errno.h>
+#include <libgen.h>
 #include "roxml.h"
 
 static struct option long_options[] =

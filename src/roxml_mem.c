@@ -135,7 +135,7 @@ ROXML_INT void *roxml_malloc(int size, int num, int type)
 	cell->next->prev = cell;
 	cell = cell->next;
 	cell->type = type;
-	cell->id = pthread_self();
+	cell->id = (unsigned long)pthread_self();
 	cell->occ = size;
 	cell->ptr = calloc(num, size);
 	head_cell.prev = cell;
